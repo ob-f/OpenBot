@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Esta aplicación de control sirve como un `control remoto` para el vehículo [OpenBot](https://www.openbot.org) similar a un controlador BT (por ejemplo, PS3/4 o Xbox). Se ejecuta en otro dispositivo Android/iOS y admite transmisión de video/audio en vivo además del control.

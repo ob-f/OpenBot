@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 This Controller app serves as a `remote controller` for the [OpenBot](https://www.openbot.org) vehicle similar as a BT controller (e.g. PS3/4 or Xbox). It runs on another Android/iOS device and supports live video/audio streaming in addition to control.

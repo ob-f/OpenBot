@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <span>Français</span> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Nous avons conçu un châssis pour un robot à roues qui repose sur du matériel de loisir peu coûteux et facilement disponible. Vous trouverez ci-dessous des instructions pour construire votre propre robot. Si vous avez d'autres questions ou préoccupations, n'hésitez pas à nous contacter. Bonne construction de robot !

@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 该模块是嵌入式Linux系统中用于控制OpenBot车辆的智能手机控制替代方案。使用Python编写，OpenBot可以通过基于Linux的计算机和摄像头进行感知和控制。

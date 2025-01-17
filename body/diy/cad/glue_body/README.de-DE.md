@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Einige 3D-Drucker haben ein Bauvolumen, das zu klein ist, um den OpenBot-Körper in voller Größe zu drucken.

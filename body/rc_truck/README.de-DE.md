@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Wir haben einen Roboterkörper für weit verbreitete RC-Spielzeug-Trucks/Buggys im Maßstab 1:16 entworfen (wie [diesen](https://www.amazon.de/dp/B00M3J7DJW) auf Amazon).

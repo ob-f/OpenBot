@@ -5,7 +5,8 @@
   <a href="CONTRIBUTING.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="CONTRIBUTING.fr-FR.md">Français</a> |
-  <a href="CONTRIBUTING.es-ES.md">Español</a>
+  <a href="CONTRIBUTING.es-ES.md">Español</a> |
+  <a href="CONTRIBUTING.ko-KR.md">한국어</a>
 </p>
 
 ## Prozess

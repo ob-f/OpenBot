@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Dieses Python-Programm ermöglicht es Ihnen, den Roboter von einer (drahtlosen) Tastatur aus zu steuern und einen Videostream von der Kamera zu empfangen. Das Programm kann auf jedem Computer ausgeführt werden, der mit demselben Netzwerk wie das Telefon des Roboters verbunden ist. Es wurde auf einem Raspberry Pi 3 und einem MacBook entwickelt und getestet. Bevor Sie die folgenden Schritte ausführen, stellen Sie sicher, dass Sie den [Quellcode](https://github.com/isl-org/OpenBot#get-the-source-code) haben und navigieren Sie zum Ordner `controller`.

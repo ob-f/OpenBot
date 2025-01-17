@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Este chasis de robot proporciona algo de altura adicional para facilitar la inclusión de todos los componentes electrónicos y una parte superior compatible con lego. Esta versión ofrece las mismas capacidades de integridad estructural que el [cuerpo regular](../regular_body/), con características adicionales como espacio extra dentro de la carcasa de OpenBot, una parte superior compatible con lego para jugar y aprender, y un tamaño adecuado para camas de impresión más pequeñas manteniendo los parachoques.

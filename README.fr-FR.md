@@ -20,7 +20,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <span>Français</span> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 OpenBot utilise les smartphones comme cerveaux pour des robots à faible coût. Nous avons conçu un petit véhicule électrique qui coûte environ 50 $ et sert de corps de robot. Notre pile logicielle pour smartphones Android prend en charge des charges de travail robotiques avancées telles que le suivi de personnes et la navigation autonome en temps réel.

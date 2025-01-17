@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ITE 的 eSpace 已经开发了一套围绕 OpenBot 软件栈的 [课程](#curriculum)，旨在提供经济且可扩展的 AI 和机器人教育。该课程以 [逐步指导的 YouTube 视频](#step-by-step-video-guides) 形式呈现，指导您组装 [OpenBot Lite](#openbot-lite-arduino)，安装必要的软件，使用跟随功能以及训练和部署您自己的自动驾驶策略。

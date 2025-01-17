@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 这个机器人底盘提供了一些额外的高度，使得安装所有电子设备更加容易，并且顶部兼容乐高。这一版本具有与[常规底盘](../regular_body/)相同的结构完整性能力，同时增加了额外的功能，例如OpenBot外壳内的额外空间、用于游戏和学习的乐高兼容顶部，以及适合较小打印床尺寸的占地面积，同时保持保险杠。

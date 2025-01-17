@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Este módulo es una alternativa embebida en Linux para el control de un vehículo OpenBot mediante un smartphone. Escrito en Python, el OpenBot puede ser controlado usando una computadora basada en Linux y una cámara para la detección.

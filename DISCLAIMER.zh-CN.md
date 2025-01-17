@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="DISCLAIMER.de-DE.md">Deutsch</a> |
   <a href="DISCLAIMER.fr-FR.md">Français</a> |
-  <a href="DISCLAIMER.es-ES.md">Español</a>
+  <a href="DISCLAIMER.es-ES.md">Español</a> |
+  <a href="DISCLAIMER.ko-KR.md">한국어</a>
 </p>
 
 OpenBot 项目是一个开源计划，旨在为教育、实验和娱乐目的提供可访问的机器人解决方案。以下免责声明概述了 OpenBot 软件和硬件设计的使用条款和条件。

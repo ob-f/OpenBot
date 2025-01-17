@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 This python program allows you to control the robot from a (wireless) keyboard and receive a video stream from the camera. The program can run on any computer connected to the same network as the robot's phone. It was developed and tested on a Raspberry Pi 3 and a MacBook. Before following the steps below, make sure you have the [source code](https://github.com/isl-org/OpenBot#get-the-source-code) and navigate to the `controller` folder.

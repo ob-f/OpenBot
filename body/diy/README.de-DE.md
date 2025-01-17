@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Wir haben ein Chassis für einen fahrenden Roboter entworfen, der auf kostengünstiger, leicht verfügbarer Hobby-Hardware basiert. Unten finden Sie Anweisungen zum Bau Ihres eigenen Roboters. Wenn Sie weitere Fragen oder Bedenken haben, können Sie uns gerne kontaktieren. Viel Spaß beim Roboterbau!

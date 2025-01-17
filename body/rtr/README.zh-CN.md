@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 即插即用 (RTR) 版本的 OpenBot 车辆是面向那些没有意愿或时间自己组装机器人的用户。RTR 车辆配备了完全集成的电子设备，已经在固件层面得到了支持，并且从软件和硬件角度都经过了彻底测试。RTR 车辆有两种不同的版本，分别称为 "RTR_TT" 和 "RTR_520"。两种车辆都基于相同的防溅 ABS 外壳，但用途不同。RTR_TT 主要用于室内，而 RTR_520 配备了更强大的处理器、更好的电机、更坚固的金属齿轮箱，并且还配有一套全地形轮胎，支持室内和室外使用。

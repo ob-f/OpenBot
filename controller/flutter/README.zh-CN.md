@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 这个控制器应用程序作为 [OpenBot](https://www.openbot.org) 车辆的 `远程控制器`，类似于 BT 控制器（例如 PS3/4 或 Xbox）。它运行在另一台 Android/iOS 设备上，除了控制功能外，还支持实时视频/音频流。

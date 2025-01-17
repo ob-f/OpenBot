@@ -221,7 +221,7 @@ public class ModelManagementFragment extends Fragment
     }
 
     private void openPicker() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("application/octet-stream"); // Specify the MIME type for TFLite files
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         mStartForResult.launch(intent);

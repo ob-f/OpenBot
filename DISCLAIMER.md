@@ -5,7 +5,8 @@
   <a href="DISCLAIMER.zh-CN.md">简体中文</a> |
   <a href="DISCLAIMER.de-DE.md">Deutsch</a> |
   <a href="DISCLAIMER.fr-FR.md">Français</a> |
-  <a href="DISCLAIMER.es-ES.md">Español</a>
+  <a href="DISCLAIMER.es-ES.md">Español</a> |
+  <a href="DISCLAIMER.ko-KR.md">한국어</a>
 </p>
 
 The OpenBot project is an open-source initiative aimed at providing accessible robotics solutions for educational, experimental, and recreational purposes. The following disclaimer outlines the terms and conditions of use for the OpenBot software and hardware designs.

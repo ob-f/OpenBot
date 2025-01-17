@@ -2,34 +2,34 @@ plugins {
     id 'io.github.reactivecircus.app-versioning' version "1.1.2"
     id 'com.google.gms.google-services'
     id 'com.android.application'
-    id 'de.undercouch.download'
-    id 'com.google.firebase.crashlytics'
 }
 
 appVersioning {
+    /**
+     * Git root directory used for fetching git tags.
+     * Use this to explicitly set the git root directory when the root Gradle project is not the git root directory.
+     */
     gitRootDirectory.set(rootProject.file("../"))
+    // if the .git directory is in the root Gradle project's parent directory.
 }
 
+apply plugin: 'com.android.application'
+apply plugin: 'de.undercouch.download'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.gms.google-services'
+
+
 android {
-    compileSdkVersion 34
-    buildToolsVersion "34.0.0"
-    useLibrary 'org.apache.http.legacy'
-
-
+    compileSdkVersion 33
+    buildToolsVersion '33.0.1'
     defaultConfig {
         applicationId "org.openbot"
         minSdkVersion 21
-        targetSdkVersion 34  // Choose appropriate target version
-        versionCode 1
-        versionName "1.0"
-
+        targetSdkVersion 32
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
-
-        buildConfigField "boolean", "DEBUG", "true"
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -37,55 +37,54 @@ android {
         }
     }
 
+
     buildFeatures {
         viewBinding true
-        buildConfig = true
     }
 
     compileOptions {
         coreLibraryDesugaringEnabled true
+
         sourceCompatibility = '17'
         targetCompatibility = '17'
     }
-
     androidResources {
         noCompress 'tflite', 'mp3'
     }
-
     lint {
         abortOnError false
         checkReleaseBuilds false
     }
-
     namespace 'org.openbot'
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
 }
+
 // Download default models
 project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
 apply from: 'download.gradle'
 apply plugin: 'kotlin-android'
 
-
-
 // Define the path to the comlib lib directory
 def comlibDir = file("${project.rootDir}/comlib/libs")
 
 dependencies {
+
     // WiFi direct + WebRTC
     implementation project(':comlib')
+
+    // Include AAR files from comlib/lib
     implementation fileTree(dir: comlibDir, include: ['*.aar'])
 
-    // Existing dependencies
     implementation 'com.google.android.material:material:1.4.0'
+
+    // Build off of stable TensorFlow Lite
+    implementation 'org.tensorflow:tensorflow-lite:2.4.0'
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.4.0'
-    implementation 'org.tensorflow:tensorflow-lite:2.12.0'
+
     implementation "com.google.android.gms:play-services-location:$location_version"
     implementation "com.google.android.gms:play-services-nearby:$nearby_version"
-
-    // Additional dependencies
-    implementation 'com.github.felHR85:UsbSerial:6.1.0'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
     implementation 'org.zeroturnaround:zt-zip:1.14'
     implementation 'com.loopj.android:android-async-http:1.4.9'
@@ -107,70 +106,88 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.3.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.1.1'
-
-    // Firebase dependencies
-    implementation platform('com.google.firebase:firebase-bom:31.5.0')
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore:24.5.0'
     implementation 'com.google.firebase:firebase-storage:20.1.0'
-    implementation 'com.google.firebase:firebase-crashlytics'
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.mediapipe:hands:0.10.18'
 
-    // Navigation components
     def nav_version = "2.3.5"
+    // Java language implementation
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
 
-    // Glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
-    // CameraX dependencies
     def camerax_version = "1.0.0"
+    // CameraX core library using camera2 implementation
     implementation "androidx.camera:camera-camera2:$camerax_version"
+    // CameraX Lifecycle Library
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
+    // CameraX View class
     implementation "androidx.camera:camera-view:1.0.0-alpha24"
-    implementation "androidx.window:window:1.1.0"
-
-    // Additional implementations
     implementation 'com.github.anastr:speedviewlib:1.6.1'
+
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'androidx.fragment:fragment:1.3.4'
 
-    // Test dependencies
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'androidx.test:core:1.6.1'
     testImplementation "org.robolectric:robolectric:4.12.1"
 
-    // Android test dependencies
+    // Core library
     androidTestImplementation 'androidx.test:core:1.5.0'
+
+    // AndroidJUnitRunner and JUnit Rules
     androidTestImplementation 'androidx.test:runner:1.3.0'
     androidTestImplementation 'androidx.test:rules:1.3.0'
+
+    // Assertions
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.ext:truth:1.3.0'
     androidTestImplementation 'com.google.truth:truth:1.0'
+
+    // Espresso dependencies
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-web:3.3.0'
     androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.3.0'
+
+    // The following Espresso dependency can be either "implementation"
+    // or "androidTestImplementation", depending on whether you want the
+    // dependency to appear on your APK's compile classpath or the test APK
+    // classpath.
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
 
-    // Java desugaring support for backward compatibility
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    implementation platform('com.google.firebase:firebase-bom:31.5.0')
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    // Declare the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.nononsenseapps:filepicker:4.2.1'
 
-    // Network, BLE, and other dependencies
+    // arcore
+    implementation 'com.google.ar:core:1.29.0'
+    implementation 'de.javagl:obj:0.2.1'
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
     implementation 'com.koushikdutta.ion:ion:3.1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.25'
+
+    // BLE
     implementation 'com.github.Ficat:EasyBle:v2.0.2'
     implementation 'com.github.Ficat:EasyPermissions:v2.1.0'
+
+    // Socket Server
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+
+    //Scan QR
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
-    implementation 'com.google.android.gms:play-services-auth:20.5.0'
     implementation('com.google.api-client:google-api-client-android:1.31.0') {
         exclude group: 'org.apache.httpcomponents'
         exclude module: 'guava-jdk5'
@@ -179,10 +196,4 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
         exclude module: 'guava-jdk5'
     }
-    implementation 'com.nononsenseapps:filepicker:4.2.1'
-    implementation 'com.google.ar:core:1.29.0'
-    implementation 'de.javagl:obj:0.2.1'
 }
-
-
-apply plugin: 'com.google.gms.google-services'

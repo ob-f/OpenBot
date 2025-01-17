@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 We have designed a body for a wheeled robot which relies on low-cost, readily available hobby hardware. You can find instructions for building you own robot below. If you have any further questions or concerns, please feel free to contact us. Happy robot building!

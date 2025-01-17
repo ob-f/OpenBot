@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 这个 Python 程序允许你通过（无线）键盘控制机器人，并从摄像头接收视频流。该程序可以在任何连接到与机器人手机相同网络的计算机上运行。它在 Raspberry Pi 3 和 MacBook 上开发和测试。在按照以下步骤操作之前，请确保你已经获取了[源代码](https://github.com/isl-org/OpenBot#get-the-source-code)并导航到 `controller` 文件夹。

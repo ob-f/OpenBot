@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Hemos diseñado un cuerpo para un robot con ruedas que se basa en hardware de hobby de bajo costo y fácilmente disponible. Puedes encontrar instrucciones para construir tu propio robot a continuación. Si tienes alguna pregunta o inquietud adicional, no dudes en contactarnos. ¡Feliz construcción de robots!

@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 这款安卓应用程序作为 [OpenBot](https://www.openbot.org) 车辆的 `远程控制器`。基本上，它的功能类似于PS3/4或Xbox的遥控器，但运行在另一台安卓设备上。

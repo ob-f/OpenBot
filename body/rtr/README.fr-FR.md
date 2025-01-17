@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <span>Français</span> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Les versions prêtes-à-l'emploi (RTR) du véhicule OpenBot sont destinées à un public qui n'a pas la volonté ou le temps de construire son propre robot. Les véhicules RTR sont livrés avec des composants électroniques entièrement intégrés, sont déjà pris en charge au niveau du firmware et ont été rigoureusement testés tant du point de vue logiciel que matériel. Les véhicules RTR sont disponibles en deux versions différentes, appelées "RTR_TT" et "RTR_520". Les deux véhicules sont construits autour de la même coque en ABS étanche, mais sont destinés à des usages différents. Alors que le RTR_TT est principalement destiné à une utilisation en intérieur, le RTR_520 est équipé d'un processeur plus puissant, de meilleurs moteurs, de boîtes de vitesses en métal plus robustes et dispose également d'un ensemble de roues tout-terrain permettant une utilisation à la fois en intérieur et en extérieur.
