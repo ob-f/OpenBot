@@ -1,6 +1,5 @@
 name: Build and Test Node.js Server
 
-# Run this workflow for every new commit and PR that changes the Node.js server
 on:
   push:
     branches: [ master ]
@@ -18,11 +17,8 @@ defaults:
     working-directory: ./controller/node-js
 
 jobs:
-  # Set the job key for testing the Node.js server
   nodejs-server:
-    # Name the Job
     name: Build and Test Node.js Server
-    # Set the type of machine to run on
     runs-on: ubuntu-latest
 
     steps:
@@ -30,9 +26,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '16' # Specify your desired Node.js version
-
-      - run: node --version
+          node-version: '16'
 
       - name: Install dependencies
         run: npm install
@@ -43,12 +37,19 @@ jobs:
       - name: Wait for server to start
         run: sleep 10
 
-      - name: Test server
+      - name: Test HTTP server
+        run: curl -I http://localhost:8081
+
+      - name: Test WebSocket server
         run: |
-          curl -I http://localhost:7071
-          curl http://localhost:7071
+          npm install -g wscat
+          wscat -c ws://localhost:7071 -x '{"test": "message"}'
+
+      - name: Simulate browser commands
+        run: |
+          curl -X POST http://localhost:8081/keypress -d '{"key": "ArrowUp"}' \
+            -H "Content-Type: application/json"
 
       - name: Stop background server
         if: always()
-        run: |
-          pkill -f "npm start" || echo "Server not running"
+        run: pkill -f "npm start"
