@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">OpenBot</string>
+    <string name="activity_name">OpenBot</string>
+    <string name="description_info">Info</string>
+    <string name="camera_error">Dieses Gerät unterstützt die Camera2 API nicht.</string>
+    <string name="threads">Threads</string>
+    <string name="camera_permission_denied">Kameraberechtigung ist erforderlich</string>
+    <string name="storage_permission_denied">Externe Speicherberechtigung ist erforderlich</string>
+    <string name="location_permission_denied">Standortberechtigung ist erforderlich</string>
+    <string name="record_audio_permission_denied">Aufnahmeberechtigung ist erforderlich</string>
+    <string name="permission_reason_logging"> um Datensätze zu protokollieren.</string>
+    <string name="permission_reason_ai"> um KI-Modelle auszuführen.</string>
+    <string name="permission_reason_ar_core"> um AR Core auszuführen.</string>
+    <string name="permission_reason_stream_video"> um Video zum Controller zu streamen.</string>
+    <string name="permission_reason_preview"> um Video vorzuschauen.</string>
+    <string name="permission_reason_stream_audio"> um Audio zum Controller zu streamen.</string>
+    <string name="permission_reason_find_controller"> um den Controller zu finden.</string>
+    <string name="permission_reason_model_from_phone"> um ein Modell aus dem Telefonspeicher auszuwählen.</string>
+    <string name="permission_reason_settings"> um alle Funktionen der App zu nutzen.</string>
+
+    <string name="storage">Speicher</string>
+    <string name="location">Standort</string>
+    <string name="microphone">Mikrofon</string>
+    <string name="video_streaming">Videostreaming</string>
+    <string name="stream_mode">Streaming-Modus</string>
+    <string name="connection_type">Verbindungstyp</string>
+    <string name="connectivity_mode">Konnektivitätsmodus</string>
+    <string name="language">Sprache</string>
+    <string name="select_language">Sprache auswählen</string>
+
+    <string name="control_mode_gamepad">Gamepads</string>
+    <string name="control_mode_phone">Telefon</string>
+    <string name="control_mode_webserver">Webserver</string>
+    <string name="control_mode_unknown">Unbekannter</string>
+    <string name="control_mode_manette">Gamepad</string>
+
+    <string name="drive_mode_gamepad">Gamepad</string>
+    <string name="drive_mode_joystick">Joystick</string>
+    <string name="drive_mode_dual">Dual</string>
+
+    <!-- Default Values -->
+    <string name="default_stream_mode">RTSP</string>
+    <string name="default_connectivity_mode">USB</string>
+    <string name="default_language">de</string>
+
+    <string name="google_account"> Richten Sie Ihr Profil ein, indem Sie sich mit Ihrem Google-Konto anmelden.</string>
+    <string name="sign_in"> Anmeldung mit Google</string>
+    <string name="edit_profile_two"> Profil bearbeiten</string>
+    <string name="logout_one"> Abmelden</string>
+
+    <string name="no_projects"> Ups! Keine Projekte gefunden.</string>
+    <string name="no_projects_google"> Es sieht so aus, als ob es noch keine Projekte in Ihrem Google Drive gibt.</string>
+    <string name="set_up_google"> Richten Sie Ihr Profil ein, indem Sie sich mit Ihrem Google-Konto anmelden.</string>
+    <string name="sign_in_google"> Anmeldung mit Google</string>
+    <string name="blink_led"> Blink-LED-Datei erkannt. Beginnen Sie, den Code auf Ihrem OpenBot auszuführen.</string>
+    <string name="start_two"> Start</string>
+
+    <string name="first_name"> Vorname</string>
+    <string name="last_name"> Nachname</string>
+    <string name="date_of_birth"> Geburtsdatum</string>
+    <string name="email_address"> E-Mail-Adresse</string>
+    <string name="save_changes"> Änderungen speichern</string>
+
+    <string name="btn_refresh"> Aktualisieren</string>
+
+    <string name="stop_btn_name"> Auto stoppen</string>
+    <string name="reset_btn_name"> Zurücksetzen</string>
+
+    <string name="qr_error_message"> Ups! Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.</string>
+    <string name="qr_bottom_sheet_title_error"> Fehler</string>
+
+    <string name="sensor_one"> Sensoren</string>
+
+    <string name="model_details"> Modelldetails</string>
+    <string name="edit_one"> .tflite</string>
+    <string name="name_model"> Name</string>
+    <string name="auto_pilot"> Autopilot</string>
+    <string name="class_model"> Klasse</string>
+    <string name="type_model"> Typ</string>
+    <string name="input_model"> Eingabe (B x H)</string>
+    <string name="done"> Fertig</string>
+
+    <string name="connect_ble"> Verbinden</string>
+
+    <string name="model_one"> Modell 1</string>
+    <string name="accelerometer"> Beschleunigungsmesser</string>
+
+    <string name="subcategory"> Unterkategorie</string>
+    <string name="category"> Kategorie</string>
+
+    <string name="all">Alle</string>
+    <string name="general">Allgemein</string>
+    <string name="legacy">Legacy</string>
+    <string name="controller_mapping">Controller-Zuordnung</string>
+    <string name="robot_info">Roboter-Info</string>
+
+    <string name="sensor_data">Sensordaten</string>
+    <string name="log_data">Protokolldaten</string>
+    <string name="model_resolution">Modellauflösung</string>
+    <string name="preview_images">Vorschau-Bilder</string>
+    <string name="training_images">Trainingsbilder</string>
+    <string name="delay">Verzögerung (ms)</string>
+
+    <!-- Game -->
+    <string name="game">Spiel</string>
+    <string name="free_roam">Freies Erkunden</string>
+    <string name="ar_mode">AR-Modus</string>
+    <string name="default_t">Standard</string>
+
+    <!-- Data Collection -->
+    <string name="data_collection">Datenaufzeichnung</string>
+    <string name="local_save_on_phone">Lokale Speicherung (auf Telefon speichern)</string>
+    <string name="edge_local_network">Edge (lokales Netzwerk)</string>
+    <string name="cloud_firebase">Cloud (Firebase)</string>
+    <string name="crowd_source">Crowd-Sourcing (Datenaufgaben posten/akzeptieren)</string>
+
+    <!-- AI -->
+    <string name="ai">KI</string>
+    <string name="autopilot">Autopilot</string>
+    <string name="person_following">Personenverfolgung</string>
+    <string name="object_nav">Objektverfolgung</string>
+    <string name="model_management">Modellverwaltung</string>
+    <string name="point_goal_navigation">Punktzielnavigation</string>
+    <string name="autonomous_driving">Autonomes Fahren</string>
+    <string name="visual_goals">Visuelle Ziele</string>
+    <string name="smart_voice">Intelligente Stimme (links/rechts/geradeaus, AR Core)</string>
+
+    <!-- Remote Access -->
+    <string name="remote_access">Fernzugriff</string>
+    <string name="web_interface">Web-Oberfläche</string>
+    <string name="ros">ROS</string>
+    <string name="fleet_management">Flottenmanagement</string>
+
+    <!-- Coding -->
+    <string name="coding">Programmierung</string>
+    <string name="block_based_programming">Blockbasierte Programmierung</string>
+    <string name="scripts">Skripte</string>
+
+    <!-- Research -->
+    <string name="research">Forschung</string>
+    <string name="classical_robotics_algorithms">Klassische Robotik-Algorithmen</string>
+    <string name="backend_for_learning">Backend für Lernen</string>
+
+    <!-- Monitoring -->
+    <string name="monitoring">Überwachung</string>
+    <string name="sensors_from_car">Sensoren vom Auto</string>
+    <string name="sensors_from_phone">Sensoren vom Telefon</string>
+    <string name="map_view">Kartenansicht</string>
+
+    <string name="video_protocol">VIDEO_PROTOCOL</string>
+    <string name="video_command">VIDEO_COMMAND</string>
+    <string name="video_server_url">VIDEO_SERVER_URL</string>
+    <string name="webrtc_event">WEB_RTC_EVENT</string>
+    <string name="switch_camera">SWITCH_CAMERA</string>
+
+    <string name="set_goal_title">Ziel setzen</string>
+    <string name="set_goal_message">Befestigen Sie das Telefon am Roboter und geben Sie ein Ziel an. Der Roboter wird versuchen, das Ziel zu erreichen, nachdem Sie Start gedrückt haben.</string>
+    <string name="start_button">Start</string>
+
+    <string name="off">Aus</string>
+    <string name="on">Ein</string>
+
+    <string name="server">Server</string>
+    <string name="save_as">Speichern unter</string>
+    <string name="ip_placeholder">x.x.x.x</string>
+    <string name="model">Modell</string>
+
+    <string name="device">Gerät</string>
+    <string name="baud_rate">Baudrate</string>
+
+    <string name="log_setting">Protokolleinstellungen</string>
+    <string name="camera_facing_back">Hinten</string>
+
+    <string name="camera_facing_front">Vorne</string>
+    <string name="logging">Protokollierung</string>
+
+    <string name="not_logging">Keine Protokollierung</string>
+
+    <string name="no_device">Kein Gerät</string>
+
+    <string name="data_log">Datenprotokoll</string>
+
+    <string name="usb_connection">USB-Verbindung</string>
+
+    <string name="camera">Kamera</string>
+
+    <string name="control">Steuerung</string>
+    <string name="battery">Batterie</string>
+    <string name="speed">Geschwindigkeit (l,r)</string>
+    <string name="sonar">Sonar</string>
+    <string name="control_info">***,***</string>
+    <string name="rpm">***,*** U/min</string>
+    <string name="voltage">**,* V</string>
+    <string name="distance">*** cm</string>
+    <string name="time_ms">*** ms</string>
+    <string name="time_fps">*** fps</string>
+    <string name="resolution">*** x ***</string>
+    <string name="drive_mode">Fahrmodus</string>
+    <string name="speed_mode">Geschwindigkeitsmodus</string>
+    <string name="plus">plus</string>
+    <string name="arrow">Pfeil</string>
+    <string name="minus">minus</string>
+    <string name="controller">Controller</string>
+    <string name="control_mode">Steuermodus</string>
+    <string name="crop">Zuschneiden</string>
+    <string name="frame">Rahmen</string>
+    <string name="_1">1</string>
+    <string name="settings">Einstellungen</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="inference">Geschwindigkeit</string>
+    <string name="input">Eingabe</string>
+    <string name="confidence">Vertrauen</string>
+    <string name="object">Objekt</string>
+    <string name="speedTitle">Geschwindigkeit</string>
+    <string name="voltageInfo">%1$s V</string>
+    <string name="speedInfo">%1$s U/min</string>
+    <string name="distanceInfo">%1$s cm</string>
+    <string name="preview_resolution">Vorschauauflösung</string>
+    <string name="save_option">Speicheroptionen</string>
+    <string name="file_available_body">Ein Modell mit demselben Namen existiert bereits. Möchten Sie es ersetzen?</string>
+    <string name="file_available_title">Datei gefunden</string>
+    <string name="model_delete_body">Möchten Sie dieses Modell wirklich löschen?</string>
+    <string name="model_delete_title">Bestätigen</string>
+    <string name="permissions">Berechtigungen</string>
+    <string name="goal_reached">Ziel erreicht.</string>
+    <string name="model_download_body">Zurückgehen würde den Download abbrechen. Sind Sie sicher?</string>
+    <string name="model_download_title">Modell-Download läuft</string>
+    <string name="save">Speichern</string>
+    <string name="confirm_title">Sind Sie sicher?</string>
+    <string name="stream_change_body">Die App muss neu gestartet werden, damit diese Einstellung wirksam wird</string>
+    <string name="selectAll">Alles auswählen</string>
+    <string name="clearAll">Alles löschen</string>
+    <string name="tracking_lost">Verfolgung verloren.</string>
+    <string name="no_initial_ar_core_pose">Keine anfängliche AR Core-Position.</string>
+    <string name="ar_core_session_paused">AR Core-Sitzung pausiert.</string>
+    <string name="tips_connect_timeout">Verbindungszeitüberschreitung</string>
+    <string name="tips_connect_fail">Verbindung fehlgeschlagen</string>
+    <string name="tips_connection_disconnected">Verbindung wurde getrennt</string>
+    <string name="tips_write_operation">Bitte geben Sie einen Hex-String ein</string>
+    <string-array name="servers">
+        <item>Kein Server</item>
+    </string-array>
+    <string-array name="models">
+        <item>Autopilot_F</item>
+        <item>MobileNetV1_1_0_Q</item>
+        <item>MobileNetV3_S_Q</item>
+        <item>YoloV4</item>
+    </string-array>
+    <string-array name="devices">
+        <item>CPU</item>
+        <item>GPU</item>
+        <item>NNAPI</item>
+    </string-array>
+    <string-array name="baud_rates">
+        <item>9600</item>
+        <item>14400</item>
+        <item>19200</item>
+        <item>38400</item>
+        <item>57600</item>
+        <item>115200</item>
+        <item>230400</item>
+        <item>460800</item>
+        <item>921600</item>
+    </string-array>
+    <string-array name="log_settings">
+        <item>alle_bilder</item>
+        <item>bildausschnitt</item>
+        <item>vorschau_bild</item>
+        <item>nur_sensoren</item>
+    </string-array>
+    <string-array name="control_modes">
+        <item>Gamepad</item>
+        <item>Standard</item>
+        <item>Telefon</item>
+        <item>Touchscreen</item>
+        <item>Tastatur</item>
+        <!--<item>WebRTC</item>-->
+    </string-array>
+
+    <string-array name="drive_modes">
+        <item>Doppelt</item>
+        <item>Spiel</item>
+        <item>Joystick</item>
+    </string-array>
+
+    <string-array name="preview_resolutions">
+        <item>Niedrig</item>
+        <item>Mittel</item>
+        <item>Hoch</item>
+    </string-array>
+
+    <string-array name="save_data">
+        <item>Lokaler Speicher</item>
+        <item>Google Drive</item>
+        <item>Lokaler Server</item>
+    </string-array>
+
+    <!-- TODO: Entfernen oder diesen Platzhaltertext ändern -->
+    <string-array name="stream_server">
+        <item>WebRTC</item>
+        <item>RTSP</item>
+    </string-array>
+    <string-array name="connection_type">
+        <item>Bluetooth</item>
+        <item>USB</item>
+    </string-array>
+    <!-- TODO: Entfernen oder diesen Platzhaltertext ändern -->
+    <string-array name="speed_modes">
+        <item>Langsam</item>
+        <item>Normal</item>
+        <item>Schnell</item>
+    </string-array>
+    <string name="profile">Profil</string>
+    <string name="projects">Projekte</string>
+    <string name="scanner">Scanner</string>
+    <string name="home">Startseite</string>
+    <string name="scan_qr_code">QR-Code scannen</string>
+    <string name="playground">Spielplatz</string>
+    <string name="text_on_qr_screen">Platzieren Sie den QR-Code innerhalb des Rahmens zum Scannen. Bitte vermeiden Sie Erschütterungen, um schnell Ergebnisse zu erzielen.</string>
+    <string name="edit_profile">Profil bearbeiten</string>
+    <string name="logout">Abmelden</string>
+    <string name="auto_mode">Automatikmodus</string>
+    <string name="dynamic_speed">Dynamische Geschwindigkeit</string>
+    <string name="bumpers">Stoßfänger</string>
+    <string name="n_a">N/V</string>
+    <string name="robot_type">Roboter-Typ:</string>
+    <string name="indicators">Indikatoren</string>
+    <string name="back">Zurück</string>
+    <string name="voltage_divider">Spannungsteiler</string>
+    <string name="status">Status</string>
+    <string name="front">Vorne</string>
+    <string name="robot_icon">Roboter-Symbol</string>
+    <string name="wheel_odometry_front">Radvodometrie Vorne</string>
+    <string name="wheel_odometry_back">Radvodometrie Hinten</string>
+    <string name="backward">Rückwärts</string>
+    <string name="forward">Vorwärts</string>
+    <string name="stop">Stopp</string>
+    <string name="motors">Motoren</string>
+    <string name="leds">LEDs</string>
+    <string name="lights">Lichter</string>
+    <string name="sensors">Sensoren</string>
+    <string name="send_commands">Befehle senden</string>
+    <string name="wheel_odometry">Radvodometrie</string>
+    <string name="readings">Messungen</string>
+    <string name="lights_slider">Lichtregler</string>
+    <string name="indicator_leds">Anzeige-LEDs</string>
+    <string name="back_leds">Hintere LEDs</string>
+    <string name="status_leds">Status-LEDs</string>
+    <string name="front_leds">Vordere LEDs</string>
+    <string name="usb">USB</string>
+    <string name="cancel">Abbrechen</string>
+</resources>
