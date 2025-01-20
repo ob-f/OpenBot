@@ -41,12 +41,12 @@ jobs:
         run: nohup npm start &
 
       - name: Wait for server to start
-        run: sleep 5 # Adjust this if your server takes longer to start
+        run: sleep 10
 
       - name: Test server
         run: |
-          curl -I http://localhost:3000 # Adjust port if necessary
-          curl http://localhost:3000 # Perform basic server response test
+          curl -I http://localhost:7071
+          curl http://localhost:7071
 
       - name: Stop background server
         if: always()
