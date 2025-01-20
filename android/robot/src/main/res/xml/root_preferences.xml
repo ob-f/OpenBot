@@ -1,46 +1,52 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="@string/permissions">
-
         <SwitchPreferenceCompat
             app:key="camera"
-            app:title="Camera" />
+            app:title="@string/camera" />
 
         <SwitchPreferenceCompat
             app:key="storage"
-            app:title="Storage" />
+            app:title="@string/storage" />
 
         <SwitchPreferenceCompat
             app:key="location"
-            app:title="Location" />
+            app:title="@string/location" />
 
         <SwitchPreferenceCompat
             app:key="mic"
-            app:title="Microphone" />
+            app:title="@string/microphone" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Video Streaming">
-
+    <PreferenceCategory app:title="@string/video_streaming">
         <ListPreference
-            app:defaultValue="RTSP"
+            app:defaultValue="@string/default_stream_mode"
             app:entries="@array/stream_server"
             app:entryValues="@array/stream_server"
             app:key="video_server"
-            app:title="Stream Mode"
+            app:title="@string/stream_mode"
             app:useSimpleSummaryProvider="true" />
-
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Connection Type">
-
+    <PreferenceCategory app:title="@string/connection_type">
         <ListPreference
-            app:defaultValue="USB"
+            app:defaultValue="@string/default_connectivity_mode"
             app:entries="@array/connection_type"
             app:entryValues="@array/connection_type"
             app:key="connection_type"
-            app:title="Connectivity Mode"
+            app:title="@string/connectivity_mode"
             app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/language">
+        <ListPreference
+            app:key="language"
+            app:title="@string/select_language"
+            app:entries="@array/language_options"
+            app:entryValues="@array/language_values"
+            app:defaultValue="@string/default_language"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>
+
