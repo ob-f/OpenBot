@@ -31,8 +31,8 @@
   "dependencies": {
     "@firebase/firestore": "^4.6.4",
     "dotenv": "^16.4.5",
-    "firebase": "^10.1.0",
+    "firebase": "^10.9.0",
     "js-cookie": "^3.0.5",
-    "ws": "^8.17.1"
+    "ws": "^8.18.0"
   }
 }
