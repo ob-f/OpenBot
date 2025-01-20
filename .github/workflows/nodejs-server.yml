@@ -1,0 +1,54 @@
+name: Build and Test Node.js Server
+
+# Run this workflow for every new commit and PR that changes the Node.js server
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'controller/node-js/**'
+      - '.github/workflows/nodejs-server.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'controller/node-js/**'
+      - '.github/workflows/nodejs-server.yml'
+
+defaults:
+  run:
+    working-directory: ./controller/node-js
+
+jobs:
+  # Set the job key for testing the Node.js server
+  nodejs-server:
+    # Name the Job
+    name: Build and Test Node.js Server
+    # Set the type of machine to run on
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Specify your desired Node.js version
+
+      - run: node --version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start server in background
+        run: nohup npm start &
+
+      - name: Wait for server to start
+        run: sleep 5 # Adjust this if your server takes longer to start
+
+      - name: Test server
+        run: |
+          curl -I http://localhost:3000 # Adjust port if necessary
+          curl http://localhost:3000 # Perform basic server response test
+
+      - name: Stop background server
+        if: always()
+        run: |
+          pkill -f "npm start" || echo "Server not running"
