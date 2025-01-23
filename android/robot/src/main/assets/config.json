@@ -124,5 +124,14 @@
     "pathType": "URL",
     "path": "https://storage.googleapis.com/openbot_models/efficientdet_lite2_metadata.tflite",
     "inputSize": "448x448"
+  },
+  {
+    "id": 15,
+    "class": "GESTUREDET",
+    "type": "GESTURE",
+    "name": "hand_landmarker.task",
+    "pathType": "URL",
+    "path": "'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task'",
+    "inputSize": "448x448"
   }
 ]

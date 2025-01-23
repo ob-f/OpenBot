@@ -11,6 +11,9 @@
         android:label="@string/app_name"
         tools:layout="@layout/fragment_main">
         <action
+            android:id="@+id/action_mainFragment_to_handGestureFragment"
+            app:destination="@id/handGestureFragment" />
+        <action
             android:id="@+id/action_mainFragment_to_freeRoamFragment"
             app:destination="@id/freeRoamFragment" />
         <action
@@ -94,6 +97,14 @@
     <action
         android:id="@+id/open_profile_fragment"
         app:destination="@id/profileFragment" />
+
+    <fragment
+        android:id="@+id/handGestureFragment"
+        android:name="org.openbot.HandGesture.HandGestureFragment"
+        android:label="Hand Gesture"
+        tools:layout="@layout/fragment_hand_gesture" />
+
+
     <fragment
         android:id="@+id/AIFragment"
         android:name="org.openbot.autopilot.AutopilotFragment"

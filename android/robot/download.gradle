@@ -5,6 +5,7 @@ task downloadNetworks(type: Download) {
             'https://storage.googleapis.com/openbot_models/navigation.tflite',
             'https://storage.googleapis.com/openbot_models/coco.txt',
             'https://storage.googleapis.com/openbot_models/labelmap.txt',
+            'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task'
     ])
     src
     dest project.ext.ASSET_DIR + '/networks'

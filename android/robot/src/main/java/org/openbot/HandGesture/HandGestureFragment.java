@@ -39,6 +39,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 //see if need
 import org.openbot.env.BorderedText;
 import org.openbot.env.ImageUtils;
+import org.openbot.tflite.Detector;
 import org.openbot.tflite.Model;
 import org.openbot.tflite.Network;
 import org.openbot.tracking.MultiBoxTracker;
@@ -64,6 +65,7 @@ public class HandGestureFragment extends CameraFragment {
     private Hands hands;
     private boolean computingNetwork = false;
     private static final float TEXT_SIZE_DIP = 10;
+    private Detector detector;
     private boolean mirrorControl;
     private Matrix frameToCropTransform;
     private Bitmap croppedBitmap;
@@ -89,15 +91,6 @@ public class HandGestureFragment extends CameraFragment {
 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Example initialization of vehicle (ensure usbManager and usbDevice are available)
-        vehicle = new Vehicle(getContext(), usbManager, usbDevice);
-
-        if (vehicle == null) {
-            Timber.e("Vehicle initialization failed.");
-        } else {
-            Timber.i("Vehicle initialized successfully.");
-        }
 
         binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
 
@@ -369,14 +362,6 @@ public class HandGestureFragment extends CameraFragment {
                 break;
         }
     }
-
-    private void setNetworkEnabledWithAudio(boolean b) {
-        setNetworkEnabled(b);
-
-        if (b) audioPlayer.play(voice, "network_enabled.mp3");
-        else audioPlayer.playDriveMode(voice, vehicle.getDriveMode());
-    }
-
     private void setNetworkEnabledWithAudio(boolean b) {
         setNetworkEnabled(b);
 
@@ -728,23 +713,6 @@ public class HandGestureFragment extends CameraFragment {
                 ringPinkyDistance > 0.1;
 
         return isThumbExtended && isIndexExtended && isMiddleExtended && isRingExtended && isPinkyExtended && fingersSpreadApart;
-    }
-
-    private void moveRobotForward() {
-        if (vehicle != null) {
-            vehicle.moveForward();
-        } else {
-            Timber.e("Vehicle object is null. Cannot move robot.");
-        }
-    }
-
-    // Helper method to stop the robot
-    private void stopRobot() {
-        if (vehicle != null) {
-            vehicle.stop();
-        } else {
-            Timber.e("Vehicle object is null. Cannot stop robot.");
-        }
     }
 }
 
