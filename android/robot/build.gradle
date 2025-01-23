@@ -113,7 +113,6 @@ dependencies {
     implementation 'com.google.mediapipe:tasks-vision:0.10.1'
     implementation 'com.google.mediapipe:tasks-vision-handlandmarker:0.10.1'
 
-
     def nav_version = "2.3.5"
     // Java language implementation
     implementation "androidx.navigation:navigation-fragment:$nav_version"
