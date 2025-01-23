@@ -108,10 +108,11 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore:24.5.0'
-    implementation 'com.google.firebase:firebase-storage:20.1.0'
     implementation 'com.google.mediapipe:hands:0.10.20'
     implementation 'com.google.mediapipe:tasks-vision:0.10.1'
     implementation 'com.google.mediapipe:tasks-vision-handlandmarker:0.10.1'
+    implementation 'com.google.firebase:firebase-storage:20.1.0'
+
 
     def nav_version = "2.3.5"
     // Java language implementation

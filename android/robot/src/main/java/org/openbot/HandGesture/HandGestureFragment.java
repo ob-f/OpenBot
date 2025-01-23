@@ -714,5 +714,7 @@ public class HandGestureFragment extends CameraFragment {
 
         return isThumbExtended && isIndexExtended && isMiddleExtended && isRingExtended && isPinkyExtended && fingersSpreadApart;
     }
+
 }
+
 
