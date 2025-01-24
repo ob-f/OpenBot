@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">OpenBot</string>
+    <string name="activity_name">OpenBot</string>
+    <string name="description_info">信息</string>
+    <string name="camera_error">此设备不支持 Camera2 API。</string>
+    <string name="threads">线程</string>
+    <string name="camera_permission_denied">需要摄像头权限</string>
+    <string name="storage_permission_denied">需要外部存储权限</string>
+    <string name="location_permission_denied">需要位置权限</string>
+    <string name="record_audio_permission_denied">需要录音权限</string>
+    <string name="permission_reason_logging"> 用于记录数据集。</string>
+    <string name="permission_reason_ai"> 用于运行 AI 模型。</string>
+    <string name="permission_reason_ar_core"> 用于运行 AR Core。</string>
+    <string name="permission_reason_stream_video"> 用于将视频流传输到控制器。</string>
+    <string name="permission_reason_preview"> 用于预览视频。</string>
+    <string name="permission_reason_stream_audio"> 用于将音频流传输到控制器。</string>
+    <string name="permission_reason_find_controller"> 用于查找控制器。</string>
+    <string name="permission_reason_model_from_phone"> 用于从手机存储中选择模型。</string>
+    <string name="permission_reason_settings"> 用于使用应用程序的所有功能。</string>
+
+    <string name="storage">存储</string>
+    <string name="location">位置</string>
+    <string name="microphone">麦克风</string>
+    <string name="video_streaming">视频流</string>
+    <string name="stream_mode">流模式</string>
+    <string name="connection_type">连接类型</string>
+    <string name="connectivity_mode">连接模式</string>
+    <string name="language">语言</string>
+    <string name="select_language">选择语言</string>
+
+    <string name="control_mode_gamepad">游戏手柄</string>
+    <string name="control_mode_phone">手机</string>
+    <string name="control_mode_webserver">网络服务器</string>
+    <string name="control_mode_unknown">未知</string>
+    <string name="control_mode_manette">手柄</string>
+
+    <string name="drive_mode_gamepad">游戏手柄</string>
+    <string name="drive_mode_joystick">摇杆</string>
+    <string name="drive_mode_dual">双重</string>
+
+    <string name="default_stream_mode">RTSP</string>
+    <string name="default_connectivity_mode">USB</string>
+    <string name="default_language">zh</string>
+
+    <string name="google_account">通过使用您的 Google 账户登录来设置您的个人资料。</string>
+    <string name="sign_in">使用 Google 登录</string>
+    <string name="edit_profile_two">编辑个人资料</string>
+    <string name="logout_one">登出</string>
+
+    <string name="no_projects">哎呀！未找到项目。</string>
+    <string name="no_projects_google">看起来您的 Google 云端硬盘中还没有项目。</string>
+    <string name="set_up_google">通过使用您的 Google 账户登录来设置您的个人资料。</string>
+    <string name="sign_in_google">使用 Google 登录</string>
+    <string name="blink_led">检测到 LED 闪烁文件。开始在您的 OpenBot 上执行代码。</string>
+    <string name="start_two">开始</string>
+
+    <string name="first_name">名字</string>
+    <string name="last_name">姓氏</string>
+    <string name="date_of_birth">出生日期</string>
+    <string name="email_address">电子邮件地址</string>
+    <string name="save_changes">保存更改</string>
+
+    <string name="btn_refresh">刷新</string>
+
+    <string name="stop_btn_name">停止汽车</string>
+    <string name="reset_btn_name">重置</string>
+
+    <string name="qr_error_message">哎呀！出现了问题。请重试。</string>
+    <string name="qr_bottom_sheet_title_error">错误</string>
+
+    <string name="sensor_one">传感器</string>
+
+    <string name="model_details">模型详情</string>
+    <string name="edit_one">.tflite</string>
+    <string name="name_model">名称</string>
+    <string name="auto_pilot">自动驾驶</string>
+    <string name="class_model">类别</string>
+    <string name="type_model">类型</string>
+    <string name="input_model">输入（宽 x 高）</string>
+    <string name="done">完成</string>
+
+    <string name="connect_ble">连接</string>
+
+    <string name="model_one">模型 1</string>
+    <string name="accelerometer">加速度计</string>
+
+    <string name="subcategory">子类别</string>
+    <string name="category">类别</string>
+
+    <string name="all">全部</string>
+    <string name="general">通用</string>
+    <string name="legacy">旧版</string>
+    <string name="controller_mapping">控制器映射</string>
+    <string name="robot_info">机器人信息</string>
+
+    <string name="sensor_data">传感器数据</string>
+    <string name="log_data">日志数据</string>
+    <string name="model_resolution">模型分辨率</string>
+    <string name="preview_images">预览图像</string>
+    <string name="training_images">训练图像</string>
+    <string name="delay">延迟（毫秒）</string>
+
+    <!-- Game -->
+    <string name="game">游戏</string>
+    <string name="free_roam">自由漫游</string>
+    <string name="ar_mode">增强现实模式</string>
+    <string name="default_t">默认</string>
+
+    <!-- Data Collection -->
+    <string name="data_collection">数据收集</string>
+    <string name="local_save_on_phone">本地（保存到手机）</string>
+    <string name="edge_local_network">边缘（本地网络）</string>
+    <string name="cloud_firebase">云端（Firebase）</string>
+    <string name="crowd_source">众包（发布/接受数据收集任务）</string>
+
+    <!-- AI -->
+    <string name="ai">人工智能</string>
+    <string name="autopilot">自动驾驶</string>
+    <string name="person_following">跟随人</string>
+    <string name="object_nav">目标跟踪</string>
+    <string name="model_management">模型管理</string>
+    <string name="point_goal_navigation">目标导航</string>
+    <string name="autonomous_driving">自动驾驶</string>
+    <string name="visual_goals">视觉目标</string>
+    <string name="smart_voice">智能语音（左/右/直行，AR核心）</string>
+
+    <!-- Remote Access -->
+    <string name="remote_access">远程访问</string>
+    <string name="web_interface">网页界面</string>
+    <string name="ros">机器人操作系统（ROS）</string>
+    <string name="fleet_management">车队管理</string>
+
+    <!-- Coding -->
+    <string name="coding">编程</string>
+    <string name="block_based_programming">积木式编程</string>
+    <string name="scripts">脚本</string>
+
+    <!-- Research -->
+    <string name="research">研究</string>
+    <string name="classical_robotics_algorithms">经典机器人算法</string>
+    <string name="backend_for_learning">学习支持后端</string>
+
+    <!-- Monitoring -->
+    <string name="monitoring">监控</string>
+    <string name="sensors_from_car">车载传感器</string>
+    <string name="sensors_from_phone">手机传感器</string>
+    <string name="map_view">地图视图</string>
+
+    <string name="video_protocol">视频协议</string>
+    <string name="video_command">视频命令</string>
+    <string name="video_server_url">视频服务器URL</string>
+    <string name="webrtc_event">WEB_RTC事件</string>
+    <string name="switch_camera">切换摄像头</string>
+
+    <string name="set_goal_title">设置目标</string>
+    <string name="set_goal_message">将手机安装在机器人上并指定目标。按下开始后，机器人将尝试达到目标。</string>
+    <string name="start_button">开始</string>
+
+    <string name="off">关闭</string>
+    <string name="on">开启</string>
+
+    <string name="server">服务器</string>
+    <string name="save_as">另存为</string>
+    <string name="ip_placeholder">x.x.x.x</string>
+    <string name="model">模型</string>
+
+    <string name="device">设备</string>
+    <string name="baud_rate">波特率</string>
+
+    <string name="log_setting">日志设置</string>
+    <string name="camera_facing_back">后置</string>
+
+    <string name="camera_facing_front">前置</string>
+    <string name="logging">记录中</string>
+
+    <string name="not_logging">未记录</string>
+
+    <string name="no_device">无设备</string>
+
+    <string name="data_log">数据日志</string>
+
+    <string name="usb_connection">USB 连接</string>
+
+    <string name="camera">相机</string>
+
+    <string name="control">控制</string>
+    <string name="battery">电池</string>
+    <string name="speed">速度（左，右）</string>
+    <string name="sonar">声纳</string>
+    <string name="control_info">***,***</string>
+    <string name="rpm">***,*** 转每分钟</string>
+    <string name="voltage">**.* 伏特</string>
+    <string name="distance">*** 厘米</string>
+    <string name="time_ms">*** 毫秒</string>
+    <string name="time_fps">*** 帧每秒</string>
+    <string name="resolution">*** x ***</string>
+    <string name="drive_mode">驾驶模式</string>
+    <string name="speed_mode">速度模式</string>
+    <string name="plus">加</string>
+    <string name="arrow">箭头</string>
+    <string name="minus">减</string>
+    <string name="controller">控制器</string>
+    <string name="control_mode">控制模式</string>
+    <string name="crop">裁剪</string>
+    <string name="frame">框架</string>
+    <string name="_1">1</string>
+    <string name="settings">设置</string>
+    <string name="bluetooth">蓝牙</string>
+    <string name="inference">速度</string>
+    <string name="input">输入</string>
+    <string name="confidence">置信度</string>
+    <string name="object">物体</string>
+    <string name="speedTitle">速度</string>
+    <string name="voltageInfo">%1$s 伏特</string>
+    <string name="speedInfo">%1$s 转每分钟</string>
+    <string name="distanceInfo">%1$s 厘米</string>
+    <string name="preview_resolution">预览分辨率</string>
+    <string name="save_option">保存选项</string>
+    <string name="file_available_body">同名模型已存在。是否要替换它？</string>
+    <string name="file_available_title">文件已找到</string>
+    <string name="model_delete_body">您确定要删除此模型吗？</string>
+    <string name="model_delete_title">确认</string>
+    <string name="permissions">权限</string>
+    <string name="goal_reached">目标已达成。</string>
+    <string name="model_download_body">返回将取消下载。您确定吗？</string>
+    <string name="model_download_title">模型下载进行中</string>
+    <string name="save">保存</string>
+    <string name="confirm_title">您确定吗？</string>
+    <string name="stream_change_body">应用程序需要重启才能使此设置生效</string>
+    <string name="selectAll">全选</string>
+    <string name="clearAll">清空所有</string>
+    <string name="tracking_lost">丢失跟踪。</string>
+    <string name="no_initial_ar_core_pose">无初始 AR Core 姿态。</string>
+    <string name="ar_core_session_paused">AR Core 会话已暂停。</string>
+    <string name="tips_connect_timeout">连接超时</string>
+    <string name="tips_connect_fail">连接失败</string>
+    <string name="tips_connection_disconnected">连接已断开</string>
+    <string name="tips_write_operation">请输入十六进制字符串</string>
+    <string-array name="servers">
+        <item>无服务器</item>
+    </string-array>
+    <string-array name="models">
+        <item>Autopilot_F</item>
+        <item>MobileNetV1_1_0_Q</item>
+        <item>MobileNetV3_S_Q</item>
+        <item>YoloV4</item>
+    </string-array>
+    <string-array name="devices">
+        <item>CPU</item>
+        <item>GPU</item>
+        <item>NNAPI</item>
+    </string-array>
+    <string-array name="baud_rates">
+        <item>9600</item>
+        <item>14400</item>
+        <item>19200</item>
+        <item>38400</item>
+        <item>57600</item>
+        <item>115200</item>
+        <item>230400</item>
+        <item>460800</item>
+        <item>921600</item>
+    </string-array>
+    <string-array name="log_settings">
+        <item>所有图片</item>
+        <item>裁剪图片</item>
+        <item>预览图片</item>
+        <item>仅限传感器</item>
+    </string-array>
+    <string-array name="control_modes">
+        <item>游戏手柄</item>
+        <item>默认</item>
+        <item>手机</item>
+        <item>触摸屏</item>
+        <item>键盘</item>
+        <!--<item>WebRTC</item>-->
+    </string-array>
+
+    <string-array name="drive_modes">
+        <item>双重</item>
+        <item>游戏</item>
+        <item>操纵杆</item>
+    </string-array>
+
+    <string-array name="preview_resolutions">
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+    </string-array>
+
+    <string-array name="save_data">
+        <item>本地存储</item>
+        <item>谷歌云盘</item>
+        <item>本地服务器</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string-array name="stream_server">
+        <item>WebRTC</item>
+        <item>RTSP</item>
+    </string-array>
+    <string-array name="connection_type">
+        <item>蓝牙</item>
+        <item>USB</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string-array name="speed_modes">
+        <item>慢</item>
+        <item>正常</item>
+        <item>快</item>
+    </string-array>
+    <string name="profile">个人资料</string>
+    <string name="projects">项目</string>
+    <string name="scanner">扫描器</string>
+    <string name="home">主页</string>
+    <string name="scan_qr_code">扫描二维码</string>
+    <string name="playground">游乐场</string>
+    <string name="text_on_qr_screen">将二维码放入框架内进行扫描。请避免抖动，以便快速获得结果。</string>
+    <string name="edit_profile">编辑个人资料</string>
+    <string name="logout">登出</string>
+    <string name="auto_mode">自动模式</string>
+    <string name="dynamic_speed">动态速度</string>
+    <string name="bumpers">防撞器</string>
+    <string name="n_a">不适用</string>
+    <string name="robot_type">机器人类型：</string>
+    <string name="indicators">指示灯</string>
+    <string name="back">后面</string>
+    <string name="voltage_divider">电压分压器</string>
+    <string name="status">状态</string>
+    <string name="front">前面</string>
+    <string name="robot_icon">机器人图标</string>
+    <string name="wheel_odometry_front">前轮里程计</string>
+    <string name="wheel_odometry_back">后轮里程计</string>
+    <string name="backward">向后</string>
+    <string name="forward">向前</string>
+    <string name="stop">停止</string>
+    <string name="motors">电动机</string>
+    <string name="leds">LED灯</string>
+    <string name="lights">灯光</string>
+    <string name="sensors">传感器</string>
+    <string name="send_commands">发送命令</string>
+    <string name="wheel_odometry">轮子里程计</string>
+    <string name="readings">读数</string>
+    <string name="lights_slider">灯光滑块</string>
+    <string name="indicator_leds">指示LED灯</string>
+    <string name="back_leds">后LED灯</string>
+    <string name="status_leds">状态LED灯</string>
+    <string name="front_leds">前LED灯</string>
+    <string name="usb">USB</string>
+    <string name="cancel">取消</string>
+
+</resources>

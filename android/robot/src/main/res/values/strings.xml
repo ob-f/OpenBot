@@ -19,6 +19,137 @@
     <string name="permission_reason_model_from_phone"> to select a model from phone storage.</string>
     <string name="permission_reason_settings"> to use all features of the app.</string>
 
+    <string name="control_mode_gamepad">Gamepad</string>
+    <string name="control_mode_phone">Phone</string>
+    <string name="control_mode_webserver">Webserver</string>
+    <string name="control_mode_unknown">Unknown</string>
+    <string name="control_mode_manette">Manette</string>
+
+    <string name="drive_mode_gamepad">Gamepad</string>
+    <string name="drive_mode_joystick">Joystick</string>
+    <string name="drive_mode_dual">Dual</string>
+
+    <string name="all">All</string>
+    <string name="general">General</string>
+    <string name="legacy">Legacy</string>
+    <string name="controller_mapping">Controller Mapping</string>
+    <string name="robot_info">Robot Info</string>
+
+    <string name="game">Game</string>
+    <string name="free_roam">Free Roam</string>
+    <string name="ar_mode">AR Mode</string>
+    <string name="default_t">Default</string>
+
+    <string name="data_collection">Data Collection</string>
+    <string name="local_save_on_phone">Local (save On Phone)</string>
+    <string name="edge_local_network">Edge (local Network)</string>
+    <string name="cloud_firebase">Cloud (firebase)</string>
+    <string name="crowd_source">Crowd-source (post/accept Data Collection Tasks)</string>
+
+    <string name="ai">AI</string>
+    <string name="autopilot">Autopilot</string>
+    <string name="person_following">Person Following</string>
+    <string name="object_nav">Object Tracking</string>
+    <string name="model_management">Model Management</string>
+    <string name="point_goal_navigation">Point Goal Navigation</string>
+    <string name="autonomous_driving">Autonomous Driving</string>
+    <string name="visual_goals">Visual Goals</string>
+    <string name="smart_voice">Smart Voice (left/right/straight, Ar Core)</string>
+
+    <string name="remote_access">Remote Access</string>
+    <string name="web_interface">Web Interface</string>
+    <string name="ros">ROS</string>
+    <string name="fleet_management">Fleet Management</string>
+
+    <string name="sensor_data"> Sensor Data</string>
+    <string name="log_data"> Log Data</string>
+    <string name="model_resolution">Model Resolution</string>
+    <string name="preview_images"> Preview Images</string>
+    <string name="training_images"> Training Images</string>
+    <string name="delay"> Delay (ms)</string>
+
+    <string name="coding">Coding</string>
+    <string name="block_based_programming">Block-Based Programming</string>
+    <string name="scripts">Scripts</string>
+
+    <string name="research">Research</string>
+    <string name="classical_robotics_algorithms">Classical Robotics Algorithms</string>
+    <string name="backend_for_learning">Backend For Learning</string>
+
+    <string name="monitoring">Monitoring</string>
+    <string name="sensors_from_car">Sensors from Car</string>
+    <string name="sensors_from_phone">Sensors from Phone</string>
+    <string name="map_view">Map View</string>
+
+    <string name="video_protocol">VIDEO_PROTOCOL</string>
+    <string name="video_command">VIDEO_COMMAND</string>
+    <string name="video_server_url">VIDEO_SERVER_URL</string>
+    <string name="webrtc_event">WEB_RTC_EVENT</string>
+    <string name="switch_camera">SWITCH_CAMERA</string>
+
+    <string name="set_goal_title">Set Goal</string>
+    <string name="set_goal_message">Mount the phone on the robot and specify a goal. The robot will try to reach the goal after pressing start.</string>
+    <string name="start_button">Start</string>
+
+    <string name="storage">Storage</string>
+    <string name="location">Location</string>
+    <string name="microphone">Microphone</string>
+    <string name="video_streaming">Video Streaming</string>
+    <string name="stream_mode">Stream Mode</string>
+    <string name="connection_type">Connection Type</string>
+    <string name="connectivity_mode">Connectivity Mode</string>
+    <string name="language">Language</string>
+    <string name="select_language">Select Language</string>
+
+    <string name="default_stream_mode">RTSP</string>
+    <string name="default_connectivity_mode">USB</string>
+    <string name="default_language">en</string>
+
+    <string name="google_account"> Set up your profile by signing in with your Google account.</string>
+    <string name="sign_in" > Sign-in with Google</string>
+    <string name="edit_profile"> Edit Profile</string>
+    <string name="logout_one"> Logout</string>
+
+    <string name="no_projects"> Oops! No projects found.</string>
+    <string name="no_projects_google">Looks like there are no projects in your google drive yet.</string>
+    <string name="set_up_google">Set up your profile by signing in with your Google account.</string>
+    <string name="sign_in_google">Sign-in with Google</string>
+    <string name="blink_led">Blink LED file detected.Start to execute the code on your OpenBot.</string>
+    <string name="start_two"> Start</string>
+
+    <string name="first_name"> First Name</string>
+    <string name="last_name"> Last Name</string>
+    <string name="date_of_birth"> Date Of Birth</string>
+    <string name="email_address"> Email Address</string>
+    <string name="save_changes"> Save Changes</string>
+
+    <string name="btn_refresh"> Refresh</string>
+
+    <string name="stop_btn_name"> Stop Car</string>
+    <string name="reset_btn_name"> Reset</string>
+
+    <string name="qr_error_message"> Oops! Something went wrong.Please try again.</string>
+    <string name="qr_bottom_sheet_title_error"> Error</string>
+
+    <string name="sensor_one"> Sensors</string>
+
+    <string name="model_details"> Model Details</string>
+    <string name="edit_one"> .tflite</string>
+    <string name="name_model"> Name</string>
+    <string name="auto_pilot"> Auto Pilot</string>
+    <string name="class_model"> Class</string>
+    <string name="type_model"> Type</string>
+    <string name="input_model"> Input (w x h)</string>
+    <string name="done"> Done</string>
+
+    <string name="connect_ble"> Connect</string>
+
+    <string name="model_one"> Model 1</string>
+    <string name="accelerometer"> Accelerometer</string>
+
+    <string name="subcategory"> Subcategory</string>
+    <string name="category"> Category</string>
+
     <string name="off">Off</string>
     <string name="on">On</string>
 
@@ -133,8 +264,12 @@
     <string-array name="control_modes">
         <item>Gamepad</item>
         <item>Phone</item>
-        <!--        <item>WebRTC</item>-->
+        <item>Default</item>
+        <item>Touchscreen</item>
+        <item>Keyboard</item>
+        <!--<item>WebRTC</item>-->
     </string-array>
+
     <string-array name="drive_modes">
         <item>Dual</item>
         <item>Game</item>
@@ -175,7 +310,7 @@
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="playground">Playground</string>
     <string name="text_on_qr_screen">Place QR code inside the frame to scan. Please avoid shake to get results quickly.</string>
-    <string name="edit_profile">Edit Profile</string>
+    <string name="edit_profile_two">Edit Profile</string>
     <string name="logout">Logout</string>
     <string name="auto_mode">Auto Mode</string>
     <string name="dynamic_speed">Dynamic Speed</string>

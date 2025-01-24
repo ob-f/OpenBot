@@ -10,23 +10,23 @@ buildscript {
         mavenLocal()
         maven { url "https://jitpack.io" }
     }
+
     dependencies {
+        classpath 'com.google.gms:google-services:4.3.10'
         classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'com.google.gms:google-services:4.3.15'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.5'
         classpath 'de.undercouch:gradle-download-task:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // Other dependencies can be added here
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenLocal()
+        mavenCentral()
         maven { url "https://jitpack.io" }
     }
 }
@@ -35,40 +35,33 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-task checkStyle(type:JavaExec) {
+task checkStyle(type: JavaExec) {
     workingDir = "utils"
     classpath = files("utils/google-java-format-1.7-all-deps.jar")
     FileTree tree = fileTree('app/src/main/java') {
         include '**/*.java'
     }
-    args(["-n","--set-exit-if-changed"]) // -n prints filename if using wrong style
-    tree.each {args += it}
-    //color codes: "\u001B[33m" - yellow, "\u001B[32m" - green, "\u001B[0m" - reset (Unix)
+    args(["-n", "--set-exit-if-changed"])
+    tree.each { args += it }
     doFirst {
         println("You can fix the style of the files below (if any) with "
                 + "\u001B[33m" + "./gradlew applyStyle" + "\u001B[0m")
     }
-    doLast { // will only execute on success (exitcode=0)
-        println ("\u001B[32m" + " -> All java files follow the correct style." + "\u001B[0m")
+    doLast {
+        println("\u001B[32m" + " -> All java files follow the correct style." + "\u001B[0m")
     }
 }
 
-task checkStyleUnix(type:Exec) {
-    workingDir 'utils'
-    commandLine './checkStyle.sh'
-}
-
-task applyStyle(type:JavaExec) {
+task applyStyle(type: JavaExec) {
     workingDir = "utils"
     classpath = files("utils/google-java-format-1.7-all-deps.jar")
     FileTree tree = fileTree('app/src/main/java') {
         include '**/*.java'
     }
-    args("-r") // replace cmd, means write changes back to source file
-    tree.each {args += it}
+    args("-r")
+    tree.each { args += it }
 }
 
-task applyStyleUnix(type:Exec) {
-    workingDir 'utils'
-    commandLine './applyStyle.sh'
-}
+apply plugin: 'com.google.gms.google-services'
+
+

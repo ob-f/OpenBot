@@ -1,2 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+
+    <string-array name="language_options">
+        <item>English</item>   <!-- Displayed option for English -->
+        <item>German</item>    <!-- Displayed option for German -->
+        <item>Chinese</item>   <!-- Displayed option for Chinese -->
+        <item>French</item>    <!-- Displayed option for French -->
+
+    </string-array>
+
+    <!-- Array for the actual values used in the app -->
+    <string-array name="language_values">
+        <item>en</item>        <!-- Value for English -->
+        <item>de</item>        <!-- Value for German -->
+        <item>zh</item>        <!-- Value for Chinese -->
+        <item>fr</item>        <!-- Value for French -->
+
+    </string-array>
+
+
+</resources>

@@ -2,8 +2,8 @@ package org.openbot.model;
 
 public class SubCategory {
 
-  public SubCategory(String title, int image, String backgroundColor) {
-    this.title = title;
+  public SubCategory(int title, int image, String backgroundColor) {
+    this.title = String.valueOf(title);
     this.backgroundColor = backgroundColor;
     this.image = image;
   }
