@@ -26,9 +26,9 @@ public class MainFragment extends Fragment implements OnItemClickListener<SubCat
   @Nullable
   @Override
   public View onCreateView(
-      @NonNull LayoutInflater inflater,
-      @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
+          @NonNull LayoutInflater inflater,
+          @Nullable ViewGroup container,
+          @Nullable Bundle savedInstanceState) {
     binding = FragmentMainBinding.inflate(inflater, container, false);
     return binding.getRoot();
   }
@@ -44,60 +44,49 @@ public class MainFragment extends Fragment implements OnItemClickListener<SubCat
 
   @Override
   public void onItemClick(SubCategory subCategory) {
-
     Timber.d("onItemClick: %s", subCategory.getTitle());
-
     switch (subCategory.getTitle()) {
-      case FeatureList.PROJECTS:
+      case "Projects":
         Navigation.findNavController(requireView()).navigate(R.id.projectsFragment);
         break;
-      case FeatureList.FREE_ROAM:
+      case "Free Roam":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_freeRoamFragment);
+                .navigate(R.id.action_mainFragment_to_freeRoamFragment);
         break;
-
-      case FeatureList.DATA_COLLECTION:
+      case "Data Collection":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_loggerFragment);
+                .navigate(R.id.action_mainFragment_to_loggerFragment);
         break;
-
-      case FeatureList.CONTROLLER:
+      case "Controller":
         // For a library module, uncomment the following line
         // intent = new Intent(this, ControllerActivity.class);
         // startActivity(intent);
         break;
-
-      case FeatureList.CONTROLLER_MAPPING:
+      case "Controller Mapping":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_controllerMappingFragment);
+                .navigate(R.id.action_mainFragment_to_controllerMappingFragment);
         break;
-
-      case FeatureList.ROBOT_INFO:
+      case "Robot Info":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_robotInfoFragment);
+                .navigate(R.id.action_mainFragment_to_robotInfoFragment);
         break;
-
-      case FeatureList.AUTOPILOT:
+      case "Autopilot":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_autopilotFragment);
+                .navigate(R.id.action_mainFragment_to_autopilotFragment);
         break;
-
-      case FeatureList.OBJECT_NAV:
+      case "Object Nav":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_objectNavFragment);
+                .navigate(R.id.action_mainFragment_to_objectNavFragment);
         break;
-
-      case FeatureList.POINT_GOAL_NAVIGATION:
+      case "Point Goal Navigation":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_pointGoalNavigationFragment);
+                .navigate(R.id.action_mainFragment_to_pointGoalNavigationFragment);
         break;
-
-      case FeatureList.MODEL_MANAGEMENT:
+      case "Model Management":
         Navigation.findNavController(requireView())
-            .navigate(R.id.action_mainFragment_to_modelManagementFragment);
+                .navigate(R.id.action_mainFragment_to_modelManagementFragment);
         break;
-
-      case FeatureList.DEFAULT:
+      case "Default":
         Intent intent = new Intent(requireActivity(), DefaultActivity.class);
         startActivity(intent);
         break;
