@@ -5,38 +5,32 @@ import java.util.List;
 
 public class Category {
 
-  private int titleResId;  // Resource ID for the title
-  private List<SubCategory> subCategories;
-
-  // Default constructor
   public Category() {}
 
-  // Constructor accepting a resource ID for the title
   public Category(int titleResId, List<SubCategory> subCategories) {
     this.titleResId = titleResId;
     this.subCategories = subCategories;
   }
 
-  // Getter method to retrieve the title as a string
+  // Store the resource ID for the title
+  private int titleResId;
+  private List<SubCategory> subCategories;
+
+  // Getter method for the title using context to get the localized string
   public String getTitle(Context context) {
-    return context.getString(titleResId);  // Fetches string resource
+    return context.getString(titleResId);  // Retrieve the localized string using the resource ID
   }
 
-  // Getter and setter for subCategories
+  // Setter for the title (although it's now resource-based, this may not be used)
+  public void setTitle(int titleResId) {
+    this.titleResId = titleResId;
+  }
+
   public List<SubCategory> getSubCategories() {
     return subCategories;
   }
 
   public void setSubCategories(List<SubCategory> subCategories) {
     this.subCategories = subCategories;
-  }
-
-  // Getter and setter for titleResId
-  public int getTitleResId() {
-    return titleResId;
-  }
-
-  public void setTitleResId(int titleResId) {
-    this.titleResId = titleResId;
   }
 }
