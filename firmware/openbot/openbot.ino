@@ -1619,7 +1619,7 @@ void display_vehicle_data() {
 #endif
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
   String left_rpm_str = String("Left RPM:  ") + String(rpm_left, 0);
-  String right_rpm_str = String("Right RPM:  ") + String(rpm_left, 0);
+  String right_rpm_str = String("Right RPM:  ") + String(rpm_right, 0);
 #else
   String left_rpm_str = String("Left RPM:  ") + String("N/A");
   String right_rpm_str = String("Right RPM:  ") + String("N/A");
