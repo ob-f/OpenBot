@@ -18,7 +18,7 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "net": "^1.0.2",
-    "ws": "^7.5.0"
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
