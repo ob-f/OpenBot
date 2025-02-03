@@ -10,7 +10,7 @@
   },
   "author": "Nitish Pratap",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
+    "cookie-parser": "~1.4.7",
     "debug": "~2.6.9",
     "dnssd2": "^1.0.0",
     "ejs": "^3.1.6",
