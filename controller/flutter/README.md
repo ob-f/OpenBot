@@ -11,7 +11,7 @@
 
 This Controller app serves as a `remote controller` for the [OpenBot](https://www.openbot.org) vehicle similar as a BT controller (e.g. PS3/4 or Xbox). It runs on another Android/iOS device and supports live video/audio streaming in addition to control.
 
- ## Getting Started
+## Getting Started
 Begin by installing [Flutter](https://flutter.dev/) on your system. Choose the appropriate download for your operating system, which includes options for Windows, macOS, Linux, and ChromeOS. Follow the official Flutter installation guide for detailed instructions: [Flutter Installation Guide](https://docs.flutter.dev/get-started/install)
 
 ### Using Terminal
@@ -23,16 +23,16 @@ Begin by installing [Flutter](https://flutter.dev/) on your system. Choose the a
     ```bash
      flutter pub get 
     ```
-    Run the project:
+  Run the project:
     ```bash
      flutter run
     ```
-    If you encounter any issues, run the following command:
+  If you encounter any issues, run the following command:
     ```bash
      flutter doctor
     ```
 ### Using Editor
-- Follow the official Flutter guide for setting up an editor:  [Set up an editor ](https://docs.flutter.dev/tools/android-studio) 
+- Follow the official Flutter guide for setting up an editor:  [Set up an editor ](https://docs.flutter.dev/tools/android-studio)
 - Ensure that your editor is configured for Flutter development. Install any required plugins or extensions, following the editor-specific instructions in the Flutter documentation for the best development experience.
 
 - Once you open your project in the editor after the setup, it will appear as shown in the following image.
@@ -47,7 +47,7 @@ Begin by installing [Flutter](https://flutter.dev/) on your system. Choose the a
     <img src="../../docs/images/run_editor.jpg" width="50%" />
   </p>
 
-## Connection 
+## Connection
 
 When the controller app is started, it immediately tries to connect to the robot and shows the following screen:
 
@@ -90,7 +90,7 @@ above/below the center of the slider.
 
 - ``Switch Camera``: switch between the front and back camera modes.
 - ``Mute``: enable/disable audio transmission.
-- ``Mirror view``: mirror the the video feed. 
+- ``Mirror view``: mirror the the video feed.
 
 ### Tilt to drive
 
@@ -112,5 +112,19 @@ Use the `accelerator` and `brake` buttons to move forward/backward.
   start moving backwards until it reaches the maximum reverse speed in one second. When we let go of the brake, the
   robot will come to a stop.
 - The robot is steered by tilting the controller phone left or right.
+
+### Controller Settings UI
+
+Here is a picture of the `Controller Settings` screen:
+
+- Controller Selection: Switch between different controller types (e.g., mobile, joystick) using the provided icons.
+ 
+- Server: Displays the current server status with a dropdown to select or change the server.
+ 
+- Noise Toggle : Enable or disable noise simulation through the toggle switch.
+
+<p float="left">
+  <img src="../../docs/images/flutter_controller_setting.jpg" width="50%" />
+</p>
 
 Here is a [Technical Overview](../../docs/technical/OpenBotController.pdf) of the controller app.

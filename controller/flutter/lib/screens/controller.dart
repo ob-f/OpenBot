@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -9,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsd/nsd.dart';
 import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
-
+import 'package:openbot_controller/screens/settingsDrawer.dart';
 import '../utils/constants.dart';
 import 'discoveringDevices.dart';
 
@@ -32,6 +31,10 @@ class ControllerState extends State<Controller> {
   bool mirroredVideo = false;
   bool indicatorLeft = false;
   bool indicatorRight = false;
+  bool isSettings = false;
+  bool isTiltingPhoneMode = false;
+  bool isScreenMode = false;
+  String fragmentType = "";
   var _nextPort = 56360;
 
   int get nextPort => _nextPort++;
@@ -194,6 +197,11 @@ class ControllerState extends State<Controller> {
                   if (msgInObject["status"] != null) {
                     processMessageFromBot(msgInObject["status"]);
                   }
+                  if (msgInObject["FRAGMENT_TYPE"] != null) {
+                    setState(() {
+                      fragmentType = msgInObject["FRAGMENT_TYPE"];
+                    });
+                  }
                 }
               }
             } catch (e) {
@@ -254,7 +262,50 @@ class ControllerState extends State<Controller> {
               mirror: mirroredVideo,
             ),
             ControlSelector(setMirrorVideo, indicatorLeft, indicatorRight,
-                services, _peerConnection)
+                services, _peerConnection, isTiltingPhoneMode, isScreenMode,fragmentType),
+            Positioned(
+              left: isTiltingPhoneMode ? 45 : 110,
+              top: 16.0, // Adjust the top margin as needed
+              child: Container(
+                // padding: EdgeInsets.only(left: ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(45),
+                  color: Colors.transparent,
+                ),
+                child: FloatingActionButton(
+                    backgroundColor: Colors.white.withOpacity(0.5),
+                    onPressed: () {
+                      setState(() {
+                        isSettings = true;
+                      });
+                    },
+                    child: const Icon(Icons.menu)),
+              ),
+            ),
+            if (isSettings)
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isSettings = false;
+                      });
+                    },
+                    child: Container(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                  SettingsDrawer(
+                    services,
+                    (bool newTiltingMode, bool newScreenMode) {
+                      setState(() {
+                        isTiltingPhoneMode = newTiltingMode;
+                        isScreenMode = newScreenMode;
+                      });
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
         debugShowCheckedModeBanner: false,

@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:openbot_controller/utils/forwardSpeed.dart';
 import 'package:openbot_controller/utils/phoneSensorToDualDriveConverter.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-
+import 'package:openbot_controller/globals.dart';
 import 'driveCommandReducer.dart';
 
 class TiltingPhoneMode extends StatefulWidget {
-  const TiltingPhoneMode({super.key});
+  final String fragmentType;
+
+  const TiltingPhoneMode({required this.fragmentType, super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -28,6 +30,7 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
       PhoneSensorToDualDriveConverter();
   double leftSpeedValue = 0;
   double rightSpeedValue = 0;
+  String typeOfFragment = "";
 
   @override
   void initState() {
@@ -41,6 +44,15 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
       rightSpeedValue = sliderValues.right;
     });
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant TiltingPhoneMode oldWidget) {
+    // TODO: implement didUpdateWidget
+    setState(() {
+      typeOfFragment = widget.fragmentType;
+    });
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -111,6 +123,54 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                         width: 64,
                       ),
                     )),
+                Container(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: Row(children: [
+                      GestureDetector(
+                          onTap: () {
+                            if (typeOfFragment == "DataCollection") {
+                              clientSocket?.writeln("{command: LOGS}");
+                            }
+                          }, // Image tapped
+                          child: Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(45),
+                              color: typeOfFragment == "DataCollection"
+                                  ? Colors.white.withOpacity(0.5)
+                                  : Colors.grey.withOpacity(0.5),
+                            ),
+                            child: const Icon(
+                              Icons.file_present,
+                              color: Colors.blue,
+                            ),
+                          )),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            if (typeOfFragment == "Autopilot" ||
+                                typeOfFragment == "ObjectDetection") {
+                              clientSocket?.writeln("{command: NETWORK}");
+                            }
+                          }, // Image tapped
+                          child: Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(45),
+                              color: typeOfFragment == "Autopilot" ||
+                                      typeOfFragment == "ObjectDetection"
+                                  ? Colors.white.withOpacity(0.5)
+                                  : Colors.grey.withOpacity(0.5),
+                            ),
+                            child: const Icon(
+                              Icons.network_check,
+                              color: Colors.blue,
+                            ),
+                          )),
+                    ])),
                 GestureDetector(
                     onTapDown: (details) {
                       setState(() {

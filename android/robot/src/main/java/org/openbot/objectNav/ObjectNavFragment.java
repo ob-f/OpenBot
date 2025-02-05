@@ -33,12 +33,14 @@ import org.openbot.R;
 import org.openbot.common.CameraFragment;
 import org.openbot.databinding.FragmentObjectNavBinding;
 import org.openbot.env.BorderedText;
+import org.openbot.env.BotToControllerEventBus;
 import org.openbot.env.ImageUtils;
 import org.openbot.tflite.Detector;
 import org.openbot.tflite.Model;
 import org.openbot.tflite.Network;
 import org.openbot.tracking.MultiBoxTracker;
 import org.openbot.utils.CameraUtils;
+import org.openbot.utils.ConnectionUtils;
 import org.openbot.utils.Constants;
 import org.openbot.utils.Enums;
 import org.openbot.utils.MovingAverage;
@@ -97,9 +99,9 @@ public class ObjectNavFragment extends CameraFragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-
+    preferencesManager.setFragment(Enums.fragmentType.OBJECTDETECTION.getFragment());
+    BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(preferencesManager.getFragment()));
     binding.confidenceValue.setText((int) (MINIMUM_CONFIDENCE_TF_OD_API * 100) + "%");
-
     binding.plusConfidence.setOnClickListener(
         v -> {
           String trimConfValue = binding.confidenceValue.getText().toString().trim();

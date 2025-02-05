@@ -24,9 +24,19 @@ public class ConnectionUtils {
     return new JSONObject();
   }
 
+
   public static JSONObject createStatus(String name, JSONObject value) {
     try {
       return new JSONObject().put("status", new JSONObject().put(name, value.toString()));
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return new JSONObject();
+  }
+
+  public static JSONObject createFragment(String value){
+    try {
+      return new JSONObject().put("FRAGMENT_TYPE", value);
     } catch (JSONException e) {
       e.printStackTrace();
     }
