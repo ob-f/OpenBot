@@ -940,7 +940,6 @@ public abstract class CameraActivity extends AppCompatActivity
     // Currently only dual drive mode supported
     setDriveMode(DriveMode.DUAL);
     driveModeSpinner.setAlpha(0.5f);
-    preferencesManager.setDriveMode(oldDriveMode.getValue());
   }
 
   private void connectWebController() {
