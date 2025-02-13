@@ -1,0 +1,10 @@
+beautifulsoup4
+langchain_google_genai
+google-generativeai
+langchain-community
+chromadb
+langchain==0.0.335
+gradio==3.50.2
+llama-cpp-python==0.2.18
+pypdf
+tenacity
