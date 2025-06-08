@@ -1,0 +1,58 @@
+[global]
+# If True, will show a warning when you run a Streamlit-enabled script via "python my_script.py".
+# Default: true
+showWarningOnDirectExecution = true
+
+[logger]
+# Level of logging: 'error', 'warning', 'info', or 'debug'.
+# Default: 'info'
+level = "debug"
+
+
+
+[runner]
+# Allows you to type a variable or string by itself in a single line of Python code to write it to the app.
+# Default: true
+magicEnabled = true
+
+
+
+[server]
+# List of folders that should not be watched for changes. Relative paths will be taken as relative to the current working directory.
+# Example: ['/home/user1/env', 'relative/path/to/folder']
+# Default: []
+folderWatchBlacklist = ['']
+
+# If false, will attempt to open a browser window on start.
+# Default: false unless (1) we are on a Linux box where DISPLAY is unset, or (2) server.liveSave is set.
+headless = true
+
+# Immediately share the app in such a way that enables live monitoring, and post-run analysis.
+# Default: false
+liveSave = false
+
+# Automatically rerun script when the file is modified on disk.
+# Default: false
+runOnSave = false
+
+# The port where the server will listen for client and browser connections.
+# Default: 8501
+port = 80
+
+# Enables support for Cross-Origin Request Sharing, for added security.
+# Default: true
+enableCORS = false
+
+[browser]
+# Internet address of the server that the browser should connect to. Can be IP address or DNS name.
+# Default: 'localhost'
+serverAddress = "0.0.0.0"
+
+# Whether to send usage statistics to Streamlit.
+# Default: true
+gatherUsageStats = true
+
+# Port that the browser should use to connect to the server when in liveSave mode.
+# Default: whatever value is set in server.port.
+serverPort = 80
+
