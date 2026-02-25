@@ -505,21 +505,34 @@ const int CH_PWM_L1 = 0;
 const int CH_PWM_L2 = 1;
 const int CH_PWM_R1 = 2;
 const int CH_PWM_R2 = 3;
+const int CH_LED_LF = 4;
+const int CH_LED_RF = 5;
+const int CH_LED_LB = 6;
+const int CH_LED_RB = 7;
 const int PIN_PWM_LF1 = 13;
 const int PIN_PWM_LF2 = 12;
 const int PIN_PWM_LB1 = 13;
 const int PIN_PWM_LB2 = 12;
-const int PIN_PWM_RF1 = 27;
-const int PIN_PWM_RF2 = 33;
-const int PIN_PWM_RB1 = 27;
-const int PIN_PWM_RB2 = 33;
-const int PIN_SPEED_LF = 5;
-const int PIN_SPEED_RF = 18;
-const int PIN_VIN = 39;
-const int PIN_TRIGGER = 25;
-const int PIN_ECHO = 26;
-const int PIN_LED_LI = 22;
-const int PIN_LED_RI = 16;
+const int PIN_PWM_RF1 = 15;
+const int PIN_PWM_RF2 = 2;
+const int PIN_PWM_RB1 = 15;
+const int PIN_PWM_RB2 = 2;
+const int PIN_SPEED_LF = 35;
+const int PIN_SPEED_LB = 34;
+const int PIN_SPEED_RF = 22;
+const int PIN_SPEED_RB = 23;
+const int PIN_VIN = 4;
+const int PIN_TRIGGER = 5;
+const int PIN_ECHO = 18;
+const int PIN_LED_LI = 5;
+const int PIN_LED_RI = 18;
+const int PIN_LED_LB = 5;
+const int PIN_LED_RB = 18;
+const int PIN_LED_LF = 19;
+const int PIN_LED_RF = 21;
+const int PIN_LED_Y = 14;
+const int PIN_LED_G = 27;
+const int PIN_LED_B = 26;
 #endif
 //------------------------------------------------------//
 
@@ -880,21 +893,6 @@ void setup() {
   pinMode(PIN_DIR_R, OUTPUT);
   pinMode(PIN_DIR_L, LOW);
   pinMode(PIN_DIR_R, LOW);
-#endif
-
-#if (OPENBOT == DIY_ESP32)
-  // PWMs
-  // Configure PWM functionalitites
-  ledcSetup(CH_PWM_L1, FREQ, RES);
-  ledcSetup(CH_PWM_L2, FREQ, RES);
-  ledcSetup(CH_PWM_R1, FREQ, RES);
-  ledcSetup(CH_PWM_R2, FREQ, RES);
-
-  // Attach the channel to the GPIO to be controlled
-  ledcAttachPin(PIN_PWM_L1, CH_PWM_L1);
-  ledcAttachPin(PIN_PWM_L2, CH_PWM_L2);
-  ledcAttachPin(PIN_PWM_R1, CH_PWM_R1);
-  ledcAttachPin(PIN_PWM_R2, CH_PWM_R2);
 #endif
 
   Serial.begin(115200, SERIAL_8N1);
@@ -1684,7 +1682,7 @@ void send_wheel_reading(long duration) {
 
 void update_indicator() {
   if (indicator_left > 0) {
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520) && PIN_LED_LI == PIN_LED_LB)
+#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_LI == PIN_LED_LB)
     ledcDetachPin(PIN_LED_LB);
 #endif
     digitalWrite(PIN_LED_LI, !digitalRead(PIN_LED_LI));
@@ -1694,12 +1692,12 @@ void update_indicator() {
 #else
     digitalWrite(PIN_LED_LI, LOW);
 #endif
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520) && PIN_LED_LI == PIN_LED_LB)
+#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_LI == PIN_LED_LB)
     ledcAttachPin(PIN_LED_LB, CH_LED_LB);
 #endif
   }
   if (indicator_right > 0) {
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520) && PIN_LED_RI == PIN_LED_RB)
+#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_RI == PIN_LED_RB)
     ledcDetachPin(PIN_LED_RB);
 #endif
     digitalWrite(PIN_LED_RI, !digitalRead(PIN_LED_RI));
@@ -1709,7 +1707,7 @@ void update_indicator() {
 #else
     digitalWrite(PIN_LED_RI, LOW);
 #endif
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520) && PIN_LED_RI == PIN_LED_RB)
+#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_RI == PIN_LED_RB)
     ledcAttachPin(PIN_LED_RB, CH_LED_RB);
 #endif
   }
@@ -1720,7 +1718,7 @@ void update_indicator() {
 #if (HAS_LEDS_FRONT || HAS_LEDS_BACK)
 void update_light() {
 #if (HAS_LEDS_FRONT)
-#if (OPENBOT == RTR_TT2 || OPENBOT == RTR_520)
+#if (OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32)
   analogWrite(CH_LED_LF, light_front);
   analogWrite(CH_LED_RF, light_front);
 #else
@@ -1730,7 +1728,7 @@ void update_light() {
 #endif
 
 #if (HAS_LEDS_BACK)
-#if (OPENBOT == RTR_TT2 || OPENBOT == RTR_520)
+#if (OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32)
   analogWrite(CH_LED_LB, light_back);
   analogWrite(CH_LED_RB, light_back);
 #else

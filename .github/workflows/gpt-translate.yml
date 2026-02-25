@@ -3,7 +3,9 @@ name: GPT Translate
 on:
   issue_comment:
     types: [created]
- 
+
+permissions: write-all
+
 jobs:
   gpt_translate:
     if: |
