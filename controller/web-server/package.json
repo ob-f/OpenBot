@@ -29,10 +29,10 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@firebase/firestore": "^4.6.4",
-    "dotenv": "^16.4.5",
-    "firebase": "^10.1.0",
+    "@firebase/firestore": "^4.12.0",
+    "dotenv": "^17.3.1",
+    "firebase": "^12.10.0",
     "js-cookie": "^3.0.5",
-    "ws": "^8.17.1"
+    "ws": "^8.19.0"
   }
 }
