@@ -1,0 +1,38 @@
+name: Blockly Config
+
+on:
+  push:
+    branches: [ "*" ]
+    paths:
+      - 'open-code/**'
+      - '.github/workflows/blockly.yml'
+  pull_request:
+    branches: [ "*" ]
+    paths:
+      - 'open-code/**'
+      - '.github/workflows/blockly.yml'
+
+jobs:
+  blockly:
+    name: Blockly Config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start server in background
+        run: npm start &
+
+      - name: Wait for server to start
+        run: sleep 10
+
+      - name: Test HTTP server
+        run: curl -I http://localhost:3000
