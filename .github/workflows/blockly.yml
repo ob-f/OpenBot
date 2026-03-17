@@ -2,12 +2,12 @@ name: Blockly Config
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ master ]
     paths:
       - 'open-code/**'
       - '.github/workflows/blockly.yml'
   pull_request:
-    branches: [ "*" ]
+    branches: [ master ]
     paths:
       - 'open-code/**'
       - '.github/workflows/blockly.yml'
