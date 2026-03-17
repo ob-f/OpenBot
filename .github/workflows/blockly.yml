@@ -26,9 +26,11 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
+        working-directory: open-code
         run: npm install
 
       - name: Start server in background
+        working-directory: open-code
         run: npm start &
 
       - name: Wait for server to start
