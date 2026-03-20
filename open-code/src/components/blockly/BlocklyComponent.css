@@ -60,6 +60,14 @@
     font-family: Gilroy-Bold, sans-serif;
 }
 
+.blocklyToolboxCategory{
+    height: 50px;
+    line-height: 50px;
+    margin-bottom: 0px;
+    padding-right: 8px;
+    white-space: nowrap;
+}
+
 
 @media (max-width: 767px) {
 
@@ -107,8 +115,9 @@
     }
 
     .blocklyTreeRow {
-        height: 2rem;
-        line-height: 2rem;
+        /* Avoid overly compact toolbox rows on short viewports. */
+        height: 2.5rem;
+        line-height: 2.5rem;
     }
 }
 
