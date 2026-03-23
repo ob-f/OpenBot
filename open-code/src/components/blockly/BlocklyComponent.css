@@ -61,13 +61,16 @@
 }
 
 .blocklyToolboxCategory{
-    height: 50px;
+    height: 2.5rem;
     line-height: 50px;
     margin-bottom: 0px;
     padding-right: 8px;
     white-space: nowrap;
 }
 
+.blocklyToolboxCategoryGroup{
+    padding-top: 2.4rem;
+}
 
 @media (max-width: 767px) {
 
