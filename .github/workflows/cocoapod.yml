@@ -23,13 +23,37 @@ jobs:
           run:
             working-directory: ios/OpenBot
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 15.4
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          xcodebuild -version
+
       - name: Install CocoaPods
         run: sudo gem install cocoapods
+
       - name: Remove Podfile.lock (regenerate)
         run: rm -f Podfile.lock
+
       - name: Pod install
         run: pod install
+
+      - name: Set Swift 5 for all Pod targets
+        run: |
+          ruby -e "
+            require 'xcodeproj'
+            project = Xcodeproj::Project.open('Pods/Pods.xcodeproj')
+            project.targets.each do |target|
+              target.build_configurations.each do |config|
+                config.build_settings['SWIFT_VERSION'] = '5.0'
+              end
+            end
+            project.save
+            puts 'Swift 5.0 set for all pod targets'
+          "
+
       - name: Build
         run: |
           xcodebuild \
@@ -42,6 +66,7 @@ jobs:
             build \
             IPHONEOS_DEPLOYMENT_TARGET=14.0 \
             SWIFT_VERSION=5.0
+
       - name: Test
         run: |
           xcodebuild \
@@ -53,10 +78,10 @@ jobs:
             -derivedDataPath build \
             test \
             IPHONEOS_DEPLOYMENT_TARGET=14.0 \
-            SWIFT_VERSION=5.0 
+            SWIFT_VERSION=5.0
+
       - name: Upload OpenBot Simulator App
         uses: actions/upload-artifact@v4
         with:
           name: OpenBot-simulator.app
           path: ios/OpenBot/build/Build/Products/Debug-iphonesimulator/OpenBot.app
-
