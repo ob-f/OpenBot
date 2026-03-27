@@ -40,7 +40,8 @@ jobs:
             -configuration Debug \
             -derivedDataPath build \
             build \
-            IPHONEOS_DEPLOYMENT_TARGET=14.0
+            IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+            SWIFT_VERSION=5.0
       - name: Test
         run: |
           xcodebuild \
@@ -51,7 +52,8 @@ jobs:
             -configuration Debug \
             -derivedDataPath build \
             test \
-            IPHONEOS_DEPLOYMENT_TARGET=14.0
+            IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+            SWIFT_VERSION=5.0 
       - name: Upload OpenBot Simulator App
         uses: actions/upload-artifact@v4
         with:
