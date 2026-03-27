@@ -36,22 +36,22 @@ jobs:
             -workspace OpenBot.xcworkspace \
             -scheme OpenBot \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
             -configuration Debug \
             -derivedDataPath build \
             build \
-            IPHONEOS_DEPLOYMENT_TARGET=13.0
+            IPHONEOS_DEPLOYMENT_TARGET=14.0
       - name: Test
         run: |
           xcodebuild \
             -workspace OpenBot.xcworkspace \
             -scheme OpenBot \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
             -configuration Debug \
             -derivedDataPath build \
             test \
-            IPHONEOS_DEPLOYMENT_TARGET=13.0
+            IPHONEOS_DEPLOYMENT_TARGET=14.0
       - name: Upload OpenBot Simulator App
         uses: actions/upload-artifact@v4
         with:
