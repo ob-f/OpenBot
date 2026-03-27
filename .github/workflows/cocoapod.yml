@@ -31,7 +31,10 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_16.app/Contents/Developer
 
       - name: Verify Xcode Version
-        run: xcodebuild -version 
+        run: |
+          xcodebuild -version 
+          xcrun simctl list devices
+          xcrun simctl list runtimes
 
       - name: Install CocoaPods
         run: sudo gem install cocoapods
@@ -45,6 +48,6 @@ jobs:
             -workspace OpenBot.xcworkspace \
             -scheme OpenBot \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
             CODE_SIGNING_ALLOWED=NO \
             clean test
