@@ -47,7 +47,6 @@ jobs:
           xcodebuild \
             -workspace OpenBot.xcworkspace \
             -scheme OpenBot \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             CODE_SIGNING_ALLOWED=NO \
             clean test
