@@ -36,7 +36,7 @@ jobs:
       - name: Install Dependencies
         run: pod install --repo-update
       
-      - name: Build and Test
+      - name: Build
         run: |
           xcodebuild \
             -workspace OpenBot.xcworkspace \
@@ -45,4 +45,15 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO \
             IPHONEOS_DEPLOYMENT_TARGET=14.0 \
-            clean test
+            clean build
+
+      - name: Test
+        run: |
+          xcodebuild \
+            -workspace OpenBot.xcworkspace \
+            -scheme OpenBot \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
+            CODE_SIGNING_ALLOWED=NO \
+            IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+            test
