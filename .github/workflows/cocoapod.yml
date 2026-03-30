@@ -35,6 +35,17 @@ jobs:
           xcodebuild -showsdks
           xcrun simctl list devices
 
+      - name: Select iOS Simulator destination
+        id: sim
+        run: |
+          # Pick the latest available iOS simulator runtime installed on the runner.
+          LATEST_IOS_RUNTIME="$(xcrun simctl list runtimes | awk '/iOS [0-9]+\.[0-9]+/ && /\(available\)/ { v=$2 } END { print v }')"
+          if [ -z "$LATEST_IOS_RUNTIME" ]; then
+            echo "No available iOS simulator runtimes found" >&2
+            exit 1
+          fi
+          echo "destination=platform=iOS Simulator,OS=${LATEST_IOS_RUNTIME}" >> "$GITHUB_OUTPUT"
+
       - name: Install CocoaPods
         run: sudo gem install cocoapods
       
@@ -47,7 +58,20 @@ jobs:
             -workspace OpenBot.xcworkspace \
             -scheme OpenBot \
             -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination "${{ steps.sim.outputs.destination }}" \
             CODE_SIGNING_ALLOWED=NO \
             SWIFT_VERSION=5.0 \
+            -derivedDataPath build \
             clean build
+
+      - name: Test
+        run: |
+          xcodebuild \
+            -workspace OpenBot.xcworkspace \
+            -scheme OpenBot \
+            -sdk iphonesimulator \
+            -destination "${{ steps.sim.outputs.destination }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            SWIFT_VERSION=5.0 \
+            -derivedDataPath build \
+            clean test
