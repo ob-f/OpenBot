@@ -26,12 +26,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-              
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods
 
-      - name: Remove Podfile.lock (regenerate)
-        run: rm -f Podfile.lock
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
 
-      - name: Pod install
-        run: pod install
+      - name: Remove Podfile.lock (regenerate)
+        run: rm -f Podfile.lock
+
+      - name: Pod install
+        run: pod install
