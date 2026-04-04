@@ -1,5 +1,5 @@
-notebook~=6.4.3
-matplotlib~=3.6.3
-pillow~=10.3.0
-numpyencoder~=0.3.0
-black[jupyter]~=23.0
+notebook~=7.5.5
+matplotlib~=3.9.4
+pillow~=10.4.0
+numpyencoder~=0.3.2
+black[jupyter]~=25.11.0
