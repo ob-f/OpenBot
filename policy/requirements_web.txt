@@ -2,5 +2,5 @@ aiohttp[speedups]==3.7.4
 aiohttp-devtools>=0.13.1
 aiohttp_json_rpc>=0.13.3
 aiozeroconf>=0.1.8
-imageio>=2.9.0
+imageio>=2.34.0
 openbot_frontend==0.7.0
