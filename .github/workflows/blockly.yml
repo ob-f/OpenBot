@@ -38,3 +38,7 @@ jobs:
 
       - name: Test HTTP server
         run: curl -I http://localhost:3000
+
+      - name: Stop server
+        if: always()
+        run: fuser -k 3000/tcp || true
