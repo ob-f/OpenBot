@@ -86,7 +86,7 @@ different locations.
 The `OpenBot Playground` starts with homepage that contains following component:
 
 - [Header](#header) : Header contains the following two sections, change theme and sign-in user.
-- [Carousel](#Carousal):Carousal's Content Explains how the Playground works.
+- [Carousal](#Carousal): Carousal's Content Explains how the Playground works.
 - [Project Section](#project-section) :Project section contains List of Projects and Create new Project button.
 
 ### Playground Page

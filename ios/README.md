@@ -13,9 +13,8 @@
 
 Click on the links below to read about the features of the apps.
 
-- [Robot App](OpenBot/README.md)
-- Controller App (Coming Soon)
-
+- [Robot App](./OpenBot/README.md)
+- [Controller App](../controller/flutter/README.md)
 ## Install the apps
 Currently, the only way to run the iOS apps on your phones is via the developer builds, as described in the section below.
 
