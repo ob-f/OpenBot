@@ -24,6 +24,7 @@ Currently, the only way to run the iOS apps on your phones is via the developer 
 
 - [Xcode iOS 13 or Later](https://developer.apple.com/xcode/) for building and installing the apps.
 - [Cocoapods](https://cocoapods.org/) installed on your system.
+- Setup   [firebase project](./OpenBot/OpenBot/Authentication/README.md).
 - Currently, we're using iOS deployment target version 15.5.
 - Project is configured as "Automatically manage signing", so you can configure your own independent account for building the app -
   <img alt="iOS App" width="100%" src="../docs/images/ios_automatically_manage_signing.png" />

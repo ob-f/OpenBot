@@ -108,12 +108,12 @@ pod init
 Open the Podfile using your preferred text editor and add the following lines at the end of the file:
 
 ```
-  pod 'Firebase/Core'
-  pod 'Firebase/Storage'
-  pod 'Firebase/Auth'
-  pod 'GoogleSignIn'
-  pod 'GoogleSignInSwiftSupport'
-  pod 'GoogleAPIClientForREST/Drive' 
+pod 'Firebase/Core'
+pod 'Firebase/Storage'
+pod 'Firebase/Auth'
+pod 'GoogleSignIn'
+pod 'GoogleSignInSwiftSupport'
+pod 'GoogleAPIClientForREST/Drive' 
   ```
 
 Save and close the Podfile, then Run the following command to install the Firebase SDKs:
@@ -134,9 +134,16 @@ Some common issues that may occur during the Firebase configuration process and 
 - Delete the Podfile.lock file and run pod install again.
 - Make sure you have added the Firebase SDK pod to your Podfile correctly, using the exact version specified in the
   Firebase Console.
+```shell
+2. Reinstall Pods (if you encounter build or package-related issues)
+```
+- pod deintegrate 
+- rm -rf Pods
+- rm -rf Podfile.lock
+- pod install
 
 ```shell
-2. Firebase configuration errors: If you are unable to configure Firebase correctly, such as not being able to initialize Firebase in your app, try the following solutions:
+3. Firebase configuration errors: If you are unable to configure Firebase correctly, such as not being able to initialize Firebase in your app, try the following solutions:
 ```
 
 - Double-check that you have followed all the steps in the "Set up the iOS Project" section of this document correctly.

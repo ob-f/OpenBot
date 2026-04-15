@@ -82,7 +82,7 @@ Interfaz simple para la recolección de conjuntos de datos.
 <img src="../../docs/images/screen_data_collection.jpg" alt="Recolección de Datos" width="50%" />
 </p>
 
-- **Servidor**: Si tienes la [aplicación web](../../policy#web-app) para el entrenamiento de políticas en funcionamiento, puedes seleccionarla aquí para cargar datos automáticamente.
+- **Servidor**: Si tienes la [aplicación web](../../policy/README.md#web-app) para el entrenamiento de políticas en funcionamiento, puedes seleccionarla aquí para cargar datos automáticamente.
 - **Resolución de Vista Previa**: Se usa para cambiar entre resoluciones de vista previa de la cámara. Hay 3 configuraciones:
   - ***FULL_HD*** (1920x1080p)
   - ***HD*** (1280x720p)
@@ -118,7 +118,7 @@ Interfaz simple para ejecutar modelos de piloto automático.
 <img src="../../docs/images/screen_autopilot.jpg" alt="Piloto Automático" width="50%" />
 </p>
 
-- **Servidor**: Si tienes la [aplicación web](../../policy#web-app) para el entrenamiento de políticas en funcionamiento, puedes seleccionarla aquí y enviar modelos de piloto automático entrenados al robot.
+- **Servidor**: Si tienes la [aplicación web](../../policy/README.md#web-app) para el entrenamiento de políticas en funcionamiento, puedes seleccionarla aquí y enviar modelos de piloto automático entrenados al robot.
 - **Modelo**: Elige un modelo entrenado para usar en el modo de piloto automático.
 - **Dispositivo**: Usa CPU, GPU o NNAPI para la inferencia (más detalles [aquí](#dispositivo)).
 - **Hilos**: Número de hilos a usar (solo hace una diferencia cuando se selecciona CPU como dispositivo).

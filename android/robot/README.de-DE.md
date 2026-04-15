@@ -82,7 +82,7 @@ Einfache Benutzeroberfläche zur Sammlung von Datensätzen.
 <img src="../../docs/images/screen_data_collection.jpg" alt="Datensammlung" width="50%" />
 </p>
 
-- **Server**: Wenn Sie die [Web-App](../../policy#web-app) für das Training von Richtlinien ausführen, können Sie sie hier auswählen, um Daten automatisch hochzuladen.
+- **Server**: Wenn Sie die [Web-App](../../policy/README.md#web-app) für das Training von Richtlinien ausführen, können Sie sie hier auswählen, um Daten automatisch hochzuladen.
 - **Vorschauauflösung**: Wird verwendet, um zwischen den Auflösungen der Kameravorschau zu wechseln. Es gibt 3 Einstellungen:
   - ***FULL_HD*** (1920x1080p)
   - ***HD*** (1280x720p)
@@ -118,7 +118,7 @@ Einfache Benutzeroberfläche zum Ausführen von Autopilot-Modellen.
 <img src="../../docs/images/screen_autopilot.jpg" alt="Autopilot" width="50%" />
 </p>
 
-- **Server**: Wenn Sie die [Web-App](../../policy#web-app) für das Training von Richtlinien ausführen, können Sie sie hier auswählen und trainierte Autopilot-Modelle an den Roboter senden.
+- **Server**: Wenn Sie die [Web-App](../../policy/README.md#web-app) für das Training von Richtlinien ausführen, können Sie sie hier auswählen und trainierte Autopilot-Modelle an den Roboter senden.
 - **Modell**: Wählen Sie ein trainiertes Modell für den Autopilot-Modus.
 - **Gerät**: Verwenden Sie CPU, GPU oder NNAPI für die Inferenz (mehr Details [hier](#gerät)).
 - **Threads**: Anzahl der zu verwendenden Threads (macht nur einen Unterschied, wenn CPU als Gerät ausgewählt ist).
@@ -385,7 +385,7 @@ Bitte beachten Sie den [Beitragsleitfaden](ContributionGuide.md), um zu erfahren
 
 ## Code-Struktur
 
-Die [TensorFlow Lite Object Detection Android Demo](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android) wurde als Ausgangspunkt verwendet, um TFLite-Modelle zu integrieren und den Kamerafeed zu erhalten. Die [DefaultActivity](src/main/java/org/openbot/robot/DefaultActivity.java) führt den Hauptthread aus und erbt von der [CameraActivity](src/main/java/org/openbot/robot/CameraActivity.java), um die Kamera und die Benutzeroberfläche zu verwalten. Der [SensorService](src/main/java/org/openbot/robot/SensorService.java) liest alle anderen Telefonsensoren und protokolliert sie. Der [ServerService](src/main/java/org/openbot/robot/ServerService.java) und der [NsdService](src/main/java/org/openbot/robot/NsdService.java) stellen eine Verbindung zu einem lokalen [Python-Server](../../policy/README.md#web-app) mit einer React-Frontend her. Wenn Sie Daten sammeln, können diese automatisch zur Visualisierung, zum Training von ML-Modellen und zum Herunterladen trainierter Modelle auf den Roboter hochgeladen werden. Der [env](src/main/java/org/openbot/env)-Ordner enthält Dienstprogrammklassen wie die [Vehicle](src/main/java/org/openbot/env/Vehicle.java)-Schnittstelle, die [GameController](src/main/java/org/openbot/env/GameController.java)-Schnittstelle, die [PhoneController](src/main/java/org/openbot/env/PhoneController.java)-Schnittstelle und einen [AudioPlayer](src/main/java/org/openbot/env/AudioPlayer.java) für das akustische Feedback. Der [tflite](src/main/java/org/openbot/tflite)-Ordner enthält die Modelldefinitionen für die [Autopilot](src/main/java/org/openbot/tflite/Autopilot.java)- und [Detector](src/main/java/org/openbot/tflite/Detector.java)-Netzwerke.
+Die [TensorFlow Lite Object Detection Android Demo](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android) wurde als Ausgangspunkt verwendet, um TFLite-Modelle zu integrieren und den Kamerafeed zu erhalten. Die [DefaultActivity](src/main/java/org/openbot/original/DefaultActivity.java) führt den Hauptthread aus und erbt von der [CameraActivity](src/main/java/org/openbot/original/CameraActivity.java), um die Kamera und die Benutzeroberfläche zu verwalten. Der [SensorService](src/main/java/org/openbot/logging/SensorService.java) liest alle anderen Telefonsensoren und protokolliert sie. Die [ServerCommunication](src/main/java/org/openbot/server/ServerCommunication.java) und der [NsdService](src/main/java/org/openbot/server/NsdService.java) stellen eine Verbindung zu einem lokalen [Python-Server](../../policy/README.md#web-app) mit einer React-Frontend her. Wenn Sie Daten sammeln, können diese automatisch zur Visualisierung, zum Training von ML-Modellen und zum Herunterladen trainierter Modelle auf den Roboter hochgeladen werden. Der [env](src/main/java/org/openbot/env)-Ordner enthält Dienstprogrammklassen wie die [Vehicle](src/main/java/org/openbot/vehicle/Vehicle.java)-Schnittstelle, die [GameController](src/main/java/org/openbot/env/GameController.java)-Schnittstelle, die [PhoneController](src/main/java/org/openbot/env/PhoneController.java)-Schnittstelle und einen [AudioPlayer](src/main/java/org/openbot/env/AudioPlayer.java) für das akustische Feedback. Der [tflite](src/main/java/org/openbot/tflite)-Ordner enthält die Modelldefinitionen für die [Autopilot](src/main/java/org/openbot/tflite/Autopilot.java)- und [Detector](src/main/java/org/openbot/tflite/Detector.java)-Netzwerke.
 
 ## Nächstes (optional)
 
