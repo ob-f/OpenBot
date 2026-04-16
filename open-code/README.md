@@ -49,6 +49,7 @@ npm start
    one click.
 5. Design the instructions for OpenBot with zero code.
 6. Fully responsive design optimized for mobile and tablet browsing.
+7. OpenBot Playground blocks to [explore](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA).
 
 ### Project Storage
 
