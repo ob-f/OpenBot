@@ -87,7 +87,7 @@ different locations.
 The `OpenBot Playground` starts with homepage that contains following component:
 
 - [Header](#header) : Header contains the following two sections, change theme and sign-in user.
-- [Carousal](#Carousal): Carousal's Content Explains how the Playground works.
+- [Carousel](#Carousel): Carousel's Content Explains how the Playground works.
 - [Project Section](#project-section) :Project section contains List of Projects and Create new Project button.
 
 ### Playground Page
@@ -160,9 +160,9 @@ two buttons.
         <img style="padding-right: 2%;margin-top: 2%" src="../docs/images/playground_help.jpg" alt="Playground Help" width="50%"/>
         </p>
 
-### Carousal
+### Carousel
 
-Carousal's container explains how Application works.
+Carousel's container explains how Application works.
 <p>
 <img style="padding-right: 2%;" src="../docs/images/playground_home_carousal1.jpg" alt="home_carousal1" width="30%"/>
 <img style="padding-right: 2%;" src="../docs/images/playground_home_carousal2.jpg" alt="home_carousal2" width="30%"/>
