@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Wir haben ein Chassis für einen fahrenden Roboter entworfen, der auf kostengünstiger, leicht verfügbarer Hobby-Hardware basiert. Unten finden Sie Anweisungen zum Bau Ihres eigenen Roboters. Wenn Sie weitere Fragen oder Bedenken haben, können Sie uns gerne kontaktieren. Viel Spaß beim Roboterbau!
@@ -54,7 +55,7 @@ Sie benötigen auch eine Handyhalterung. Hier sind einige Optionen:
 
 - Handyhalterung ([EU](https://www.amazon.de/dp/B06XDYJNSR), [US](https://www.amazon.com/dp/B09CY8MC2R))
 
-Sie können auch kreativ werden und Ihr eigenes OpenBot-Chassis und Handyhalterung aus einem Material Ihrer Wahl (z.B. Holz, Karton, Styropor, etc.) bauen. Wenn Sie dies tun, posten Sie bitte einige Bilder im [Slack-Kanal](https://github.com/intel-isl/OpenBot#contact), damit andere Ihre Kreativität bewundern können. Hier ist ein Beispiel von [@custom-build-robots](https://custom-build-robots.com/roboter/openbot-dein-smartphone-steuert-ein-roboter-auto-chassis-bauen/13636):
+Sie können auch kreativ werden und Ihr eigenes OpenBot-Chassis und Handyhalterung aus einem Material Ihrer Wahl (z.B. Holz, Karton, Styropor, etc.) bauen. Wenn Sie dies tun, posten Sie bitte einige Bilder im [Slack-Kanal](https://github.com/ob-f/OpenBot#contact), damit andere Ihre Kreativität bewundern können. Hier ist ein Beispiel von [@custom-build-robots](https://custom-build-robots.com/roboter/openbot-dein-smartphone-steuert-ein-roboter-auto-chassis-bauen/13636):
 
 <p float="left">
   <img src="../../docs/images/chassis_cardboard_1.jpg" width="32%" />

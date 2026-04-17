@@ -16,13 +16,14 @@ apply from: 'download.gradle'
 
 def googleWebrtcFile = file("${project.ext.LIB_DIR}/google-webrtc-1.0.32006.aar")
 def wroupFile = file("${project.ext.LIB_DIR}/Wroup-master-release.aar")
+def usbserialFile = file("${project.ext.LIB_DIR}/usbserial-6.1.0-release.aar")
 
 // Task to check for AAR files
 task checkAars {
     dependsOn downloadAars // Ensure this matches the actual download task name
 
     doLast {
-        if (!googleWebrtcFile.exists() || !wroupFile.exists()) {
+        if (!googleWebrtcFile.exists() || !wroupFile.exists() || !usbserialFile.exists()) {
             throw new GradleException("Required AAR files are missing. Please run the download task.")
         }
     }
@@ -35,6 +36,10 @@ dependencies {
     
     if (wroupFile.exists()) {
         api files(wroupFile)
+    }
+
+    if (usbserialFile.exists()) {
+        api files(usbserialFile)
     }
 }
 

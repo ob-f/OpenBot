@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Este módulo es una alternativa embebida en Linux para el control de un vehículo OpenBot mediante un smartphone. Escrito en Python, el OpenBot puede ser controlado usando una computadora basada en Linux y una cámara para la detección.
@@ -92,7 +93,7 @@ Actualmente, el código se prueba en:
 - Placa: [Up Core Plus](https://up-board.org/upcoreplus/specifications/)
 - Cámara: [Realsense D435i](https://www.intelrealsense.com/depth-camera-d435i/)
 - Controlador: [Xbox One](https://www.microsoft.com/en-gb/store/collections/xboxcontrollers?source=lp)
-- Arduino: [Firmware de OpenBot](https://github.com/isl-org/OpenBot/blob/master/firmware/README.md)
+- Arduino: [Firmware de OpenBot](https://github.com/ob-f/OpenBot/blob/master/firmware/README.md)
 
 ## Módulos de Python
 

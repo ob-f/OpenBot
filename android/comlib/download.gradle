@@ -2,6 +2,7 @@ task downloadAars(type: Download) {
     src([
             'https://storage.googleapis.com/openbot_aar/Wroup-master-release.aar',
             'https://storage.googleapis.com/openbot_aar/google-webrtc-1.0.32006.aar',
+            'https://storage.googleapis.com/openbot_aar/usbserial-6.1.0-release.aar',
     ])
     dest project.ext.LIB_DIR
     onlyIfModified true

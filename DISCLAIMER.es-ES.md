@@ -5,7 +5,8 @@
   <a href="DISCLAIMER.zh-CN.md">简体中文</a> |
   <a href="DISCLAIMER.de-DE.md">Deutsch</a> |
   <a href="DISCLAIMER.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="DISCLAIMER.ko-KR.md">한국어</a>
 </p>
 
 El proyecto OpenBot es una iniciativa de código abierto que tiene como objetivo proporcionar soluciones robóticas accesibles para fines educativos, experimentales y recreativos. El siguiente aviso legal describe los términos y condiciones de uso del software y los diseños de hardware de OpenBot.

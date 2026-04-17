@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## Nomenclature
@@ -35,7 +36,7 @@ First make sure you have installed [Node.js](https://nodejs.org/), version 10 or
     node --version
 
 The software is located in the ```/controller/web-server``` directory of the OpenBot project. After checking out the
-code from [github](https://github.com/isl-org/OpenBot), change into this directory and run the following commands:
+code from [github](https://github.com/ob-f/OpenBot), change into this directory and run the following commands:
 
     npm install
     npm start
@@ -95,7 +96,7 @@ Android app to the cloud server, and a video will appear on the UI.
 4. The user enters keyboard commands from the browser. These key presses are sent to the Server via the WebSocket or
    webrtc. The server converts these to commands that the Robot can understand, like ```{driveCmd: {l:0.4, r:0.34}}``` (
    a list of all commands can be found in the documentation for the Android
-   controller [here](https://github.com/isl-org/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). These
+   controller [here](https://github.com/ob-f/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). These
    commands are sent to the Robot via the Socket connection.
 5. The WebSocket serves as a crucial data channel for WebRTC signaling proxy. WebRTC efficiently leverages the existing
    open socket connections for this purpose, eliminating the need for any additional connections or configurations. This

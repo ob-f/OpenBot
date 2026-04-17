@@ -7,7 +7,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 OpenBot Playground 是一个支持 OpenBot 应用程序的拖放平台，任何人都可以在这里为机器人构建指令。

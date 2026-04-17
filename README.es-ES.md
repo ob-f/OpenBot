@@ -5,14 +5,14 @@
 <h1 align="center"><a>Convirtiendo Smartphones en Robots</a></h1>
 
 <p align="center">
-   <img alt="GitHub build" src="https://img.shields.io/github/actions/workflow/status/isl-org/OpenBot/gradle.yml?branch=master"></a>
-   <img alt="GitHub issues" src="https://img.shields.io/github/issues/isl-org/OpenBot"></a>
-   <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/isl-org/OpenBot"></a>
-   <img alt="GitHub forks" src="https://img.shields.io/github/forks/isl-org/OpenBot"></a>
-   <img alt="GitHub stars" src="https://img.shields.io/github/stars/isl-org/OpenBot"></a>
-   <img alt="Github downloads" src="https://img.shields.io/github/downloads/isl-org/OpenBot/total"></a>
-   <img alt="Github size" src="https://img.shields.io/github/repo-size/isl-org/OpenBot"></a>
-   <img alt="Github license" src="https://img.shields.io/github/license/isl-org/OpenBot"></a>
+   <img alt="GitHub build" src="https://img.shields.io/github/actions/workflow/status/ob-f/OpenBot/gradle.yml?branch=master"></a>
+   <img alt="GitHub issues" src="https://img.shields.io/github/issues/ob-f/OpenBot"></a>
+   <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/ob-f/OpenBot"></a>
+   <img alt="GitHub forks" src="https://img.shields.io/github/forks/ob-f/OpenBot"></a>
+   <img alt="GitHub stars" src="https://img.shields.io/github/stars/ob-f/OpenBot"></a>
+   <img alt="Github downloads" src="https://img.shields.io/github/downloads/ob-f/OpenBot/total"></a>
+   <img alt="Github size" src="https://img.shields.io/github/repo-size/ob-f/OpenBot"></a>
+   <img alt="Github license" src="https://img.shields.io/github/license/ob-f/OpenBot"></a>
 </p>
 
 <p align="center">
@@ -20,7 +20,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 OpenBot aprovecha los smartphones como cerebros para robots de bajo costo. Hemos diseñado un pequeño vehículo eléctrico que cuesta alrededor de $50 y sirve como cuerpo del robot. Nuestra pila de software para smartphones Android soporta cargas de trabajo avanzadas de robótica, como seguimiento de personas y navegación autónoma en tiempo real.
@@ -37,10 +38,10 @@ OpenBot aprovecha los smartphones como cerebros para robots de bajo costo. Hemos
 
 ## Obtén el código fuente
 
-- Puedes descargar el repositorio como un [archivo zip](https://github.com/intel-isl/OpenBot/archive/master.zip) y extraerlo en una carpeta de tu elección.
+- Puedes descargar el repositorio como un [archivo zip](https://github.com/ob-f/OpenBot/archive/master.zip) y extraerlo en una carpeta de tu elección.
 - Puedes clonar el repositorio de OpenBot desde GitHub con el siguiente comando:
     ```bash
-    git clone https://github.com/intel-isl/OpenBot.git
+    git clone https://github.com/ob-f/OpenBot.git
     ```
 - Puedes bifurcar el repositorio de OpenBot y luego clonar tu copia local. Esto es recomendable, especialmente si deseas [contribuir](CONTRIBUTING.md).
 
@@ -80,7 +81,7 @@ Ya hay muchos proyectos geniales usando OpenBot. A continuación, una pequeña s
 
 ## Contribuir
 
-Por favor, lee las [directrices de contribución](CONTRIBUTING.md). Si no estás seguro de por dónde empezar, echa un vistazo a los [problemas abiertos](https://github.com/intel-isl/OpenBot/issues).
+Por favor, lee las [directrices de contribución](CONTRIBUTING.md). Si no estás seguro de por dónde empezar, echa un vistazo a los [problemas abiertos](https://github.com/ob-f/OpenBot/issues).
 
 ## Cita
 

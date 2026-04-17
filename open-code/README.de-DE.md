@@ -7,7 +7,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 OpenBot Playground ist eine Drag-and-Drop-Plattform zur Unterstützung der OpenBot-Anwendung, auf der jeder Anweisungen für den Roboter erstellen kann.

@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## 术语
@@ -28,7 +29,7 @@
 
     node --version
 
-软件位于 OpenBot 项目的 ```/controller/web-server``` 目录中。从 [github](https://github.com/isl-org/OpenBot) 检出代码后，进入此目录并运行以下命令：
+软件位于 OpenBot 项目的 ```/controller/web-server``` 目录中。从 [github](https://github.com/ob-f/OpenBot) 检出代码后，进入此目录并运行以下命令：
 
     npm install
     npm start
@@ -65,7 +66,7 @@
 
     <img src="../../controller/web-server/images/web_server_video_streaming.gif" width="50%"/>
 
-4. 用户从浏览器输入键盘命令。这些按键通过 WebSocket 或 webrtc 发送到服务器。服务器将这些命令转换为机器人可以理解的命令，例如 ```{driveCmd: {l:0.4, r:0.34}}```（所有命令的列表可以在安卓控制器的文档中找到 [这里](https://github.com/isl-org/OpenBot/blob/master/docs/technical/OpenBotController.pdf)）。这些命令通过 Socket 连接发送到机器人。
+4. 用户从浏览器输入键盘命令。这些按键通过 WebSocket 或 webrtc 发送到服务器。服务器将这些命令转换为机器人可以理解的命令，例如 ```{driveCmd: {l:0.4, r:0.34}}```（所有命令的列表可以在安卓控制器的文档中找到 [这里](https://github.com/ob-f/OpenBot/blob/master/docs/technical/OpenBotController.pdf)）。这些命令通过 Socket 连接发送到机器人。
 5. WebSocket 作为 WebRTC 信令代理的关键数据通道。WebRTC 高效利用现有的开放 socket 连接，无需任何额外的连接或配置。这种简化的方法提高了效率，减少了无缝实时通信的设置要求。
 
 ### 创建你自己的服务器

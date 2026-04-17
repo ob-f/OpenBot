@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## 术语
@@ -30,7 +31,7 @@
 
     node --version
 
-该软件位于 OpenBot 项目的 ```/controller/node-js``` 目录中。从 [github](https://github.com/isl-org/OpenBot) 检出代码后，进入此目录并运行以下命令：
+该软件位于 OpenBot 项目的 ```/controller/node-js``` 目录中。从 [github](https://github.com/ob-f/OpenBot) 检出代码后，进入此目录并运行以下命令：
 
     npm install
     npm start
@@ -55,7 +56,7 @@
 
 3. 此外，Node 服务器在端口 7071 创建一个 WebSocket 服务器。这将用于直接与浏览器通信。因此，总结到目前为止，服务器已创建了两个 Socket 连接，一个到机器人，一个到浏览器。
 
-4. 用户从浏览器输入键盘命令。这些按键通过 WebSocket 发送到服务器。服务器将这些命令转换为机器人可以理解的命令，如 ```{driveCmd: {r:0.4, l:0.34}}```（所有命令的列表可以在 Android 控制器的文档中找到 [这里](https://github.com/isl-org/OpenBot/blob/master/docs/technical/OpenBotController.pdf)）。这些命令通过 Socket 连接发送到机器人。
+4. 用户从浏览器输入键盘命令。这些按键通过 WebSocket 发送到服务器。服务器将这些命令转换为机器人可以理解的命令，如 ```{driveCmd: {r:0.4, l:0.34}}```（所有命令的列表可以在 Android 控制器的文档中找到 [这里](https://github.com/ob-f/OpenBot/blob/master/docs/technical/OpenBotController.pdf)）。这些命令通过 Socket 连接发送到机器人。
 
 5. 机器人通过 Socket 连接将状态信息发送回服务器，服务器将其转发到 UI。UI 可以使用此信息来增强其外观，如显示闪烁的指示灯等，但目前此状态被忽略。
 

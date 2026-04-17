@@ -5,7 +5,8 @@
   <a href="CONTRIBUTING.zh-CN.md">简体中文</a> |
   <a href="CONTRIBUTING.de-DE.md">Deutsch</a> |
   <a href="CONTRIBUTING.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="CONTRIBUTING.ko-KR.md">한국어</a>
 </p>
 
 ## Proceso
@@ -30,7 +31,7 @@
    git push --set-upstream origin <nombre-de-la-rama>
    ```
 
-6. Crea una [pull request](https://github.com/intel-isl/OpenBot/pulls) en GitHub y enlaza el issue a ella. Debería aparecer en la columna "In progress" en el proyecto OpenBot.
+6. Crea una [pull request](https://github.com/ob-f/OpenBot/pulls) en GitHub y enlaza el issue a ella. Debería aparecer en la columna "In progress" en el proyecto OpenBot.
 7. Trabaja en cualquier comentario de revisión de código que puedas recibir y empújalo a tu fork. La pull request se actualiza automáticamente.
 8. Tómate una bebida fría de tu elección para recompensarte por hacer del mundo un lugar mejor.
 

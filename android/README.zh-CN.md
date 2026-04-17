@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## 功能
@@ -37,7 +38,7 @@
   </tr>
 </table>
 
-或者，你可以从任何[发布](https://github.com/intel-isl/OpenBot/releases)的资产中下载apk。如果你想要来自主分支的最新应用程序，你也可以从构建工件[这里](https://github.com/intel-isl/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22)下载。请注意，它可能不稳定。如果你以后想对应用程序进行更改，请按照以下步骤编译应用程序并将其部署到手机上。
+或者，你可以从任何[发布](https://github.com/ob-f/OpenBot/releases)的资产中下载apk。如果你想要来自主分支的最新应用程序，你也可以从构建工件[这里](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22)下载。请注意，它可能不稳定。如果你以后想对应用程序进行更改，请按照以下步骤编译应用程序并将其部署到手机上。
 
 ## 构建应用程序
 

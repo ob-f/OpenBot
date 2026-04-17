@@ -1,0 +1,55 @@
+name: Build and Test Node.js Server
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'controller/node-js/**'
+      - '.github/workflows/nodejs-server.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'controller/node-js/**'
+      - '.github/workflows/nodejs-server.yml'
+
+defaults:
+  run:
+    working-directory: ./controller/node-js
+
+jobs:
+  nodejs-server:
+    name: Build and Test Node.js Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start server in background
+        run: nohup npm start &
+
+      - name: Wait for server to start
+        run: sleep 10
+
+      - name: Test HTTP server
+        run: curl -I http://localhost:8081
+
+      - name: Test WebSocket server
+        run: |
+          npm install -g wscat
+          wscat -c ws://localhost:7071 -x '{"test": "message"}'
+
+      - name: Simulate browser commands
+        run: |
+          curl -X POST http://localhost:8081/keypress -d '{"key": "ArrowUp"}' \
+            -H "Content-Type: application/json"
+
+      - name: Stop background server
+        if: always()
+        run: pkill -f "npm start"
