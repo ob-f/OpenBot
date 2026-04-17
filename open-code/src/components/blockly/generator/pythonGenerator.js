@@ -6,17 +6,15 @@ import {pythonGenerator} from "blockly/python";
  */
 pythonGenerator.forBlock['soundType'] = function (block) {
     let dropdown_type = block.getFieldValue('type');
-    let value_name = pythonGenerator.valueToCode(block, 'NAME', pythonGenerator.ORDER_ATOMIC);
     let code = '';
-    code += "playSoundSpeed('" + dropdown_type + "')\n" + value_name;
+    code += "playSoundSpeed('" + dropdown_type + "')\n";
     return code;
 };
 
 pythonGenerator.forBlock['soundMode'] = function (block) {
     let dropdown_mode_type = block.getFieldValue('mode_type');
-    let value_name = pythonGenerator.valueToCode(block, 'NAME', pythonGenerator.ORDER_ATOMIC);
     let code = '';
-    code += "playSoundMode('" + dropdown_mode_type + "')\n" + value_name;
+    code += "playSoundMode('" + dropdown_mode_type + "')\n";
     return code;
 };
 
