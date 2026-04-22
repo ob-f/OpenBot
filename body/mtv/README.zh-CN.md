@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 我们在此提出了一个原始 [OpenBot](https://www.openbot.org/) 车辆的全地形替代方案。由 **Ivy Tech LTD** 合作开发的多地形车辆 (MTV) 也基于廉价且易于打印的组件。MTV 的设计灵感来自过去几十年为月球和火星探索开发的多个探测车概念。MTV 采用 6 个驱动轮，按照摇杆-摇臂配置排列。与大多数月球或火星探测车不同，这些轮子不能径向旋转。因此，该车辆的操作方式类似于坦克，使得手动控制相当直观。

@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="CONTRIBUTING.de-DE.md">Deutsch</a> |
   <a href="CONTRIBUTING.fr-FR.md">Français</a> |
-  <a href="CONTRIBUTING.es-ES.md">Español</a>
+  <a href="CONTRIBUTING.es-ES.md">Español</a> |
+  <a href="CONTRIBUTING.ko-KR.md">한국어</a>
 </p>
 
 ## 过程
@@ -30,7 +31,7 @@
    git push --set-upstream origin <branch-name>
    ```
 
-6. 在GitHub中创建一个[拉取请求](https://github.com/intel-isl/OpenBot/pulls)并将issue链接到它。它应该显示在OpenBot项目的“进行中”列中。
+6. 在GitHub中创建一个[拉取请求](https://github.com/ob-f/OpenBot/pulls)并将issue链接到它。它应该显示在OpenBot项目的“进行中”列中。
 7. 处理您可能收到的任何代码审查反馈并将其推送到您的fork。拉取请求会自动更新。
 8. 喝一杯您喜欢的冷饮，奖励自己让世界变得更美好。
 

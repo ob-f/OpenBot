@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## Nomenclatura
@@ -30,7 +31,7 @@ Puedes ejecutar este software en una PC, un dispositivo tipo RaspberryPi o inclu
 
     node --version
 
-El software se encuentra en el directorio ```/controller/node-js``` del proyecto OpenBot. Después de clonar el código desde [github](https://github.com/isl-org/OpenBot), cambia a este directorio y ejecuta los siguientes comandos:
+El software se encuentra en el directorio ```/controller/node-js``` del proyecto OpenBot. Después de clonar el código desde [github](https://github.com/ob-f/OpenBot), cambia a este directorio y ejecuta los siguientes comandos:
 
     npm install
     npm start
@@ -55,7 +56,7 @@ Asegúrate de que tu Robot esté conectado a la misma red. En la aplicación And
 
 3. Además, el servidor Node crea un servidor WebSocket en el puerto 7071. Esto se utilizará para comunicarse directamente con el navegador. Entonces, para resumir hasta ahora, el servidor ha creado dos conexiones Socket, una para el Robot y otra para el Navegador.
 
-4. El usuario ingresa comandos de teclado desde el navegador. Estas pulsaciones de teclas se envían al Servidor a través del WebSocket. El servidor convierte estos comandos en comandos que el Robot puede entender, como ```{driveCmd: {r:0.4, l:0.34}}``` (una lista de todos los comandos se puede encontrar en la documentación para el controlador de Android [aquí](https://github.com/isl-org/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). Estos comandos se envían al Robot a través de la conexión Socket.
+4. El usuario ingresa comandos de teclado desde el navegador. Estas pulsaciones de teclas se envían al Servidor a través del WebSocket. El servidor convierte estos comandos en comandos que el Robot puede entender, como ```{driveCmd: {r:0.4, l:0.34}}``` (una lista de todos los comandos se puede encontrar en la documentación para el controlador de Android [aquí](https://github.com/ob-f/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). Estos comandos se envían al Robot a través de la conexión Socket.
 
 5. El Robot envía información de estado de vuelta al servidor en la conexión Socket, y el servidor la reenvía a la UI. La UI puede usar esta información para mejorar su apariencia, como mostrar indicadores parpadeantes, etc., pero actualmente este estado se ignora.
 

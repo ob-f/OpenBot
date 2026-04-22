@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## Nomenclatura
@@ -28,7 +29,7 @@ Puedes ejecutar este software en una PC, un dispositivo tipo RaspberryPi o inclu
 
     node --version
 
-El software se encuentra en el directorio ```/controller/web-server``` del proyecto OpenBot. Después de descargar el código desde [github](https://github.com/isl-org/OpenBot), cambia a este directorio y ejecuta los siguientes comandos:
+El software se encuentra en el directorio ```/controller/web-server``` del proyecto OpenBot. Después de descargar el código desde [github](https://github.com/ob-f/OpenBot), cambia a este directorio y ejecuta los siguientes comandos:
 
     npm install
     npm start
@@ -65,7 +66,7 @@ o simplemente:
 
     <img src="../../controller/web-server/images/web_server_video_streaming.gif" width="50%"/>
 
-4. El usuario ingresa comandos de teclado desde el navegador. Estas pulsaciones de teclas se envían al Servidor a través del WebSocket o webrtc. El servidor convierte estos comandos en comandos que el Robot puede entender, como ```{driveCmd: {l:0.4, r:0.34}}``` (una lista de todos los comandos se puede encontrar en la documentación del controlador de Android [aquí](https://github.com/isl-org/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). Estos comandos se envían al Robot a través de la conexión Socket.
+4. El usuario ingresa comandos de teclado desde el navegador. Estas pulsaciones de teclas se envían al Servidor a través del WebSocket o webrtc. El servidor convierte estos comandos en comandos que el Robot puede entender, como ```{driveCmd: {l:0.4, r:0.34}}``` (una lista de todos los comandos se puede encontrar en la documentación del controlador de Android [aquí](https://github.com/ob-f/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). Estos comandos se envían al Robot a través de la conexión Socket.
 5. El WebSocket sirve como un canal de datos crucial para el proxy de señalización de WebRTC. WebRTC aprovecha eficientemente las conexiones de socket abiertas existentes para este propósito, eliminando la necesidad de conexiones o configuraciones adicionales. Este enfoque simplificado mejora la eficiencia y minimiza los requisitos de configuración para una comunicación en tiempo real sin problemas.
 
 ### Crear tu propio servidor

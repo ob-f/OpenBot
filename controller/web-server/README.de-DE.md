@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## Nomenklatur
@@ -28,7 +29,7 @@ Sie können diese Software auf einem PC, einem RaspberryPi-ähnlichen Gerät ode
 
     node --version
 
-Die Software befindet sich im Verzeichnis ```/controller/web-server``` des OpenBot-Projekts. Nachdem Sie den Code von [github](https://github.com/isl-org/OpenBot) ausgecheckt haben, wechseln Sie in dieses Verzeichnis und führen Sie die folgenden Befehle aus:
+Die Software befindet sich im Verzeichnis ```/controller/web-server``` des OpenBot-Projekts. Nachdem Sie den Code von [github](https://github.com/ob-f/OpenBot) ausgecheckt haben, wechseln Sie in dieses Verzeichnis und führen Sie die folgenden Befehle aus:
 
     npm install
     npm start
@@ -65,7 +66,7 @@ oder einfach:
 
     <img src="../../controller/web-server/images/web_server_video_streaming.gif" width="50%"/>
 
-4. Der Benutzer gibt Tastaturbefehle vom Browser aus ein. Diese Tastendrücke werden über den WebSocket oder WebRTC an den Server gesendet. Der Server wandelt diese in Befehle um, die der Roboter verstehen kann, wie ```{driveCmd: {l:0.4, r:0.34}}``` (eine Liste aller Befehle finden Sie in der Dokumentation für den Android-Controller [hier](https://github.com/isl-org/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). Diese Befehle werden über die Socket-Verbindung an den Roboter gesendet.
+4. Der Benutzer gibt Tastaturbefehle vom Browser aus ein. Diese Tastendrücke werden über den WebSocket oder WebRTC an den Server gesendet. Der Server wandelt diese in Befehle um, die der Roboter verstehen kann, wie ```{driveCmd: {l:0.4, r:0.34}}``` (eine Liste aller Befehle finden Sie in der Dokumentation für den Android-Controller [hier](https://github.com/ob-f/OpenBot/blob/master/docs/technical/OpenBotController.pdf)). Diese Befehle werden über die Socket-Verbindung an den Roboter gesendet.
 5. Der WebSocket dient als wichtiger Datenkanal für das WebRTC-Signalisierungsproxy. WebRTC nutzt effizient die bestehenden offenen Socket-Verbindungen für diesen Zweck, wodurch zusätzliche Verbindungen oder Konfigurationen überflüssig werden. Dieser optimierte Ansatz erhöht die Effizienz und minimiert die Einrichtungsanforderungen für eine nahtlose Echtzeitkommunikation.
 
 ### Erstellen Sie Ihren eigenen Server

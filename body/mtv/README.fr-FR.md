@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <span>Français</span> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Nous proposons ici une alternative tout-terrain au véhicule original [OpenBot](https://www.openbot.org/). Développé en collaboration avec **Ivy Tech LTD**, le Véhicule Multi-Terrain (MTV) est également basé sur des composants peu coûteux et facilement imprimables. Le MTV s'inspire de plusieurs concepts de véhicules d'exploration développés au cours des dernières décennies pour l'exploration lunaire et martienne. Le MTV est conçu autour d'un ensemble de 6 roues actionnées, organisées en configuration Rocker-Bogie. Contrairement à la plupart des rovers lunaires ou martiens, les roues ne peuvent pas tourner radialement. Le véhicule fonctionne donc de la même manière qu'un char, ce qui rend le contrôle manuel assez intuitif.

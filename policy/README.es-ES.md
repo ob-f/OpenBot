@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <span>Español</span>
+  <span>Español</span> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## DESCARGOS DE RESPONSABILIDAD
@@ -125,7 +126,7 @@ Interfaz web:
 ### Notas
 
 - Recuerda activar el entorno antes de ejecutar comandos en la terminal: `conda activate openbot`
-- Si la importación de tensorflow no funciona, intenta instalarlo a través de `pip install tensorflow --user`. (Ver este [problema](https://github.com/intel-isl/OpenBot/issues/98).)
+- Si la importación de tensorflow no funciona, intenta instalarlo a través de `pip install tensorflow --user`. (Ver este [problema](https://github.com/ob-f/OpenBot/issues/98).)
 
 ## Conjunto de Datos
 

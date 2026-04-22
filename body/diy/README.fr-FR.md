@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <span>Français</span> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 Nous avons conçu un châssis pour un robot à roues qui repose sur du matériel de loisir peu coûteux et facilement disponible. Vous trouverez ci-dessous des instructions pour construire votre propre robot. Si vous avez d'autres questions ou préoccupations, n'hésitez pas à nous contacter. Bonne construction de robot !
@@ -54,7 +55,7 @@ Vous aurez également besoin d'un support de téléphone. Voici quelques options
 
 - Support de téléphone ([EU](https://www.amazon.de/dp/B06XDYJNSR), [US](https://www.amazon.com/dp/B09CY8MC2R))
 
-Vous pouvez également faire preuve de créativité et construire votre propre châssis OpenBot et support de téléphone en utilisant un matériau de votre choix (par exemple, bois, carton, polystyrène, etc.). Si vous le faites, veuillez poster des photos sur le [canal Slack](https://github.com/intel-isl/OpenBot#contact) pour que les autres puissent admirer votre créativité. Voici un exemple par [@custom-build-robots](https://custom-build-robots.com/roboter/openbot-dein-smartphone-steuert-ein-roboter-auto-chassis-bauen/13636) :
+Vous pouvez également faire preuve de créativité et construire votre propre châssis OpenBot et support de téléphone en utilisant un matériau de votre choix (par exemple, bois, carton, polystyrène, etc.). Si vous le faites, veuillez poster des photos sur le [canal Slack](https://github.com/ob-f/OpenBot#contact) pour que les autres puissent admirer votre créativité. Voici un exemple par [@custom-build-robots](https://custom-build-robots.com/roboter/openbot-dein-smartphone-steuert-ein-roboter-auto-chassis-bauen/13636) :
 
 <p float="left">
   <img src="../../docs/images/chassis_cardboard_1.jpg" width="32%" />

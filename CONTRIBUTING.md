@@ -5,7 +5,8 @@
   <a href="CONTRIBUTING.zh-CN.md">简体中文</a> |
   <a href="CONTRIBUTING.de-DE.md">Deutsch</a> |
   <a href="CONTRIBUTING.fr-FR.md">Français</a> |
-  <a href="CONTRIBUTING.es-ES.md">Español</a>
+  <a href="CONTRIBUTING.es-ES.md">Español</a> |
+  <a href="CONTRIBUTING.ko-KR.md">한국어</a>
 </p>
 
 ## Process
@@ -30,7 +31,7 @@
    git push --set-upstream origin <branch-name>
    ```
 
-6. Create a [pull request](https://github.com/intel-isl/OpenBot/pulls) in GitHub and link the issue to it. It should show up in the "In progress" column in the OpenBot project.
+6. Create a [pull request](https://github.com/ob-f/OpenBot/pulls) in GitHub and link the issue to it. It should show up in the "In progress" column in the OpenBot project.
 7. Work on any code review feedback you may receive and push it to your fork. The pull request gets updated automatically.
 8. Get a cold drink of your choice to reward yourself for making the world a better place.
 

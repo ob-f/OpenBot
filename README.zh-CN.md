@@ -5,14 +5,14 @@
 <h1 align="center"><a>将智能手机变成机器人</a></h1>
 
 <p align="center">
-   <img alt="GitHub build" src="https://img.shields.io/github/actions/workflow/status/isl-org/OpenBot/gradle.yml?branch=master"></a>
-   <img alt="GitHub issues" src="https://img.shields.io/github/issues/isl-org/OpenBot"></a>
-   <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/isl-org/OpenBot"></a>
-   <img alt="GitHub forks" src="https://img.shields.io/github/forks/isl-org/OpenBot"></a>
-   <img alt="GitHub stars" src="https://img.shields.io/github/stars/isl-org/OpenBot"></a>
-   <img alt="Github downloads" src="https://img.shields.io/github/downloads/isl-org/OpenBot/total"></a>
-   <img alt="Github size" src="https://img.shields.io/github/repo-size/isl-org/OpenBot"></a>
-   <img alt="Github license" src="https://img.shields.io/github/license/isl-org/OpenBot"></a>
+   <img alt="GitHub build" src="https://img.shields.io/github/actions/workflow/status/ob-f/OpenBot/gradle.yml?branch=master"></a>
+   <img alt="GitHub issues" src="https://img.shields.io/github/issues/ob-f/OpenBot"></a>
+   <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/ob-f/OpenBot"></a>
+   <img alt="GitHub forks" src="https://img.shields.io/github/forks/ob-f/OpenBot"></a>
+   <img alt="GitHub stars" src="https://img.shields.io/github/stars/ob-f/OpenBot"></a>
+   <img alt="Github downloads" src="https://img.shields.io/github/downloads/ob-f/OpenBot/total"></a>
+   <img alt="Github size" src="https://img.shields.io/github/repo-size/ob-f/OpenBot"></a>
+   <img alt="Github license" src="https://img.shields.io/github/license/ob-f/OpenBot"></a>
 </p>
 
 <p align="center">
@@ -20,7 +20,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 OpenBot 利用智能手机作为低成本机器人的大脑。我们设计了一种小型电动车，成本约为 50 美元，作为机器人的主体。我们的 Android 智能手机软件栈支持高级机器人工作负载，如跟随人和实时自主导航。
@@ -37,10 +38,10 @@ OpenBot 利用智能手机作为低成本机器人的大脑。我们设计了一
 
 ## 获取源代码
 
-- 你可以下载仓库为 [zip 文件](https://github.com/intel-isl/OpenBot/archive/master.zip) 并解压到你选择的文件夹中。
+- 你可以下载仓库为 [zip 文件](https://github.com/ob-f/OpenBot/archive/master.zip) 并解压到你选择的文件夹中。
 - 你可以使用以下命令从 GitHub 克隆 OpenBot 仓库：
     ```bash
-    git clone https://github.com/intel-isl/OpenBot.git
+    git clone https://github.com/ob-f/OpenBot.git
     ```
 - 你可以 fork OpenBot 仓库，然后克隆你的本地副本。特别是如果你想 [贡献](CONTRIBUTING.md)，这是推荐的方式。
 
@@ -80,7 +81,7 @@ OpenBot 利用智能手机作为低成本机器人的大脑。我们设计了一
 
 ## 贡献
 
-请阅读 [贡献指南](CONTRIBUTING.md)。如果你不确定从哪里开始，可以查看 [开放问题](https://github.com/intel-isl/OpenBot/issues)。
+请阅读 [贡献指南](CONTRIBUTING.md)。如果你不确定从哪里开始，可以查看 [开放问题](https://github.com/ob-f/OpenBot/issues)。
 
 ## 引用
 

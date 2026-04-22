@@ -204,8 +204,9 @@ public class AutopilotFragment extends CameraFragment {
 
         binding.trackingOverlay.addCallback(
                 canvas -> {
-                    tracker.draw(canvas);
-                    //          tracker.drawDebug(canvas);
+                    if (tracker != null) {
+                        tracker.draw(canvas);
+                    }
                 });
         tracker.setFrameConfiguration(
                 getMaxAnalyseImageSize().getWidth(),

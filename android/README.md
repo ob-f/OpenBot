@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## Features
@@ -38,7 +39,7 @@ The easiest way to get either of the apps is to download it directly to the phon
 </table>
 
 
-Alternatively, you can download the apks from the assets of any [release](https://github.com/intel-isl/OpenBot/releases). If you want the latest app from the master branch, you can also download it from the build artifacts [here](https://github.com/intel-isl/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22). Note, that it may not be stable. If you would like to make changes to the app later, follow the steps below to compile the app and deploy it on your phone.
+Alternatively, you can download the apks from the assets of any [release](https://github.com/ob-f/OpenBot/releases). If you want the latest app from the master branch, you can also download it from the build artifacts [here](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22). Note, that it may not be stable. If you would like to make changes to the app later, follow the steps below to compile the app and deploy it on your phone.
 
 ## Build the apps
 

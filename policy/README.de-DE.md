@@ -5,7 +5,8 @@
   <a href="README.zh-CN.md">简体中文</a> |
   <span>Deutsch</span> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## HAFTUNGSAUSSCHLÜSSE
@@ -125,7 +126,7 @@ Webschnittstelle:
 ### Hinweise
 
 - Denken Sie daran, die Umgebung zu aktivieren, bevor Sie Befehle im Terminal ausführen: `conda activate openbot`
-- Wenn Ihr TensorFlow-Import nicht funktioniert, versuchen Sie, es über `pip install tensorflow --user` zu installieren. (Siehe dieses [Problem](https://github.com/intel-isl/OpenBot/issues/98).)
+- Wenn Ihr TensorFlow-Import nicht funktioniert, versuchen Sie, es über `pip install tensorflow --user` zu installieren. (Siehe dieses [Problem](https://github.com/ob-f/OpenBot/issues/98).)
 
 ## Datensatz
 

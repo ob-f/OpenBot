@@ -5,7 +5,8 @@
   <span>简体中文</span> |
   <a href="README.de-DE.md">Deutsch</a> |
   <a href="README.fr-FR.md">Français</a> |
-  <a href="README.es-ES.md">Español</a>
+  <a href="README.es-ES.md">Español</a> |
+  <a href="README.ko-KR.md">한국어</a>
 </p>
 
 ## 免责声明
@@ -125,7 +126,7 @@ Web界面：
 ### 注意事项
 
 - 记得在终端运行命令之前激活环境：`conda activate openbot`
-- 如果您的tensorflow导入不起作用，请尝试通过`pip install tensorflow --user`安装。（参见这个[问题](https://github.com/intel-isl/OpenBot/issues/98)。）
+- 如果您的tensorflow导入不起作用，请尝试通过`pip install tensorflow --user`安装。（参见这个[问题](https://github.com/ob-f/OpenBot/issues/98)。）
 
 ## 数据集
 
