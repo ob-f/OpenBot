@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "cd server && npm install",
-    "start": "run-p dev:server dev:start-server",
+    "postinstall": "cd server && npm install",
+    "start": "npx run-p dev:server dev:start-server",
     "start-nohup": "nohup npm run start",
     "dev:server": "npm run start --prefix server",
     "dev:start-server-headless": "NODE_ENV=development snowpack build --watch",
