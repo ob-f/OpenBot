@@ -269,6 +269,12 @@ public class LoggerFragment extends CameraFragment {
     super.onPause();
   }
 
+  @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    BotToControllerEventBus.emitEvent(ConnectionUtils.closeFragment());
+  }
+
   protected synchronized void runInBackground(final Runnable r) {
     if (handler != null) {
       handler.post(r);

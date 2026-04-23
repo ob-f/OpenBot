@@ -43,6 +43,15 @@ public class ConnectionUtils {
     return new JSONObject();
   }
 
+  public static JSONObject closeFragment(){
+    try {
+      return new JSONObject().put("FRAGMENT_TYPE", "CLOSE");
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return new JSONObject();
+  }
+
   public static JSONObject getStatus(
       boolean loggingEnabled,
       boolean noiseEnabled,

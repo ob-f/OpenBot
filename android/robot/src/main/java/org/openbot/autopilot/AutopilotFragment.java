@@ -30,11 +30,13 @@ import org.openbot.R;
 import org.openbot.common.CameraFragment;
 import org.openbot.databinding.FragmentAutopilotBinding;
 import org.openbot.env.BorderedText;
+import org.openbot.env.BotToControllerEventBus;
 import org.openbot.env.ImageUtils;
 import org.openbot.tflite.Autopilot;
 import org.openbot.tflite.Model;
 import org.openbot.tflite.Network;
 import org.openbot.tracking.MultiBoxTracker;
+import org.openbot.utils.ConnectionUtils;
 import org.openbot.utils.Constants;
 import org.openbot.utils.Enums;
 import org.openbot.utils.PermissionUtils;
@@ -79,11 +81,17 @@ public class AutopilotFragment extends CameraFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        BotToControllerEventBus.emitEvent(ConnectionUtils.closeFragment());
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
-
         binding.deviceSpinner.setSelection(preferencesManager.getDevice());
+        preferencesManager.setFragment(Enums.fragmentType.AUTOPILOT.getFragment());
         setNumThreads(preferencesManager.getNumThreads());
         binding.threads.setText(String.valueOf(getNumThreads()));
         binding.cameraToggle.setOnClickListener(v -> toggleCamera());
@@ -176,6 +184,8 @@ public class AutopilotFragment extends CameraFragment {
                                         Enums.SpeedMode.getByID(preferencesManager.getSpeedMode()))));
 
         binding.autoSwitch.setOnClickListener(v -> setNetworkEnabled(binding.autoSwitch.isChecked()));
+        BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(preferencesManager.getFragment()));
+
     }
 
     private void updateCropImageInfo() {

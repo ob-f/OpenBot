@@ -97,6 +97,13 @@ public class ObjectNavFragment extends CameraFragment {
   }
 
   @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    BotToControllerEventBus.emitEvent(ConnectionUtils.closeFragment());
+  }
+
+
+  @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     preferencesManager.setFragment(Enums.fragmentType.OBJECTDETECTION.getFragment());
