@@ -106,6 +106,8 @@ class DataCollectionController: CameraController {
     /// Called after the view was dismissed, covered or otherwise hidden.
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        let msg = JSON.toString(self.fragmentType.closeFragment())
+        client.send(message: msg)
     }
 
     /// Called when the view controller's view's size is changed by its parent (i.e. for the root view controller when its window rotates or is resized).
@@ -390,7 +392,12 @@ class DataCollectionController: CameraController {
         }
         if notification.object != nil {
             let command = notification.object as! String
-            let controllerCommand = command.slice(from: "command: ", to: " }")
+            let controllerCommand = command
+                .replacingOccurrences(of: "{", with: "")
+                .replacingOccurrences(of: "}", with: "")
+                .replacingOccurrences(of: "command:", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
             switch controllerCommand {
             case "INDICATOR_LEFT":
                 self.webSocketMsgHandler.indicatorLeft()
@@ -409,6 +416,10 @@ class DataCollectionController: CameraController {
             case "DRIVE_MODE":
                 self.webSocketMsgHandler.driveMode()
                 break;
+            case "LOGS":
+                self.webSocketMsgHandler.toggleLogging()
+                break;
+
             default:
                 break;
             }

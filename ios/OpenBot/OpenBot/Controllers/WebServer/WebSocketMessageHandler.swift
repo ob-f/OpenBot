@@ -35,7 +35,7 @@ class WebSocketMessageHandler {
     }
 
     func toggleLogging(){
-
+        NotificationCenter.default.post(name: .logData, object: nil)
     }
 
     func quit(){

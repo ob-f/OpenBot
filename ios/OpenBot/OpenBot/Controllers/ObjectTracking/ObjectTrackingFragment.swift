@@ -191,6 +191,10 @@ class ObjectTrackingFragment: CameraController {
         if autoMode {
             autoMode = false
         }
+        
+        let msg = JSON.toString(self.fragmentType.closeFragment())
+        client.send(message: msg)
+        
     }
 
     func setupNavigationBarItem() {
@@ -413,7 +417,12 @@ class ObjectTrackingFragment: CameraController {
         }
         if notification.object != nil {
             let command = notification.object as! String
-            let controllerCommand = command.slice(from: "command: ", to: " }")
+            let controllerCommand = command
+                .replacingOccurrences(of: "{", with: "")
+                .replacingOccurrences(of: "}", with: "")
+                .replacingOccurrences(of: "command:", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
             switch controllerCommand {
             case "INDICATOR_LEFT":
                 self.webSocketMsgHandler.indicatorLeft()
@@ -431,6 +440,12 @@ class ObjectTrackingFragment: CameraController {
                 break;
             case "DRIVE_MODE":
                 self.webSocketMsgHandler.driveMode()
+                break;
+            case "NETWORK":
+                if let autoModeButton = self.objectTrackingSettings?.autoModeButton {
+                    autoModeButton.setOn(!autoModeButton.isOn, animated: true)
+                    self.objectTrackingSettings?.switchButton(autoModeButton)
+                }
                 break;
             default:
                 break;
