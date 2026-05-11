@@ -106,8 +106,8 @@ public class ObjectNavFragment extends CameraFragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    preferencesManager.setFragment(Enums.fragmentType.OBJECTDETECTION.getFragment());
-    BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(preferencesManager.getFragment()));
+    BotToControllerEventBus.emitEvent(
+        ConnectionUtils.createFragment(Enums.FragmentType.OBJECTDETECTION.getFragment()));
     binding.confidenceValue.setText((int) (MINIMUM_CONFIDENCE_TF_OD_API * 100) + "%");
     binding.plusConfidence.setOnClickListener(
         v -> {

@@ -46,18 +46,13 @@ class ControlSelectorState extends State<ControlSelector> {
   @override
   Widget build(BuildContext context) {
     if (widget.isTiltingPhoneMode) {
-      return GestureDetector(
-          child: TiltingPhoneMode(fragmentType: widget.fragmentType));
+      return TiltingPhoneMode(fragmentType: widget.fragmentType);
     } else if (widget.isScreenMode) {
-      return GestureDetector(
-        child: OnScreenMode(widget.updateMirrorView, widget.indicatorLeft,
-            widget.indicatorRight, widget.peerConnection, widget.fragmentType),
-      );
+      return OnScreenMode(widget.updateMirrorView, widget.indicatorLeft,
+          widget.indicatorRight, widget.peerConnection, widget.fragmentType);
     } else {
-      return GestureDetector(
-        child: OnScreenMode(widget.updateMirrorView, widget.indicatorLeft,
-            widget.indicatorRight, widget.peerConnection, widget.fragmentType),
-      );
+      return OnScreenMode(widget.updateMirrorView, widget.indicatorLeft,
+          widget.indicatorRight, widget.peerConnection, widget.fragmentType);
     }
   }
 }

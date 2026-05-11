@@ -91,7 +91,6 @@ public class AutopilotFragment extends CameraFragment {
         super.onViewCreated(view, savedInstanceState);
         binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
         binding.deviceSpinner.setSelection(preferencesManager.getDevice());
-        preferencesManager.setFragment(Enums.fragmentType.AUTOPILOT.getFragment());
         setNumThreads(preferencesManager.getNumThreads());
         binding.threads.setText(String.valueOf(getNumThreads()));
         binding.cameraToggle.setOnClickListener(v -> toggleCamera());
@@ -184,7 +183,7 @@ public class AutopilotFragment extends CameraFragment {
                                         Enums.SpeedMode.getByID(preferencesManager.getSpeedMode()))));
 
         binding.autoSwitch.setOnClickListener(v -> setNetworkEnabled(binding.autoSwitch.isChecked()));
-        BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(preferencesManager.getFragment()));
+        BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(Enums.FragmentType.AUTOPILOT.getFragment()));
 
     }
 

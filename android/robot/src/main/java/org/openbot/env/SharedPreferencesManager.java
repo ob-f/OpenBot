@@ -1,6 +1,5 @@
 package org.openbot.env;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.google.common.reflect.TypeToken;
@@ -44,9 +43,6 @@ public class SharedPreferencesManager {
   private static final String DELAY = "DELAY";
   private static final String PROJECTS_LIST = "PROJECTS_LIST";
 
-  private static final String FRAGMENT_TYPE = "FRAGMENT_TYPE";
-
-
   private final SharedPreferences preferences;
 
   public SharedPreferencesManager(Context context) {
@@ -55,12 +51,6 @@ public class SharedPreferencesManager {
             .getApplicationContext()
             .getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
   }
-  public String getFragment(){return preferences.getString(FRAGMENT_TYPE, "" );}
-  public void setFragment(String fragment)
-  {
-    preferences.edit().putString(FRAGMENT_TYPE, fragment).apply();
-  }
-
   public int getBaudrate() {
     return preferences.getInt(BAUD_RATE, DEFAULT_BAUD_RATE);
   }

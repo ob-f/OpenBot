@@ -29,14 +29,20 @@ public class Enums {
     }
   }
 
-  public enum fragmentType{
+  public enum FragmentType {
     AUTOPILOT("Autopilot"),
     OBJECTDETECTION("ObjectDetection"),
     DATACOLLECTION("DataCollection"),
     FREEROAM("FreeRoam");
-    private String fragmentType;
-    fragmentType(String fragmentType) {this.fragmentType=fragmentType;}
-    public String getFragment() {return fragmentType;}
+    private final String fragmentType;
+
+    FragmentType(String fragmentType) {
+      this.fragmentType = fragmentType;
+    }
+
+    public String getFragment() {
+      return fragmentType;
+    }
   }
 
   public enum LogMode {

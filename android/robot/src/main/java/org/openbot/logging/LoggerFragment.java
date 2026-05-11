@@ -85,8 +85,8 @@ public class LoggerFragment extends CameraFragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    preferencesManager.setFragment(Enums.fragmentType.DATACOLLECTION.getFragment());
-    BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(preferencesManager.getFragment()));
+    BotToControllerEventBus.emitEvent(
+        ConnectionUtils.createFragment(Enums.FragmentType.DATACOLLECTION.getFragment()));
     binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
 
     intentSensorService = new Intent(requireActivity(), SensorService.class);

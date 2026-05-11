@@ -47,9 +47,8 @@ public class FreeRoamFragment extends ControlsFragment {
 
     phoneController = PhoneController.getInstance(requireContext());
 
-    preferencesManager.setFragment(Enums.fragmentType.FREEROAM.getFragment());
-
-    BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(preferencesManager.getFragment()));
+    BotToControllerEventBus.emitEvent(
+        ConnectionUtils.createFragment(Enums.FragmentType.FREEROAM.getFragment()));
 
     binding.voltageInfo.setText(getString(R.string.voltageInfo, "--.-"));
     binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));

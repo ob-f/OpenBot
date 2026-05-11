@@ -57,6 +57,10 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLogsEnabled = typeOfFragment == "DataCollection";
+    final bool isNetworkEnabled =
+        typeOfFragment == "Autopilot" || typeOfFragment == "ObjectDetection";
+
     return WillPopScope(
       onWillPop: () async {
         return true;
@@ -127,47 +131,59 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                     alignment: AlignmentDirectional.bottomEnd,
                     margin: const EdgeInsets.only(bottom: 20),
                     child: Row(children: [
-                      GestureDetector(
-                          onTap: () {
-                            if (typeOfFragment == "DataCollection") {
-                              clientSocket?.writeln("{command: LOGS}");
-                            }
-                          }, // Image tapped
-                          child: Container(
-                            padding: const EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(45),
-                              color: typeOfFragment == "DataCollection"
-                                  ? Colors.white.withOpacity(0.5)
-                                  : Colors.grey.withOpacity(0.5),
-                            ),
-                            child: const Icon(
-                              Icons.sd_card,
-                              color: Colors.blue,
+                      Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(45),
+                            splashColor: Colors.white.withOpacity(0.2),
+                            highlightColor: Colors.white.withOpacity(0.12),
+                            onTap: isLogsEnabled
+                                ? () {
+                                    clientSocket?.writeln("{command: LOGS}");
+                                  }
+                                : null, // Image tapped
+                            child: Ink(
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(45),
+                                color: isLogsEnabled
+                                    ? const Color(0xFF0071C5).withOpacity(0.5)
+                                    : Colors.grey.withOpacity(0.5),
+                              ),
+                              child: Icon(
+                                Icons.sd_card_outlined,
+                                color: isLogsEnabled ? Colors.white : Colors.blue,
+                              ),
                             ),
                           )),
                       const SizedBox(
                         width: 15,
                       ),
-                      GestureDetector(
-                          onTap: () {
-                            if (typeOfFragment == "Autopilot" ||
-                                typeOfFragment == "ObjectDetection") {
-                              clientSocket?.writeln("{command: NETWORK}");
-                            }
-                          }, // Image tapped
-                          child: Container(
-                            padding: const EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(45),
-                              color: typeOfFragment == "Autopilot" ||
-                                      typeOfFragment == "ObjectDetection"
-                                  ? Colors.white.withOpacity(0.5)
-                                  : Colors.grey.withOpacity(0.5),
-                            ),
-                            child: const Icon(
-                              Icons.person_search_outlined,
-                              color: Colors.blue,
+                      Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(45),
+                            splashColor: Colors.white.withOpacity(0.2),
+                            highlightColor: Colors.white.withOpacity(0.12),
+                            onTap: isNetworkEnabled
+                                ? () {
+                                    clientSocket?.writeln("{command: NETWORK}");
+                                  }
+                                : null, // Image tapped
+                            child: Ink(
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(45),
+                                color: isNetworkEnabled
+                                    ? const Color(0xFF0071C5).withOpacity(0.5)
+                                    : Colors.grey.withOpacity(0.5),
+                              ),
+                              child: Icon(
+                                Icons.person_search_outlined,
+                                color: isNetworkEnabled
+                                    ? Colors.white
+                                    : Colors.blue,
+                              ),
                             ),
                           )),
                     ])),
