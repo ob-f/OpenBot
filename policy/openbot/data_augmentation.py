@@ -2,6 +2,7 @@
 Created by Marcel Santos - Intel Intelligent Systems Lab - 2021
 This script implements several routines for data augmentation.
 """
+
 import tensorflow as tf
 import numpy as np
 

@@ -1,4 +1,5 @@
 """Frontend for OpenBot policy server."""
+
 from pathlib import Path
 
 

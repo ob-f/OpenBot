@@ -1,4 +1,4 @@
-""" Example of announcing a service (in this case, a fake HTTP server) """
+"""Example of announcing a service (in this case, a fake HTTP server)"""
 
 import asyncio
 import logging
