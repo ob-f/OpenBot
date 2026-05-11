@@ -208,7 +208,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                       : Colors.grey.withOpacity(0.5),
                 ),
                 child: const Icon(
-                  Icons.file_present,
+                  Icons.sd_card,
                   color: Colors.blue,
                 ),
               )),
@@ -232,7 +232,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                       : Colors.grey.withOpacity(0.5),
                 ),
                 child: const Icon(
-                  Icons.network_check,
+                  Icons.person_search_outlined,
                   color: Colors.blue,
                 ),
               )),
