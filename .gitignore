@@ -17,3 +17,12 @@ wandb/
 # build
 /bin
 /node_modules/
+
+/caches
+/wrapper
+controller/flutter/android/build
+/daemon
+kotlin-profile
+native
+jdks
+/android/FakeDependency.jar
