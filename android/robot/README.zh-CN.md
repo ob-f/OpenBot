@@ -82,7 +82,7 @@
 <img src="../../docs/images/screen_data_collection.jpg" alt="数据收集" width="50%" />
 </p>
 
-- **服务器**: 如果您正在运行用于策略训练的[web应用程序](../../policy#web-app)，可以在此选择它以自动上传数据。
+- **服务器**: 如果您正在运行用于策略训练的[web应用程序](../../policy/README.md#web-app)，可以在此选择它以自动上传数据。
 - **预览分辨率**: 用于切换相机预览的分辨率。有3种设置：
   - ***FULL_HD*** (1920x1080p)
   - ***HD*** (1280x720p)
@@ -118,7 +118,7 @@
 <img src="../../docs/images/screen_autopilot.jpg" alt="自动驾驶" width="50%" />
 </p>
 
-- **服务器**: 如果您正在运行用于策略训练的[web应用程序](../../policy#web-app)，可以在此选择它并将训练好的自动驾驶模型发送到机器人。
+- **服务器**: 如果您正在运行用于策略训练的[web应用程序](../../policy/README.md#web-app)，可以在此选择它并将训练好的自动驾驶模型发送到机器人。
 - **模型**: 选择一个训练好的模型用于自动驾驶模式。
 - **设备**: 使用CPU、GPU或NNAPI进行推理（更多详情见[这里](#device)）。
 - **线程**: 使用的线程数（仅在选择CPU作为设备时有所不同）。
@@ -384,7 +384,7 @@
 
 ## 代码结构
 
-[TensorFlow Lite对象检测Android演示](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android)被用作集成TFLite模型和获取相机视频流的起点。[DefaultActivity](src/main/java/org/openbot/robot/DefaultActivity.java)运行主线程，并继承自[CameraActivity](src/main/java/org/openbot/robot/CameraActivity.java)以管理相机和UI。[SensorService](src/main/java/org/openbot/robot/SensorService.java)读取所有其他手机传感器并记录它们。[ServerService](src/main/java/org/openbot/robot/ServerService.java)和[NsdService](src/main/java/org/openbot/robot/NsdService.java)与具有React前端的本地[Python服务器](../../policy/README.md#web-app)建立连接。如果您收集数据，它可以自动上传以进行可视化、训练ML模型并将训练好的模型下载到机器人。[env](src/main/java/org/openbot/env)文件夹包含实用类，如[Vehicle](src/main/java/org/openbot/env/Vehicle.java)接口、[GameController](src/main/java/org/openbot/env/GameController.java)接口、[PhoneController](src/main/java/org/openbot/env/PhoneController.java)接口和用于声音反馈的[AudioPlayer](src/main/java/org/openbot/env/AudioPlayer)。[tflite](src/main/java/org/openbot/tflite)文件夹包含[Autopilot](src/main/java/org/openbot/tflite/Autopilot.java)和[Detector](src/main/java/org/openbot/tflite/Detector.java)网络的模型定义。
+[TensorFlow Lite对象检测Android演示](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android)被用作集成TFLite模型和获取相机视频流的起点。[DefaultActivity](src/main/java/org/openbot/original/DefaultActivity.java)运行主线程，并继承自[CameraActivity](src/main/java/org/openbot/original/CameraActivity.java)以管理相机和UI。[SensorService](src/main/java/org/openbot/logging/SensorService.java)读取所有其他手机传感器并记录它们。[ServerCommunication](src/main/java/org/openbot/server/ServerCommunication.java)和[NsdService](src/main/java/org/openbot/server/NsdService.java)与具有React前端的本地[Python服务器](../../policy/README.md#web-app)建立连接。如果您收集数据，它可以自动上传以进行可视化、训练ML模型并将训练好的模型下载到机器人。[env](src/main/java/org/openbot/env)文件夹包含实用类，如[Vehicle](src/main/java/org/openbot/vehicle/Vehicle.java)接口、[GameController](src/main/java/org/openbot/env/GameController.java)接口、[PhoneController](src/main/java/org/openbot/env/PhoneController.java)接口和用于声音反馈的[AudioPlayer](src/main/java/org/openbot/env/AudioPlayer)。[tflite](src/main/java/org/openbot/tflite)文件夹包含[Autopilot](src/main/java/org/openbot/tflite/Autopilot.java)和[Detector](src/main/java/org/openbot/tflite/Detector.java)网络的模型定义。
 
 ## 下一步（可选）
 

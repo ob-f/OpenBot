@@ -82,6 +82,7 @@
   Below are some examples:
     - Indicators: Block used to enable indicators by turning them ON/OFF.
     - Brightness: used to set the brightness of tail and head LED by taking dynamic values.
+    - [Demo video](https://www.youtube.com/watch?v=ICSi-1ip22U&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=3)
 
   NOTE: Keeping the brightness at zero will make the brightness mode OFF and if the brightness is at the highest point
   ie.100 will turn ON the brightness mode.
@@ -110,6 +111,7 @@
 
     - Speed: Helps you to play the sound as slow, medium and fast.
     - Mode: Helps you to play the sound as dual, joystick or game.
+    - [Demo video](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=1)
 
 - ### Sensors:
 
@@ -121,6 +123,7 @@
     - Phone Sensors: Help to measure Gyroscope,Acceleration, and Magnetic readings at different axis(3-Dimensional).
     - Car Sensors: Help to provide the different readings like Sonar, Speed. Also, it will check if bumper gets collide
       with an obstacle.
+    - [Demo video](https://www.youtube.com/watch?v=Ubcb1bTgfuc&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=2)
 
 - ### Movement:
 
@@ -133,6 +136,7 @@
 
     - Set speed: Helps to set the speed as slow, medium and fast.
     - Move: Helps to make the movement in forward or backward and left or right direction at required speed.
+    - [Demo video](https://www.youtube.com/watch?v=X7M45-PGOVg&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=4)
 
   Key Points:
     - if the left speed value is set lower than the right, the robot will move counterclockwise, or vice versa.
@@ -164,6 +168,7 @@
       project is
       executed on a phone, the point navigation fragment will be displayed on the screen with an Augmented Reality (AR)
       view. Subsequently, the robot will initiate movement until it successfully reaches the goal.
+    - [Demo video](https://www.youtube.com/watch?v=MPzbwUoG97Q&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=6)
 
    <p style="color: yellow"> TIP: If you've incorporated an external modal, ensure to enable AutoSync in the playground. This feature will assist you in display newly added model in block and verifying the availability and successful download of the modal in robot app.</p>
 

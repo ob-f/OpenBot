@@ -82,7 +82,7 @@ Interface utilisateur simple pour la collecte de jeux de données.
 <img src="../../docs/images/screen_data_collection.jpg" alt="Collecte de Données" width="50%" />
 </p>
 
-- **Serveur** : Si vous avez l'[application web](../../policy#web-app) pour l'entraînement des politiques en cours d'exécution, vous pouvez la sélectionner ici pour télécharger automatiquement les données.
+- **Serveur** : Si vous avez l'[application web](../../policy/README.md#web-app) pour l'entraînement des politiques en cours d'exécution, vous pouvez la sélectionner ici pour télécharger automatiquement les données.
 - **Résolution de Prévisualisation** : Utilisée pour basculer entre les résolutions de prévisualisation de la caméra. Il y a 3 réglages :
   - ***FULL_HD*** (1920x1080p)
   - ***HD*** (1280x720p)
@@ -118,7 +118,7 @@ Interface utilisateur simple pour exécuter des modèles de pilote automatique.
 <img src="../../docs/images/screen_autopilot.jpg" alt="Pilote Automatique" width="50%" />
 </p>
 
-- **Serveur** : Si vous avez l'[application web](../../policy#web-app) pour l'entraînement des politiques en cours d'exécution, vous pouvez la sélectionner ici et envoyer des modèles de pilote automatique entraînés au robot.
+- **Serveur** : Si vous avez l'[application web](../../policy/README.md#web-app) pour l'entraînement des politiques en cours d'exécution, vous pouvez la sélectionner ici et envoyer des modèles de pilote automatique entraînés au robot.
 - **Modèle** : Choisissez un modèle entraîné à utiliser pour le mode pilote automatique.
 - **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#device)).
 - **Threads** : Nombre de threads à utiliser (fait une différence uniquement lorsque le CPU est sélectionné comme appareil).
@@ -380,7 +380,7 @@ Veuillez vous référer au [Guide de contribution](ContributionGuide.md) pour ap
 
 ## Structure du code
 
-La [démo Android de détection d'objets TensorFlow Lite](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android) a été utilisée comme point de départ pour intégrer les modèles TFLite et obtenir le flux de la caméra. La [DefaultActivity](src/main/java/org/openbot/robot/DefaultActivity.java) exécute le thread principal et hérite de la [CameraActivity](src/main/java/org/openbot/robot/CameraActivity.java) pour gérer la caméra et l'interface utilisateur. Le [SensorService](src/main/java/org/openbot/robot/SensorService.java) lit tous les autres capteurs du téléphone et les enregistre. Le [ServerService](src/main/java/org/openbot/robot/ServerService.java) et le [NsdService](src/main/java/org/openbot/robot/NsdService.java) établissent une connexion à un [serveur Python local](../../policy/README.md#web-app) avec une interface frontend React. Si vous collectez des données, elles peuvent être téléchargées automatiquement pour la visualisation, l'entraînement de modèles ML et le téléchargement de modèles entraînés sur le robot. Le dossier [env](src/main/java/org/openbot/env) contient des classes utilitaires telles que l'interface [Vehicle](src/main/java/org/openbot/env/Vehicle.java), l'interface [GameController](src/main/java/org/openbot/env/GameController.java), l'interface [PhoneController](src/main/java/org/openbot/env/PhoneController.java) et un [AudioPlayer](src/main/java/org/openbot/env/AudioPlayer.java) pour le retour sonore. Le dossier [tflite](src/main/java/org/openbot/tflite) contient les définitions de modèles pour les réseaux [Autopilot](src/main/java/org/openbot/tflite/Autopilot.java) et [Detector](src/main/java/org/openbot/tflite/Detector.java).
+La [démo Android de détection d'objets TensorFlow Lite](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android) a été utilisée comme point de départ pour intégrer les modèles TFLite et obtenir le flux de la caméra. La [DefaultActivity](src/main/java/org/openbot/original/DefaultActivity.java) exécute le thread principal et hérite de la [CameraActivity](src/main/java/org/openbot/original/CameraActivity.java) pour gérer la caméra et l'interface utilisateur. Le [SensorService](src/main/java/org/openbot/logging/SensorService.java) lit tous les autres capteurs du téléphone et les enregistre. La [ServerCommunication](src/main/java/org/openbot/server/ServerCommunication.java) et le [NsdService](src/main/java/org/openbot/server/NsdService.java) établissent une connexion à un [serveur Python local](../../policy/README.md#web-app) avec une interface frontend React. Si vous collectez des données, elles peuvent être téléchargées automatiquement pour la visualisation, l'entraînement de modèles ML et le téléchargement de modèles entraînés sur le robot. Le dossier [env](src/main/java/org/openbot/env) contient des classes utilitaires telles que l'interface [Vehicle](src/main/java/org/openbot/vehicle/Vehicle.java), l'interface [GameController](src/main/java/org/openbot/env/GameController.java), l'interface [PhoneController](src/main/java/org/openbot/env/PhoneController.java) et un [AudioPlayer](src/main/java/org/openbot/env/AudioPlayer.java) pour le retour sonore. Le dossier [tflite](src/main/java/org/openbot/tflite) contient les définitions de modèles pour les réseaux [Autopilot](src/main/java/org/openbot/tflite/Autopilot.java) et [Detector](src/main/java/org/openbot/tflite/Detector.java).
 
 ## Suivant (optionnel)
 
