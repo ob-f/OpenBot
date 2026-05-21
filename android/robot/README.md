@@ -82,7 +82,7 @@ Simple UI for collection of data sets.
 <img src="../../docs/images/screen_data_collection.jpg" alt="Data Collection" width="50%" />
 </p>
 
-- **Server**: If you have the [web app](../../policy#web-app) for policy training running, you can select it here to automatically upload data.
+- **Server**: If you have the [web app](../../policy/README.md#web-app) for policy training running, you can select it here to automatically upload data.
 - **Preview Resolution**: Used to switch between resolutions of camera preview. There are 3 settings:
   - ***FULL_HD*** (1920x1080p)
   - ***HD*** (1280x720p)
@@ -118,7 +118,7 @@ Simple UI for running autopilot models.
 <img src="../../docs/images/screen_autopilot.jpg" alt="Autopilot" width="50%" />
 </p>
 
-- **Server**: If you have the [web app](../../policy#web-app) for policy training running, you can select it here and send trained autopilot models to the robot.
+- **Server**: If you have the [web app](../../policy/README.md#web-app) for policy training running, you can select it here and send trained autopilot models to the robot.
 - **Model**: Choose a trained model to use for autopilot mode.
 - **Device**: Use CPU, GPU or NNAPI for inference (more details [here](#device)).
 - **Threads**: Number of threads to use (only makes a difference when CPU is selected as device).
@@ -443,7 +443,7 @@ Please refer to the [ContributionGuide](ContributionGuide.md) to learn how to ad
 
 ## Code Structure
 
-The [TensorFlow Lite Object Detection Android Demo](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android) was used as starting point to integrate TFLite models and obtain the camera feed. The [DefaultActivity](src/main/java/org/openbot/robot/DefaultActivity.java) runs the main thread and inherits from the [CameraActivity](src/main/java/org/openbot/robot/CameraActivity.java) to manage the camera and UI. The [SensorService](src/main/java/org/openbot/robot/SensorService.java) reads all other phone sensors and logs them. The [ServerService](src/main/java/org/openbot/robot/ServerService.java) and [NsdService](src/main/java/org/openbot/robot/NsdService.java) establish a connection to a local [Python server](../../policy/README.md#web-app) with a React frontend. If you collect data it can be uploaded automatically for visualization, training ML models and downloading trained models to the robot. The [env](src/main/java/org/openbot/env) folder contains utility classes such as the [Vehicle](src/main/java/org/openbot/env/Vehicle.java) interface, [GameController](src/main/java/org/openbot/env/GameController.java) interface, [PhoneController](src/main/java/org/openbot/env/PhoneController.java) interface and an [AudioPlayer](src/main/java/org/openbot/env/AudioPlayer.java) for the audible feedback. The [tflite](src/main/java/org/openbot/tflite) folder contains the model definitions for the [Autopilot](src/main/java/org/openbot/tflite/Autopilot.java) and [Detector](src/main/java/org/openbot/tflite/Detector.java) networks.
+The [TensorFlow Lite Object Detection Android Demo](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android) was used as starting point to integrate TFLite models and obtain the camera feed. The [DefaultActivity](src/main/java/org/openbot/original/DefaultActivity.java) runs the main thread and inherits from the [CameraActivity](src/main/java/org/openbot/original/CameraActivity.java) to manage the camera and UI. The [SensorService](src/main/java/org/openbot/logging/SensorService.java) reads all other phone sensors and logs them. The [ServerCommunication](src/main/java/org/openbot/server/ServerCommunication.java) and [NsdService](src/main/java/org/openbot/server/NsdService.java) establish a connection to a local [Python server](../../policy/README.md#web-app) with a React frontend. If you collect data it can be uploaded automatically for visualization, training ML models and downloading trained models to the robot. The [env](src/main/java/org/openbot/env) folder contains utility classes such as the [Vehicle](src/main/java/org/openbot/vehicle/Vehicle.java) interface, [GameController](src/main/java/org/openbot/env/GameController.java) interface, [PhoneController](src/main/java/org/openbot/env/PhoneController.java) interface and an [AudioPlayer](src/main/java/org/openbot/env/AudioPlayer.java) for the audible feedback. The [tflite](src/main/java/org/openbot/tflite) folder contains the model definitions for the [Autopilot](src/main/java/org/openbot/tflite/Autopilot.java) and [Detector](src/main/java/org/openbot/tflite/Detector.java) networks.
 
 ## Next (optional)
 

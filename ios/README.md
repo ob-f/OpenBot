@@ -13,9 +13,8 @@
 
 Click on the links below to read about the features of the apps.
 
-- [Robot App](OpenBot/README.md)
-- Controller App (Coming Soon)
-
+- [Robot App](./OpenBot/README.md)
+- [Controller App](../controller/flutter/README.md)
 ## Install the apps
 Currently, the only way to run the iOS apps on your phones is via the developer builds, as described in the section below.
 
@@ -25,6 +24,7 @@ Currently, the only way to run the iOS apps on your phones is via the developer 
 
 - [Xcode iOS 13 or Later](https://developer.apple.com/xcode/) for building and installing the apps.
 - [Cocoapods](https://cocoapods.org/) installed on your system.
+- Setup   [firebase project](./OpenBot/OpenBot/Authentication/README.md).
 - Currently, we're using iOS deployment target version 15.5.
 - Project is configured as "Automatically manage signing", so you can configure your own independent account for building the app -
   <img alt="iOS App" width="100%" src="../docs/images/ios_automatically_manage_signing.png" />

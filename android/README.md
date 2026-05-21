@@ -55,7 +55,7 @@ Alternatively, you can download the apks from the assets of any [release](https:
 
 1. Open Android Studio and select *Open an existing Android Studio project*.
 2. Select the OpenBot/android directory and click OK.
-3. If you want to install the [OpenBot app](app/README.md) make sure to select the *app* configuration. If you want to install the [Controller app](controller/README.md), select the *controller* configuration. Confirm Gradle Sync if neccessary. To perform a Gradle Sync manually, click on the gradle icon.
+3. If you want to install the [OpenBot app](robot/README.md) make sure to select the *app* configuration. If you want to install the [Controller app](controller/README.md), select the *controller* configuration. Confirm Gradle Sync if neccessary. To perform a Gradle Sync manually, click on the gradle icon.
   ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. Connect your Android device and make sure USB Debugging in the [developer options](https://developer.android.com/studio/debug/dev-options) is enabled. Depending on your development environment [further steps](https://developer.android.com/studio/run/device) might be necessary. You should see your device in the navigation bar at the top now.
   ![Phone](../docs/images/android_studio_bar_phone.jpg)

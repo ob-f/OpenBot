@@ -32,7 +32,7 @@ dependencies:
     - attrs==22.2.0
     - backcall==0.2.0
     - beautifulsoup4==4.11.2
-    - black==23.1.0
+    - black==25.11.0
     - bleach==6.0.0
     - brotlipy==0.7.0
     - cachetools==5.3.0
@@ -67,7 +67,7 @@ dependencies:
     - ipython-genutils==0.2.0
     - jedi==0.18.2
     - jinja2==3.1.2
-    - jsonschema==4.17.3
+    - jsonschema>=4.18.0
     - jupyter_client==8.0.3
     - jupyter_core==5.2.0
     - jupyterlab-pygments==0.2.2
@@ -77,7 +77,7 @@ dependencies:
     - libclang==15.0.6.1
     - markdown==3.4.1
     - markupsafe==2.1.2
-    - matplotlib==3.6.3
+    - matplotlib==3.9.4
     - matplotlib-inline==0.1.6
     - mistune==2.0.5
     - multidict==6.0.4
@@ -87,9 +87,9 @@ dependencies:
     - nbformat==5.7.3
     - nest-asyncio==1.5.6
     - netifaces==0.11.0
-    - notebook==6.4.12
-    - numpy==1.24.2
-    - numpyencoder==0.3.0
+    - notebook==7.5.5
+    - numpy<2
+    - numpyencoder==0.3.2
     - oauthlib==3.2.2
     - openbot-frontend==0.7.0
     - opt-einsum==3.3.0
@@ -98,7 +98,7 @@ dependencies:
     - parso==0.8.3
     - pathspec==0.11.0
     - pickleshare==0.7.5
-    - pillow==8.3.2
+    - pillow==10.4.0
     - platformdirs==3.0.0
     - prometheus-client==0.16.0
     - prompt-toolkit==3.0.36
@@ -116,7 +116,7 @@ dependencies:
     - pywin32==305
     - pywinpty==2.0.10
     - pyzmq==25.0.0
-    - requests==2.28.2
+    - requests==2.31.0
     - requests-oauthlib==1.3.1
     - rsa==4.9
     - send2trash==1.8.0
