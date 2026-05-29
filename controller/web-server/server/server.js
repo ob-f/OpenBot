@@ -1,118 +1,124 @@
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({ port: 8080 }, () => {
-    console.log("Signaling server is now listening on port 8080");
+    console.log('Signaling server is now listening on port 8080');
 });
-let rooms = new Map();
+
+// Each room = one browser + one robot, matched by Google email (roomId).
+const rooms = new Map();
+
+// Join only when message is just roomId (+ optional clientType), not a drive command.
+const isJoinMessage = (msg) => {
+    if (!msg.roomId || msg.roomId === 'request-roomId') {
+        return false;
+    }
+    if (msg.driveCmd || msg.command || msg.status || msg.webrtc_event) {
+        return false;
+    }
+    const keys = Object.keys(msg);
+    return keys.every((k) => k === 'roomId' || k === 'clientType');
+};
+
 wss.on('connection', (ws) => {
-    console.log(`Client connected. Total connected clients: ${wss.clients.size}`);
+    ws.clientType = null;
+    ws.roomId = null;
+    console.log(`Client connected (total: ${wss.clients.size})`);
     askIdOfClient(ws);
-    ws.on("message", function message(data, isBinary) {
 
+    ws.on('message', (data, isBinary) => {
         const message = isBinary ? data : data.toString();
-        // console.log(JSON.parse(message));
-        let msg = JSON.parse(message);
+        let msg;
 
-        if (Object.keys(msg)[0] === 'roomId') {
-            createOrJoinRoom(msg.roomId, ws);
-            ws.id = msg.roomId;
-            return;
-        }
-        else if (Object.keys(msg)[0] === 'driveCmd') {
-            let driveCmd = msg.driveCmd;
-            console.log(driveCmd);
-        }
-        else if ('command') {
-            // You may add additional checks for different message types.
-        }
-
-        if (msg.roomId === undefined) {
-            sendToBot(ws, message);
+        try {
+            msg = JSON.parse(message);
+        } catch (error) {
+            console.log('Ignoring non-JSON message');
             return;
         }
 
-        // Broadcast the message to clients within the same room based on the roomId.
-        sendToRoom(msg.roomId, message);
+        if (isJoinMessage(msg)) {
+            const clientType = msg.clientType === 'robot' ? 'robot' : 'browser';
+            joinRoom(msg.roomId, ws, clientType);
+            return;
+        }
+
+        const roomId = msg.roomId || ws.roomId;
+        if (!roomId) {
+            console.log('Dropping message (client not in a room):', Object.keys(msg).join(','));
+            return;
+        }
+
+        if (!ws.roomId) {
+            joinRoom(roomId, ws, ws.clientType || 'browser');
+        }
+
+        relayToPeer(roomId, message, ws, msg);
     });
 
-
-    const sendToRoom = (roomId, message) => {
-        console.log("roomId: ", roomId);
-        let room = rooms.get(roomId);
-
-        if (room) {
-            // Broadcast the message to all non-null clients in the room.
-            broadcastToRoom(room, message);
-        } else {
-            console.log("Room not found for roomId:", roomId);
-        }
-    }
-
-
-    ws.onclose = (socket) => {
-        console.log(`Client disconnected. Total connected clients: ${wss.clients.size}`);
-        let room = rooms.get(ws.id);
-        if (room === undefined){
-            return
-        }
-        room[0]?.close()
-        rooms[1]?.close();
-        rooms.delete(ws.id);
-        console.log(rooms)
-    };
-
+    ws.on('close', () => {
+        console.log(`Client disconnected (${ws.clientType || 'unknown'} total: ${wss.clients.size})`);
+        leaveRoom(ws);
+    });
 });
 
-// Function to ask for client's roomId
+// Tell new clients to send their room id (Google email).
 const askIdOfClient = (ws) => {
-    let request = {
-        roomId: "request-roomId"
-    };
-    ws.send(JSON.stringify(request));
+    ws.send(JSON.stringify({ roomId: 'request-roomId' }));
 };
 
-const createOrJoinRoom = (roomId, ws) => {
-    // Check if the room with the given roomId exists
-    if (!rooms.has(roomId) || rooms.get(roomId).clients[1] !== null) {
-        // Room does not exist or is full (has two clients already)
-        let room = {
-            clients: [ws, null]
-        };
-        rooms.set(roomId, room);
+const joinRoom = (roomId, ws, clientType) => {
+    if (!rooms.has(roomId)) {
+        rooms.set(roomId, { browser: null, robot: null });
+    }
+
+    const room = rooms.get(roomId);
+    const slot = clientType === 'robot' ? 'robot' : 'browser';
+    const previous = room[slot];
+
+    if (previous && previous !== ws && previous.readyState === WebSocket.OPEN) {
+        console.log(`Closing previous ${slot} in room ${roomId}`);
+        previous.close(4000, 'replaced by newer connection');
+    }
+
+    room[slot] = ws;
+    ws.clientType = clientType;
+    ws.roomId = roomId;
+
+    const browserConnected = room.browser != null && room.browser.readyState === WebSocket.OPEN;
+    const robotConnected = room.robot != null && room.robot.readyState === WebSocket.OPEN;
+    console.log(
+        `Room ${roomId}: ${clientType} joined (browser=${browserConnected}, robot=${robotConnected})`
+    );
+};
+
+const leaveRoom = (ws) => {
+    if (!ws.roomId) {
+        return;
+    }
+    const room = rooms.get(ws.roomId);
+    if (!room) {
+        return;
+    }
+    if (ws.clientType === 'browser' && room.browser === ws) {
+        room.browser = null;
+    }
+    if (ws.clientType === 'robot' && room.robot === ws) {
+        room.robot = null;
+    }
+    ws.roomId = null;
+};
+
+const relayToPeer = (roomId, message, sender, msg) => {
+    const room = rooms.get(roomId);
+    if (!room) {
+        console.log(`No room for ${roomId}`);
+        return;
+    }
+
+    const peer = sender.clientType === 'browser' ? room.robot : room.browser;
+    if (peer && peer.readyState === WebSocket.OPEN) {
+        peer.send(message);
     } else {
-        // Room exists and has space for the new client
-        console.log("joining to the room",rooms);
-        let room = rooms.get(roomId);
-        room.clients[1] = ws;
-        rooms.set(roomId, room);
+        console.log(`No peer in room ${roomId} (sender=${sender.clientType})`);
     }
 };
-
-// Broadcast to all.
-wss.broadcast = (ws, data) => {
-    let obj = JSON.parse(data);
-    let key = Object.keys(obj)[0];
-    wss.clients.forEach((client) => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(data);
-        }
-    });
-};
-
-// Broadcast to all clients in a specific room.
-const broadcastToRoom = (room, message) => {
-    room.clients.forEach((client) => {
-        if (client && client.readyState === WebSocket.OPEN) {
-            client.send(message);
-
-        }
-    });
-};
-
-const sendToBot = (ws, message) => {
-    wss.clients.forEach((client) => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(message);
-        }
-    });
-}

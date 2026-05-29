@@ -12,7 +12,15 @@ public class ControllerConfig {
     WEBRTC,
     RTSP
   }
+  /** Web signaling URL (machine running controller/web-server). Override in app settings. */
+  public String getWebSignalingServerUrl() {
+    return get("web_signaling_server", "ws://192.168.1.25:8080/ws");
+  }
 
+  public void setWebSignalingServerUrl(String url) {
+    set("web_signaling_server", url);
+  }
+}
   private String currentServerType;
 
   public static ControllerConfig getInstance() {

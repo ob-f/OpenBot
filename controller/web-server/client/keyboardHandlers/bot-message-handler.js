@@ -10,19 +10,21 @@
 import {WebRTC} from '../webRTC/webrtc.js'
 import {ErrorDisplay} from '../utils/error-display.js'
 import {Buttons} from './buttons.js'
+import {applyToggleStatus} from './status-ui.js'
 
 export function BotMessageHandler (connection) {
     const webRtc = new WebRTC(connection)
     const buttons = new Buttons(connection)
     const errDisplay = new ErrorDisplay()
 
-    webRtc.onDataMessageReceived((message) => {
-        // Do something on data received;
-    })
-
-    this.handle = (msg, connection) => {
+    this.handle = (msg) => {
         if (msg === undefined || msg === null) {
             return
+        }
+
+        applyToggleStatus(msg)
+        if (msg.SWITCH_CAMERA !== undefined) {
+            console.log('[Web] SWITCH_CAMERA result from robot:', msg.SWITCH_CAMERA)
         }
 
         const msgType = Object.keys(msg)[0]
@@ -48,23 +50,25 @@ export function BotMessageHandler (connection) {
                 }
                 break
 
-            case 'WEB_RTC_EVENT':
-                webRtc.handle(msg.WEB_RTC_EVENT, connection)
+            // Robot sends uppercase key; browser answer uses webrtc_event below.
+            case 'WEB_RTC_EVENT': {
+                let event = msg.WEB_RTC_EVENT
+                if (typeof event === 'string') {
+                    try {
+                        event = JSON.parse(event)
+                    } catch (error) {
+                        console.error('Invalid WEB_RTC_EVENT JSON', error)
+                        return
+                    }
+                }
+                webRtc.handle(event)
                 break
-            case 'driveCmd' :
-                connection.send(JSON.stringify(msg))
-                // webRtc.send(JSON.stringify(msg))
-                break
-
-            case 'command' :
-                connection.send(JSON.stringify(msg))
-                // webRtc.send(JSON.stringify(msg))
+            }
+            case 'webrtc_event':
+                webRtc.handle(msg.webrtc_event)
                 break
 
             default:
-                // Process other status information here
-                // This can be used to enhance the UI, for example
-                // to display a blinking signal indicator, etc.
                 break
         }
     }

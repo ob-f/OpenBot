@@ -186,7 +186,28 @@ public class WebRtcServer implements IVideoServer {
         event -> {
           switch (event.getString("command")) {
             case "SWITCH_CAMERA":
-              ((CameraVideoCapturer) videoCapturer).switchCamera(null);
+              Log.d(TAG, "Received SWITCH_CAMERA command");
+              if (!(videoCapturer instanceof CameraVideoCapturer)) {
+                Log.e(TAG, "Cannot switch camera: capturer is not ready");
+                emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
+                break;
+              }
+              ((CameraVideoCapturer) videoCapturer)
+                  .switchCamera(
+                      new CameraVideoCapturer.CameraSwitchHandler() {
+                        @Override
+                        public void onCameraSwitchDone(boolean isFrontCamera) {
+                          String cameraName = isFrontCamera ? "FRONT" : "BACK";
+                          Log.d(TAG, "Camera switched successfully to " + cameraName);
+                          emitSwitchCameraStatus(cameraName);
+                        }
+
+                        @Override
+                        public void onCameraSwitchError(String errorDescription) {
+                          Log.e(TAG, "Camera switch failed: " + errorDescription);
+                          emitSwitchCameraStatus("ERROR:" + errorDescription);
+                        }
+                      });
               break;
           }
         },
@@ -195,8 +216,12 @@ public class WebRtcServer implements IVideoServer {
         },
         event ->
             event.has("command")
-                && ("SWITCH_CAMERA".equals(event.getString("command"))) // filter everything else
+                && ("SWITCH_CAMERA".equals(event.getString("command")))
         );
+  }
+
+  private void emitSwitchCameraStatus(String value) {
+    BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("SWITCH_CAMERA", value));
   }
 
   private void doAnswer() {

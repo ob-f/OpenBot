@@ -50,14 +50,35 @@ public class FreeRoamFragment extends ControlsFragment {
     BotToControllerEventBus.emitEvent(
         ConnectionUtils.createStatus(
             "FRAGMENT_TYPE", Enums.FragmentType.FREEROAM.getFragment()));
+    if (vehicle == null) {
+      mViewModel
+          .getVehicle()
+          .observe(
+              getViewLifecycleOwner(),
+              v -> {
+                if (v != null && vehicle == null) {
+                  vehicle = v;
+                  setupFreeRoamUi();
+                }
+              });
+      return;
+    }
+    setupFreeRoamUi();
+  }
+
+  private void setupFreeRoamUi() {
+    if (vehicle == null || binding == null) {
+      return;
+    }
 
     binding.voltageInfo.setText(getString(R.string.voltageInfo, "--.-"));
     binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
     binding.sonarInfo.setText(getString(R.string.distanceInfo, "---"));
-    if (vehicle.getConnectionType().equals("USB")) {
+    String connectionType = vehicle.getConnectionType();
+    if (connectionType != null && connectionType.equals("USB")) {
       binding.usbToggle.setVisibility(View.VISIBLE);
       binding.bleToggle.setVisibility(View.GONE);
-    } else if (vehicle.getConnectionType().equals("Bluetooth")) {
+    } else if (connectionType.equals("Bluetooth")) {
       binding.bleToggle.setVisibility(View.VISIBLE);
       binding.usbToggle.setVisibility(View.GONE);
     }
@@ -116,21 +137,21 @@ public class FreeRoamFragment extends ControlsFragment {
           binding.bleToggle.setChecked(vehicle.bleConnected());
           Navigation.findNavController(requireView()).navigate(R.id.open_bluetooth_fragment);
         });
-    binding.bleToggle.setOnClickListener(
-        v -> {
-          binding.bleToggle.setChecked(vehicle.bleConnected());
-          Navigation.findNavController(requireView()).navigate(R.id.open_bluetooth_fragment);
-        });
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    binding.bleToggle.setChecked(vehicle.bleConnected());
+    if (vehicle != null && binding != null) {
+      binding.bleToggle.setChecked(vehicle.bleConnected());
+    }
   }
 
   @Override
   protected void processUSBData(String data) {
+    if (vehicle == null || binding == null) {
+      return;
+    }
 
     binding.controllerContainer.speedInfo.setText(
         getString(
@@ -301,15 +322,9 @@ public class FreeRoamFragment extends ControlsFragment {
         break;
 
       case Constants.CMD_INDICATOR_LEFT:
-        toggleIndicator(Enums.VehicleIndicator.LEFT.getValue());
-        break;
-
       case Constants.CMD_INDICATOR_RIGHT:
-        toggleIndicator(Enums.VehicleIndicator.RIGHT.getValue());
-        break;
-
       case Constants.CMD_INDICATOR_STOP:
-        toggleIndicator(Enums.VehicleIndicator.STOP.getValue());
+        toggleIndicator(vehicle.getIndicator());
         break;
 
       case Constants.CMD_DRIVE_MODE:

@@ -9,65 +9,97 @@
 
 import {ErrorDisplay} from '../utils/error-display.js'
 
-/**
- * function to connect websocket to remote server
- * @constructor
- */
+// One socket per tab — keyboard and video signaling share it.
+let sharedSocket = null
+let onSocketReadyCallback = null
+
 export function Connection () {
-    const connectToServer = async () => {
-        const ws = new WebSocket(`ws://${window.location.hostname}:8080/ws`)
-        // const ws = new WebSocket(`ws://verdant-imported-peanut.glitch.me`);
+    const errDisplay = new ErrorDisplay()
+
+    this.send = () => {}
+
+    // Vite dev (8081) proxies /ws to the Node server on 8080.
+    const getWebSocketUrl = () => {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+        if (window.location.port === '8081') {
+            return `${wsProtocol}//${window.location.host}/ws`
+        }
+        return `${wsProtocol}//${window.location.hostname}:8080/ws`
+    }
+
+    const connectToServer = () => {
+        if (sharedSocket && sharedSocket.readyState === WebSocket.OPEN) {
+            return Promise.resolve(sharedSocket)
+        }
+        if (sharedSocket) {
+            sharedSocket.close()
+            sharedSocket = null
+        }
+
+        const ws = new WebSocket(getWebSocketUrl())
         return new Promise((resolve, reject) => {
-            const timer = setInterval(() => {
-                if (ws.readyState === 1) {
-                    clearInterval(timer)
-                    resolve(ws)
+            const timeout = setTimeout(() => {
+                reject(new Error('WebSocket connection timeout'))
+            }, 10000)
+
+            ws.onopen = () => {
+                clearTimeout(timeout)
+                sharedSocket = ws
+                errDisplay.reset()
+                if (onSocketReadyCallback) {
+                    onSocketReadyCallback()
                 }
-            }, 10)
+                resolve(ws)
+            }
+
+            ws.onerror = () => {
+                clearTimeout(timeout)
+                reject(new Error('WebSocket connection failed'))
+            }
         })
     }
 
-    const sendToBot = (message) => {
-        this.send(message)
-    }
+    this.start = async (onData, onReady) => {
+        if (onReady) {
+            onSocketReadyCallback = onReady
+        }
 
-    this.start = async (onData) => {
-        let ws = await connectToServer()
+        const ws = await connectToServer()
+
         this.send = (data) => {
-            if (ws) {
-                console.log(('sending to server' + data))
-                ws.send(data)
+            if (sharedSocket && sharedSocket.readyState === WebSocket.OPEN) {
+                sharedSocket.send(data)
             }
         }
-        const errDisplay = new ErrorDisplay()
-        let idSent = false
 
         ws.onmessage = (webSocketMessage) => {
-            const msg = JSON.parse(webSocketMessage.data)
-            if (Object.keys(msg)[0] === 'roomId' && !idSent) {
-                idSent = true
-            } else {
-                console.log(webSocketMessage.data)
-                console.log('Data Displayed')
-                onData(webSocketMessage.data)
+            try {
+                const msg = JSON.parse(webSocketMessage.data)
+                // Server wants our Google email as room id (send after sign-in).
+                if (msg.roomId === 'request-roomId') {
+                    if (onSocketReadyCallback) {
+                        onSocketReadyCallback()
+                    }
+                    return
+                }
+            } catch (error) {
+                return
             }
+            onData(webSocketMessage.data)
         }
 
         ws.onclose = () => {
             errDisplay.set('Disconnected from the server. To reconnect, reload this page.')
-            idSent = false
-        }
-
-        ws.onopen = () => {
-            errDisplay.reset()
-            idSent = false
-        }
-
-        this.stop = () => {
-            if (ws != null) {
-                ws.close()
-                ws = null
+            if (sharedSocket === ws) {
+                sharedSocket = null
             }
+        }
+    }
+
+    this.stop = () => {
+        if (sharedSocket != null) {
+            sharedSocket.close()
+            sharedSocket = null
         }
     }
 }

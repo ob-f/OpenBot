@@ -47,6 +47,7 @@ video::-webkit-media-controls-timeline {
     width: calc(100% - 64px);
 }
 
+/* Main area: video left, keyboard help right */
 .video-container {
     height: calc(100% - 4rem);
     width: calc(100% - 4rem);
@@ -54,17 +55,69 @@ video::-webkit-media-controls-timeline {
     border: 2px dashed #0071C5;
     background-color: #0070c50d;
     display: flex;
-    align-items: center;
-    justify-content: end;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 12px;
+}
+
+/* Video + overlay toolbar */
+.video-stage {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    height: 100%;
 }
 
 .video-container video {
     height: 100%;
+    width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    object-fit: contain;
     position: absolute;
     left: 50%;
+    top: 0;
     transform: translateX(-50%);
+    z-index: 1;
+}
+
+.video-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+    position: absolute;
+    left: 50%;
+    bottom: 5%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    padding: 5px;
+    z-index: 10;
+}
+
+/* Controls list (WASD, N noise, arrows, etc.) */
+.command-sidebar {
+    list-style-type: none;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    padding: 15px;
+    margin: 0;
+    min-width: 220px;
+    max-width: 280px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    z-index: 5;
+}
+
+.command-sidebar-title {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.command-sidebar-title h3 {
+    margin: 0;
 }
 
 .button {
@@ -82,12 +135,17 @@ video::-webkit-media-controls-timeline {
 }
 
 
-/* Styles for controlls */
-#command-list li {
+/* Styles for controls */
+#command-list li.command-sidebar-title {
+    display: block;
+}
+
+#command-list li:not(.command-sidebar-title) {
     display: flex;
     align-items: center;
     gap: 15px;
     margin: 12px 0;
+    cursor: pointer;
 }
 
 .key-display {
@@ -165,10 +223,6 @@ video::-webkit-media-controls-timeline {
 .logout {
     margin-left: 15px;
     margin-top: 15px;
-}
-
-.video-container {
-    position: relative;
 }
 
 .logout-wrapper {

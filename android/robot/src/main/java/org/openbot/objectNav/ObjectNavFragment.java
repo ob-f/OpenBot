@@ -412,10 +412,17 @@ public class ObjectNavFragment extends CameraFragment {
             String.format(Locale.US, "%.0f,%.0f", vehicle.getLeftSpeed(), vehicle.getRightSpeed()));
         break;
 
-      case Constants.CMD_NETWORK:
-        setNetworkEnabledWithAudio(!binding.autoSwitch.isChecked());
-        break;
     }
+  }
+
+  @Override
+  protected void handleNetworkCommand() {
+    setNetworkEnabledWithAudio(!binding.autoSwitch.isChecked());
+  }
+
+  @Override
+  protected boolean isNetworkModeEnabled() {
+    return binding.autoSwitch.isChecked();
   }
 
   private void setNetworkEnabledWithAudio(boolean b) {
@@ -427,6 +434,7 @@ public class ObjectNavFragment extends CameraFragment {
 
   private void setNetworkEnabled(boolean b) {
     binding.autoSwitch.setChecked(b);
+    emitNetworkStatus(b);
 
     binding.controllerContainer.controlMode.setEnabled(!b);
     binding.controllerContainer.driveMode.setEnabled(!b);
