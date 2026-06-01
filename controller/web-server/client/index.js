@@ -79,13 +79,28 @@ try {
 export let signedInUser = storedUser
 
 const signInButton = document.getElementsByClassName('google-sign-in-button')[0]
-signInButton.addEventListener('click', handleSignInButtonClick)
-const cancelButton = document.getElementById('logout-cancel-button')
-const okButton = document.getElementById('logout-ok-button')
-cancelButton.addEventListener('click', handleCancelButtonClick)
-okButton.addEventListener('click', handleOkButtonClick)
-const subscribeButton = document.getElementById('subscribe-button')
-subscribeButton.addEventListener('click', handleSubscription)
+signInButton?.addEventListener('click', handleSignInButtonClick)
+
+const logoutWrapper = document.querySelector('.logout-wrapper')
+logoutWrapper?.addEventListener('click', (event) => {
+    if (event.target === logoutWrapper) {
+        hideLogoutWrapper()
+    }
+})
+
+document.getElementById('logout-cancel-button')
+    ?.addEventListener('click', (event) => {
+        event.stopPropagation()
+        handleCancelButtonClick()
+    })
+document.getElementById('logout-ok-button')
+    ?.addEventListener('click', (event) => {
+        event.stopPropagation()
+        handleOkButtonClick()
+    })
+
+document.getElementById('subscribe-button')
+    ?.addEventListener('click', handleSubscription)
 
 function handleSignInButtonClick() {
     if (localStorage.getItem(localStorageKeys.isSignIn) === 'false') {
@@ -132,13 +147,11 @@ function handleCancelButtonClick() {
 }
 
 function hideLogoutWrapper() {
-    const logout = document.getElementsByClassName('logout-wrapper')[0]
-    logout.style.display = 'none'
+    document.querySelector('.logout-wrapper')?.classList.remove('is-open')
 }
 
 function showLogoutWrapper() {
-    const logout = document.getElementsByClassName('logout-wrapper')[0]
-    logout.style.display = 'block'
+    document.querySelector('.logout-wrapper')?.classList.add('is-open')
 }
 
 function hideExpirationWrapper() {

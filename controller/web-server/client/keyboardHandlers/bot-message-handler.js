@@ -10,7 +10,6 @@
 import {WebRTC} from '../webRTC/webrtc.js'
 import {ErrorDisplay} from '../utils/error-display.js'
 import {Buttons} from './buttons.js'
-import {applyToggleStatus} from './status-ui.js'
 
 export function BotMessageHandler (connection) {
     const webRtc = new WebRTC(connection)
@@ -22,7 +21,6 @@ export function BotMessageHandler (connection) {
             return
         }
 
-        applyToggleStatus(msg)
         if (msg.SWITCH_CAMERA !== undefined) {
             console.log('[Web] SWITCH_CAMERA result from robot:', msg.SWITCH_CAMERA)
         }

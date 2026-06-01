@@ -21,6 +21,7 @@ export function Connection () {
     // Vite dev (8081) proxies /ws to the Node server on 8080.
     const getWebSocketUrl = () => {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+        // return "wss://web-controller-server.onrender.com/ws";
         if (window.location.port === '8081') {
             return `${wsProtocol}//${window.location.host}/ws`
         }

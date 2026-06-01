@@ -68,7 +68,8 @@ public class ControllerConfig {
 
   /** Web signaling URL (machine running controller/web-server). Override in app settings. */
   public String getWebSignalingServerUrl() {
-    return get("web_signaling_server", "ws://192.168.1.21:8080/ws");
+    return get("web_signaling_server", "ws://192.168.1.45:8080/ws");
+    //return get("web_signaling_server", "wss://web-controller-server.onrender.com/ws");
   }
 
   public void setWebSignalingServerUrl(String url) {

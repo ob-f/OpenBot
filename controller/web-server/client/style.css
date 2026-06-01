@@ -220,20 +220,32 @@ video::-webkit-media-controls-timeline {
     0 0 0 3px #c8dafc;
 }
 
-.logout {
-    margin-left: 15px;
-    margin-top: 15px;
+#video-panel {
+    position: relative;
 }
 
 .logout-wrapper {
-    position: absolute;
-    top: 50%;
-    left: 40%;
-    transform: translate(-50%, -50%);
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: auto;
+}
+
+.logout-wrapper.is-open {
+    display: flex;
+}
+
+.logout {
+    margin: 0;
+    padding: 1rem 1.25rem;
     background-color: #f8f9fb;
     border: solid 1px black;
     border-radius: 10px;
-    display: none;
+    pointer-events: auto;
 }
 
 .logout-message {
@@ -256,8 +268,10 @@ video::-webkit-media-controls-timeline {
     border-radius: 5px;
 }
 
-.logout-buttons :hover {
+.logout-buttons button:hover {
     background-color: #0071C5;
+    color: white;
+    cursor: pointer;
 }
 
 .plan-expiration-model {
