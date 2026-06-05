@@ -28,6 +28,7 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
     private let mainView = UIView()
     let mSocket = NativeWebSocket.shared;
     let roomId: String = Auth.auth().currentUser?.email ?? ""
+    private var serverWebrtcDelegate: ServerWebrtcDelegate?
     let webSocketMsgHandler = WebSocketMessageHandler();
     let fragmentType = FragmentType.shared
 
@@ -441,8 +442,10 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
             if(webRTCClient != nil){
                 webRTCClient.disconnect();
             }
-            sendMessage();
-            _ = ServerWebrtcDelegate();
+            mSocket.connectWebServer { [weak self] in
+                self?.sendMessage()
+                self?.serverWebrtcDelegate = ServerWebrtcDelegate()
+            }
         }
         updateGameControllerModeType()
         secondView.addSubview(gamePadController)

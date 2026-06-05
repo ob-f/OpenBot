@@ -18,6 +18,7 @@ class VehicleControl: UIView {
     let audioPlayer = AudioPlayer.shared;
     let mSocket = NativeWebSocket.shared;
     let roomId: String = Auth.auth().currentUser?.email ?? ""
+    private var serverWebrtcDelegate: ServerWebrtcDelegate?
     var preferencesManager : SharedPreferencesManager = SharedPreferencesManager()
 
     /// initializing function
@@ -125,8 +126,10 @@ class VehicleControl: UIView {
                 if(webRTCClient != nil){
                     webRTCClient.disconnect();
                 }
-                sendMessage();
-                _ = ServerWebrtcDelegate();
+                mSocket.connectWebServer { [weak self] in
+                    self?.sendMessage()
+                    self?.serverWebrtcDelegate = ServerWebrtcDelegate()
+                }
             }
             else{
                 controlMode = ControlMode.GAMEPAD;

@@ -8,34 +8,55 @@ import FirebaseAuth
 
 @available(iOS 13.0, *)
 class NativeWebSocket: NSObject, WebSocketProvider {
-    let url = URL(string: "ws://192.168.0.114:8080/ws")!
+    let url = URL(string: "ws://192.168.1.11:8080/ws")!
 //    let url = URL(string: "ws://verdant-imported-peanut.glitch.me")!;
 
-    let roomId: String = Auth.auth().currentUser?.email ?? ""
+    var roomId: String {
+        Auth.auth().currentUser?.email ?? ""
+    }
     static let shared: NativeWebSocket = NativeWebSocket();
     var delegate: WebSocketProviderDelegate?
     private var socket: URLSessionWebSocketTask?
     private lazy var urlSession: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+    private var onReady: (() -> Void)?
+    private var isOpen = false
 
     override init() {
         super.init()
-        connect();
-
     }
 
     func connect() {
+        connectWebServer()
+    }
+
+    func connectWebServer(onReady: (() -> Void)? = nil) {
+        if let onReady = onReady {
+            self.onReady = onReady
+        }
+        if isOpen {
+            sendRoomJoin()
+            self.onReady?()
+            self.onReady = nil
+            return
+        }
+        socket?.cancel(with: .goingAway, reason: nil)
+        isOpen = false
         let socket = urlSession.webSocketTask(with: url)
         socket.resume()
         self.socket = socket
-        NotificationCenter.default.post(name: .clientConnected, object: nil);
-        self.readMessage()
+        readMessage()
     }
 
     func send(data: Data) {
-        self.socket?.send(.data(data)) { _ in
-        }
+        guard let text = String(data: data, encoding: .utf8) else { return }
+        socket?.send(.string(text)) { _ in }
     }
 
+    private func sendRoomJoin() {
+        guard !roomId.isEmpty else { return }
+        let response = try! JSONEncoder().encode(responseId(roomId: roomId, clientType: "robot"))
+        send(data: response)
+    }
 
     private func readMessage() {
         self.socket?.receive { [weak self] message in
@@ -47,11 +68,8 @@ class NativeWebSocket: NSObject, WebSocketProvider {
                 self.delegate?.webSocket(self, didReceiveData: data)
                 self.readMessage()
             case .success(.string(let text)):
-//                print("Received text message", text, Date().millisecondsSince1970)
-                // Process the text message if needed
                 if text.contains("request-roomId") {
-                    let response = try! JSONEncoder().encode(responseId(roomId: roomId));
-                    send(data: response);
+                    self.sendRoomJoin()
                 }
                 self.delegate?.webSocket(self, didReceiveData: text);
                 NotificationCenter.default.post(name: .updateDataFromControllerApp, object: text);
@@ -68,6 +86,7 @@ class NativeWebSocket: NSObject, WebSocketProvider {
     }
 
     private func disconnect() {
+        isOpen = false
         self.socket?.cancel()
         self.socket = nil
         NotificationCenter.default.post(name: .clientDisConnected, object: nil);
@@ -78,7 +97,12 @@ class NativeWebSocket: NSObject, WebSocketProvider {
 @available(iOS 13.0, *)
 extension NativeWebSocket: URLSessionWebSocketDelegate, URLSessionDelegate {
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+        isOpen = true
         self.delegate?.webSocketDidConnect(self)
+        NotificationCenter.default.post(name: .clientConnected, object: nil);
+        sendRoomJoin()
+        onReady?()
+        onReady = nil
     }
 
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
@@ -92,4 +116,5 @@ struct requestId: Decodable {
 
 struct responseId: Encodable {
     var roomId: String
+    var clientType: String
 }
