@@ -14,6 +14,7 @@ class VehicleControl: UIView {
     var speedInRpm = UILabel()
     var isButtonEnable: Bool = true
     let gameController = GameController.shared
+    let bluetooth = bluetoothDataController.shared
     var downSwipe: Bool = false
     let audioPlayer = AudioPlayer.shared;
     let mSocket = NativeWebSocket.shared;
@@ -47,12 +48,14 @@ class VehicleControl: UIView {
         updateDriveMode(self)
         refreshSpeedButton()
         createRpm()
+        speedInRpm.text = bluetooth.getFormattedRpmShort()
         createLabel(text: Strings.controller, bottomAnchor: 0, leadingAnchor: width / 2 - 100, isBoldNeeded: true)
         createLabel(text: Strings.driveMode, bottomAnchor: 0, leadingAnchor: width / 2 - 30, isBoldNeeded: true)
         createLabel(text: Strings.speed, bottomAnchor: 0, leadingAnchor: width / 2 + 50, isBoldNeeded: true)
         NotificationCenter.default.addObserver(self, selector: #selector(toggleAutoMode), name: .autoMode, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(toggleAutoMode), name: .autoModeObjectTracking, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateRpmLabel), name: .updateRpmLabel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWheelRpmFromBle), name: .updateLabel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(resetWheelRpm), name: .bluetoothDisconnected, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(decreaseSpeedMode), name: .decreaseSpeedMode, object: nil);
         NotificationCenter.default.addObserver(self, selector: #selector(increaseSpeedMode), name: .increaseSpeedMode, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateDrive), name: .updateDriveMode, object: nil)
@@ -235,9 +238,14 @@ class VehicleControl: UIView {
         isButtonEnable = !isButtonEnable
     }
 
-    /// function to update the RPM speed
-    @objc func updateRpmLabel(_ notification: Notification) {
-        speedInRpm.text = (notification.object as! String)
+    /// update speedInRpm from BLE wheel speed sensor data
+    @objc func updateWheelRpmFromBle(_ notification: Notification) {
+        speedInRpm.text = bluetooth.getFormattedRpmShort()
+    }
+
+    /// reset speedInRpm when BLE disconnects
+    @objc func resetWheelRpm(_ notification: Notification) {
+        speedInRpm.text = "---,--- rpm"
     }
 
     ///function to update the setting to display or not
