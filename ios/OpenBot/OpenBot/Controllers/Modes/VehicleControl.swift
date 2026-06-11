@@ -45,7 +45,7 @@ class VehicleControl: UIView {
         }
         updateControlMode(self)
         updateDriveMode(self)
-        updateSpeedMode(self)
+        refreshSpeedButton()
         createRpm()
         createLabel(text: Strings.controller, bottomAnchor: 0, leadingAnchor: width / 2 - 100, isBoldNeeded: true)
         createLabel(text: Strings.driveMode, bottomAnchor: 0, leadingAnchor: width / 2 - 30, isBoldNeeded: true)
@@ -184,21 +184,17 @@ class VehicleControl: UIView {
             switch (speedMode) {
             case .SLOW:
                 speedMode = .NORMAL;
-                createAndUpdateButton(iconName: Images.mediumIcon!, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true);
-                preferencesManager.setSpeedMode(value: SpeedMode.SLOW.rawValue)
                 break;
             case .NORMAL:
                 speedMode = .FAST;
-                createAndUpdateButton(iconName: Images.fastIcon!, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true);
-                preferencesManager.setSpeedMode(value: SpeedMode.NORMAL.rawValue)
                 break;
             case .FAST:
                 speedMode = .SLOW;
-                createAndUpdateButton(iconName: Images.slowIcon!, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true);
-                preferencesManager.setSpeedMode(value: SpeedMode.FAST.rawValue)
                 break;
             }
+            preferencesManager.setSpeedMode(value: speedMode.rawValue)
             gameController.selectedSpeedMode = speedMode
+            refreshSpeedButton()
         }
     }
 
@@ -254,34 +250,35 @@ class VehicleControl: UIView {
         }
     }
 
-    /// function to decrease the speed modes
-    @objc func decreaseSpeedMode(_ notification: Notification) {
+    /// function to update the speed mode button icon
+    private func refreshSpeedButton() {
+        let icon: UIImage
         switch speedMode {
         case .SLOW:
-            return;
+            icon = Images.slowIcon!
         case .NORMAL:
-            speedMode = .FAST
-            break;
+            icon = Images.mediumIcon!
         case .FAST:
-            speedMode = .SLOW;
-            break;
+            icon = Images.fastIcon!
         }
-        updateSpeedMode(self);
-        audioPlayer.playSpeedMode(speedMode: speedMode);
+        createAndUpdateButton(iconName: icon, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true)
+        gameController.selectedSpeedMode = speedMode
     }
 
-    ///function to increase the speed modes.
+    /// callback to sync speed mode button when speed is decreased
+    @objc func decreaseSpeedMode(_ notification: Notification) {
+        speedMode = gameController.selectedSpeedMode
+        preferencesManager.setSpeedMode(value: speedMode.rawValue)
+        refreshSpeedButton()
+        audioPlayer.playSpeedMode(speedMode: speedMode)
+    }
+
+    /// callback to sync speed mode button when speed is increased
     @objc func increaseSpeedMode(_ notification: Notification) {
-        switch speedMode {
-        case .SLOW:
-            updateSpeedMode(self);
-        case .NORMAL:
-            updateSpeedMode(self);
-            break;
-        case .FAST:
-            return;
-        }
-        audioPlayer.playSpeedMode(speedMode: speedMode);
+        speedMode = gameController.selectedSpeedMode
+        preferencesManager.setSpeedMode(value: speedMode.rawValue)
+        refreshSpeedButton()
+        audioPlayer.playSpeedMode(speedMode: speedMode)
     }
 
     /// function to update the drive modes.

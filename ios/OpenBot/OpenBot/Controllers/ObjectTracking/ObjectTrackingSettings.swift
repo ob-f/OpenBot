@@ -604,10 +604,10 @@ class ObjectTrackingSettings: UIView {
         leftSpeedLabel.text = notification.object as? String
     }
 
-    /// Callback function to switch network on or off
+    /// callback to toggle autopilot when network command is received from web controller
     @objc func toggleNetwork(_ notification: Notification) {
-        autoModeButton.isOn = !autoModeButton.isOn
-        NotificationCenter.default.post(name: .autoModeObjectTracking, object: nil)
+        autoModeButton.setOn(!autoModeButton.isOn, animated: true)
+        switchButton(autoModeButton)
     }
 
     /// Callback function to update the speed label

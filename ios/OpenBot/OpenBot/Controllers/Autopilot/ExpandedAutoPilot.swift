@@ -579,12 +579,12 @@ class expandedAutoPilot: UIView {
         leftSpeedLabel.text = (notification.object as! String)
     }
 
-    /// function to turn on off autopilot
+    /// callback to toggle autopilot when network command is received from web controller
     ///
     /// - Parameter notification:
     @objc func toggleNetwork(_ notification: Notification) {
-        autoModeButton.isOn = !autoModeButton.isOn
-        NotificationCenter.default.post(name: .autoMode, object: nil)
+        autoModeButton.setOn(!autoModeButton.isOn, animated: true)
+        switchButton(autoModeButton)
     }
 
     /// function that show current fps

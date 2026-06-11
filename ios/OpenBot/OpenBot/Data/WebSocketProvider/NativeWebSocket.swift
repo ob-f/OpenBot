@@ -8,8 +8,7 @@ import FirebaseAuth
 
 @available(iOS 13.0, *)
 class NativeWebSocket: NSObject, WebSocketProvider {
-    let url = URL(string: "ws://192.168.1.11:8080/ws")!
-//    let url = URL(string: "ws://verdant-imported-peanut.glitch.me")!;
+    let url = URL(string: "ws://192.168.1.40:8080/ws")!
 
     var roomId: String {
         Auth.auth().currentUser?.email ?? ""
@@ -71,8 +70,11 @@ class NativeWebSocket: NSObject, WebSocketProvider {
                 if text.contains("request-roomId") {
                     self.sendRoomJoin()
                 }
-                self.delegate?.webSocket(self, didReceiveData: text);
-                NotificationCenter.default.post(name: .updateDataFromControllerApp, object: text);
+                // deliver web socket messages on the main thread
+                DispatchQueue.main.async {
+                    self.delegate?.webSocket(self, didReceiveData: text)
+                    NotificationCenter.default.post(name: .updateDataFromControllerApp, object: text)
+                }
                 self.readMessage()
 
             case .success:

@@ -90,23 +90,7 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
                 updateGameControllerModeType()
             }
         }
-        if let value = preferencesManager.getSpeedMode() {
-            if let mode = SpeedMode(rawValue: value) {
-                if(mode == SpeedMode.SLOW){
-                    selectedSpeedMode = SpeedMode.NORMAL;
-                    gameController.selectedSpeedMode = SpeedMode.NORMAL
-                }
-                else if(mode == SpeedMode.NORMAL){
-                    selectedSpeedMode = SpeedMode.FAST;
-                    gameController.selectedSpeedMode = SpeedMode.FAST
-                }
-                else if(mode == SpeedMode.FAST){
-                    selectedSpeedMode = SpeedMode.SLOW;
-                    gameController.selectedSpeedMode = SpeedMode.SLOW
-                }
-                updateSpeedModes()
-            }
-        }
+        syncSpeedFromStoredPreferences()
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateConnect), name: .bluetoothConnected, object: nil);
         NotificationCenter.default.addObserver(self, selector: #selector(updateConnect), name: .bluetoothDisconnected, object: nil);
@@ -117,6 +101,7 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(updateLightsCommandFromControllerApp), name: .updateLightsCommandFromControllerApp, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(clientConnected), name: .clientConnected, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(clientDisconnected), name: .clientDisConnected, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(switchCamera), name: .switchCamera, object: nil)
         gameController.resetControl = false
         fragmentType.currentFragment = "FreeRoam";
         let msg = JSON.toString(FragmentTypeEvent(status: .init(FRAGMENT_TYPE: self.fragmentType.currentFragment)));
@@ -179,6 +164,7 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
     /// Notifies the view controller that its view is about to be added to a view hierarchy.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        syncSpeedFromStoredPreferences()
     }
 
     override func captureOutput(_ output: AVFoundation.AVCaptureOutput, didOutput sampleBuffer: CoreMedia.CMSampleBuffer, from connection: AVFoundation.AVCaptureConnection) {
@@ -540,24 +526,15 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
     }
 
     @objc func slow(_ sender: UIView) {
-        selectedSpeedMode = SpeedMode.SLOW
-        gameController.selectedSpeedMode = SpeedMode.SLOW
-        updateSpeedModes()
-        preferencesManager.setSpeedMode(value: SpeedMode.FAST.rawValue);
+        applySpeedMode(.SLOW)
     }
 
     @objc func medium(_ sender: UIView) {
-        selectedSpeedMode = SpeedMode.NORMAL
-        gameController.selectedSpeedMode = SpeedMode.NORMAL
-        updateSpeedModes()
-        preferencesManager.setSpeedMode(value: SpeedMode.SLOW.rawValue);
+        applySpeedMode(.NORMAL)
     }
 
     @objc func fast(_ sender: UIView) {
-        selectedSpeedMode = SpeedMode.FAST
-        gameController.selectedSpeedMode = SpeedMode.FAST
-        updateSpeedModes()
-        preferencesManager.setSpeedMode(value: SpeedMode.NORMAL.rawValue);
+        applySpeedMode(.FAST)
     }
 
     /// UI function to create the mode
@@ -688,36 +665,14 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
         }
     }
 
-    /// update when decrease mode
+    /// callback to apply speed mode when speed is decreased
     @objc func decreaseSpeedMode(_ notification: Notification) {
-        switch selectedSpeedMode {
-        case .SLOW:
-            return;
-        case .NORMAL:
-            selectedSpeedMode = .SLOW;
-            break;
-        case .FAST:
-            selectedSpeedMode = .NORMAL;
-            break;
-        }
-        audioPlayer.playSpeedMode(speedMode: selectedSpeedMode);
-        updateSpeedModes()
+        applySpeedMode(gameController.selectedSpeedMode, playAudio: true)
     }
 
-    /// update when increase speed mode
+    /// callback to apply speed mode when speed is increased
     @objc func increaseSpeedMode(_ notification: Notification) {
-        switch selectedSpeedMode {
-        case .SLOW:
-            selectedSpeedMode = .NORMAL;
-            break;
-        case .NORMAL:
-            selectedSpeedMode = .FAST;
-            break;
-        case .FAST:
-            return
-        }
-        audioPlayer.playSpeedMode(speedMode: selectedSpeedMode);
-        updateSpeedModes()
+        applySpeedMode(gameController.selectedSpeedMode, playAudio: true)
     }
 
     /// update drive mode
@@ -786,7 +741,11 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
             }
         }
     }
-    
+
+    /// callback to switch camera when web controller sends switch camera command
+    @objc func switchCamera() {
+        switchCameraView()
+    }
 
     /// update when client connects
     @objc func clientConnected(_ notification: Notification) {
@@ -802,8 +761,26 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
 
     /// update speed mode
     func setupSpeedMode() {
-        gameController.selectedSpeedMode = SpeedMode.NORMAL;
         gameController.selectedDriveMode = DriveMode.JOYSTICK;
+    }
+
+    /// function to load saved speed mode from preferences
+    func syncSpeedFromStoredPreferences() {
+        if let value = preferencesManager.getSpeedMode(),
+           let mode = SpeedMode(rawValue: value) {
+            applySpeedMode(mode)
+        }
+    }
+
+    /// function to apply speed mode and update the UI
+    func applySpeedMode(_ mode: SpeedMode, playAudio: Bool = false) {
+        selectedSpeedMode = mode
+        gameController.selectedSpeedMode = mode
+        preferencesManager.setSpeedMode(value: mode.rawValue)
+        updateSpeedModes()
+        if playAudio {
+            audioPlayer.playSpeedMode(speedMode: mode)
+        }
     }
     
     /// function to parse the message for the connection and send it.
