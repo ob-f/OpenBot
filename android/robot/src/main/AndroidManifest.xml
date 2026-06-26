@@ -18,6 +18,8 @@
     <!-- RTSP Video streaming -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- To Access device motion and locating sensor data-->
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"/>
 
     <uses-feature android:name="android.hardware.camera" android:required="true"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="true"/>
