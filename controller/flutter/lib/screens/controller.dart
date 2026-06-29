@@ -279,7 +279,7 @@ class ControllerState extends State<Controller> {
                         isSettings = true;
                       });
                     },
-                    child: const Icon(Icons.menu)),
+                    child: const Icon(Icons.menu, color: Color(0xFF0071C5))),
               ),
             ),
             if (isSettings)
