@@ -15,6 +15,7 @@ import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.widget.Toast;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
@@ -115,7 +116,8 @@ public class UsbConnection {
     localIntentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
     localIntentFilter.addAction(ACTION_USB_PERMISSION);
     localBroadcastManager.registerReceiver(usbReceiver, localIntentFilter);
-    context.registerReceiver(usbReceiver, localIntentFilter);
+    ContextCompat.registerReceiver(
+        context, usbReceiver, localIntentFilter, ContextCompat.RECEIVER_EXPORTED);
 
     Map<String, UsbDevice> connectedDevices = usbManager.getDeviceList();
     if (!connectedDevices.isEmpty()) {

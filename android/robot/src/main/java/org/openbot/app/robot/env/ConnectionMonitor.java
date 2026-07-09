@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import androidx.core.content.ContextCompat;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -43,7 +44,8 @@ public class ConnectionMonitor {
 
     void register(Context context, IntentFilter intentFilter) {
       if (!isRegistered) {
-        context.registerReceiver(this, intentFilter);
+        ContextCompat.registerReceiver(
+            context, this, intentFilter, ContextCompat.RECEIVER_EXPORTED);
         isRegistered = true;
       }
     }

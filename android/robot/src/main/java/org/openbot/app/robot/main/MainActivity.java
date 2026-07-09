@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     viewModel = new ViewModelProvider(this).get(MainViewModel.class);
     vehicle = OpenBotApplication.vehicle;
     bottomNavigationView = findViewById(R.id.bottomNavigationView);
-    bottomNavigationView.setSelectedItemId(R.id.home);
+    bottomNavigationView.setSelectedItemId(R.id.mainFragment);
     //    if (vehicle == null) {
     //      SharedPreferences sharedPreferences =
     // PreferenceManager.getDefaultSharedPreferences(this);
@@ -116,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
     localBroadcastManager = LocalBroadcastManager.getInstance(this);
     localBroadcastManager.registerReceiver(localBroadcastReceiver, localIntentFilter);
 
-    registerReceiver(localBroadcastReceiver, localIntentFilter);
+    ContextCompat.registerReceiver(
+        this, localBroadcastReceiver, localIntentFilter, ContextCompat.RECEIVER_EXPORTED);
 
     NavHostFragment navHostFragment =
         (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
