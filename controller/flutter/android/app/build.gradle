@@ -2,11 +2,6 @@ plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
-    id "io.github.reactivecircus.app-versioning" version "1.1.2"
-}
-
-appVersioning {
-    gitRootDirectory.set(rootProject.file("../../../"))
 }
 
 android {
@@ -26,6 +21,9 @@ android {
 
         // 4. Updated to match the latest Android standards
         targetSdk 36
+
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 
     buildTypes {
