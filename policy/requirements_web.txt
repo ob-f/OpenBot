@@ -1,4 +1,4 @@
-aiohttp[speedups]==3.7.4
+aiohttp[speedups]==3.13.4
 aiohttp-devtools>=0.13.1
 aiohttp_json_rpc>=0.13.3
 aiozeroconf>=0.1.8
