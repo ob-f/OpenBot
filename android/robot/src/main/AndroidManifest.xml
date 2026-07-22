@@ -18,7 +18,7 @@
     <!-- RTSP Video streaming -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- To Access device motion and locating sensor data-->
+    <!-- Required by ARCore on Android 12+ for high-frequency IMU access -->
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"/>
 
     <uses-feature android:name="android.hardware.camera" android:required="true"/>
