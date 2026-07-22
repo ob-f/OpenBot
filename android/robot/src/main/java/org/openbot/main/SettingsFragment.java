@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.ListPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 import org.openbot.R;
@@ -185,6 +186,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             dialog.show();
             return false;
           });
+
+    Preference language = findPreference("app_language");
+    if (language != null) {
+      language.setOnPreferenceClickListener(
+          preference -> {
+            new LanguagePickerDialogFragment().show(getParentFragmentManager(), "language_picker");
+            return true;
+          });
+    }
   }
 
   private void restartApp() {

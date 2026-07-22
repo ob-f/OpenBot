@@ -207,4 +207,14 @@
     <string name="front_leds">Front LEDs</string>
     <string name="usb">USB</string>
     <string name="cancel">Cancel</string>
+    <string name="language">Language</string>
+    <string name="language_summary">Choose the app display language</string>
+    <string name="system_default">System Default</string>
+    <string name="storage">Storage</string>
+    <string name="location">Location</string>
+    <string name="microphone">Microphone</string>
+    <string name="video_streaming">Video Streaming</string>
+    <string name="stream_mode">Stream Mode</string>
+    <string name="connection_type_category">Connection Type</string>
+    <string name="connectivity_mode">Connectivity Mode</string>
 </resources>
