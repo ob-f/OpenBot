@@ -43,18 +43,16 @@ javascriptGenerator.forBlock['forever'] = function (block) {
 //Javascript generated function for type of sound block
 javascriptGenerator.forBlock['soundType'] = function (block) {
     let dropdown_type = block.getFieldValue('type');
-    let value_name = javascriptGenerator.valueToCode(block, 'NAME', javascriptGenerator.ORDER_ATOMIC);
     let code = '';
-    code += "playSoundSpeed('" + dropdown_type + "');\n" + value_name;
+    code += "playSoundSpeed('" + dropdown_type + "');\n";
     return code;
 };
 
 //Javascript generated function for type of drive sound block
 javascriptGenerator.forBlock['soundMode'] = function (block) {
     let dropdown_mode_type = block.getFieldValue('mode_type');
-    let value_name = javascriptGenerator.valueToCode(block, 'NAME', javascriptGenerator.ORDER_ATOMIC);
     let code = '';
-    code += "playSoundMode('" + dropdown_mode_type + "');\n" + value_name;
+    code += "playSoundMode('" + dropdown_mode_type + "');\n";
     return code;
 };
 

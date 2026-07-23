@@ -1,7 +1,10 @@
 plugins {
-    id 'io.github.reactivecircus.app-versioning' version "1.1.2"
-    id 'com.google.gms.google-services'
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'de.undercouch.download'
+    id 'io.github.reactivecircus.app-versioning' version "1.1.2"
 }
 
 appVersioning {
@@ -12,11 +15,6 @@ appVersioning {
     gitRootDirectory.set(rootProject.file("../"))
     // if the .git directory is in the root Gradle project's parent directory.
 }
-
-apply plugin: 'com.android.application'
-apply plugin: 'de.undercouch.download'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.gms.google-services'
 
 
 android {
@@ -48,6 +46,9 @@ android {
         sourceCompatibility = '17'
         targetCompatibility = '17'
     }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
     androidResources {
         noCompress 'tflite', 'mp3'
     }
@@ -64,7 +65,6 @@ android {
 // Download default models
 project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
 apply from: 'download.gradle'
-apply plugin: 'kotlin-android'
 
 // Define the path to the comlib lib directory
 def comlibDir = file("${project.rootDir}/comlib/libs")
