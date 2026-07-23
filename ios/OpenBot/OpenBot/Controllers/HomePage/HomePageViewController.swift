@@ -228,6 +228,7 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
             return headerView
         default:
             assert(false, "Unexpected element kind")
+            return UICollectionReusableView()
         }
     }
 

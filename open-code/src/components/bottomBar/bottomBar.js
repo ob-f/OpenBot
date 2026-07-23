@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import Blockly from "blockly/core";
+import * as Blockly from "blockly/core";
 import styles from "./style.module.css"
 import {javascriptGenerator} from 'blockly/javascript';
 import {StoreContext} from "../../context/context";

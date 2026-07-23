@@ -5,18 +5,19 @@
   "main": "index.js",
   "scripts": {
     "prestart": "cd server && npm install",
-    "start": "run-p dev:server dev:start-server",
+    "start": "run-p dev:server dev:client",
     "start-nohup": "nohup npm run start",
     "dev:server": "npm run start --prefix server",
-    "dev:start-server-headless": "NODE_ENV=development snowpack build --watch",
-    "dev:start-server": "npx snowpack dev --port 8081",
-    "build": "snowpack build"
+    "dev:client": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [
     "webrtc",
     "websocket"
   ],
   "author": "Nitish Pratap",
+  "license": "ISC",
   "devDependencies": {
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
@@ -25,14 +26,13 @@
     "eslint-plugin-promise": "^5.2.0",
     "http2-proxy": "^5.0.53",
     "npm-run-all": "^4.1.5",
-    "snowpack": "^3.8.8"
+    "vite": "^5.0.0"
   },
-  "license": "ISC",
   "dependencies": {
-    "@firebase/firestore": "^4.6.4",
-    "dotenv": "^16.4.5",
-    "firebase": "^10.1.0",
+    "@firebase/firestore": "^4.12.0",
+    "dotenv": "^17.3.1",
+    "firebase": "^12.10.0",
     "js-cookie": "^3.0.5",
-    "ws": "^8.17.1"
+    "ws": "^8.19.0"
   }
 }

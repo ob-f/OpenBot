@@ -10,15 +10,15 @@
   },
   "author": "Nitish Pratap",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
+    "cookie-parser": "~1.4.7",
+    "debug": "~4.4.3",
     "dnssd2": "^1.0.0",
-    "ejs": "^3.1.6",
-    "express": "^4.17.1",
-    "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
+    "ejs": "^5.0.1",
+    "express": "^5.2.1",
+    "http-errors": "~2.0.1",
+    "morgan": "~1.10.1",
     "net": "^1.0.2",
-    "ws": "^7.5.0"
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",

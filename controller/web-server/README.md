@@ -144,7 +144,7 @@ For testing purposes, we have opened new remote server on ``glitch`` but you can
 
 ## Development
 
-This code uses [snowpack](https://www.snowpack.dev/) for a fast, lightweight building tool.
+This code uses [Vite](https://vite.dev/) for a fast, lightweight development and build workflow.
 
 We use [eslint](https://eslint.org/) for linting and automatically formatting your code. It is recommended that you run
 lint and fix any errors before committing new code. If you are using Visual Code, you can get a
