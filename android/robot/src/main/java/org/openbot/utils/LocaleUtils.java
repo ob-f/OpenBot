@@ -18,7 +18,7 @@ public class LocaleUtils {
   public static List<LanguageOption> getLanguageOptions(Context context) {
     return Arrays.asList(
         new LanguageOption(null, context.getString(R.string.system_default), R.drawable.ic_flag_globe),
-        new LanguageOption("en", "English", R.drawable.ic_flag_globe),
+        new LanguageOption("en", "English", R.drawable.ic_flag_us),
         new LanguageOption("de", "Deutsch", R.drawable.ic_flag_de),
         new LanguageOption("es", "Español", R.drawable.ic_flag_es),
         new LanguageOption("fr", "Français", R.drawable.ic_flag_fr),
