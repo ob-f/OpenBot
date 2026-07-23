@@ -7,6 +7,7 @@
     <string name="storage_permission_denied">L\'autorisation de stockage externe est nécessaire</string>
     <string name="location_permission_denied">L\'autorisation de localisation est nécessaire</string>
     <string name="record_audio_permission_denied">L\'autorisation d\'enregistrement audio est nécessaire</string>
+    <string name="nearby_permission_denied">L\'autorisation des appareils à proximité est nécessaire</string>
     <string name="permission_reason_logging"> pour enregistrer les jeux de données.</string>
     <string name="permission_reason_ai"> pour exécuter les modèles d\'IA.</string>
     <string name="permission_reason_ar_core"> pour exécuter AR Core.</string>
@@ -52,7 +53,7 @@
     <string name="frame">Cadre</string>
     <string name="settings">Paramètres</string>
     <string name="bluetooth">Bluetooth</string>
-    <string name="inference">Vitesse</string>
+    <string name="inference">Inférence</string>
     <string name="input">Entrée</string>
     <string name="confidence">Confiance</string>
     <string name="object">Objet</string>
@@ -93,7 +94,7 @@
     <string name="bumpers">Pare-chocs</string>
     <string name="robot_type">Type de robot :</string>
     <string name="indicators">Clignotants</string>
-    <string name="back">Retour</string>
+    <string name="back">Arrière</string>
     <string name="voltage_divider">Diviseur de tension</string>
     <string name="status">Statut</string>
     <string name="front">Avant</string>
@@ -117,14 +118,40 @@
     <string name="front_leds">LED avant</string>
     <string name="cancel">Annuler</string>
 
+    <string name="general">Général</string>
     <string name="language">Langue</string>
     <string name="language_summary">Choisir la langue d\'affichage de l\'app</string>
+    <string name="applying_language">Application de la langue…</string>
     <string name="system_default">Système par défaut</string>
     <string name="storage">Stockage</string>
     <string name="location">Localisation</string>
     <string name="microphone">Microphone</string>
+    <string name="nearby">Appareils à proximité</string>
     <string name="video_streaming">Diffusion vidéo</string>
     <string name="stream_mode">Mode de diffusion</string>
     <string name="connection_type_category">Type de connexion</string>
     <string name="connectivity_mode">Mode de connectivité</string>
+    <string name="tile_general">Général</string>
+    <string name="tile_ai">IA</string>
+    <string name="tile_legacy">Legacy</string>
+    <string name="tile_free_roam">Conduite libre</string>
+    <string name="tile_data_collection">Collecte de données</string>
+    <string name="tile_controller_mapping">Mappage du contrôleur</string>
+    <string name="tile_robot_info">Infos robot</string>
+    <string name="tile_autopilot">Autopilote</string>
+    <string name="tile_object_nav">Suivi d\'objet</string>
+    <string name="tile_point_goal_navigation">Navigation ciblée</string>
+    <string name="tile_model_management">Gestion des modèles</string>
+    <string name="tile_default_mode">Par défaut</string>
+
+    <string-array name="preview_resolutions">
+        <item>Basse</item>
+        <item>Moyenne</item>
+        <item>Haute</item>
+    </string-array>
+    <string-array name="save_data">
+        <item>Local</item>
+        <item>Google Drive</item>
+        <item>Serveur local</item>
+    </string-array>
 </resources>

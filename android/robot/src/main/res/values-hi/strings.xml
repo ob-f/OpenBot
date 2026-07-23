@@ -7,6 +7,7 @@
     <string name="storage_permission_denied">बाहरी स्टोरेज अनुमति आवश्यक है</string>
     <string name="location_permission_denied">लोकेशन अनुमति आवश्यक है</string>
     <string name="record_audio_permission_denied">ऑडियो रिकॉर्ड करने की अनुमति आवश्यक है</string>
+    <string name="nearby_permission_denied">आस-पास के डिवाइस की अनुमति आवश्यक है</string>
     <string name="permission_reason_logging"> डेटासेट लॉग करने के लिए।</string>
     <string name="permission_reason_ai"> AI मॉडल चलाने के लिए।</string>
     <string name="permission_reason_ar_core"> AR Core चलाने के लिए।</string>
@@ -52,7 +53,7 @@
     <string name="frame">फ्रेम</string>
     <string name="settings">सेटिंग्स</string>
     <string name="bluetooth">ब्लूटूथ</string>
-    <string name="inference">गति</string>
+    <string name="inference">अनुमान</string>
     <string name="input">इनपुट</string>
     <string name="confidence">विश्वास स्तर</string>
     <string name="object">ऑब्जेक्ट</string>
@@ -93,7 +94,7 @@
     <string name="bumpers">बंपर</string>
     <string name="robot_type">रोबोट प्रकार:</string>
     <string name="indicators">इंडिकेटर</string>
-    <string name="back">वापस</string>
+    <string name="back">पीछे</string>
     <string name="voltage_divider">वोल्टेज डिवाइडर</string>
     <string name="status">स्थिति</string>
     <string name="front">सामने</string>
@@ -117,14 +118,40 @@
     <string name="front_leds">फ्रंट LED</string>
     <string name="cancel">रद्द करें</string>
 
+    <string name="general">सामान्य</string>
     <string name="language">भाषा</string>
     <string name="language_summary">ऐप की डिस्प्ले भाषा चुनें</string>
+    <string name="applying_language">भाषा लागू की जा रही है…</string>
     <string name="system_default">सिस्टम डिफ़ॉल्ट</string>
     <string name="storage">स्टोरेज</string>
     <string name="location">लोकेशन</string>
     <string name="microphone">माइक्रोफ़ोन</string>
+    <string name="nearby">आस-पास के डिवाइस</string>
     <string name="video_streaming">वीडियो स्ट्रीमिंग</string>
     <string name="stream_mode">स्ट्रीम मोड</string>
     <string name="connection_type_category">कनेक्शन प्रकार</string>
     <string name="connectivity_mode">कनेक्टिविटी मोड</string>
+    <string name="tile_general">सामान्य</string>
+    <string name="tile_ai">AI</string>
+    <string name="tile_legacy">लीगेसी</string>
+    <string name="tile_free_roam">फ्री रोम</string>
+    <string name="tile_data_collection">डेटा संग्रहण</string>
+    <string name="tile_controller_mapping">कंट्रोलर मैपिंग</string>
+    <string name="tile_robot_info">रोबोट जानकारी</string>
+    <string name="tile_autopilot">ऑटोपायलट</string>
+    <string name="tile_object_nav">ऑब्जेक्ट ट्रैकिंग</string>
+    <string name="tile_point_goal_navigation">लक्ष्य नेविगेशन</string>
+    <string name="tile_model_management">मॉडल प्रबंधन</string>
+    <string name="tile_default_mode">डिफ़ॉल्ट</string>
+
+    <string-array name="preview_resolutions">
+        <item>कम</item>
+        <item>मध्यम</item>
+        <item>उच्च</item>
+    </string-array>
+    <string-array name="save_data">
+        <item>लोकल स्टोरेज</item>
+        <item>Google Drive</item>
+        <item>लोकल सर्वर</item>
+    </string-array>
 </resources>

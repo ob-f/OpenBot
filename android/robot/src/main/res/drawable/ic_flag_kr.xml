@@ -4,10 +4,32 @@
     android:viewportWidth="24"
     android:viewportHeight="16">
   <path android:fillColor="#FFFFFF" android:pathData="M0,0h24v16h-24z"/>
+
+  <!-- Taegeuk -->
   <path
       android:fillColor="#CD2E3A"
       android:pathData="M12,3.8 A4.2,4.2 0 0,1 12,12.2 A2.1,2.1 0 0,1 12,8 A2.1,2.1 0 0,0 12,3.8 Z"/>
   <path
       android:fillColor="#0047A0"
       android:pathData="M12,3.8 A4.2,4.2 0 0,0 12,12.2 A2.1,2.1 0 0,0 12,8 A2.1,2.1 0 0,1 12,3.8 Z"/>
+
+  <!-- Geon (top-left): three solid bars -->
+  <path android:fillColor="#000000" android:pathData="M1.2,1.0h3.6v0.6h-3.6z"/>
+  <path android:fillColor="#000000" android:pathData="M1.2,2.1h3.6v0.6h-3.6z"/>
+  <path android:fillColor="#000000" android:pathData="M1.2,3.2h3.6v0.6h-3.6z"/>
+
+  <!-- Gam (top-right): broken, solid, broken -->
+  <path android:fillColor="#000000" android:pathData="M19.2,1.0h1.5v0.6h-1.5z M21.3,1.0h1.5v0.6h-1.5z"/>
+  <path android:fillColor="#000000" android:pathData="M19.2,2.1h3.6v0.6h-3.6z"/>
+  <path android:fillColor="#000000" android:pathData="M19.2,3.2h1.5v0.6h-1.5z M21.3,3.2h1.5v0.6h-1.5z"/>
+
+  <!-- Ri (bottom-left): solid, broken, solid -->
+  <path android:fillColor="#000000" android:pathData="M1.2,12.2h3.6v0.6h-3.6z"/>
+  <path android:fillColor="#000000" android:pathData="M1.2,13.3h1.5v0.6h-1.5z M3.3,13.3h1.5v0.6h-1.5z"/>
+  <path android:fillColor="#000000" android:pathData="M1.2,14.4h3.6v0.6h-3.6z"/>
+
+  <!-- Gon (bottom-right): three broken bars -->
+  <path android:fillColor="#000000" android:pathData="M19.2,12.2h1.5v0.6h-1.5z M21.3,12.2h1.5v0.6h-1.5z"/>
+  <path android:fillColor="#000000" android:pathData="M19.2,13.3h1.5v0.6h-1.5z M21.3,13.3h1.5v0.6h-1.5z"/>
+  <path android:fillColor="#000000" android:pathData="M19.2,14.4h1.5v0.6h-1.5z M21.3,14.4h1.5v0.6h-1.5z"/>
 </vector>

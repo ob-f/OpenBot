@@ -7,6 +7,7 @@
     <string name="storage_permission_denied">Se necesita el permiso de almacenamiento externo</string>
     <string name="location_permission_denied">Se necesita el permiso de ubicación</string>
     <string name="record_audio_permission_denied">Se necesita el permiso para grabar audio</string>
+    <string name="nearby_permission_denied">Se necesita el permiso de dispositivos cercanos</string>
     <string name="permission_reason_logging"> para registrar conjuntos de datos.</string>
     <string name="permission_reason_ai"> para ejecutar modelos de IA.</string>
     <string name="permission_reason_ar_core"> para ejecutar AR Core.</string>
@@ -52,7 +53,7 @@
     <string name="frame">Marco</string>
     <string name="settings">Configuración</string>
     <string name="bluetooth">Bluetooth</string>
-    <string name="inference">Velocidad</string>
+    <string name="inference">Inferencia</string>
     <string name="input">Entrada</string>
     <string name="confidence">Confianza</string>
     <string name="object">Objeto</string>
@@ -117,14 +118,40 @@
     <string name="front_leds">LEDs delanteros</string>
     <string name="cancel">Cancelar</string>
 
+    <string name="general">General</string>
     <string name="language">Idioma</string>
     <string name="language_summary">Elige el idioma de visualización de la app</string>
+    <string name="applying_language">Aplicando idioma…</string>
     <string name="system_default">Predeterminado del sistema</string>
     <string name="storage">Almacenamiento</string>
     <string name="location">Ubicación</string>
     <string name="microphone">Micrófono</string>
+    <string name="nearby">Dispositivos cercanos</string>
     <string name="video_streaming">Transmisión de video</string>
     <string name="stream_mode">Modo de transmisión</string>
     <string name="connection_type_category">Tipo de conexión</string>
     <string name="connectivity_mode">Modo de conectividad</string>
+    <string name="tile_general">General</string>
+    <string name="tile_ai">IA</string>
+    <string name="tile_legacy">Legado</string>
+    <string name="tile_free_roam">Conducción libre</string>
+    <string name="tile_data_collection">Captura de datos</string>
+    <string name="tile_controller_mapping">Mapeo del controlador</string>
+    <string name="tile_robot_info">Info del robot</string>
+    <string name="tile_autopilot">Autopiloto</string>
+    <string name="tile_object_nav">Seguimiento de objetos</string>
+    <string name="tile_point_goal_navigation">Navegación al objetivo</string>
+    <string name="tile_model_management">Gestión de modelos</string>
+    <string name="tile_default_mode">Predeterminado</string>
+
+    <string-array name="preview_resolutions">
+        <item>Baja</item>
+        <item>Media</item>
+        <item>Alta</item>
+    </string-array>
+    <string-array name="save_data">
+        <item>Local</item>
+        <item>Google Drive</item>
+        <item>Servidor local</item>
+    </string-array>
 </resources>

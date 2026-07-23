@@ -9,6 +9,7 @@
     <string name="storage_permission_denied">External storage permission is necessary</string>
     <string name="location_permission_denied">Location permission is necessary</string>
     <string name="record_audio_permission_denied">Recording audio permission is necessary</string>
+    <string name="nearby_permission_denied">Nearby devices permission is necessary</string>
     <string name="permission_reason_logging"> to log datasets.</string>
     <string name="permission_reason_ai"> to run AI models.</string>
     <string name="permission_reason_ar_core"> to run AR Core.</string>
@@ -207,14 +208,29 @@
     <string name="front_leds">Front LEDs</string>
     <string name="usb">USB</string>
     <string name="cancel">Cancel</string>
+    <string name="general">General</string>
     <string name="language">Language</string>
     <string name="language_summary">Choose the app display language</string>
+    <string name="applying_language">Applying language…</string>
     <string name="system_default">System Default</string>
     <string name="storage">Storage</string>
     <string name="location">Location</string>
     <string name="microphone">Microphone</string>
+    <string name="nearby">Nearby Devices</string>
     <string name="video_streaming">Video Streaming</string>
     <string name="stream_mode">Stream Mode</string>
     <string name="connection_type_category">Connection Type</string>
     <string name="connectivity_mode">Connectivity Mode</string>
+    <string name="tile_general">General</string>
+    <string name="tile_ai">AI</string>
+    <string name="tile_legacy">Legacy</string>
+    <string name="tile_free_roam">Free Roam</string>
+    <string name="tile_data_collection">Data Collection</string>
+    <string name="tile_controller_mapping">Controller Mapping</string>
+    <string name="tile_robot_info">Robot Info</string>
+    <string name="tile_autopilot">Autopilot</string>
+    <string name="tile_object_nav">Object Tracking</string>
+    <string name="tile_point_goal_navigation">Point Goal Navigation</string>
+    <string name="tile_model_management">Model Management</string>
+    <string name="tile_default_mode">Default</string>
 </resources>

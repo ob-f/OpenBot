@@ -7,6 +7,7 @@
     <string name="storage_permission_denied">需要外部存储权限</string>
     <string name="location_permission_denied">需要位置权限</string>
     <string name="record_audio_permission_denied">需要录音权限</string>
+    <string name="nearby_permission_denied">需要附近设备权限</string>
     <string name="permission_reason_logging">以记录数据集。</string>
     <string name="permission_reason_ai">以运行 AI 模型。</string>
     <string name="permission_reason_ar_core">以运行 AR Core。</string>
@@ -52,7 +53,7 @@
     <string name="frame">画面</string>
     <string name="settings">设置</string>
     <string name="bluetooth">蓝牙</string>
-    <string name="inference">速度</string>
+    <string name="inference">推理</string>
     <string name="input">输入</string>
     <string name="confidence">置信度</string>
     <string name="object">物体</string>
@@ -93,7 +94,7 @@
     <string name="bumpers">保险杠</string>
     <string name="robot_type">机器人类型：</string>
     <string name="indicators">转向灯</string>
-    <string name="back">返回</string>
+    <string name="back">后</string>
     <string name="voltage_divider">分压器</string>
     <string name="status">状态</string>
     <string name="front">前</string>
@@ -117,14 +118,40 @@
     <string name="front_leds">前置 LED</string>
     <string name="cancel">取消</string>
 
+    <string name="general">通用</string>
     <string name="language">语言</string>
     <string name="language_summary">选择应用显示语言</string>
+    <string name="applying_language">正在应用语言…</string>
     <string name="system_default">系统默认</string>
     <string name="storage">存储</string>
     <string name="location">位置</string>
     <string name="microphone">麦克风</string>
+    <string name="nearby">附近设备</string>
     <string name="video_streaming">视频流</string>
     <string name="stream_mode">流模式</string>
     <string name="connection_type_category">连接类型</string>
     <string name="connectivity_mode">连接模式</string>
+    <string name="tile_general">通用</string>
+    <string name="tile_ai">AI</string>
+    <string name="tile_legacy">旧版</string>
+    <string name="tile_free_roam">自由漫游</string>
+    <string name="tile_data_collection">数据采集</string>
+    <string name="tile_controller_mapping">控制器映射</string>
+    <string name="tile_robot_info">机器人信息</string>
+    <string name="tile_autopilot">自动驾驶</string>
+    <string name="tile_object_nav">物体追踪</string>
+    <string name="tile_point_goal_navigation">目标点导航</string>
+    <string name="tile_model_management">模型管理</string>
+    <string name="tile_default_mode">默认</string>
+
+    <string-array name="preview_resolutions">
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+    </string-array>
+    <string-array name="save_data">
+        <item>本地存储</item>
+        <item>Google Drive</item>
+        <item>本地服务器</item>
+    </string-array>
 </resources>

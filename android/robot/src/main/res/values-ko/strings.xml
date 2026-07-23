@@ -7,6 +7,7 @@
     <string name="storage_permission_denied">외부 저장소 권한이 필요합니다</string>
     <string name="location_permission_denied">위치 권한이 필요합니다</string>
     <string name="record_audio_permission_denied">오디오 녹음 권한이 필요합니다</string>
+    <string name="nearby_permission_denied">주변 기기 권한이 필요합니다</string>
     <string name="permission_reason_logging"> 데이터셋을 기록하기 위해.</string>
     <string name="permission_reason_ai"> AI 모델을 실행하기 위해.</string>
     <string name="permission_reason_ar_core"> AR Core를 실행하기 위해.</string>
@@ -52,7 +53,7 @@
     <string name="frame">프레임</string>
     <string name="settings">설정</string>
     <string name="bluetooth">블루투스</string>
-    <string name="inference">속도</string>
+    <string name="inference">추론</string>
     <string name="input">입력</string>
     <string name="confidence">신뢰도</string>
     <string name="object">객체</string>
@@ -93,7 +94,7 @@
     <string name="bumpers">범퍼</string>
     <string name="robot_type">로봇 유형:</string>
     <string name="indicators">방향지시등</string>
-    <string name="back">뒤로</string>
+    <string name="back">후면</string>
     <string name="voltage_divider">전압 분배기</string>
     <string name="status">상태</string>
     <string name="front">전면</string>
@@ -117,14 +118,40 @@
     <string name="front_leds">전면 LED</string>
     <string name="cancel">취소</string>
 
+    <string name="general">일반</string>
     <string name="language">언어</string>
     <string name="language_summary">앱 표시 언어를 선택하세요</string>
+    <string name="applying_language">언어 적용 중…</string>
     <string name="system_default">시스템 기본값</string>
     <string name="storage">저장소</string>
     <string name="location">위치</string>
     <string name="microphone">마이크</string>
+    <string name="nearby">주변 기기</string>
     <string name="video_streaming">동영상 스트리밍</string>
     <string name="stream_mode">스트림 모드</string>
     <string name="connection_type_category">연결 유형</string>
     <string name="connectivity_mode">연결 모드</string>
+    <string name="tile_general">일반</string>
+    <string name="tile_ai">AI</string>
+    <string name="tile_legacy">레거시</string>
+    <string name="tile_free_roam">자유 주행</string>
+    <string name="tile_data_collection">데이터 수집</string>
+    <string name="tile_controller_mapping">컨트롤러 매핑</string>
+    <string name="tile_robot_info">로봇 정보</string>
+    <string name="tile_autopilot">자율주행</string>
+    <string name="tile_object_nav">객체 추적</string>
+    <string name="tile_point_goal_navigation">목표 내비게이션</string>
+    <string name="tile_model_management">모델 관리</string>
+    <string name="tile_default_mode">기본값</string>
+
+    <string-array name="preview_resolutions">
+        <item>낮음</item>
+        <item>중간</item>
+        <item>높음</item>
+    </string-array>
+    <string-array name="save_data">
+        <item>로컬 저장소</item>
+        <item>Google Drive</item>
+        <item>로컬 서버</item>
+    </string-array>
 </resources>
