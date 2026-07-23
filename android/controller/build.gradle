@@ -2,7 +2,7 @@ plugins {
     // For a library module, uncomment the following line and comment the one after
     // id 'com.android.library'
     id 'com.android.application'
-    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android'
     id 'io.github.reactivecircus.app-versioning' version "1.1.2"
 }
 
@@ -91,9 +91,4 @@ dependencies {
 
     // material design
     implementation 'com.google.android.material:material:1.4.0'
-
-    // For a library module, uncomment the following line and comment the one after
-    // apply plugin: 'com.android.library'
-    apply plugin: 'com.android.application'
-    apply plugin: 'kotlin-android'
 }

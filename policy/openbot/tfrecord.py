@@ -1,7 +1,7 @@
 """
 Created by Marcel Santos - Intel Intelligent Systems Lab - 2021
 This script implements a tf-records generator for more robust data loading.
-Specifically, the user specifies to path of the collected dataset and the path for storing the output tfrecord 
+Specifically, the user specifies to path of the collected dataset and the path for storing the output tfrecord
 file and this script will create a tfrecord with the dataset ready to be used for training a drive policy.
 """
 

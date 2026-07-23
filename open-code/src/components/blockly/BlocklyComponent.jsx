@@ -1,7 +1,7 @@
 import './BlocklyComponent.css';
 import React, {useCallback, useContext, useEffect, useRef} from 'react';
-import Blockly from 'blockly/core';
-import locale from 'blockly/msg/en';
+import * as Blockly from 'blockly/core';
+import * as locale from 'blockly/msg/en';
 import 'blockly/blocks';
 import {ThemeContext} from "../../App";
 import {aiBlocks, Constants, DarkTheme, errorToast, LightTheme, PathName} from "../../utils/constants";
@@ -76,7 +76,21 @@ function BlocklyComponent(props) {
         });
     }, []);
 
-    //handling all child blocks for enabling and disabling
+   
+    const DISABLED_REASON_ID = "only-one-active-block";
+
+    const setBlockEnabled = (block, enabled) => {
+        if (!block) return;
+        if (typeof block.setDisabledReason !== "function") return;
+        try {
+            block.setDisabledReason(!enabled, DISABLED_REASON_ID);
+        } catch (e) {
+            // Fail softly: keep workspace usable even if an unexpected block
+            // object is encountered.
+            console.warn("Failed to toggle Blockly block enabled state", e);
+        }
+    };
+
     const handlingBlocks = (event, blockType) => {
         let existingBlocks = primaryWorkspace.current.getBlocksByType(blockType);
         if (event.type === Blockly.Events.CREATE && event.blockId) {
@@ -86,7 +100,7 @@ function BlocklyComponent(props) {
             }
         } else if (event.type === Blockly.Events.DELETE && event.blockId) {
             if (existingBlocks.length > 0) {
-                existingBlocks[0].setEnabled(true);
+                setBlockEnabled(existingBlocks[0], true);
                 enableAllChildBlocks(existingBlocks[0]);
             }
         }
@@ -96,20 +110,19 @@ function BlocklyComponent(props) {
     const disableChildBlocks = (blocks) => {
         if (blocks.length > 1) {
             for (let i = 1; i < blocks.length; i++) {
-                blocks[i].setEnabled(false);
+                setBlockEnabled(blocks[i], false);
             }
         }
     };
 
     //function to enable all child blocks
     const enableAllChildBlocks = (block) => {
-        if (block) {
-            block.setEnabled(true);
-            const children = block.getChildren();
+        if (!block) return;
+        setBlockEnabled(block, true);
+        const children = typeof block.getChildren === "function" ? block.getChildren(false) : [];
             for (let i = 0; i < children.length; i++) {
                 enableAllChildBlocks(children[i]);
             }
-        }
     };
 
     /**
@@ -131,10 +144,10 @@ function BlocklyComponent(props) {
             })
             if (filteredAIBlocks?.length > 0) {
                 for (let i = 0; i < forever.length; i++) {
-                    forever[i].setEnabled(false);
+                    setBlockEnabled(forever[i], false);
                 }
             } else {
-                forever[0].setEnabled(true);
+                setBlockEnabled(forever[0], true);
                 enableAllChildBlocks(forever[0]);
             }
         }

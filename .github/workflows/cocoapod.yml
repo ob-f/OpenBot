@@ -1,0 +1,37 @@
+# This workflow builds and tests the iOS app with CocoaPods and Xcode
+# For more information see: https://docs.github.com/actions/guides/building-and-testing-swift
+
+name: IOS CI with cocoapods
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - 'ios/OpenBot/**'
+    - '.github/workflows/cocoapod.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+    - 'ios/OpenBot/**'
+    - '.github/workflows/cocoapod.yml'
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    defaults:
+      run:
+        working-directory: ios/OpenBot
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Remove Podfile.lock (regenerate)
+        run: rm -f Podfile.lock
+
+      - name: Pod install
+        run: pod install

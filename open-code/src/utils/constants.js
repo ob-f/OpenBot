@@ -1,4 +1,4 @@
-import Blockly from "blockly/core";
+import * as Blockly from "blockly/core";
 import {colors} from "./color";
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
