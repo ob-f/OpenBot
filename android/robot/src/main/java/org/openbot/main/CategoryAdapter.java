@@ -33,7 +33,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
   @Override
   public void onBindViewHolder(final ViewHolder holder, int position) {
     holder.mItem = mValues.get(position);
-    holder.title.setText(mValues.get(position).getTitle());
+    holder.title.setText(mValues.get(position).getDisplayTitle(holder.itemView.getContext()));
     holder.subCategoryList.setLayoutManager(
         new LinearLayoutManager(holder.itemView.getContext(), RecyclerView.HORIZONTAL, false));
     holder.subCategoryList.setAdapter(
