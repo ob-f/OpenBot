@@ -3,6 +3,7 @@ package org.openbot.main;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import org.openbot.R;
 import org.openbot.utils.LocaleUtils;
 
@@ -29,7 +30,7 @@ public class LanguageApplyingActivity extends Activity {
     String tag = getIntent().getStringExtra(EXTRA_LANGUAGE_TAG);
     LocaleUtils.applyLocale(tag);
 
-    new Handler()
+    new Handler(Looper.getMainLooper())
         .postDelayed(
             () -> {
               finish();

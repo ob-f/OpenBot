@@ -29,7 +29,7 @@ public class LanguagePickerDialogFragment extends DialogFragment {
   @Override
   public View onCreateView(
       @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    binding = DialogLanguagePickerBinding.inflate(LayoutInflater.from(getContext()));
+    binding = DialogLanguagePickerBinding.inflate(inflater, container, false);
 
     binding.languageList.setLayoutManager(new LinearLayoutManager(requireContext()));
     binding.languageList.setAdapter(
@@ -59,5 +59,11 @@ public class LanguagePickerDialogFragment extends DialogFragment {
       requireActivity()
           .overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
+  }
+
+  @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    binding = null;
   }
 }

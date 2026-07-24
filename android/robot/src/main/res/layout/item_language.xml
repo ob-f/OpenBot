@@ -14,6 +14,7 @@
         android:id="@+id/flag"
         android:layout_width="32dp"
         android:layout_height="22dp"
+        android:contentDescription="@null"
         android:scaleType="fitCenter"
         tools:src="@drawable/ic_flag_de" />
 
@@ -31,6 +32,7 @@
         android:id="@+id/check"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:contentDescription="@null"
         android:src="@drawable/ic_check_24"
         android:visibility="invisible"
         app:tint="@color/openBotBlue"

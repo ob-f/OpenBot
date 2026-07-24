@@ -9,6 +9,7 @@
         android:id="@+id/logo"
         android:layout_width="96dp"
         android:layout_height="96dp"
+        android:contentDescription="@null"
         android:src="@drawable/ic_openbot"
         app:layout_constraintBottom_toTopOf="@id/progress"
         app:layout_constraintEnd_toEndOf="parent"
