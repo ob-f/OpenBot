@@ -141,7 +141,7 @@ public class ObjectNavFragment extends CameraFragment {
           @Override
           public void onNothingSelected(AdapterView<?> parent) {}
         });
-    binding.deviceSpinner.setSelection(preferencesManager.getDevice());
+    initDeviceSpinner(binding.deviceSpinner, preferencesManager.getDevice());
     setNumThreads(preferencesManager.getNumThreads());
     binding.threads.setText(String.valueOf(getNumThreads()));
 
@@ -325,10 +325,8 @@ public class ObjectNavFragment extends CameraFragment {
           .runOnUiThread(
               () -> {
                 ArrayAdapter<String> adapter =
-                    new ArrayAdapter<>(
-                        getContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        detector.getLabels());
+                    new ArrayAdapter<>(getContext(), R.layout.spinner_item, detector.getLabels());
+                adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
                 binding.classType.setAdapter(adapter);
                 binding.classType.setSelection(
                     detector.getLabels().indexOf(preferencesManager.getObjectType()));

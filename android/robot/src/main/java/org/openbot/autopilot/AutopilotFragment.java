@@ -83,7 +83,7 @@ public class AutopilotFragment extends CameraFragment {
         super.onViewCreated(view, savedInstanceState);
         binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
 
-        binding.deviceSpinner.setSelection(preferencesManager.getDevice());
+        initDeviceSpinner(binding.deviceSpinner, preferencesManager.getDevice());
         setNumThreads(preferencesManager.getNumThreads());
         binding.threads.setText(String.valueOf(getNumThreads()));
         binding.cameraToggle.setOnClickListener(v -> toggleCamera());

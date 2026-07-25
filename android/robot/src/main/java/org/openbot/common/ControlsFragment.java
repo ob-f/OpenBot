@@ -391,6 +391,18 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
         });
   }
 
+  protected void initDeviceSpinner(Spinner spinner, int selected) {
+    initArraySpinner(spinner, R.array.devices);
+    spinner.setSelection(selected);
+  }
+
+  protected void initArraySpinner(Spinner spinner, int arrayResId) {
+    ArrayAdapter<CharSequence> adapter =
+        ArrayAdapter.createFromResource(requireContext(), arrayResId, R.layout.spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+    spinner.setAdapter(adapter);
+  }
+
   protected void initServerSpinner(Spinner spinner) {
     serverAdapter = new ArrayAdapter<>(requireContext(), R.layout.spinner_item);
     serverAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
