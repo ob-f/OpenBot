@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="Oops! No projects found."
+            android:text="@string/no_projects_found_title"
             android:textAlignment="center"
             android:textColor="@color/openBotBlue"
             android:textSize="20sp"
@@ -63,7 +63,7 @@
         <TextView
             android:layout_width="270dp"
             android:layout_height="wrap_content"
-            android:text="Looks like there are no projects in your google drive yet."
+            android:text="@string/no_projects_found_body"
             android:textAlignment="center"
             android:textColor="@color/black_text"
             android:textSize="16sp" />
@@ -82,7 +82,7 @@
             android:id="@+id/project_screen_info"
             android:layout_width="270dp"
             android:layout_height="wrap_content"
-            android:text="Set up your profile by signing in with your Google account."
+            android:text="@string/sign_in_description"
             android:textAlignment="center"
             android:textColor="@color/black_text"
             android:textSize="16sp" />
@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:drawablePadding="20dp"
                 android:gravity="center"
-                android:text="Sign-in with Google"
+                android:text="@string/sign_in_with_google"
                 android:textColor="@color/white_text"
                 android:textSize="16sp"
                 app:drawableLeftCompat="@drawable/ic_google_custom" />
@@ -141,7 +141,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:text="Blink LED file detected.Start to execute the code on your OpenBot."
+                android:text="@string/blink_led_detected"
                 android:textColor="@color/black_text"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -166,7 +166,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Start"
+                    android:text="@string/start"
                     android:textColor="@color/white_text"
                     android:textSize="18sp" />
             </LinearLayout>
@@ -182,7 +182,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cancel"
+                    android:text="@string/cancel"
                     android:textColor="@color/black_text"
                     android:textSize="18sp" />
             </LinearLayout>

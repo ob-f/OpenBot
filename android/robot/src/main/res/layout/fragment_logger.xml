@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:layout_margin="8dp"
-            android:text="Log Data"
+            android:text="@string/log_data"
             app:layout_constraintBottom_toTopOf="@+id/previewText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view" />
@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:padding="8dp"
-            android:text="Model Resolution"
+            android:text="@string/model_resolution"
             android:textColor="@android:color/black"
             app:layout_constraintBottom_toTopOf="@+id/server"
             app:layout_constraintEnd_toEndOf="@+id/previewText"
@@ -200,7 +200,7 @@
                 android:background="@drawable/button_background_border"
                 android:foreground="?attr/selectableItemBackground"
                 android:paddingHorizontal="32dp"
-                android:text="Sensor Data"
+                android:text="@string/sensor_data"
                 android:textAllCaps="false"
                 android:textColor="@android:color/black"
                 android:textSize="12sp"
@@ -212,7 +212,7 @@
                 android:id="@+id/previewCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Preview Images"
+                android:text="@string/preview_images"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/sensorDataButton"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -222,7 +222,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Training Images"
+                android:text="@string/training_images"
                 app:layout_constraintStart_toStartOf="@id/previewCheckBox"
                 app:layout_constraintTop_toBottomOf="@+id/previewCheckBox" />
 

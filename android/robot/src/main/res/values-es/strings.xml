@@ -40,7 +40,7 @@
 
     <string name="control">Control</string>
     <string name="battery">Batería</string>
-    <string name="speed">Velocidad (i,d)</string>
+    <string name="speed">RPM (i,d)</string>
     <string name="sonar">Sonar</string>
     <string name="drive_mode">Modo de conducción</string>
     <string name="speed_mode">Modo de velocidad</string>
@@ -54,7 +54,7 @@
     <string name="settings">Configuración</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="inference">Inferencia</string>
-    <string name="input">Entrada</string>
+    <string name="input">Resolución</string>
     <string name="confidence">Confianza</string>
     <string name="object">Objeto</string>
     <string name="speedTitle">Velocidad</string>
@@ -154,4 +154,24 @@
         <item>Google Drive</item>
         <item>Servidor local</item>
     </string-array>
+
+    <string name="set_goal_title">Establecer objetivo</string>
+    <string name="set_goal_message">Monta el teléfono en el robot y especifica un objetivo. El robot intentará alcanzar el objetivo después de pulsar Iniciar.</string>
+    <string name="start">Iniciar</string>
+    <string name="forward_hint_m">Adelante [m]</string>
+    <string name="left_hint_m">Izquierda [m]</string>
+    <string name="log_data">Registrar datos</string>
+    <string name="model_resolution">Resolución del modelo</string>
+    <string name="sensor_data">Datos del sensor</string>
+    <string name="preview_images">Imágenes de vista previa</string>
+    <string name="training_images">Imágenes de entrenamiento</string>
+    <string name="sign_in_description">Configura tu perfil iniciando sesión con tu cuenta de Google.</string>
+    <string name="sign_in_with_google">Iniciar sesión con Google</string>
+    <string name="no_projects_found_title">¡Vaya! No se encontraron proyectos.</string>
+    <string name="no_projects_found_body">Parece que aún no hay proyectos en tu Google Drive.</string>
+    <string name="blink_led_detected">Archivo de LED parpadeante detectado. Pulsa Iniciar para ejecutar el código en tu OpenBot.</string>
+    <string name="usb_check_connection">Por favor, comprueba la conexión USB.</string>
+    <string name="ble_connecting">Conectando</string>
+    <string name="ble_disconnect">Desconectar</string>
+    <string name="ble_connect">Conectar</string>
 </resources>

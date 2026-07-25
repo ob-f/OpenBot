@@ -40,7 +40,7 @@
 
     <string name="control">控制</string>
     <string name="battery">电池</string>
-    <string name="speed">速度（左，右）</string>
+    <string name="speed">转速（左，右）</string>
     <string name="sonar">声呐</string>
     <string name="drive_mode">驾驶模式</string>
     <string name="speed_mode">速度模式</string>
@@ -54,7 +54,7 @@
     <string name="settings">设置</string>
     <string name="bluetooth">蓝牙</string>
     <string name="inference">推理</string>
-    <string name="input">输入</string>
+    <string name="input">分辨率</string>
     <string name="confidence">置信度</string>
     <string name="object">物体</string>
     <string name="speedTitle">速度</string>
@@ -154,4 +154,24 @@
         <item>Google Drive</item>
         <item>本地服务器</item>
     </string-array>
+
+    <string name="set_goal_title">设置目标</string>
+    <string name="set_goal_message">将手机安装在机器人上并指定一个目标。按下开始后，机器人将尝试到达该目标。</string>
+    <string name="start">开始</string>
+    <string name="forward_hint_m">前进 [米]</string>
+    <string name="left_hint_m">左侧 [米]</string>
+    <string name="log_data">记录数据</string>
+    <string name="model_resolution">模型分辨率</string>
+    <string name="sensor_data">传感器数据</string>
+    <string name="preview_images">预览图像</string>
+    <string name="training_images">训练图像</string>
+    <string name="sign_in_description">使用您的 Google 账号登录以设置个人资料。</string>
+    <string name="sign_in_with_google">使用 Google 登录</string>
+    <string name="no_projects_found_title">哎呀！未找到项目。</string>
+    <string name="no_projects_found_body">您的 Google Drive 中似乎还没有项目。</string>
+    <string name="blink_led_detected">检测到闪烁 LED 文件。按下开始以在您的 OpenBot 上执行代码。</string>
+    <string name="usb_check_connection">请检查 USB 连接。</string>
+    <string name="ble_connecting">连接中</string>
+    <string name="ble_disconnect">断开连接</string>
+    <string name="ble_connect">连接</string>
 </resources>

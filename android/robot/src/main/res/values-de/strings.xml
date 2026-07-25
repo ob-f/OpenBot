@@ -40,7 +40,7 @@
 
     <string name="control">Steuerung</string>
     <string name="battery">Akku</string>
-    <string name="speed">Geschwindigkeit (l,r)</string>
+    <string name="speed">Drehzahl (l,r)</string>
     <string name="sonar">Sonar</string>
     <string name="drive_mode">Fahrmodus</string>
     <string name="speed_mode">Geschwindigkeits-&#8203;Modus</string>
@@ -54,10 +54,10 @@
     <string name="settings">Einstellungen</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="inference">Bildrate</string>
-    <string name="input">Eingabe</string>
+    <string name="input">Auflösung</string>
     <string name="confidence">Konfidenz</string>
     <string name="object">Objekt</string>
-    <string name="speedTitle">Geschwindigkeit</string>
+    <string name="speedTitle">Tempo</string>
     <string name="preview_resolution">Vorschau-&#8203;Auflösung</string>
     <string name="save_option">Speicher-&#8203;Optionen</string>
     <string name="file_available_body">Ein Modell mit demselben Namen existiert bereits. Möchten Sie es ersetzen?</string>
@@ -90,7 +90,7 @@
     <string name="edit_profile">Profil bearbeiten</string>
     <string name="logout">Abmelden</string>
     <string name="auto_mode">Automatik-&#8203;Modus</string>
-    <string name="dynamic_speed">Dynamische Geschwindigkeit</string>
+    <string name="dynamic_speed">Dynamisches Tempo</string>
     <string name="bumpers">Stoßfänger</string>
     <string name="robot_type">Robotertyp:</string>
     <string name="indicators">Blinker</string>
@@ -154,4 +154,24 @@
         <item>Google Drive</item>
         <item>Lokaler Server</item>
     </string-array>
+
+    <string name="set_goal_title">Ziel festlegen</string>
+    <string name="set_goal_message">Befestigen Sie das Telefon am Roboter und legen Sie ein Ziel fest. Der Roboter versucht, das Ziel nach dem Drücken von Start zu erreichen.</string>
+    <string name="start">Start</string>
+    <string name="forward_hint_m">Vorwärts [m]</string>
+    <string name="left_hint_m">Links [m]</string>
+    <string name="log_data">Daten protokollieren</string>
+    <string name="model_resolution">Modell-&#8203;Auflösung</string>
+    <string name="sensor_data">Sensordaten</string>
+    <string name="preview_images">Vorschaubilder</string>
+    <string name="training_images">Trainingsbilder</string>
+    <string name="sign_in_description">Richten Sie Ihr Profil ein, indem Sie sich mit Ihrem Google-Konto anmelden.</string>
+    <string name="sign_in_with_google">Mit Google anmelden</string>
+    <string name="no_projects_found_title">Hoppla! Keine Projekte gefunden.</string>
+    <string name="no_projects_found_body">Es sieht so aus, als gäbe es noch keine Projekte in Ihrem Google Drive.</string>
+    <string name="blink_led_detected">Blink-LED-Datei erkannt. Drücken Sie Start, um den Code auf Ihrem OpenBot auszuführen.</string>
+    <string name="usb_check_connection">Bitte überprüfen Sie die USB-Verbindung.</string>
+    <string name="ble_connecting">Verbinde …</string>
+    <string name="ble_disconnect">Trennen</string>
+    <string name="ble_connect">Verbinden</string>
 </resources>

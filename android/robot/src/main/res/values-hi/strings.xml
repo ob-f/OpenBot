@@ -40,7 +40,7 @@
 
     <string name="control">नियंत्रण</string>
     <string name="battery">बैटरी</string>
-    <string name="speed">गति (बा,दा)</string>
+    <string name="speed">RPM (बा,दा)</string>
     <string name="sonar">सोनार</string>
     <string name="drive_mode">ड्राइव मोड</string>
     <string name="speed_mode">गति मोड</string>
@@ -54,7 +54,7 @@
     <string name="settings">सेटिंग्स</string>
     <string name="bluetooth">ब्लूटूथ</string>
     <string name="inference">अनुमान</string>
-    <string name="input">इनपुट</string>
+    <string name="input">रिज़ॉल्यूशन</string>
     <string name="confidence">विश्वास स्तर</string>
     <string name="object">ऑब्जेक्ट</string>
     <string name="speedTitle">गति</string>
@@ -154,4 +154,24 @@
         <item>Google Drive</item>
         <item>लोकल सर्वर</item>
     </string-array>
+
+    <string name="set_goal_title">लक्ष्य सेट करें</string>
+    <string name="set_goal_message">फ़ोन को रोबोट पर लगाएं और एक लक्ष्य निर्दिष्ट करें। स्टार्ट दबाने के बाद रोबोट लक्ष्य तक पहुंचने की कोशिश करेगा।</string>
+    <string name="start">शुरू करें</string>
+    <string name="forward_hint_m">आगे [मी]</string>
+    <string name="left_hint_m">बाएं [मी]</string>
+    <string name="log_data">डेटा लॉग करें</string>
+    <string name="model_resolution">मॉडल रिज़ॉल्यूशन</string>
+    <string name="sensor_data">सेंसर डेटा</string>
+    <string name="preview_images">पूर्वावलोकन छवियां</string>
+    <string name="training_images">प्रशिक्षण छवियां</string>
+    <string name="sign_in_description">अपने Google खाते से साइन इन करके अपनी प्रोफ़ाइल सेट करें।</string>
+    <string name="sign_in_with_google">Google से साइन इन करें</string>
+    <string name="no_projects_found_title">अरे! कोई प्रोजेक्ट नहीं मिला।</string>
+    <string name="no_projects_found_body">ऐसा लगता है कि आपके Google Drive में अभी तक कोई प्रोजेक्ट नहीं है।</string>
+    <string name="blink_led_detected">ब्लिंक LED फ़ाइल मिली। अपने OpenBot पर कोड चलाने के लिए स्टार्ट दबाएं।</string>
+    <string name="usb_check_connection">कृपया USB कनेक्शन जांचें।</string>
+    <string name="ble_connecting">कनेक्ट हो रहा है</string>
+    <string name="ble_disconnect">डिस्कनेक्ट करें</string>
+    <string name="ble_connect">कनेक्ट करें</string>
 </resources>

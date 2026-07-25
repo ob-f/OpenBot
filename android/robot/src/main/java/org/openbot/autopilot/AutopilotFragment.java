@@ -487,7 +487,8 @@ public class AutopilotFragment extends CameraFragment {
             final boolean threadsEnabled = device == Network.Device.CPU;
             binding.plus.setEnabled(threadsEnabled);
             binding.minus.setEnabled(threadsEnabled);
-            binding.threads.setText(threadsEnabled ? String.valueOf(numThreads) : "N/A");
+            binding.threads.setText(
+                threadsEnabled ? String.valueOf(numThreads) : getString(R.string.n_a));
             if (threadsEnabled) binding.threads.setTextColor(Color.BLACK);
             else binding.threads.setTextColor(Color.GRAY);
             preferencesManager.setDevice(device.ordinal());
