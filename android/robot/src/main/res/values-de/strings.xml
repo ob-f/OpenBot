@@ -169,7 +169,7 @@
     <string name="sign_in_with_google">Mit Google anmelden</string>
     <string name="no_projects_found_title">Hoppla! Keine Projekte gefunden.</string>
     <string name="no_projects_found_body">Es sieht so aus, als gäbe es noch keine Projekte in Ihrem Google Drive.</string>
-    <string name="blink_led_detected">Blink-LED-Datei erkannt. Drücken Sie Start, um den Code auf Ihrem OpenBot auszuführen.</string>
+    <string name="project_file_detected">%1$s-Datei erkannt. Drücken Sie Start, um den Code auf Ihrem OpenBot auszuführen.</string>
     <string name="usb_check_connection">Bitte überprüfen Sie die USB-Verbindung.</string>
     <string name="ble_connecting">Verbinde …</string>
     <string name="ble_disconnect">Trennen</string>

@@ -169,7 +169,7 @@
     <string name="sign_in_with_google">Se connecter avec Google</string>
     <string name="no_projects_found_title">Oups ! Aucun projet trouvé.</string>
     <string name="no_projects_found_body">Il semble qu\'il n\'y ait pas encore de projets dans votre Google Drive.</string>
-    <string name="blink_led_detected">Fichier LED clignotante détecté. Appuyez sur Démarrer pour exécuter le code sur votre OpenBot.</string>
+    <string name="project_file_detected">Fichier %1$s détecté. Appuyez sur Démarrer pour exécuter le code sur votre OpenBot.</string>
     <string name="usb_check_connection">Veuillez vérifier la connexion USB.</string>
     <string name="ble_connecting">Connexion en cours</string>
     <string name="ble_disconnect">Déconnecter</string>

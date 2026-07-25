@@ -169,7 +169,7 @@
     <string name="sign_in_with_google">Google से साइन इन करें</string>
     <string name="no_projects_found_title">अरे! कोई प्रोजेक्ट नहीं मिला।</string>
     <string name="no_projects_found_body">ऐसा लगता है कि आपके Google Drive में अभी तक कोई प्रोजेक्ट नहीं है।</string>
-    <string name="blink_led_detected">ब्लिंक LED फ़ाइल मिली। अपने OpenBot पर कोड चलाने के लिए स्टार्ट दबाएं।</string>
+    <string name="project_file_detected">%1$s फ़ाइल मिली। अपने OpenBot पर कोड चलाने के लिए स्टार्ट दबाएं।</string>
     <string name="usb_check_connection">कृपया USB कनेक्शन जांचें।</string>
     <string name="ble_connecting">कनेक्ट हो रहा है</string>
     <string name="ble_disconnect">डिस्कनेक्ट करें</string>

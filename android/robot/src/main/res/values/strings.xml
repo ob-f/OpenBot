@@ -248,7 +248,7 @@
     <string name="sign_in_with_google">Sign-in with Google</string>
     <string name="no_projects_found_title">Oops! No projects found.</string>
     <string name="no_projects_found_body">Looks like there are no projects in your google drive yet.</string>
-    <string name="blink_led_detected">Blink LED file detected. Start to execute the code on your OpenBot.</string>
+    <string name="project_file_detected">%1$s file detected. Start to execute the code on your OpenBot.</string>
     <string name="usb_check_connection">Please check the USB connection.</string>
     <string name="ble_connecting">Connecting</string>
     <string name="ble_disconnect">Disconnect</string>

@@ -169,7 +169,7 @@
     <string name="sign_in_with_google">使用 Google 登录</string>
     <string name="no_projects_found_title">哎呀！未找到项目。</string>
     <string name="no_projects_found_body">您的 Google Drive 中似乎还没有项目。</string>
-    <string name="blink_led_detected">检测到闪烁 LED 文件。按下开始以在您的 OpenBot 上执行代码。</string>
+    <string name="project_file_detected">检测到 %1$s 文件。按下开始以在您的 OpenBot 上执行代码。</string>
     <string name="usb_check_connection">请检查 USB 连接。</string>
     <string name="ble_connecting">连接中</string>
     <string name="ble_disconnect">断开连接</string>
