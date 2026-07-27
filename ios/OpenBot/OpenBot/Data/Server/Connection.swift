@@ -118,7 +118,7 @@ class Connection: sendInitialMessageDelegate, startStreamDelegate {
         client.send(message: msg);
         msg = JSON.toString(VehicleStatusEvent(status: .init(LOGS: false, NOISE: false, NETWORK: false, DRIVE_MODE: "GAME", INDICATOR_LEFT: false, INDICATOR_RIGHT: false, INDICATOR_STOP: true)));
         client.send(message: msg)
-        msg = JSON.toString(FragmentStatus(FRAGMENT_TYPE: fragmentType.currentFragment));
+        msg = JSON.toString(FragmentTypeEvent(status: .init(FRAGMENT_TYPE: fragmentType.currentFragment)));
         client.send(message: msg);
     }
 

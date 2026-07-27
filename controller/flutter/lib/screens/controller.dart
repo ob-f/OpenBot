@@ -197,11 +197,6 @@ class ControllerState extends State<Controller> {
                   if (msgInObject["status"] != null) {
                     processMessageFromBot(msgInObject["status"]);
                   }
-                  if (msgInObject["FRAGMENT_TYPE"] != null) {
-                    setState(() {
-                      fragmentType = msgInObject["FRAGMENT_TYPE"];
-                    });
-                  }
                 }
               }
             } catch (e) {
@@ -326,6 +321,12 @@ class ControllerState extends State<Controller> {
     String candidate = "";
     if (items["CONNECTION_ACTIVE"] != null) {
       setDeviceConnected(items["CONNECTION_ACTIVE"]);
+    }
+
+    if (items["FRAGMENT_TYPE"] != null) {
+      setState(() {
+        fragmentType = items["FRAGMENT_TYPE"];
+      });
     }
 
     if (items["VIDEO_PROTOCOL"] != null) {

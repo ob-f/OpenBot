@@ -13,7 +13,7 @@ class FragmentType {
     
     var currentFragment : String = ""
     
-    func closeFragment() -> FragmentStatus {
-        return FragmentStatus(FRAGMENT_TYPE: "CLOSE")
+    func closeFragment() -> FragmentTypeEvent {
+        return FragmentTypeEvent(status: .init(FRAGMENT_TYPE: "CLOSE"))
     }
 }

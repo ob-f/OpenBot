@@ -99,7 +99,8 @@ public class ObjectNavFragment extends CameraFragment {
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-    BotToControllerEventBus.emitEvent(ConnectionUtils.closeFragment());
+    BotToControllerEventBus.emitEvent(
+        ConnectionUtils.createStatus("FRAGMENT_TYPE", "CLOSE"));
   }
 
 
@@ -107,7 +108,8 @@ public class ObjectNavFragment extends CameraFragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     BotToControllerEventBus.emitEvent(
-        ConnectionUtils.createFragment(Enums.FragmentType.OBJECTDETECTION.getFragment()));
+        ConnectionUtils.createStatus(
+            "FRAGMENT_TYPE", Enums.FragmentType.OBJECTDETECTION.getFragment()));
     binding.confidenceValue.setText((int) (MINIMUM_CONFIDENCE_TF_OD_API * 100) + "%");
     binding.plusConfidence.setOnClickListener(
         v -> {

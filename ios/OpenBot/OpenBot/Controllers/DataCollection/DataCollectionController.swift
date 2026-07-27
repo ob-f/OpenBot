@@ -93,7 +93,7 @@ class DataCollectionController: CameraController {
         var serverListener = ServerListener();
         serverListener.start();
         dataLogger.getDocumentDirectoryInformation()
-        let msg = JSON.toString(FragmentStatus(FRAGMENT_TYPE: self.fragmentType.currentFragment));
+        let msg = JSON.toString(FragmentTypeEvent(status: .init(FRAGMENT_TYPE: self.fragmentType.currentFragment)));
         client.send(message: msg);
     }
 

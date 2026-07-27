@@ -86,7 +86,8 @@ public class LoggerFragment extends CameraFragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     BotToControllerEventBus.emitEvent(
-        ConnectionUtils.createFragment(Enums.FragmentType.DATACOLLECTION.getFragment()));
+        ConnectionUtils.createStatus(
+            "FRAGMENT_TYPE", Enums.FragmentType.DATACOLLECTION.getFragment()));
     binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
 
     intentSensorService = new Intent(requireActivity(), SensorService.class);
@@ -272,7 +273,8 @@ public class LoggerFragment extends CameraFragment {
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-    BotToControllerEventBus.emitEvent(ConnectionUtils.closeFragment());
+    BotToControllerEventBus.emitEvent(
+        ConnectionUtils.createStatus("FRAGMENT_TYPE", "CLOSE"));
   }
 
   protected synchronized void runInBackground(final Runnable r) {

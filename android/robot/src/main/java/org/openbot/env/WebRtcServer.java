@@ -127,7 +127,7 @@ public class WebRtcServer implements IVideoServer {
   @Override
   public void sendServerUrl() {
     BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("VIDEO_SERVER_URL", ""));
-    BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(""));
+    BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("FRAGMENT_TYPE", ""));
   }
 
   @Override

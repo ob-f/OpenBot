@@ -83,7 +83,8 @@ public class AutopilotFragment extends CameraFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        BotToControllerEventBus.emitEvent(ConnectionUtils.closeFragment());
+        BotToControllerEventBus.emitEvent(
+            ConnectionUtils.createStatus("FRAGMENT_TYPE", "CLOSE"));
     }
 
     @Override
@@ -183,7 +184,9 @@ public class AutopilotFragment extends CameraFragment {
                                         Enums.SpeedMode.getByID(preferencesManager.getSpeedMode()))));
 
         binding.autoSwitch.setOnClickListener(v -> setNetworkEnabled(binding.autoSwitch.isChecked()));
-        BotToControllerEventBus.emitEvent(ConnectionUtils.createFragment(Enums.FragmentType.AUTOPILOT.getFragment()));
+        BotToControllerEventBus.emitEvent(
+            ConnectionUtils.createStatus(
+                "FRAGMENT_TYPE", Enums.FragmentType.AUTOPILOT.getFragment()));
 
     }
 
