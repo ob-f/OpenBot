@@ -29,6 +29,22 @@ public class Enums {
     }
   }
 
+  public enum FragmentType {
+    AUTOPILOT("Autopilot"),
+    OBJECTDETECTION("ObjectDetection"),
+    DATACOLLECTION("DataCollection"),
+    FREEROAM("FreeRoam");
+    private final String fragmentType;
+
+    FragmentType(String fragmentType) {
+      this.fragmentType = fragmentType;
+    }
+
+    public String getFragment() {
+      return fragmentType;
+    }
+  }
+
   public enum LogMode {
     ALL_IMGS(0),
     CROP_IMG(1),

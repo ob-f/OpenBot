@@ -30,6 +30,10 @@
 	<array>
 		<string>_openbot._tcp.</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to the camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to the microphone</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

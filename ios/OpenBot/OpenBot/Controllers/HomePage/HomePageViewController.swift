@@ -86,7 +86,7 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
         gameController.resetControl = true
         fragmentType.currentFragment = "Home";
         setupOpenCodeIcon();
-        let msg = JSON.toString(FragmentStatus(FRAGMENT_TYPE: fragmentType.currentFragment));
+        let msg = JSON.toString(FragmentTypeEvent(status: .init(FRAGMENT_TYPE: fragmentType.currentFragment)));
         client.send(message: msg);
     }
 

@@ -83,8 +83,12 @@ struct VehicleStatusEvent: Codable {
     }
 }
 
-struct FragmentStatus : Codable {
-    var FRAGMENT_TYPE: String
+struct FragmentTypeEvent: Codable {
+    var status: FragmentTypeStatus
+
+    struct FragmentTypeStatus: Codable {
+        var FRAGMENT_TYPE: String
+    }
 }
 
 struct OfferEvent: Codable {
