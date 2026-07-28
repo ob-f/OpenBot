@@ -45,5 +45,12 @@ public class Constants {
   public static final String CMD_DISCONNECTED = "DISCONNECTED";
   public static final String CMD_SPEED_UP = "SPEED_UP";
   public static final String CMD_SPEED_DOWN = "SPEED_DOWN";
+
+  // Local-only commands (never sent to a remote controller): used to coordinate the
+  // CameraX preview in CameraFragment with WebRtcServer's own camera capturer so the
+  // two never hold the physical camera open at the same time (see SWITCH_CAMERA handling
+  // in WebRtcServer, which would otherwise fail with ERROR_MAX_CAMERAS_IN_USE).
+  public static final String CMD_PAUSE_LOCAL_CAMERA = "PAUSE_LOCAL_CAMERA";
+  public static final String CMD_RESUME_LOCAL_CAMERA = "RESUME_LOCAL_CAMERA";
   // endregion
 }

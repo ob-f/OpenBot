@@ -3,6 +3,8 @@ package org.openbot.env;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.ToneGenerator;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceView;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.utils.AndGate;
+import org.openbot.utils.Constants;
 import org.openbot.utils.ConnectionUtils;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
@@ -180,6 +183,12 @@ public class WebRtcServer implements IVideoServer {
     monitorCameraControlEvents();
   }
 
+  // Gap between asking CameraFragment's CameraX preview to unbind and actually starting the
+  // WebRTC camera switch. CameraX's unbindAll() returns before the hardware camera device has
+  // finished closing, so switching immediately can still race into ERROR_MAX_CAMERAS_IN_USE.
+  private static final long LOCAL_CAMERA_RELEASE_DELAY_MS = 300;
+  private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
   private void monitorCameraControlEvents() {
     ControllerToBotEventBus.subscribe(
         this.getClass().getSimpleName(),
@@ -192,22 +201,7 @@ public class WebRtcServer implements IVideoServer {
                 emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
                 break;
               }
-              ((CameraVideoCapturer) videoCapturer)
-                  .switchCamera(
-                      new CameraVideoCapturer.CameraSwitchHandler() {
-                        @Override
-                        public void onCameraSwitchDone(boolean isFrontCamera) {
-                          String cameraName = isFrontCamera ? "FRONT" : "BACK";
-                          Log.d(TAG, "Camera switched successfully to " + cameraName);
-                          emitSwitchCameraStatus(cameraName);
-                        }
-
-                        @Override
-                        public void onCameraSwitchError(String errorDescription) {
-                          Log.e(TAG, "Camera switch failed: " + errorDescription);
-                          emitSwitchCameraStatus("ERROR:" + errorDescription);
-                        }
-                      });
+              switchCameraWithoutConflictingWithLocalPreview();
               break;
           }
         },
@@ -218,6 +212,48 @@ public class WebRtcServer implements IVideoServer {
             event.has("command")
                 && ("SWITCH_CAMERA".equals(event.getString("command")))
         );
+  }
+
+  // Frees up CameraFragment's CameraX camera before this class's own WebRTC capturer opens the
+  // other physical camera, so the device never has to hold two camera sessions open at once.
+  private void switchCameraWithoutConflictingWithLocalPreview() {
+    emitLocalCameraCommand(Constants.CMD_PAUSE_LOCAL_CAMERA);
+
+    mainHandler.postDelayed(
+        () ->
+            ((CameraVideoCapturer) videoCapturer)
+                .switchCamera(
+                    new CameraVideoCapturer.CameraSwitchHandler() {
+                      @Override
+                      public void onCameraSwitchDone(boolean isFrontCamera) {
+                        String cameraName = isFrontCamera ? "FRONT" : "BACK";
+                        Log.d(TAG, "Camera switched successfully to " + cameraName);
+                        emitSwitchCameraStatus(cameraName);
+                        resumeLocalCamera();
+                      }
+
+                      @Override
+                      public void onCameraSwitchError(String errorDescription) {
+                        Log.e(TAG, "Camera switch failed: " + errorDescription);
+                        emitSwitchCameraStatus("ERROR:" + errorDescription);
+                        resumeLocalCamera();
+                      }
+                    }),
+        LOCAL_CAMERA_RELEASE_DELAY_MS);
+  }
+
+  private void resumeLocalCamera() {
+    emitLocalCameraCommand(Constants.CMD_RESUME_LOCAL_CAMERA);
+  }
+
+  // ControllerToBotEventBus commands are read back out via event.getString("command"), so this
+  // must stay a flat {"command": ...} object rather than ConnectionUtils' {"status": {...}} shape.
+  private void emitLocalCameraCommand(String command) {
+    try {
+      ControllerToBotEventBus.emitEvent(new JSONObject().put("command", command).toString());
+    } catch (JSONException e) {
+      Timber.e(e, "Failed to emit local camera lifecycle command: %s", command);
+    }
   }
 
   private void emitSwitchCameraStatus(String value) {
