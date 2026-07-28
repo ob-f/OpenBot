@@ -83,10 +83,7 @@ public abstract class CameraFragment extends ControlsFragment {
     subscribeToLocalCameraLifecycleEvents();
   }
 
-  // WebRtcServer switches its own (separate) camera capturer for the web controller's video
-  // feed. Most devices only allow one open camera device at a time, so it asks this CameraX
-  // preview to let go of the camera for the duration of that switch to avoid
-  // ERROR_MAX_CAMERAS_IN_USE, then tells it to resume once the switch is done.
+  // Allowing WebRtcServer pause/resume to handle camera preview
   private void subscribeToLocalCameraLifecycleEvents() {
     String subscriber = getClass().getSimpleName() + "_localCameraLifecycle";
     ControllerToBotEventBus.unsubscribe(subscriber);

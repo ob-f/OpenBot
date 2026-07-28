@@ -183,9 +183,7 @@ public class WebRtcServer implements IVideoServer {
     monitorCameraControlEvents();
   }
 
-  // Gap between asking CameraFragment's CameraX preview to unbind and actually starting the
-  // WebRTC camera switch. CameraX's unbindAll() returns before the hardware camera device has
-  // finished closing, so switching immediately can still race into ERROR_MAX_CAMERAS_IN_USE.
+  // Delay to let the local camera actually finish releasing before we switch.
   private static final long LOCAL_CAMERA_RELEASE_DELAY_MS = 300;
   private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -214,8 +212,7 @@ public class WebRtcServer implements IVideoServer {
         );
   }
 
-  // Frees up CameraFragment's CameraX camera before this class's own WebRTC capturer opens the
-  // other physical camera, so the device never has to hold two camera sessions open at once.
+  // Pauses the local preview camera first so we don't open two cameras at once.
   private void switchCameraWithoutConflictingWithLocalPreview() {
     emitLocalCameraCommand(Constants.CMD_PAUSE_LOCAL_CAMERA);
 
@@ -245,9 +242,7 @@ public class WebRtcServer implements IVideoServer {
   private void resumeLocalCamera() {
     emitLocalCameraCommand(Constants.CMD_RESUME_LOCAL_CAMERA);
   }
-
-  // ControllerToBotEventBus commands are read back out via event.getString("command"), so this
-  // must stay a flat {"command": ...} object rather than ConnectionUtils' {"status": {...}} shape.
+  
   private void emitLocalCameraCommand(String command) {
     try {
       ControllerToBotEventBus.emitEvent(new JSONObject().put("command", command).toString());
