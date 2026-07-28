@@ -12,4 +12,8 @@ class FragmentType {
     static let shared : FragmentType = FragmentType();
     
     var currentFragment : String = ""
+    
+    func closeFragment() -> FragmentTypeEvent {
+        return FragmentTypeEvent(status: .init(FRAGMENT_TYPE: "CLOSE"))
+    }
 }

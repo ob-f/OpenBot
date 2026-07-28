@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:openbot_controller/utils/forwardSpeed.dart';
 import 'package:openbot_controller/utils/phoneSensorToDualDriveConverter.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-
+import 'package:openbot_controller/globals.dart';
 import 'driveCommandReducer.dart';
 
 class TiltingPhoneMode extends StatefulWidget {
-  const TiltingPhoneMode({super.key});
+  final String fragmentType;
+
+  const TiltingPhoneMode({required this.fragmentType, super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -28,6 +30,7 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
       PhoneSensorToDualDriveConverter();
   double leftSpeedValue = 0;
   double rightSpeedValue = 0;
+  String typeOfFragment = "";
 
   @override
   void initState() {
@@ -44,7 +47,20 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
   }
 
   @override
+  void didUpdateWidget(covariant TiltingPhoneMode oldWidget) {
+    // TODO: implement didUpdateWidget
+    setState(() {
+      typeOfFragment = widget.fragmentType;
+    });
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final bool isLogsEnabled = typeOfFragment == "DataCollection";
+    final bool isNetworkEnabled =
+        typeOfFragment == "Autopilot" || typeOfFragment == "ObjectDetection";
+
     return WillPopScope(
       onWillPop: () async {
         return true;
@@ -111,6 +127,66 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                         width: 64,
                       ),
                     )),
+                Container(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: Row(children: [
+                      Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(45),
+                            splashColor: Colors.white.withOpacity(0.2),
+                            highlightColor: Colors.white.withOpacity(0.12),
+                            onTap: isLogsEnabled
+                                ? () {
+                                    clientSocket?.writeln("{command: LOGS}");
+                                  }
+                                : null, // Image tapped
+                            child: Ink(
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(45),
+                                color: isLogsEnabled
+                                    ? const Color(0xFF0071C5).withOpacity(0.5)
+                                    : Colors.grey.withOpacity(0.5),
+                              ),
+                              child: Icon(
+                                Icons.sd_card_outlined,
+                                color: isLogsEnabled ? Colors.white : Colors.blue,
+                              ),
+                            ),
+                          )),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(45),
+                            splashColor: Colors.white.withOpacity(0.2),
+                            highlightColor: Colors.white.withOpacity(0.12),
+                            onTap: isNetworkEnabled
+                                ? () {
+                                    clientSocket?.writeln("{command: NETWORK}");
+                                  }
+                                : null, // Image tapped
+                            child: Ink(
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(45),
+                                color: isNetworkEnabled
+                                    ? const Color(0xFF0071C5).withOpacity(0.5)
+                                    : Colors.grey.withOpacity(0.5),
+                              ),
+                              child: Icon(
+                                Icons.person_search_outlined,
+                                color: isNetworkEnabled
+                                    ? Colors.white
+                                    : Colors.blue,
+                              ),
+                            ),
+                          )),
+                    ])),
                 GestureDetector(
                     onTapDown: (details) {
                       setState(() {
