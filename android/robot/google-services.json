@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:955078484078:android:42efc0c06fa6583165867f",
         "android_client_info": {
-          "package_name": "org.openbot"
+          "package_name": "org.openbot.app.robot"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "955078484078-91d6gg3p2qt9eilolpqp8o9j6nqjaqdf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "org.openbot",
+            "package_name": "org.openbot.app.robot",
             "certificate_hash": "224d8f13596161c1d53e2008aee1650856446ce7"
           }
         },
@@ -26,7 +26,7 @@
           "client_id": "955078484078-kiqt23b9043p6lpevmdd2c42bid22rct.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "org.openbot",
+            "package_name": "org.openbot.app.robot",
             "certificate_hash": "d6550cd35e6f79362f3d379f65f5bf7b607830f5"
           }
         },

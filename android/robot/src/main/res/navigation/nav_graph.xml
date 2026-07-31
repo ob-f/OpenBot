@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="org.openbot.main.MainFragment"
+        android:name="org.openbot.app.robot.main.MainFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_main">
         <action
@@ -43,13 +43,13 @@
     </fragment>
     <fragment
         android:id="@+id/freeRoamFragment"
-        android:name="org.openbot.robot.FreeRoamFragment"
+        android:name="org.openbot.app.robot.robot.FreeRoamFragment"
         android:label="FreeRoamFragment"
         tools:layout="@layout/fragment_free_roam" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="org.openbot.main.SettingsFragment"
+        android:name="org.openbot.app.robot.main.SettingsFragment"
         android:label="@string/settings" />
 
     <action
@@ -59,7 +59,7 @@
 
     <fragment
         android:id="@+id/bluetoothFragment"
-        android:name="org.openbot.main.BluetoothFragment"
+        android:name="org.openbot.app.robot.main.BluetoothFragment"
         android:label="@string/bluetooth" />
 
     <action
@@ -68,7 +68,7 @@
 
     <fragment
         android:id="@+id/usbFragment"
-        android:name="org.openbot.main.UsbFragment"
+        android:name="org.openbot.app.robot.main.UsbFragment"
         android:label="@string/usb" />
 
     <action
@@ -78,13 +78,13 @@
 
     <fragment
         android:id="@+id/loggerFragment"
-        android:name="org.openbot.logging.LoggerFragment"
+        android:name="org.openbot.app.robot.logging.LoggerFragment"
         android:label="fragment_logger"
         tools:layout="@layout/fragment_logger" />
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="org.openbot.profile.ProfileFragment"
+        android:name="org.openbot.app.robot.profile.ProfileFragment"
         android:label="My Profile" >
         <action
             android:id="@+id/action_profileFragment_to_EditProfileFragment"
@@ -96,35 +96,35 @@
         app:destination="@id/profileFragment" />
     <fragment
         android:id="@+id/AIFragment"
-        android:name="org.openbot.autopilot.AutopilotFragment"
+        android:name="org.openbot.app.robot.autopilot.AutopilotFragment"
         android:label="fragment_ai"
         tools:layout="@layout/fragment_autopilot" />
 
     <fragment
         android:id="@+id/controllerMappingFragment"
-        android:name="org.openbot.controller.ControllerMappingFragment"
+        android:name="org.openbot.app.robot.controller.ControllerMappingFragment"
         android:label="fragment_controller_mapping"
         tools:layout="@layout/fragment_controller_mapping" />
     <fragment
         android:id="@+id/objectNavFragment"
-        android:name="org.openbot.objectNav.ObjectNavFragment"
+        android:name="org.openbot.app.robot.objectNav.ObjectNavFragment"
         android:label="fragment_object_nav"
         tools:layout="@layout/fragment_object_nav" />
 
     <fragment
         android:id="@+id/modelManagementFragment"
-        android:name="org.openbot.modelManagement.ModelManagementFragment"
+        android:name="org.openbot.app.robot.modelManagement.ModelManagementFragment"
         android:label="fragment_model_management"
         tools:layout="@layout/fragment_model_management" />
     <fragment
         android:id="@+id/pointGoalNavigationFragment"
-        android:name="org.openbot.pointGoalNavigation.PointGoalNavigationFragment"
+        android:name="org.openbot.app.robot.pointGoalNavigation.PointGoalNavigationFragment"
         android:label="fragment_point_goal_navigation"
         tools:layout="@layout/fragment_point_goal_navigation" />
 
     <fragment
         android:id="@+id/projectsFragment"
-        android:name="org.openbot.projects.ProjectsFragment"
+        android:name="org.openbot.app.robot.projects.ProjectsFragment"
         android:label="My Projects">
         <action
             android:id="@+id/action_projectsFragment_to_barCodeScannerFragment"
@@ -142,7 +142,7 @@
 
     <fragment
         android:id="@+id/barCodeScannerFragment"
-        android:name="org.openbot.projects.BarCodeScannerFragment"
+        android:name="org.openbot.app.robot.projects.BarCodeScannerFragment"
         android:label="barCodeScanner"
         tools:layout="@layout/fragment_bar_code_scanner">
         <action
@@ -152,23 +152,23 @@
 
     <fragment
         android:id="@+id/playGroundFragment"
-        android:name="org.openbot.playground.PlayGroundViewFragment"
+        android:name="org.openbot.app.robot.playground.PlayGroundViewFragment"
         android:label="PlayGround"
         tools:layout="@layout/fragment_playground"/>
 
     <fragment
         android:id="@+id/blocklyExecutingFragment"
-        android:name="org.openbot.projects.BlocklyExecutingFragment"
+        android:name="org.openbot.app.robot.projects.BlocklyExecutingFragment"
         android:label="blocklyExecute"
         tools:layout="@layout/fragment_blockly_executing" />
 
     <fragment
         android:id="@+id/EditProfileFragment"
-        android:name="org.openbot.profile.EditProfileFragment"
+        android:name="org.openbot.app.robot.profile.EditProfileFragment"
         android:label="editProfile"
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
         android:id="@+id/robotInfoFragment"
-        android:name="org.openbot.robot.RobotInfoFragment"
+        android:name="org.openbot.app.robot.robot.RobotInfoFragment"
         android:label="RobotInfoFragment" />
 </navigation>

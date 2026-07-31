@@ -21,7 +21,7 @@ android {
     compileSdkVersion 33
     buildToolsVersion '33.0.1'
     defaultConfig {
-        applicationId "org.openbot"
+        applicationId "org.openbot.app.robot"
         minSdkVersion 21
         targetSdkVersion 32
         ndk {
@@ -56,7 +56,7 @@ android {
         abortOnError false
         checkReleaseBuilds false
     }
-    namespace 'org.openbot'
+    namespace 'org.openbot.app.robot'
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
