@@ -1,6 +1,8 @@
 package org.openbot.utils;
 
 import static org.openbot.utils.Constants.PERMISSION_AUDIO;
+import static org.openbot.utils.Constants.PERMISSION_BLUETOOTH_CONNECT;
+import static org.openbot.utils.Constants.PERMISSION_BLUETOOTH_SCAN;
 import static org.openbot.utils.Constants.PERMISSION_CAMERA;
 import static org.openbot.utils.Constants.PERMISSION_LOCATION;
 import static org.openbot.utils.Constants.PERMISSION_STORAGE;
@@ -14,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
@@ -70,6 +73,18 @@ public class PermissionUtils {
   public static boolean hasAudioPermission(Activity activity) {
     return ContextCompat.checkSelfPermission(activity, PERMISSION_AUDIO)
         == PackageManager.PERMISSION_GRANTED;
+  }
+
+  /**
+   * "Nearby devices" permission (Bluetooth scan/connect). Always true below API 31, where
+   * Bluetooth access is covered by the normal, auto-granted legacy BLUETOOTH permissions.
+   */
+  public static boolean hasNearbyPermission(Activity activity) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true;
+    return ContextCompat.checkSelfPermission(activity, PERMISSION_BLUETOOTH_SCAN)
+            == PackageManager.PERMISSION_GRANTED
+        && ContextCompat.checkSelfPermission(activity, PERMISSION_BLUETOOTH_CONNECT)
+            == PackageManager.PERMISSION_GRANTED;
   }
 
   public static boolean hasLoggingPermissions(Activity activity) {
@@ -268,6 +283,11 @@ public class PermissionUtils {
   public static void showAudioPermissionSettingsToast(Activity activity) {
     showPermissionsSettingsToast(
         activity, activity.getResources().getString(R.string.record_audio_permission_denied));
+  }
+
+  public static void showNearbyPermissionSettingsToast(Activity activity) {
+    showPermissionsSettingsToast(
+        activity, activity.getResources().getString(R.string.nearby_permission_denied));
   }
 
   public static void showStoragePermissionModelManagementToast(Activity activity) {

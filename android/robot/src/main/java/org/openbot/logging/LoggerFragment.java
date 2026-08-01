@@ -153,6 +153,8 @@ public class LoggerFragment extends CameraFragment {
     List<String> models = getModelNames(f -> f.pathType != Model.PATH_TYPE.URL);
     initModelSpinner(binding.modelSpinner, models, "");
     initServerSpinner(binding.serverSpinner);
+    initArraySpinner(binding.saveAs, R.array.save_data);
+    initArraySpinner(binding.resolutionSpinner, R.array.preview_resolutions);
 
     binding.saveAs.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
 

@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import org.openbot.R;
 import org.openbot.databinding.SetGoalDialogViewBinding;
 
 public class SetGoalDialogFragment extends DialogFragment {
@@ -28,12 +29,11 @@ public class SetGoalDialogFragment extends DialogFragment {
 
     MaterialAlertDialogBuilder builder =
         new MaterialAlertDialogBuilder(getActivity())
-            .setTitle("Set Goal")
-            .setMessage(
-                "Mount the phone on the robot and specify a goal. The robot will try to reach the goal after pressing start.")
+            .setTitle(R.string.set_goal_title)
+            .setMessage(R.string.set_goal_message)
             .setView(binding.getRoot())
-            .setNeutralButton("Cancel", (dialogInterface, i) -> setFragmentResult(false))
-            .setPositiveButton("Start", (dialogInterface, i) -> setFragmentResult(true));
+            .setNeutralButton(R.string.cancel, (dialogInterface, i) -> setFragmentResult(false))
+            .setPositiveButton(R.string.start, (dialogInterface, i) -> setFragmentResult(true));
 
     dialog = builder.create();
 

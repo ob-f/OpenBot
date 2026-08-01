@@ -1,44 +1,85 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/permissions">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:layout="@layout/preference_category_custom"
+        app:title="@string/general">
 
-        <SwitchPreferenceCompat
-            app:key="camera"
-            app:title="Camera" />
+        <Preference
+            app:icon="@drawable/ic_flag_globe"
+            app:key="app_language"
+            app:layout="@layout/preference_icon_end_last"
+            app:title="@string/language"
+            app:summary="@string/language_summary" />
 
-        <SwitchPreferenceCompat
-            app:key="storage"
-            app:title="Storage" />
-
-        <SwitchPreferenceCompat
-            app:key="location"
-            app:title="Location" />
-
-        <SwitchPreferenceCompat
-            app:key="mic"
-            app:title="Microphone" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Video Streaming">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:layout="@layout/preference_category_custom"
+        app:title="@string/permissions">
+
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_pref_camera"
+            app:key="camera"
+            app:layout="@layout/preference_icon_end"
+            app:title="@string/camera" />
+
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_pref_storage"
+            app:key="storage"
+            app:layout="@layout/preference_icon_end"
+            app:title="@string/storage" />
+
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_location"
+            app:key="location"
+            app:layout="@layout/preference_icon_end"
+            app:title="@string/location" />
+
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_mic"
+            app:key="mic"
+            app:layout="@layout/preference_icon_end"
+            app:title="@string/microphone" />
+
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_nearby"
+            app:key="nearby"
+            app:layout="@layout/preference_icon_end_last"
+            app:title="@string/nearby" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:layout="@layout/preference_category_custom"
+        app:title="@string/video_streaming">
 
         <ListPreference
             app:defaultValue="RTSP"
             app:entries="@array/stream_server"
             app:entryValues="@array/stream_server"
+            app:icon="@drawable/ic_videocam"
             app:key="video_server"
-            app:title="Stream Mode"
+            app:layout="@layout/preference_icon_end_last"
+            app:title="@string/stream_mode"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Connection Type">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:layout="@layout/preference_category_custom"
+        app:title="@string/connection_type_category">
 
         <ListPreference
             app:defaultValue="USB"
             app:entries="@array/connection_type"
             app:entryValues="@array/connection_type"
+            app:icon="@drawable/ic_link"
             app:key="connection_type"
-            app:title="Connectivity Mode"
+            app:layout="@layout/preference_icon_end"
+            app:title="@string/connectivity_mode"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

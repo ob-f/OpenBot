@@ -36,7 +36,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
   @Override
   public void onBindViewHolder(final ViewHolder holder, int position) {
     SubCategory item = mValues.get(position);
-    holder.title.setText(item.getTitle());
+    holder.title.setText(item.getDisplayTitle(holder.itemView.getContext()));
     Glide.with(holder.itemView).load(item.getImage()).centerInside().into(holder.icon);
     int color = Color.parseColor(item.getBackgroundColor());
     //        Color.rgb(holder.rand.nextInt(255), holder.rand.nextInt(255),
