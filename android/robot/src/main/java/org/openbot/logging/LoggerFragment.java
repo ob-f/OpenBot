@@ -597,7 +597,7 @@ public class LoggerFragment extends CameraFragment {
 
   private void connectPhoneController() {
     phoneController.connect(requireContext());
-    Enums.DriveMode oldDriveMode = currentDriveMode;
+    Enums.DriveMode oldDriveMode = vehicle.getDriveMode();
     // Currently only dual drive mode supported
     setDriveMode(Enums.DriveMode.DUAL);
     binding.controllerContainer.driveMode.setAlpha(0.5f);
@@ -607,7 +607,7 @@ public class LoggerFragment extends CameraFragment {
 
   private void connectWebController() {
     phoneController.connectWebServer();
-    Enums.DriveMode oldDriveMode = currentDriveMode;
+    Enums.DriveMode oldDriveMode = vehicle.getDriveMode();
     // Currently only dual drive mode supported
     setDriveMode(Enums.DriveMode.GAME);
     binding.controllerContainer.driveMode.setAlpha(0.5f);

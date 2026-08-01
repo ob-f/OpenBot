@@ -268,7 +268,7 @@ public class FreeRoamFragment extends ControlsFragment {
 
   private void connectPhoneController() {
     phoneController.connect(requireContext());
-    DriveMode oldDriveMode = currentDriveMode;
+    DriveMode oldDriveMode = vehicle.getDriveMode();
     // Currently only dual drive mode supported
     setDriveMode(DriveMode.DUAL);
     binding.controllerContainer.driveMode.setAlpha(0.5f);
@@ -278,9 +278,9 @@ public class FreeRoamFragment extends ControlsFragment {
 
   private void connectWebController() {
     phoneController.connectWebServer();
-    Enums.DriveMode oldDriveMode = currentDriveMode;
+    DriveMode oldDriveMode = vehicle.getDriveMode();
     // Currently only dual drive mode supported
-    setDriveMode(Enums.DriveMode.GAME);
+    setDriveMode(DriveMode.GAME);
     binding.controllerContainer.driveMode.setAlpha(0.5f);
     binding.controllerContainer.driveMode.setEnabled(false);
     preferencesManager.setDriveMode(oldDriveMode.getValue());
