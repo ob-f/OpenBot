@@ -20,10 +20,10 @@
     "ws": "^8.17.0"
   },
   "devDependencies": {
-    "eslint": "^9.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-n": "^17.0.0",
-    "eslint-plugin-promise": "^6.0.0",
-    "nodemon": "^3.1.0"
-  }
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "nodemon": "^3.1.0"  }
 }
