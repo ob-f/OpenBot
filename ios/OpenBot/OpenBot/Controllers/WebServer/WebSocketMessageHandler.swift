@@ -36,6 +36,7 @@ class WebSocketMessageHandler {
 
     func toggleLogging(){
         NotificationCenter.default.post(name: .logData, object: nil)
+    }
 
     func toggleNetwork() {
         NotificationCenter.default.post(name: .toggleNetworks, object: nil)

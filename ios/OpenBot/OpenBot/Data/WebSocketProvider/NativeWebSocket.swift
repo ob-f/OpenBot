@@ -8,6 +8,7 @@ import FirebaseAuth
 
 @available(iOS 13.0, *)
 class NativeWebSocket: NSObject, WebSocketProvider {
+    // change this IP to match the web-server host when running from a different device/network
     let url = URL(string: "ws://192.168.1.40:8080/ws")!
 
     var roomId: String {
@@ -53,7 +54,7 @@ class NativeWebSocket: NSObject, WebSocketProvider {
 
     private func sendRoomJoin() {
         guard !roomId.isEmpty else { return }
-        let response = try! JSONEncoder().encode(responseId(roomId: roomId, clientType: "robot"))
+        guard let response = try? JSONEncoder().encode(responseId(roomId: roomId, clientType: "robot")) else { return }
         send(data: response)
     }
 

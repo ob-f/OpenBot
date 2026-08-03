@@ -78,7 +78,7 @@ public class FreeRoamFragment extends ControlsFragment {
     if (connectionType != null && connectionType.equals("USB")) {
       binding.usbToggle.setVisibility(View.VISIBLE);
       binding.bleToggle.setVisibility(View.GONE);
-    } else if (connectionType.equals("Bluetooth")) {
+    } else if (connectionType != null && connectionType.equals("Bluetooth")) {
       binding.bleToggle.setVisibility(View.VISIBLE);
       binding.usbToggle.setVisibility(View.GONE);
     }

@@ -105,6 +105,9 @@ const leaveRoom = (ws) => {
     if (ws.clientType === 'robot' && room.robot === ws) {
         room.robot = null;
     }
+    if (!room.browser && !room.robot) {
+        rooms.delete(ws.roomId);
+    }
     ws.roomId = null;
 };
 
