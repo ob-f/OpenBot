@@ -127,7 +127,7 @@ class RobotInfoFrame: UIViewController {
 
     /// creates heading label
     func createRobotTypeHeading() {
-        robotType = createHeadings(text: "Robot Type")
+        robotType = createHeadings(text: Strings.robotTypeHeading)
         robotType.frame.origin = CGPoint(x: 10, y: topPadding + adapted(dimensionSize: 30, to: .height))
     }
 
@@ -158,7 +158,7 @@ class RobotInfoFrame: UIViewController {
 
     /// creates sensors heading
     func createSensorHeading() {
-        sensorHeading = createHeadings(text: "Sensors")
+        sensorHeading = createHeadings(text: Strings.sensorsHeading)
     }
 
     /// creates checkboxes for sensors
@@ -608,7 +608,7 @@ class RobotInfoFrame: UIViewController {
         if sonarData != "" {
             let index = sonarData.index(after: sonarData.startIndex)
             let actualSonarValue = min(Int(String(sonarData[index...])) ?? 0, 300)
-            sonar.text = "Sonar " + String(actualSonarValue) + " cm"
+            sonar.text = String(format: Strings.sonarReadingFormat, String(actualSonarValue))
         }
     }
 
@@ -617,7 +617,7 @@ class RobotInfoFrame: UIViewController {
         let voltageData = bluetooth.voltageDivider
         if voltageData != "" {
             let index = voltageData.index(after: voltageData.startIndex)
-            battery.text = "Battery " + String(voltageData[index...]) + " V"
+            battery.text = String(format: Strings.batteryReadingFormat, String(voltageData[index...]))
         }
     }
 

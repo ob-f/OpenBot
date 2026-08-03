@@ -230,7 +230,7 @@ class expandedAutoPilot: UIView {
         serverDropDown.anchorView = serverDropDownView
         serverDropDown.dataSource = servers
         serverDropDown.show()
-        ddView = createDropdownView(borderColor: "", buttonName: "No Server", leadingAnchor: 180, topAnchor: adapted(dimensionSize: 50, to: .height), action: #selector(showServerDropdown(_:)))
+        ddView = createDropdownView(borderColor: "", buttonName: Strings.noServer, leadingAnchor: 180, topAnchor: adapted(dimensionSize: 50, to: .height), action: #selector(showServerDropdown(_:)))
         serverDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
             serverDropDownLabel.text = item
             let server = serverItems.filter { server in
@@ -256,7 +256,7 @@ class expandedAutoPilot: UIView {
         upwardImage.translatesAutoresizingMaskIntoConstraints = false
         upwardImage.trailingAnchor.constraint(equalTo: ddView.trailingAnchor, constant: -10).isActive = true
         upwardImage.topAnchor.constraint(equalTo: ddView.topAnchor, constant: 11.5).isActive = true
-        serverDropDownLabel.text = "No Server"
+        serverDropDownLabel.text = Strings.noServer
         serverDropDownLabel.textColor = Colors.border
         serverDropDownLabel.frame = CGRect(x: 10, y: 0, width: 210, height: 40)
         ddView.addSubview(serverDropDownLabel)

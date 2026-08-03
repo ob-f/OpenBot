@@ -128,3 +128,73 @@
 "projectsTab" = "Projekte";
 "homeTab" = "Start";
 "profileTab" = "Profil";
+
+/* Loading / generic alerts */
+"loadingTitle" = "Lädt";
+"loadingProfileMessage" = "Bitte warten, während das Profil geladen wird …";
+"loadingDataMessage" = "Bitte warten, während die Daten geladen werden …";
+"pleaseWaitMessage" = "Bitte warten …";
+"errorHeading" = "Fehler";
+"genericErrorMessage" = "Hoppla! Etwas ist schiefgelaufen. Bitte versuche es erneut.";
+"okAction" = "OK";
+
+/* Profile screen */
+"myProfileHeading" = "Mein Profil";
+"setupProfilePromptLine1" = "Richte dein Profil ein, indem du dich mit";
+"setupProfilePromptLine2" = "deinem Google-Konto anmeldest.";
+"editProfile" = "Profil bearbeiten";
+"logoutMenuItem" = "Abmelden";
+"firstNameFieldLabel" = "Vorname";
+"lastNameFieldLabel" = "Nachname";
+"dateOfBirthFieldLabel" = "Geburtsdatum";
+"emailFieldLabel" = "E-Mail";
+"unknownFallback" = "Unbekannt";
+"saveChangesButton" = "Änderungen speichern";
+"profileUpdatedSuccessToast" = "Profil erfolgreich aktualisiert";
+"profilePictureLoadErrorToast" = "Fehler beim Laden des Profilbilds";
+"signInWithGoogle" = "Mit Google anmelden";
+
+/* Project screen */
+"myProjectsHeading" = "Meine Projekte";
+"pleaseSignInProjectsLine1" = "Bitte melde dich an, um auf deine";
+"pleaseSignInProjectsLine2" = "Projekte zuzugreifen.";
+"noProjectsFoundHeading" = "Hoppla! Keine Projekte gefunden.";
+"noProjectsFoundBody" = "Es sieht so aus, als gäbe es noch keine\nProjekte in deinem Google Drive.";
+"deleteFileTitle" = "Diese Datei löschen";
+"deleteFileMessage" = "Diese Datei kann später nicht wiederhergestellt werden";
+"deleteAction" = "Löschen";
+
+/* QR Scanner / open-code bottom sheet */
+"scanQrCodeHeading" = "QR-Code scannen";
+"scanInstructions" = "Platziere den QR-Code im Rahmen, um ihn zu scannen. Bitte nicht wackeln, damit das Ergebnis schneller erscheint.";
+"scanQrButton" = "QR scannen";
+"qrScannerNavTitle" = "QR-Scanner";
+"qrScanSuccessHeading" = "QR-Code erfolgreich gescannt";
+"qrFileDetectedMessageFormat" = "Datei „%@“ erkannt. Starte die Ausführung des Codes auf deinem OpenBot.";
+"startButton" = "Start";
+
+/* Playground (Run Robot / Blockly execution screen) */
+"cancelledStatus" = "Abgebrochen";
+"stopRobotButton" = "Roboter stoppen";
+"resetRobotButton" = "Roboter zurücksetzen";
+"stopCarButton" = "Fahrzeug stoppen";
+"playgroundNavTitle" = "Spielwiese";
+
+/* Robot Info headings */
+"robotTypeHeading" = "Robotertyp";
+"sensorsHeading" = "Sensoren";
+"sonarReadingFormat" = "Sonar %@ cm";
+"batteryReadingFormat" = "Akku %@ V";
+
+/* Point Goal Navigation */
+"goalReachedMessage" = "Ziel erreicht";
+
+/* Model Management filter dropdown */
+"modelFilterAll" = "Alle";
+"modelFilterAllCaps" = "ALLE";
+"modelFilterAutoPilot" = "Autopilot";
+"modelFilterDetector" = "Detektor";
+"modelFilterNavigation" = "Navigation";
+
+/* Data Collection / Autopilot server dropdown default state */
+"noServer" = "Kein Server";

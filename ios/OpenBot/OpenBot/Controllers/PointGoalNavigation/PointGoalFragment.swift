@@ -117,7 +117,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         infoText.translatesAutoresizingMaskIntoConstraints = false
         infoText.leadingAnchor.constraint(equalTo: infoMessageRect.leadingAnchor, constant: 30).isActive = true
         infoText.topAnchor.constraint(equalTo: infoMessageRect.topAnchor, constant: 30).isActive = true
-        let goalReachedText = createLabel(text: "Goal reached", fontSize: 16)
+        let goalReachedText = createLabel(text: Strings.goalReachedMessage, fontSize: 16)
         infoMessageRect.addSubview(goalReachedText)
         goalReachedText.translatesAutoresizingMaskIntoConstraints = false
         goalReachedText.leadingAnchor.constraint(equalTo: infoText.leadingAnchor, constant: 0).isActive = true

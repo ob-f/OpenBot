@@ -244,7 +244,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         server.heightAnchor.constraint(equalToConstant: 40).isActive = true;
         server.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true;
         server.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 230).isActive = true;
-        serverDropDownLabel.text = "No Server"
+        serverDropDownLabel.text = Strings.noServer
         serverDropDownLabel.textColor = Colors.border
         serverDropDownLabel.frame = CGRect(x: 10, y: 0, width: 210, height: 40)
         server.addSubview(serverDropDownLabel);

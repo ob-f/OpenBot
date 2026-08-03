@@ -128,3 +128,73 @@
 "projectsTab" = "Proyectos";
 "homeTab" = "Inicio";
 "profileTab" = "Perfil";
+
+/* Loading / generic alerts */
+"loadingTitle" = "Cargando";
+"loadingProfileMessage" = "Espera mientras cargamos el perfil...";
+"loadingDataMessage" = "Espera mientras cargamos los datos...";
+"pleaseWaitMessage" = "Espera un momento...";
+"errorHeading" = "Error";
+"genericErrorMessage" = "¡Vaya! Algo salió mal. Inténtalo de nuevo.";
+"okAction" = "Aceptar";
+
+/* Profile screen */
+"myProfileHeading" = "Mi Perfil";
+"setupProfilePromptLine1" = "Configura tu perfil iniciando sesión con";
+"setupProfilePromptLine2" = "tu cuenta de Google.";
+"editProfile" = "Editar Perfil";
+"logoutMenuItem" = "Cerrar sesión";
+"firstNameFieldLabel" = "Nombre";
+"lastNameFieldLabel" = "Apellido";
+"dateOfBirthFieldLabel" = "Fecha de Nacimiento";
+"emailFieldLabel" = "Correo electrónico";
+"unknownFallback" = "Desconocido";
+"saveChangesButton" = "Guardar Cambios";
+"profileUpdatedSuccessToast" = "Perfil actualizado correctamente";
+"profilePictureLoadErrorToast" = "Error al cargar la foto de perfil";
+"signInWithGoogle" = "Iniciar sesión con Google";
+
+/* Project screen */
+"myProjectsHeading" = "Mis Proyectos";
+"pleaseSignInProjectsLine1" = "Inicia sesión primero para acceder a tus";
+"pleaseSignInProjectsLine2" = "proyectos.";
+"noProjectsFoundHeading" = "¡Vaya! No se encontraron proyectos.";
+"noProjectsFoundBody" = "Parece que todavía no hay proyectos\nen tu Google Drive.";
+"deleteFileTitle" = "Eliminar este archivo";
+"deleteFileMessage" = "No podrás restaurar este archivo más tarde";
+"deleteAction" = "Eliminar";
+
+/* QR Scanner / open-code bottom sheet */
+"scanQrCodeHeading" = "Escanear Código QR";
+"scanInstructions" = "Coloca el código QR dentro del marco para escanearlo. Evita mover el teléfono para obtener resultados más rápido.";
+"scanQrButton" = "Escanear QR";
+"qrScannerNavTitle" = "Escáner QR";
+"qrScanSuccessHeading" = "Código QR escaneado correctamente";
+"qrFileDetectedMessageFormat" = "Archivo %@ detectado. Comenzando a ejecutar el código en tu OpenBot.";
+"startButton" = "Iniciar";
+
+/* Playground (Run Robot / Blockly execution screen) */
+"cancelledStatus" = "Cancelado";
+"stopRobotButton" = "Detener Robot";
+"resetRobotButton" = "Reiniciar Robot";
+"stopCarButton" = "Detener Vehículo";
+"playgroundNavTitle" = "Zona de Pruebas";
+
+/* Robot Info headings */
+"robotTypeHeading" = "Tipo de Robot";
+"sensorsHeading" = "Sensores";
+"sonarReadingFormat" = "Sonar %@ cm";
+"batteryReadingFormat" = "Batería %@ V";
+
+/* Point Goal Navigation */
+"goalReachedMessage" = "Meta alcanzada";
+
+/* Model Management filter dropdown */
+"modelFilterAll" = "Todos";
+"modelFilterAllCaps" = "TODOS";
+"modelFilterAutoPilot" = "Piloto Automático";
+"modelFilterDetector" = "Detector";
+"modelFilterNavigation" = "Navegación";
+
+/* Data Collection / Autopilot server dropdown default state */
+"noServer" = "Sin Servidor";

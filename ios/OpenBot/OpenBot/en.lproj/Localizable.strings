@@ -128,3 +128,73 @@
 "projectsTab" = "Projects";
 "homeTab" = "Home";
 "profileTab" = "Profile";
+
+/* Loading / generic alerts */
+"loadingTitle" = "Loading";
+"loadingProfileMessage" = "Please wait while we load the profile...";
+"loadingDataMessage" = "Please wait while we load data...";
+"pleaseWaitMessage" = "Please wait...";
+"errorHeading" = "Error";
+"genericErrorMessage" = "Oops! Something went wrong. Please try again.";
+"okAction" = "OK";
+
+/* Profile screen */
+"myProfileHeading" = "My Profile";
+"setupProfilePromptLine1" = "Set up your profile by signing in with";
+"setupProfilePromptLine2" = "your Google account.";
+"editProfile" = "Edit Profile";
+"logoutMenuItem" = "Logout";
+"firstNameFieldLabel" = "First Name";
+"lastNameFieldLabel" = "Last Name";
+"dateOfBirthFieldLabel" = "Date Of Birth";
+"emailFieldLabel" = "Email";
+"unknownFallback" = "Unknown";
+"saveChangesButton" = "Save Changes";
+"profileUpdatedSuccessToast" = "Profile Updated Successfully";
+"profilePictureLoadErrorToast" = "Error while loading profile picture";
+"signInWithGoogle" = "Sign-in with Google";
+
+/* Project screen */
+"myProjectsHeading" = "My Projects";
+"pleaseSignInProjectsLine1" = "Please sign in first to access your";
+"pleaseSignInProjectsLine2" = "projects.";
+"noProjectsFoundHeading" = "Oops! No projects found.";
+"noProjectsFoundBody" = "Looks like there are no projects\nin your google drive yet.";
+"deleteFileTitle" = "Delete this file";
+"deleteFileMessage" = "You cannot restore this file later";
+"deleteAction" = "Delete";
+
+/* QR Scanner / open-code bottom sheet */
+"scanQrCodeHeading" = "Scan Qr Code";
+"scanInstructions" = "Place qr code inside the frame to scan. Please avoid shake to get results quickly.";
+"scanQrButton" = "Scan QR";
+"qrScannerNavTitle" = "Qr Scanner";
+"qrScanSuccessHeading" = "QR scanned successfully";
+"qrFileDetectedMessageFormat" = "%@ file detected. Start to execute the code on your OpenBot.";
+"startButton" = "Start";
+
+/* Playground (Run Robot / Blockly execution screen) */
+"cancelledStatus" = "Cancelled";
+"stopRobotButton" = "Stop Robot";
+"resetRobotButton" = "Reset Robot";
+"stopCarButton" = "Stop Car";
+"playgroundNavTitle" = "Playground";
+
+/* Robot Info headings */
+"robotTypeHeading" = "Robot Type";
+"sensorsHeading" = "Sensors";
+"sonarReadingFormat" = "Sonar %@ cm";
+"batteryReadingFormat" = "Battery %@ V";
+
+/* Point Goal Navigation */
+"goalReachedMessage" = "Goal reached";
+
+/* Model Management filter dropdown */
+"modelFilterAll" = "All";
+"modelFilterAllCaps" = "ALL";
+"modelFilterAutoPilot" = "AutoPilot";
+"modelFilterDetector" = "Detector";
+"modelFilterNavigation" = "Navigation";
+
+/* Data Collection / Autopilot server dropdown default state */
+"noServer" = "No Server";

@@ -201,6 +201,79 @@ struct Strings {
     static var homeTab: String { L10n.string("homeTab") }
     static var profileTab: String { L10n.string("profileTab") }
 
+    // Loading / generic alerts
+    static var loadingTitle: String { L10n.string("loadingTitle") }
+    static var loadingProfileMessage: String { L10n.string("loadingProfileMessage") }
+    static var loadingDataMessage: String { L10n.string("loadingDataMessage") }
+    static var pleaseWaitMessage: String { L10n.string("pleaseWaitMessage") }
+    static var errorHeading: String { L10n.string("errorHeading") }
+    static var genericErrorMessage: String { L10n.string("genericErrorMessage") }
+    static var okAction: String { L10n.string("okAction") }
+
+    // Profile screen
+    static var myProfileHeading: String { L10n.string("myProfileHeading") }
+    static var setupProfilePromptLine1: String { L10n.string("setupProfilePromptLine1") }
+    static var setupProfilePromptLine2: String { L10n.string("setupProfilePromptLine2") }
+    static var editProfile: String { L10n.string("editProfile") }
+    static var logoutMenuItem: String { L10n.string("logoutMenuItem") }
+    static var firstNameFieldLabel: String { L10n.string("firstNameFieldLabel") }
+    static var lastNameFieldLabel: String { L10n.string("lastNameFieldLabel") }
+    static var dateOfBirthFieldLabel: String { L10n.string("dateOfBirthFieldLabel") }
+    static var emailFieldLabel: String { L10n.string("emailFieldLabel") }
+    static var unknownFallback: String { L10n.string("unknownFallback") }
+    static var saveChangesButton: String { L10n.string("saveChangesButton") }
+    static var profileUpdatedSuccessToast: String { L10n.string("profileUpdatedSuccessToast") }
+    static var profilePictureLoadErrorToast: String { L10n.string("profilePictureLoadErrorToast") }
+    static var signInWithGoogle: String { L10n.string("signInWithGoogle") }
+
+    // Project screen
+    static var myProjectsHeading: String { L10n.string("myProjectsHeading") }
+    static var pleaseSignInProjectsLine1: String { L10n.string("pleaseSignInProjectsLine1") }
+    static var pleaseSignInProjectsLine2: String { L10n.string("pleaseSignInProjectsLine2") }
+    static var noProjectsFoundHeading: String { L10n.string("noProjectsFoundHeading") }
+    static var noProjectsFoundBody: String { L10n.string("noProjectsFoundBody") }
+    static var deleteFileTitle: String { L10n.string("deleteFileTitle") }
+    static var deleteFileMessage: String { L10n.string("deleteFileMessage") }
+    static var deleteAction: String { L10n.string("deleteAction") }
+
+    // QR Scanner / open-code bottom sheet
+    static var scanQrCodeHeading: String { L10n.string("scanQrCodeHeading") }
+    static var scanInstructions: String { L10n.string("scanInstructions") }
+    static var scanQrButton: String { L10n.string("scanQrButton") }
+    static var qrScannerNavTitle: String { L10n.string("qrScannerNavTitle") }
+    static var qrScanSuccessHeading: String { L10n.string("qrScanSuccessHeading") }
+    /// Format string with one %@ placeholder for the scanned project's file name.
+    static var qrFileDetectedMessageFormat: String { L10n.string("qrFileDetectedMessageFormat") }
+    static var startButton: String { L10n.string("startButton") }
+
+    // Playground (Run Robot / Blockly execution screen)
+    static var cancelledStatus: String { L10n.string("cancelledStatus") }
+    static var stopRobotButton: String { L10n.string("stopRobotButton") }
+    static var resetRobotButton: String { L10n.string("resetRobotButton") }
+    static var stopCarButton: String { L10n.string("stopCarButton") }
+    static var playgroundNavTitle: String { L10n.string("playgroundNavTitle") }
+
+    // Robot Info headings
+    static var robotTypeHeading: String { L10n.string("robotTypeHeading") }
+    static var sensorsHeading: String { L10n.string("sensorsHeading") }
+    /// Format string with one %@ placeholder for the sonar reading value, e.g. "Sonar %@ cm".
+    static var sonarReadingFormat: String { L10n.string("sonarReadingFormat") }
+    /// Format string with one %@ placeholder for the battery reading value, e.g. "Battery %@ V".
+    static var batteryReadingFormat: String { L10n.string("batteryReadingFormat") }
+
+    // Point Goal Navigation
+    static var goalReachedMessage: String { L10n.string("goalReachedMessage") }
+
+    // Model Management filter dropdown
+    static var modelFilterAll: String { L10n.string("modelFilterAll") }
+    static var modelFilterAllCaps: String { L10n.string("modelFilterAllCaps") }
+    static var modelFilterAutoPilot: String { L10n.string("modelFilterAutoPilot") }
+    static var modelFilterDetector: String { L10n.string("modelFilterDetector") }
+    static var modelFilterNavigation: String { L10n.string("modelFilterNavigation") }
+
+    // Data Collection / Autopilot server dropdown default state
+    static var noServer: String { L10n.string("noServer") }
+
     //open-code functions
     static let moveForward: String = "moveForward";
     static let loop: String = "loop";

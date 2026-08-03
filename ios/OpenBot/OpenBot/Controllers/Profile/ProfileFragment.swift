@@ -12,7 +12,7 @@ import GoogleSignIn
 class profileFragment: UIViewController {
     let shadowSheet = UIView(frame: UIScreen.main.bounds);
     var logoutView = UIView()
-    let alert = UIAlertController(title: "Loading", message: "Please wait while we load the profile...", preferredStyle: .alert)
+    let alert = UIAlertController(title: Strings.loadingTitle, message: Strings.loadingProfileMessage, preferredStyle: .alert)
     var firstLabel = UILabel()
     var secondLabel = UILabel()
     var signInBtn = GoogleSignInBtn()
@@ -77,7 +77,7 @@ class profileFragment: UIViewController {
      Function to create My profile Label on top
      */
     private func createMyProfileLabel() {
-        let label = CustomLabel(text: "My Profile", fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(origin: .zero, size: CGSize(width: 200, height: 40)));
+        let label = CustomLabel(text: Strings.myProfileHeading, fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(origin: .zero, size: CGSize(width: 200, height: 40)));
         label.font = HelveticaNeue.regular(size: 15);
         label.translatesAutoresizingMaskIntoConstraints = false;
         view.addSubview(label)
@@ -90,8 +90,12 @@ class profileFragment: UIViewController {
      Function to create the message for sign-in
      */
     private func createPleaseSignInLabel() {
-        firstLabel = CustomLabel(text: "Set up your profile by signing in with", fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: width / 2 - 135, y: 20, width: 270, height: 40));
-        secondLabel = CustomLabel(text: "your Google account.", fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: width / 2 - 80, y: firstLabel.bottom - 5, width: 160, height: 40));
+        // Full-width and center-aligned rather than a box tuned for the English text's pixel
+        // width, since translations vary too much in length to keep a fixed narrow box centered.
+        firstLabel = CustomLabel(text: Strings.setupProfilePromptLine1, fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 20, y: 20, width: width - 40, height: 40));
+        firstLabel.textAlignment = .center;
+        secondLabel = CustomLabel(text: Strings.setupProfilePromptLine2, fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 20, y: firstLabel.bottom - 5, width: width - 40, height: 40));
+        secondLabel.textAlignment = .center;
         guestView.addSubview(firstLabel);
         guestView.addSubview(secondLabel);
     }
@@ -110,12 +114,12 @@ class profileFragment: UIViewController {
      Function to create labels for edit profile and logout
      */
     private func createEditProfileAndLogoutLabel() {
-        editProfileLabel = CustomLabel(text: "Edit Profile", fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: userImgView.right + 72, y: 0, width: 120, height: 50))
+        editProfileLabel = CustomLabel(text: Strings.editProfile, fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: userImgView.right + 72, y: 0, width: 120, height: 50))
         signInView.addSubview(editProfileLabel);
         editProfileLabel.isUserInteractionEnabled = true;
         let tapOnEditProfile = UITapGestureRecognizer(target: self, action: #selector(editProfileHandler))
         editProfileLabel.addGestureRecognizer(tapOnEditProfile);
-        logoutLabel = CustomLabel(text: "Logout", fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: userImgView.right + 72, y: editProfileLabel.bottom + 25, width: 120, height: 50))
+        logoutLabel = CustomLabel(text: Strings.logoutMenuItem, fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: userImgView.right + 72, y: editProfileLabel.bottom + 25, width: 120, height: 50))
         signInView.addSubview(logoutLabel);
         logoutLabel.isUserInteractionEnabled = true;
         let tapOnLogout = UITapGestureRecognizer(target: self, action: #selector(logoutHandler))

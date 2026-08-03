@@ -128,3 +128,73 @@
 "projectsTab" = "प्रोजेक्ट्स";
 "homeTab" = "होम";
 "profileTab" = "प्रोफ़ाइल";
+
+/* Loading / generic alerts */
+"loadingTitle" = "लोड हो रहा है";
+"loadingProfileMessage" = "कृपया प्रतीक्षा करें, प्रोफ़ाइल लोड हो रही है...";
+"loadingDataMessage" = "कृपया प्रतीक्षा करें, डेटा लोड हो रहा है...";
+"pleaseWaitMessage" = "कृपया प्रतीक्षा करें...";
+"errorHeading" = "त्रुटि";
+"genericErrorMessage" = "उफ़! कुछ गलत हो गया। कृपया फिर से प्रयास करें।";
+"okAction" = "ठीक है";
+
+/* Profile screen */
+"myProfileHeading" = "मेरी प्रोफ़ाइल";
+"setupProfilePromptLine1" = "अपने Google खाते से साइन इन करके";
+"setupProfilePromptLine2" = "अपनी प्रोफ़ाइल सेट करें।";
+"editProfile" = "प्रोफ़ाइल संपादित करें";
+"logoutMenuItem" = "लॉग आउट";
+"firstNameFieldLabel" = "पहला नाम";
+"lastNameFieldLabel" = "अंतिम नाम";
+"dateOfBirthFieldLabel" = "जन्म तिथि";
+"emailFieldLabel" = "ईमेल";
+"unknownFallback" = "अज्ञात";
+"saveChangesButton" = "बदलाव सहेजें";
+"profileUpdatedSuccessToast" = "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई";
+"profilePictureLoadErrorToast" = "प्रोफ़ाइल फ़ोटो लोड करने में त्रुटि";
+"signInWithGoogle" = "Google से साइन इन करें";
+
+/* Project screen */
+"myProjectsHeading" = "मेरे प्रोजेक्ट्स";
+"pleaseSignInProjectsLine1" = "अपने प्रोजेक्ट्स तक पहुँचने के लिए पहले";
+"pleaseSignInProjectsLine2" = "साइन इन करें।";
+"noProjectsFoundHeading" = "उफ़! कोई प्रोजेक्ट नहीं मिला।";
+"noProjectsFoundBody" = "ऐसा लगता है कि आपकी Google Drive में\nअभी तक कोई प्रोजेक्ट नहीं है।";
+"deleteFileTitle" = "इस फ़ाइल को हटाएँ";
+"deleteFileMessage" = "यह फ़ाइल बाद में पुनर्स्थापित नहीं की जा सकेगी";
+"deleteAction" = "हटाएँ";
+
+/* QR Scanner / open-code bottom sheet */
+"scanQrCodeHeading" = "क्यूआर कोड स्कैन करें";
+"scanInstructions" = "क्यूआर कोड को फ़्रेम के अंदर रखें और स्कैन करें। जल्दी परिणाम पाने के लिए फ़ोन को न हिलाएँ।";
+"scanQrButton" = "क्यूआर स्कैन करें";
+"qrScannerNavTitle" = "क्यूआर स्कैनर";
+"qrScanSuccessHeading" = "क्यूआर कोड सफलतापूर्वक स्कैन हुआ";
+"qrFileDetectedMessageFormat" = "%@ फ़ाइल मिली। आपके OpenBot पर कोड चलाना शुरू किया जा रहा है।";
+"startButton" = "शुरू करें";
+
+/* Playground (Run Robot / Blockly execution screen) */
+"cancelledStatus" = "रद्द किया गया";
+"stopRobotButton" = "रोबोट रोकें";
+"resetRobotButton" = "रोबोट रीसेट करें";
+"stopCarButton" = "वाहन रोकें";
+"playgroundNavTitle" = "प्लेग्राउंड";
+
+/* Robot Info headings */
+"robotTypeHeading" = "रोबोट प्रकार";
+"sensorsHeading" = "सेंसर";
+"sonarReadingFormat" = "सोनार %@ cm";
+"batteryReadingFormat" = "बैटरी %@ V";
+
+/* Point Goal Navigation */
+"goalReachedMessage" = "लक्ष्य तक पहुँच गए";
+
+/* Model Management filter dropdown */
+"modelFilterAll" = "सभी";
+"modelFilterAllCaps" = "सभी";
+"modelFilterAutoPilot" = "ऑटो पायलट";
+"modelFilterDetector" = "डिटेक्टर";
+"modelFilterNavigation" = "नेविगेशन";
+
+/* Data Collection / Autopilot server dropdown default state */
+"noServer" = "कोई सर्वर नहीं";

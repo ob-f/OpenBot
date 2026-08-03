@@ -67,11 +67,11 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
         super.viewDidLoad()
         setUpUI();
         stopRobot.backgroundColor = Colors.title;
-        stopRobot.setTitle("Stop Robot", for: .normal);
+        stopRobot.setTitle(Strings.stopRobotButton, for: .normal);
         stopRobot.addTarget(self, action: #selector(cancel), for: .touchUpInside);
         stopRobot.layer.cornerRadius = 10;
         resetRobot.backgroundColor = Colors.title
-        resetRobot.setTitle("Reset Robot", for: .normal);
+        resetRobot.setTitle(Strings.resetRobotButton, for: .normal);
         resetRobot.addTarget(self, action: #selector(resetRobotFunction), for: .touchUpInside);
         resetRobot.layer.cornerRadius = 10;
         NotificationCenter.default.addObserver(self, selector: #selector(updateCommandMsg), name: .commandName, object: nil);
@@ -369,9 +369,9 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
      */
     @objc func cancel() {
         NotificationCenter.default.post(name: .cancelThread, object: nil);
-        NotificationCenter.default.post(name: .commandName, object: "\(Strings.cancel)ed");
+        NotificationCenter.default.post(name: .commandName, object: Strings.cancelledStatus);
         stopCar();
-        self.stopRobot.setTitle("Back", for: .normal);
+        self.stopRobot.setTitle(Strings.back, for: .normal);
         self.stopRobot.removeTarget(nil, action: nil, for: .touchUpInside)
         self.stopRobot.addTarget(self, action: #selector(self.backItem(sender:)), for: .touchUpInside);
     }
@@ -382,7 +382,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
     @objc  func resetRobotFunction() {
             self.stopCar()
             _ = jsEvaluator(jsCode: self.preferencesManager.getBlocklyCode()!);
-            self.stopRobot.setTitle("Stop Car", for: .normal);
+            self.stopRobot.setTitle(Strings.stopCarButton, for: .normal);
             self.stopRobot.removeTarget(nil, action: nil, for: .touchUpInside)
             self.stopRobot.addTarget(self, action: #selector(self.cancel), for: .touchUpInside);
     }
@@ -393,7 +393,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
     func setupNavigationBarItem() {
         if UIImage(named: "back") != nil {
             let backNavigationIcon = (UIImage(named: "back")?.withRenderingMode(.alwaysOriginal))!
-            let newBackButton = UIBarButtonItem(image: backNavigationIcon, title: "Playground", target: self, action: #selector(back(sender:)), titleColor: Colors.navigationColor ?? .white)
+            let newBackButton = UIBarButtonItem(image: backNavigationIcon, title: Strings.playgroundNavTitle, target: self, action: #selector(back(sender:)), titleColor: Colors.navigationColor ?? .white)
             navigationItem.leftBarButtonItem = newBackButton
         }
     }

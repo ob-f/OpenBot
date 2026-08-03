@@ -110,11 +110,11 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
     /// function to trigger the popup when camera permissions are not allowed.
     func createAllowAlert(alertFor: String) {
         let alert = UIAlertController(
-                title: "IMPORTANT",
-                message: "Please allow " + alertFor + " access for OpenBot",
+                title: Strings.important,
+                message: String(format: Strings.allowPermissionMessageFormat, alertFor),
                 preferredStyle: UIAlertController.Style.alert
         )
-        alert.addAction(UIAlertAction(title: "Allow " + alertFor, style: .cancel, handler: { (alert) -> Void in
+        alert.addAction(UIAlertAction(title: String(format: Strings.allowButtonFormat, alertFor), style: .cancel, handler: { (alert) -> Void in
             guard let url = URL(string: UIApplication.openSettingsURLString), !url.absoluteString.isEmpty else {
                 return
             }
