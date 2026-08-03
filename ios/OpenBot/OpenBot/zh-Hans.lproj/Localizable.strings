@@ -1,0 +1,130 @@
+/* Screens */
+"OpenBot" = "OpenBot";
+"freeRoam" = "自由漫游";
+"dataCollection" = "数据采集";
+"controllerMapping" = "控制器映射";
+"autoPilot" = "自动驾驶";
+"objectTracking" = "物体追踪";
+"modelManagement" = "模型管理";
+"robotInfo" = "机器人信息";
+"navigation" = "目标点导航";
+
+/* Misc */
+"controller" = "控制器";
+"speed" = "速度";
+"driveMode" = "驾驶模式";
+"gamepad" = "游戏手柄";
+"phone" = "手机";
+"web" = "网页";
+"joystick" = "摇杆";
+"game" = "游戏";
+"dual" = "双控";
+"slow" = "慢速";
+"medium" = "中速";
+"fast" = "快速";
+"logData" = "记录数据";
+"previewResolutionMedium" = "预览分辨率 (1280 x 720)";
+"previewResolutionLow" = "预览分辨率 (960 x 540)";
+"previewResolutionHigh" = "预览分辨率 (1920 x 1080)";
+"low" = "低";
+"high" = "高";
+"modelResolution" = "模型分辨率 ";
+"server" = "服务器";
+"preview" = "预览";
+"training" = "训练";
+"sensorData" = "传感器数据";
+"vehicle" = "车辆";
+"gps" = "GPS";
+"accelerometer" = "加速度计";
+"magnetic" = "磁力计";
+"gyroscope" = "陀螺仪";
+"delay" = "延迟 (毫秒)";
+"Autopilot" = "自动驾驶";
+"ObjectTracking" = "物体追踪";
+"autoMode" = "自动模式";
+"model" = "模型";
+"input" = "输入";
+"device" = "设备";
+"threads" = "线程数";
+"object" = "物体";
+"confidence" = "置信度";
+"dynamicSpeed" = "动态速度";
+
+/* Settings */
+"camera" = "相机";
+"microphone" = "麦克风";
+"location" = "位置";
+"permission" = "权限";
+"bluetooth" = "蓝牙";
+"general" = "通用";
+"language" = "语言";
+"languageSubtitle" = "选择应用的显示语言";
+"systemDefault" = "系统默认";
+"applyingLanguage" = "正在应用语言…";
+
+/* Bluetooth Status */
+"connect" = "连接";
+"disconnect" = "断开连接";
+"connecting" = "正在连接";
+"disconnecting" = "正在断开";
+
+/* Model management */
+"modelDetails" = "模型详情";
+"name" = "名称";
+"type" = "类型";
+"class" = "类别";
+"inputOfModel" = "输入 (宽 x 高)";
+"tfliteLabel" = ".tflite";
+"cancel" = "取消";
+"done" = "完成";
+"file" = "文件";
+"url" = "URL";
+"addNewModel" = "添加新模型";
+
+/* Robot Info */
+"voltageDivider" = "分压器";
+"sonarText" = "声呐";
+"bumperText" = "保险杠";
+"wheelOdometer" = "车轮里程计";
+"front" = "前";
+"back" = "后";
+"led" = "指示灯";
+"indicatorText" = "转向灯";
+"status" = "状态";
+"motors" = "电机";
+"forward" = "前进";
+"backward" = "后退";
+"stopLabel" = "停止";
+"readings" = "读数";
+"battery" = "电池 **.* V";
+"speedText" = "速度 (左,右) ***,*** 转/分";
+"sonarLabel" = "声呐 *** 厘米";
+"sendCommand" = "发送指令";
+"lightLabel" = "灯光";
+
+/* Navigation */
+"setGoal" = "设置目标";
+"setGoalText" = "将手机安装到机器人上，\n 设置一个目标位置。按下开始后，\n 机器人将尝试到达该目标。";
+"left" = "左";
+"meter" = "[米]";
+"startLabel" = "开始";
+"canceled" = "取消";
+"info" = "信息";
+"restart" = "重新开始";
+
+/* Settings > Permissions */
+"important" = "重要提示";
+"cameraAccessRequiredMessage" = "OpenBot 需要访问相机权限";
+"allowPermissionMessageFormat" = "请允许 OpenBot 访问%@";
+"allowButtonFormat" = "允许访问%@";
+
+/* Logout / open-code UI */
+"logOut" = "退出登录";
+"confirmLogoutTitle" = "确认退出登录";
+"confirmLogoutMessage" = "确定要退出登录吗？";
+"codeExecuting" = "代码正在执行中……";
+
+/* Tab bar */
+"projectsTab" = "项目";
+"homeTab" = "首页";
+"profileTab" = "我的";

@@ -39,6 +39,7 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
     */
     override func viewDidLoad() {
         super.viewDidLoad()
+        tabBarItem.title = Strings.projectsTab
         baseView?.addSubview(animationView);
         animationView.backgroundColor = Colors.title
         view.addSubview(signInView);

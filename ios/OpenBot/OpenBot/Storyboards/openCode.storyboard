@@ -147,6 +147,9 @@
                     </view>
                     <connections>
                         <outlet property="confirmLogoutLabel" destination="p7T-Sc-pYT" id="tiV-kt-4Gt"/>
+                        <outlet property="confirmLogoutMessageLabel" destination="BhB-vU-Jms" id="Lcl-03-msgL"/>
+                        <outlet property="cancelButton" destination="cBx-4m-rvF" id="Lcl-01-canB"/>
+                        <outlet property="logOutButton" destination="ddC-HJ-0x5" id="Lcl-02-logB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yAW-td-qNf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

@@ -1,0 +1,130 @@
+/* Screens */
+"OpenBot" = "OpenBot";
+"freeRoam" = "Free Roam";
+"dataCollection" = "Data Collection";
+"controllerMapping" = "Controller Mapping";
+"autoPilot" = "Auto Pilot";
+"objectTracking" = "Object Tracking";
+"modelManagement" = "Model Management";
+"robotInfo" = "Robot Info";
+"navigation" = "Point Goal Navigation";
+
+/* Misc */
+"controller" = "Controller";
+"speed" = "Speed";
+"driveMode" = "Drive Mode";
+"gamepad" = "Gamepad";
+"phone" = "Phone";
+"web" = "Web";
+"joystick" = "Joystick";
+"game" = "Game";
+"dual" = "Dual";
+"slow" = "Slow";
+"medium" = "Medium";
+"fast" = "Fast";
+"logData" = "Log Data";
+"previewResolutionMedium" = "Preview Resolution (1280 x 720)";
+"previewResolutionLow" = "Preview Resolution (960 x 540)";
+"previewResolutionHigh" = "Preview Resolution (1920 x 1080)";
+"low" = "Low";
+"high" = "High";
+"modelResolution" = "Model Resolution ";
+"server" = "Server";
+"preview" = "Preview";
+"training" = "Training";
+"sensorData" = "Sensor Data";
+"vehicle" = "Vehicle";
+"gps" = "GPS";
+"accelerometer" = "Accelerometer";
+"magnetic" = "Magnetic";
+"gyroscope" = "Gyroscope";
+"delay" = "Delay (ms)";
+"Autopilot" = "Autopilot";
+"ObjectTracking" = "Object Tracking";
+"autoMode" = "Auto Mode";
+"model" = "Model";
+"input" = "Input";
+"device" = "Device";
+"threads" = "Threads";
+"object" = "Object";
+"confidence" = "Confidence";
+"dynamicSpeed" = "Dynamic Speed";
+
+/* Settings */
+"camera" = "Camera";
+"microphone" = "Microphone";
+"location" = "Location";
+"permission" = "Permissions";
+"bluetooth" = "Bluetooth";
+"general" = "General";
+"language" = "Language";
+"languageSubtitle" = "Choose the app display language";
+"systemDefault" = "System Default";
+"applyingLanguage" = "Applying language…";
+
+/* Bluetooth Status */
+"connect" = "Connect";
+"disconnect" = "Disconnect";
+"connecting" = "Connecting";
+"disconnecting" = "Disconnecting";
+
+/* Model management */
+"modelDetails" = "Model Details";
+"name" = "Name";
+"type" = "Type";
+"class" = "Class";
+"inputOfModel" = "Input(w x h)";
+"tfliteLabel" = ".tflite";
+"cancel" = "Cancel";
+"done" = "Done";
+"file" = "File";
+"url" = "URL";
+"addNewModel" = "Add New Model";
+
+/* Robot Info */
+"voltageDivider" = "Voltage Divider";
+"sonarText" = "Sonar";
+"bumperText" = "Bumpers";
+"wheelOdometer" = "Wheel Odometry";
+"front" = "Front";
+"back" = "Back";
+"led" = "Leds";
+"indicatorText" = "Indicators";
+"status" = "Status";
+"motors" = "Motors";
+"forward" = "Forward";
+"backward" = "Backward";
+"stopLabel" = "Stop";
+"readings" = "Readings";
+"battery" = "Battery **.* V";
+"speedText" = "Speed (l,r) ***,*** rpm";
+"sonarLabel" = "Sonar *** cm";
+"sendCommand" = "Send Commands";
+"lightLabel" = "Lights";
+
+/* Navigation */
+"setGoal" = "Set Goal";
+"setGoalText" = "Mount the phone on the robot and \n specify a goal. The robot will try to\n reach the goal after pressing start.";
+"left" = "Left";
+"meter" = "[m]";
+"startLabel" = "START";
+"canceled" = "CANCEL";
+"info" = "Info";
+"restart" = "Restart";
+
+/* Settings > Permissions */
+"important" = "IMPORTANT";
+"cameraAccessRequiredMessage" = "Camera access required for OpenBot";
+"allowPermissionMessageFormat" = "Please allow %@ access for OpenBot";
+"allowButtonFormat" = "Allow %@";
+
+/* Logout / open-code UI */
+"logOut" = "LOG OUT";
+"confirmLogoutTitle" = "Confirm Logout";
+"confirmLogoutMessage" = "Are you sure you want to logout?";
+"codeExecuting" = "Your code is executing..";
+
+/* Tab bar */
+"projectsTab" = "Projects";
+"homeTab" = "Home";
+"profileTab" = "Profile";

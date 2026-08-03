@@ -79,24 +79,26 @@ struct Constants {
     static let openbotService_TX = "9bf1103b-834c-47cf-b149-c9e4bcf778a7"
 
     // Game Data
-    static let gameModes: [[ModeItem]] = [
-        // General
+    static var gameModes: [[ModeItem]] {
         [
-            ModeItem(label: Strings.freeRoam, icon: Images.freeRoam!, identifier: Strings.ScreenFreeRoam, color: Colors.freeRoamColor),
-            ModeItem(label: Strings.dataCollection, icon: Images.dataCollection!, identifier: Strings.ScreenDataCollection, color: Colors.dataCollectionColor),
-            ModeItem(label: Strings.controllerMapping, icon: Images.controllerMapping!, identifier: Strings.ScreenControllerMapping, color: Colors.controllerMappingColor),
-            ModeItem(label: Strings.robotInfo, icon: Images.robotInfoIcon!, identifier: Strings.ScreenRobotInfo, color: Colors.robotInfoColor),
-        ],
-        // AI
-        [
-            ModeItem(label: Strings.Autopilot, icon: Images.autopilotIcon!, identifier: Strings.AutopilotFragment, color: Colors.autopilotColor),
-            ModeItem(label: Strings.ObjectTracking, icon: Images.objectTrackingIcon!, identifier: Strings.ObjectTrackingFragment, color: Colors.objectTrackingColor),
-            ModeItem(label: Strings.navigation, icon: Images.pointGoalIcon!, identifier: Strings.ScreenNavigation, color: Colors.pointGoalColor),
-            ModeItem(label: Strings.modelManagement, icon: Images.modelManagementIcon!, identifier: Strings.ScreenModelManagement, color: Colors.modelColor)
-        ],
-        // Legacy
-        []
-    ]
+            // General
+            [
+                ModeItem(label: Strings.freeRoam, icon: Images.freeRoam!, identifier: Strings.ScreenFreeRoam, color: Colors.freeRoamColor),
+                ModeItem(label: Strings.dataCollection, icon: Images.dataCollection!, identifier: Strings.ScreenDataCollection, color: Colors.dataCollectionColor),
+                ModeItem(label: Strings.controllerMapping, icon: Images.controllerMapping!, identifier: Strings.ScreenControllerMapping, color: Colors.controllerMappingColor),
+                ModeItem(label: Strings.robotInfo, icon: Images.robotInfoIcon!, identifier: Strings.ScreenRobotInfo, color: Colors.robotInfoColor),
+            ],
+            // AI
+            [
+                ModeItem(label: Strings.Autopilot, icon: Images.autopilotIcon!, identifier: Strings.AutopilotFragment, color: Colors.autopilotColor),
+                ModeItem(label: Strings.ObjectTracking, icon: Images.objectTrackingIcon!, identifier: Strings.ObjectTrackingFragment, color: Colors.objectTrackingColor),
+                ModeItem(label: Strings.navigation, icon: Images.pointGoalIcon!, identifier: Strings.ScreenNavigation, color: Colors.pointGoalColor),
+                ModeItem(label: Strings.modelManagement, icon: Images.modelManagementIcon!, identifier: Strings.ScreenModelManagement, color: Colors.modelColor)
+            ],
+            // Legacy
+            []
+        ]
+    }
     static let frameColors: [UIColor] = [UIColor.red, UIColor.orange, UIColor.blue, UIColor.green, UIColor.brown]
     static let autopilotMode = "AUTOPILOT"
     static let objectTrackingMode = "DETECTOR"

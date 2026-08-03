@@ -1,0 +1,130 @@
+/* Screens */
+"OpenBot" = "OpenBot";
+"freeRoam" = "फ्री रोम";
+"dataCollection" = "डेटा संग्रहण";
+"controllerMapping" = "कंट्रोलर मैपिंग";
+"autoPilot" = "ऑटो पायलट";
+"objectTracking" = "ऑब्जेक्ट ट्रैकिंग";
+"modelManagement" = "मॉडल प्रबंधन";
+"robotInfo" = "रोबोट जानकारी";
+"navigation" = "लक्ष्य नेविगेशन";
+
+/* Misc */
+"controller" = "कंट्रोलर";
+"speed" = "गति";
+"driveMode" = "ड्राइव मोड";
+"gamepad" = "गेमपैड";
+"phone" = "फ़ोन";
+"web" = "वेब";
+"joystick" = "जॉयस्टिक";
+"game" = "गेम";
+"dual" = "ड्यूल";
+"slow" = "धीमी";
+"medium" = "मध्यम";
+"fast" = "तेज़";
+"logData" = "डेटा लॉग करें";
+"previewResolutionMedium" = "प्रीव्यू रिज़ॉल्यूशन (1280 x 720)";
+"previewResolutionLow" = "प्रीव्यू रिज़ॉल्यूशन (960 x 540)";
+"previewResolutionHigh" = "प्रीव्यू रिज़ॉल्यूशन (1920 x 1080)";
+"low" = "कम";
+"high" = "अधिक";
+"modelResolution" = "मॉडल रिज़ॉल्यूशन ";
+"server" = "सर्वर";
+"preview" = "प्रीव्यू";
+"training" = "प्रशिक्षण";
+"sensorData" = "सेंसर डेटा";
+"vehicle" = "वाहन";
+"gps" = "जीपीएस";
+"accelerometer" = "एक्सेलेरोमीटर";
+"magnetic" = "मैग्नेटिक सेंसर";
+"gyroscope" = "जायरोस्कोप";
+"delay" = "देरी (ms)";
+"Autopilot" = "ऑटो पायलट";
+"ObjectTracking" = "ऑब्जेक्ट ट्रैकिंग";
+"autoMode" = "ऑटो मोड";
+"model" = "मॉडल";
+"input" = "इनपुट";
+"device" = "डिवाइस";
+"threads" = "थ्रेड्स";
+"object" = "ऑब्जेक्ट";
+"confidence" = "कॉन्फिडेंस";
+"dynamicSpeed" = "डायनामिक स्पीड";
+
+/* Settings */
+"camera" = "कैमरा";
+"microphone" = "माइक्रोफ़ोन";
+"location" = "लोकेशन";
+"permission" = "अनुमतियाँ";
+"bluetooth" = "ब्लूटूथ";
+"general" = "सामान्य";
+"language" = "भाषा";
+"languageSubtitle" = "ऐप की डिस्प्ले भाषा चुनें";
+"systemDefault" = "सिस्टम डिफ़ॉल्ट";
+"applyingLanguage" = "भाषा लागू की जा रही है…";
+
+/* Bluetooth Status */
+"connect" = "कनेक्ट करें";
+"disconnect" = "डिस्कनेक्ट करें";
+"connecting" = "कनेक्ट हो रहा है";
+"disconnecting" = "डिस्कनेक्ट हो रहा है";
+
+/* Model management */
+"modelDetails" = "मॉडल विवरण";
+"name" = "नाम";
+"type" = "प्रकार";
+"class" = "क्लास";
+"inputOfModel" = "इनपुट (चौड़ाई x ऊँचाई)";
+"tfliteLabel" = ".tflite";
+"cancel" = "रद्द करें";
+"done" = "हो गया";
+"file" = "फ़ाइल";
+"url" = "URL";
+"addNewModel" = "नया मॉडल जोड़ें";
+
+/* Robot Info */
+"voltageDivider" = "वोल्टेज डिवाइडर";
+"sonarText" = "सोनार";
+"bumperText" = "बम्पर";
+"wheelOdometer" = "व्हील ओडोमेट्री";
+"front" = "आगे";
+"back" = "पीछे";
+"led" = "एलईडी";
+"indicatorText" = "इंडिकेटर";
+"status" = "स्थिति";
+"motors" = "मोटर्स";
+"forward" = "आगे बढ़ें";
+"backward" = "पीछे जाएँ";
+"stopLabel" = "रोकें";
+"readings" = "रीडिंग";
+"battery" = "बैटरी **.* V";
+"speedText" = "गति (बाएँ,दाएँ) ***,*** rpm";
+"sonarLabel" = "सोनार *** cm";
+"sendCommand" = "कमांड भेजें";
+"lightLabel" = "लाइट्स";
+
+/* Navigation */
+"setGoal" = "लक्ष्य निर्धारित करें";
+"setGoalText" = "फ़ोन को रोबोट पर लगाएँ और \n एक लक्ष्य निर्धारित करें। स्टार्ट दबाने के बाद\n रोबोट लक्ष्य तक पहुँचने की कोशिश करेगा।";
+"left" = "बाएँ";
+"meter" = "[मी.]";
+"startLabel" = "शुरू करें";
+"canceled" = "रद्द करें";
+"info" = "जानकारी";
+"restart" = "पुनः आरंभ करें";
+
+/* Settings > Permissions */
+"important" = "महत्वपूर्ण";
+"cameraAccessRequiredMessage" = "OpenBot को कैमरे की अनुमति चाहिए";
+"allowPermissionMessageFormat" = "कृपया OpenBot को %@ का एक्सेस दें";
+"allowButtonFormat" = "%@ की अनुमति दें";
+
+/* Logout / open-code UI */
+"logOut" = "लॉग आउट";
+"confirmLogoutTitle" = "लॉगआउट की पुष्टि करें";
+"confirmLogoutMessage" = "क्या आप वाकई लॉग आउट करना चाहते हैं?";
+"codeExecuting" = "आपका कोड चल रहा है..";
+
+/* Tab bar */
+"projectsTab" = "प्रोजेक्ट्स";
+"homeTab" = "होम";
+"profileTab" = "प्रोफ़ाइल";

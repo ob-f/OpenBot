@@ -159,7 +159,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
      function to create label
      */
     func setUpLabel(){
-        commandMessage.text = "You code is executing..";
+        commandMessage.text = Strings.codeExecuting;
         commandMessage.translatesAutoresizingMaskIntoConstraints = false;
         if currentOrientation == .portrait {
             topLabelConstraint = commandMessage.topAnchor.constraint(equalTo: view.topAnchor, constant: 450)

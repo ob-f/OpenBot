@@ -138,7 +138,7 @@ class ObjectTrackingSettings: UIView {
         label.text = text
         label.textColor = Colors.border
         label.frame.origin = CGPoint(x: leadingAnchor, y: topAnchor)
-        label.frame.size = resized(size: CGSize(width: text.count * 10, height: 40), basedOn: .height)
+        label.frame.size = resized(size: CGSize(width: measuredWidth(of: text, font: label.font) + 8, height: 40), basedOn: .height)
         return label
     }
 

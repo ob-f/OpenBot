@@ -28,6 +28,7 @@ class profileFragment: UIViewController {
      */
     override func viewDidLoad() {
         super.viewDidLoad()
+        tabBarItem.title = Strings.profileTab
         createMyProfileLabel();
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()

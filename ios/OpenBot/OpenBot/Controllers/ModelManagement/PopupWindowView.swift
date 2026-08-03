@@ -81,10 +81,11 @@ class popupWindowView: UIView {
         heading.font = heading.font.withSize(22);
         addSubview(heading);
         heading.translatesAutoresizingMaskIntoConstraints = false;
-        heading.widthAnchor.constraint(equalToConstant: CGFloat(Strings.modelDetails.count * 10)).isActive = true;
+        let headingWidth = measuredWidth(of: Strings.modelDetails, font: heading.font) + 8
+        heading.widthAnchor.constraint(equalToConstant: headingWidth).isActive = true;
         heading.heightAnchor.constraint(equalToConstant: 40).isActive = true;
         heading.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true;
-        headingLeadingAnchor = heading.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: width / 2 - CGFloat(Strings.modelDetails.count * 5))
+        headingLeadingAnchor = heading.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: width / 2 - headingWidth / 2)
         headingLeadingAnchor.isActive = true;
     }
 
@@ -94,7 +95,7 @@ class popupWindowView: UIView {
         label.text = text;
         addSubview(label);
         label.translatesAutoresizingMaskIntoConstraints = false;
-        label.widthAnchor.constraint(equalToConstant: CGFloat(text.count * 12)).isActive = true;
+        label.widthAnchor.constraint(equalToConstant: measuredWidth(of: text, font: label.font) + 8).isActive = true;
         label.heightAnchor.constraint(equalToConstant: 40).isActive = true;
         label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: leadingAnchor).isActive = true;
         label.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: topAnchor).isActive = true;
@@ -126,10 +127,10 @@ class popupWindowView: UIView {
     /// function to create tflite label.
     func createtfliteLabel() {
         let label = UILabel();
-        label.text = Strings.tflite;
+        label.text = Strings.tfliteLabel;
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false;
-        label.widthAnchor.constraint(equalToConstant: CGFloat(Strings.tflite.count * 10)).isActive = true;
+        label.widthAnchor.constraint(equalToConstant: measuredWidth(of: Strings.tfliteLabel, font: label.font) + 8).isActive = true;
         label.heightAnchor.constraint(equalToConstant: 40).isActive = true;
         label.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         label.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 60).isActive = true
