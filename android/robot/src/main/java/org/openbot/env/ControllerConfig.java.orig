@@ -65,12 +65,4 @@ public class ControllerConfig {
   public void setVideoServerType(String type) {
     set("video_server", type);
   }
-
-  public String getWebControllerServerIp() {
-    return get("web_controller_server_ip", "192.168.1.9");
-  }
-
-  public void setWebControllerServerIp(String ip) {
-    set("web_controller_server_ip", ip);
-  }
 }

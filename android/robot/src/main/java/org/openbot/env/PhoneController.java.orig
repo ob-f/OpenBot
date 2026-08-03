@@ -124,7 +124,8 @@ public class PhoneController {
   }
 
   private void nodeServerConnect() {
-    String serverUrl = "ws://" + ControllerConfig.getInstance().getWebControllerServerIp() + ":8080";
+//     String serverUrl = "ws://verdant-imported-peanut.glitch.me";
+           String serverUrl = "ws://192.168.1.6:8080";
 
     OkHttpClient client = new OkHttpClient();
     Request request = new Request.Builder().url(serverUrl).build();
