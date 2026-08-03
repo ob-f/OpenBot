@@ -85,6 +85,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate {
     func createSectionHeader(text: String, topAnchor: CGFloat) -> UILabel {
         let header = createLabel(text: text, leadingAnchor: 20, topAnchor: topAnchor)
         header.font = UIFont.boldSystemFont(ofSize: 20.0)
+        header.frame.size.width = measuredWidth(of: text, font: header.font) + 8
         return header
     }
 
