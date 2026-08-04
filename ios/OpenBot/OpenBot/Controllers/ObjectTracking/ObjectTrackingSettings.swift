@@ -9,6 +9,7 @@ import DropDown
 /// Implementation of Object tracking settings.
 class ObjectTrackingSettings: UIView {
     let autoModeButton = UISwitch()
+    var autoModeLabel = UILabel()
     var speedLabel = UILabel()
     var modelDropdownLabel = UILabel()
     var imageInputLabel = UILabel()
@@ -48,7 +49,8 @@ class ObjectTrackingSettings: UIView {
         swipeUp.direction = .up
         addGestureRecognizer(swipeUp)
         createBar()
-        addSubview(createLabel(text: Strings.autoMode, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 15, to: .height))));
+        autoModeLabel = createLabel(text: Strings.autoMode, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 15, to: .height)));
+        addSubview(autoModeLabel);
         createBluetoothIcon()
         createCameraIcon()
         createSwitchButton()
@@ -128,7 +130,10 @@ class ObjectTrackingSettings: UIView {
         autoModeButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(autoModeButton)
         autoModeButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        autoModeButton.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 120).isActive = true
+        autoModeButton.leadingAnchor.constraint(greaterThanOrEqualTo: autoModeLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredPosition = autoModeButton.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 120)
+        preferredPosition.priority = .defaultLow
+        preferredPosition.isActive = true
         autoModeButton.topAnchor.constraint(equalTo: topAnchor, constant: 25).isActive = true
     }
 

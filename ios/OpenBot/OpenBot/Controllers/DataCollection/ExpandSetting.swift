@@ -107,14 +107,17 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
 
     /// UI Function to create button for logs
     func createLogDataButton() {
-        _ = createLabels(value: Strings.logData, leadingAnchor: 10, topAnchor: 13, labelWidth: 100, labelHeight: 40)
+        let label = createLabels(value: Strings.logData, leadingAnchor: 10, topAnchor: 13, labelWidth: 100, labelHeight: 40)
         logData.isOn = false
         logData.setOn(false, animated: true)
         logData.onTintColor = Colors.title
         logData.addTarget(self, action: #selector(switchLogButton(_:)), for: .valueChanged)
         logData.translatesAutoresizingMaskIntoConstraints = false
         addSubview(logData)
-        logData.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 90).isActive = true
+        logData.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 12).isActive = true
+        let preferredPosition = logData.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 90)
+        preferredPosition.priority = .defaultLow
+        preferredPosition.isActive = true
         logData.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
     }
 
