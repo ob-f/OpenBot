@@ -44,7 +44,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate {
         createPermissionIcon(systemName: "mic.fill", topAnchor: adapted(dimensionSize: 250, to: .height))
         scrollView.addSubview(createLabel(text: Strings.bluetooth, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 300, to: .height)))
         createBluetoothSwitch()
-        createPermissionIcon(systemName: "wave.3.right", topAnchor: adapted(dimensionSize: 300, to: .height))
+        createPermissionIcon(image: Images.bluetooth, tinted: false, topAnchor: adapted(dimensionSize: 300, to: .height))
         updateSwitchPosition()
     }
 
@@ -141,8 +141,15 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate {
 
     /// Creates the SF Symbol icon shown to the left of a permission's switch.
     func createPermissionIcon(systemName: String, topAnchor: CGFloat) {
-        let icon = UIImageView(image: UIImage(systemName: systemName))
-        icon.tintColor = Colors.border
+        createPermissionIcon(image: UIImage(systemName: systemName), tinted: true, topAnchor: topAnchor)
+    }
+
+    /// Creates a permission row icon from a bundled image asset
+    func createPermissionIcon(image: UIImage?, tinted: Bool, topAnchor: CGFloat) {
+        let icon = UIImageView(image: image)
+        if tinted {
+            icon.tintColor = Colors.border
+        }
         icon.contentMode = .scaleAspectFit
         icon.frame = CGRect(x: switchButtonTrailingAnchor - 40, y: topAnchor + 8, width: 24, height: 24)
         scrollView.addSubview(icon)
