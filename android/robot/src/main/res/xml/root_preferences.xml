@@ -43,4 +43,14 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Web Controller">
+
+        <EditTextPreference
+            app:defaultValue="ws://192.168.1.45:8080/ws"
+            app:key="web_signaling_server"
+            app:title="Web Signaling Server"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

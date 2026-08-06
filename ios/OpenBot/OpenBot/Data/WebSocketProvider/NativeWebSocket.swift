@@ -8,8 +8,11 @@ import FirebaseAuth
 
 @available(iOS 13.0, *)
 class NativeWebSocket: NSObject, WebSocketProvider {
-    // change this IP to match the web-server host when running from a different device/network
-    let url = URL(string: "ws://192.168.1.40:8080/ws")!
+    // configurable in Settings; falls back to the LAN default if unset
+    var url: URL {
+        let urlString = SharedPreferencesManager().getWebSignalingServerUrl()
+        return URL(string: urlString) ?? URL(string: "ws://192.168.1.40:8080/ws")!
+    }
 
     var roomId: String {
         Auth.auth().currentUser?.email ?? ""

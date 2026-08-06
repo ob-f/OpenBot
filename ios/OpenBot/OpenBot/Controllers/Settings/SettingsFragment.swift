@@ -9,14 +9,16 @@ import CoreLocation
 import CoreLocationUI
 import CoreBluetooth
 
-class SettingsFragment: UIViewController, CLLocationManagerDelegate {
+class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate {
     var scrollView: UIScrollView!
     var cameraSwitch = UISwitch()
     let locationSwitch = UISwitch()
     let microphoneSwitch = UISwitch()
     let bluetoothSwitch = UISwitch()
+    let webSignalingServerField = UITextField()
     var switchButtonTrailingAnchor = width - 80;
     let locationManager = CLLocationManager()
+    let sharedPreferences = SharedPreferencesManager()
 
     /// Called after the view fragment has loaded.
     override func viewDidLoad() {
@@ -33,6 +35,8 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate {
         createMicrophoneSwitch()
         scrollView.addSubview(createLabel(text: Strings.bluetooth, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 200, to: .height)))
         createBluetoothSwitch()
+        scrollView.addSubview(createLabel(text: "Web Signaling Server", leadingAnchor: 40, topAnchor: adapted(dimensionSize: 250, to: .height)))
+        createWebSignalingServerField()
         updateSwitchPosition()
     }
 
@@ -124,6 +128,24 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate {
         scrollView.addSubview(bluetoothSwitch)
         bluetoothSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 200, to: .height))
         bluetoothSwitch.addTarget(self, action: #selector(toggleBluetooth(_:)), for: .valueChanged)
+    }
+
+    /// creates a text field for the web signaling server URL, prefilled from stored settings
+    func createWebSignalingServerField() {
+        webSignalingServerField.text = sharedPreferences.getWebSignalingServerUrl()
+        webSignalingServerField.placeholder = "ws://<host>:8080/ws"
+        webSignalingServerField.borderStyle = .roundedRect
+        webSignalingServerField.autocapitalizationType = .none
+        webSignalingServerField.autocorrectionType = .no
+        webSignalingServerField.delegate = self
+        webSignalingServerField.frame = CGRect(x: 40, y: adapted(dimensionSize: 280, to: .height), width: width - 80, height: 40)
+        scrollView.addSubview(webSignalingServerField)
+    }
+
+    /// persists the web signaling server URL when the user finishes editing
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        guard textField == webSignalingServerField, let text = textField.text, !text.isEmpty else { return }
+        sharedPreferences.setWebSignalingServerUrl(value: text)
     }
 
     /// function to set the positions of the buttons.
