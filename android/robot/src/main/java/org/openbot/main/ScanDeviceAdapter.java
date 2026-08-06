@@ -30,13 +30,13 @@ public class ScanDeviceAdapter extends CommonRecyclerViewAdapter<BleDevice> {
     tvName.setText(data.name);
     tvAddress.setText(data.address);
     if (data.connecting) {
-      tvConnectionState.setText("Connecting");
+      tvConnectionState.setText(R.string.ble_connecting);
       tvConnectionState.setTextColor(Color.BLUE);
     } else if (data.connected) {
-      tvConnectionState.setText("Disconnect");
+      tvConnectionState.setText(R.string.ble_disconnect);
       tvConnectionState.setTextColor(Color.RED);
     } else if (!data.connected) {
-      tvConnectionState.setText("Connect");
+      tvConnectionState.setText(R.string.ble_connect);
       tvConnectionState.setTextColor(Color.BLACK);
     }
   }

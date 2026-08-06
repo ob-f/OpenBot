@@ -24,12 +24,12 @@ public class UsbFragment extends PreferenceFragmentCompat {
 
     connection = findPreference("connection");
     if (connection != null) {
-      connection.setTitle("No Device");
+      connection.setTitle(R.string.no_device);
       if (vehicle != null && vehicle.isUsbConnected()) {
         connection.setChecked(true);
         connection.setTitle(vehicle.getUsbConnection().getProductName());
       } else {
-        connection.setTitle("No Device");
+        connection.setTitle(R.string.no_device);
         connection.setChecked(false);
       }
       connection.setOnPreferenceClickListener(
@@ -41,17 +41,17 @@ public class UsbFragment extends PreferenceFragmentCompat {
                 if (vehicle.isUsbConnected())
                   connection.setTitle(vehicle.getUsbConnection().getProductName());
                 else {
-                  connection.setTitle("No Device");
+                  connection.setTitle(R.string.no_device);
                   connection.setChecked(false);
                   Toast.makeText(
                           requireContext().getApplicationContext(),
-                          "Please check the USB connection.",
+                          R.string.usb_check_connection,
                           Toast.LENGTH_SHORT)
                       .show();
                 }
               } else {
                 vehicle.disconnectUsb();
-                connection.setTitle("No Device");
+                connection.setTitle(R.string.no_device);
               }
               mViewModel.setUsbStatus(vehicle.isUsbConnected());
             }

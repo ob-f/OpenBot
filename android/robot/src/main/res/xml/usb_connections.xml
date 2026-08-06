@@ -13,7 +13,7 @@
 
         <SwitchPreferenceCompat
             app:key="connection"
-            app:title="No Device"/>
+            app:title="@string/no_device"/>
 
     </PreferenceCategory>
 

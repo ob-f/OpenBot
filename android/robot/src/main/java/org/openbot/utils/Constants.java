@@ -20,6 +20,13 @@ public class Constants {
   public static final String PERMISSION_BLUETOOTH = Manifest.permission.BLUETOOTH;
   public static final String PERMISSION_AUDIO = Manifest.permission.RECORD_AUDIO;
 
+  // "Nearby devices" permission group (Android 12+/API 31+). On older versions Bluetooth
+  // access is covered by the normal (auto-granted) BLUETOOTH/BLUETOOTH_ADMIN permissions
+  // declared with maxSdkVersion=30 in the manifest, so no runtime request is needed there.
+  public static final String PERMISSION_BLUETOOTH_SCAN = Manifest.permission.BLUETOOTH_SCAN;
+  public static final String PERMISSION_BLUETOOTH_CONNECT =
+      Manifest.permission.BLUETOOTH_CONNECT;
+
   public static final String[] PERMISSIONS_LOGGING =
       new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE, PERMISSION_LOCATION};
   public static final String[] PERMISSIONS_CONTROLLER =

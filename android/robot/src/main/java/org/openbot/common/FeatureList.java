@@ -72,24 +72,48 @@ public class FeatureList {
     ArrayList<SubCategory> subCategories;
 
     subCategories = new ArrayList<>();
-    subCategories.add(new SubCategory(FREE_ROAM, R.drawable.ic_game, "#FFFF6D00"));
-
-    subCategories.add(new SubCategory(DATA_COLLECTION, R.drawable.ic_storage, "#93C47D"));
-    subCategories.add(new SubCategory(CONTROLLER_MAPPING, R.drawable.ic_controller, "#7268A6"));
-    subCategories.add(new SubCategory(ROBOT_INFO, R.drawable.ic_openbot_space, "#4B7BFF"));
-    categories.add(new Category(GENERAL, subCategories));
-
-    subCategories = new ArrayList<>();
-    subCategories.add(new SubCategory(AUTOPILOT, R.drawable.ic_autopilot, "#44525F"));
-    subCategories.add(new SubCategory(OBJECT_NAV, R.drawable.ic_person_search, "#E7CE88"));
     subCategories.add(
-        new SubCategory(POINT_GOAL_NAVIGATION, R.drawable.ic_baseline_golf_course, "#1BBFBF"));
-    subCategories.add(new SubCategory(MODEL_MANAGEMENT, R.drawable.ic_list_bulleted_48, "#BC7680"));
-    categories.add(new Category(AI, subCategories));
+        new SubCategory(FREE_ROAM, R.string.tile_free_roam, R.drawable.ic_game, "#FFFF6D00"));
+
+    subCategories.add(
+        new SubCategory(
+            DATA_COLLECTION, R.string.tile_data_collection, R.drawable.ic_storage, "#93C47D"));
+    subCategories.add(
+        new SubCategory(
+            CONTROLLER_MAPPING,
+            R.string.tile_controller_mapping,
+            R.drawable.ic_controller,
+            "#7268A6"));
+    subCategories.add(
+        new SubCategory(
+            ROBOT_INFO, R.string.tile_robot_info, R.drawable.ic_openbot_space, "#4B7BFF"));
+    categories.add(new Category(GENERAL, R.string.tile_general, subCategories));
 
     subCategories = new ArrayList<>();
-    subCategories.add(new SubCategory(DEFAULT, R.drawable.ic_legacy_car, "#F86363"));
-    categories.add(new Category(LEGACY, subCategories));
+    subCategories.add(
+        new SubCategory(AUTOPILOT, R.string.tile_autopilot, R.drawable.ic_autopilot, "#44525F"));
+    subCategories.add(
+        new SubCategory(
+            OBJECT_NAV, R.string.tile_object_nav, R.drawable.ic_person_search, "#E7CE88"));
+    subCategories.add(
+        new SubCategory(
+            POINT_GOAL_NAVIGATION,
+            R.string.tile_point_goal_navigation,
+            R.drawable.ic_baseline_golf_course,
+            "#1BBFBF"));
+    subCategories.add(
+        new SubCategory(
+            MODEL_MANAGEMENT,
+            R.string.tile_model_management,
+            R.drawable.ic_list_bulleted_48,
+            "#BC7680"));
+    categories.add(new Category(AI, R.string.tile_ai, subCategories));
+
+    subCategories = new ArrayList<>();
+    subCategories.add(
+        new SubCategory(
+            DEFAULT, R.string.tile_default_mode, R.drawable.ic_legacy_car, "#F86363"));
+    categories.add(new Category(LEGACY, R.string.tile_legacy, subCategories));
 
     /*
         subCategories = new ArrayList<>();

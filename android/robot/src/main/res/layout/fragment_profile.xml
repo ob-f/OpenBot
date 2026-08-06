@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="270dp"
             android:layout_height="wrap_content"
-            android:text="Set up your profile by signing in with your Google account."
+            android:text="@string/sign_in_description"
             android:textAlignment="center"
             android:textColor="@color/black_text"
             android:textSize="16sp" />
@@ -31,7 +31,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign-in with Google"
+                android:text="@string/sign_in_with_google"
                 android:textColor="@color/white_text"
                 android:gravity="center"
                 app:drawableLeftCompat="@drawable/ic_google_custom"

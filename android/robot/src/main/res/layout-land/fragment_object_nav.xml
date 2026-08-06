@@ -305,7 +305,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1.3"
-                    android:entries="@array/devices"
+                    tools:entries="@array/devices"
                     android:prompt="@string/device" />
 
                 <TextView

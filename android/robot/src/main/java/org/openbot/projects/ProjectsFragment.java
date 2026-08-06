@@ -1,6 +1,5 @@
 package org.openbot.projects;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.SparseArray;
@@ -161,7 +160,6 @@ public class ProjectsFragment extends Fragment {
    * @param fileContents
    * @param projectName
    */
-  @SuppressLint("SetTextI18n")
   private void onTapProjectItem(String fileContents, String projectName) {
     String code = fileContents;
     for (String fun : BotFunctionUtils.botFunctionArray) {
@@ -171,8 +169,7 @@ public class ProjectsFragment extends Fragment {
     }
     barCodeScannerFragment.finalCode = code;
     binding.dpMessage.setText(
-        projectName.replace(".js", "")
-            + " file detected. Start to execute the code on your OpenBot.");
+        getString(R.string.project_file_detected, projectName.replace(".js", "")));
     projectsBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
   }
 

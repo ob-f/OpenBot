@@ -91,7 +91,7 @@ public class AutopilotFragment extends CameraFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
-        binding.deviceSpinner.setSelection(preferencesManager.getDevice());
+        initDeviceSpinner(binding.deviceSpinner, preferencesManager.getDevice());
         setNumThreads(preferencesManager.getNumThreads());
         binding.threads.setText(String.valueOf(getNumThreads()));
         binding.cameraToggle.setOnClickListener(v -> toggleCamera());
@@ -507,7 +507,8 @@ public class AutopilotFragment extends CameraFragment {
             final boolean threadsEnabled = device == Network.Device.CPU;
             binding.plus.setEnabled(threadsEnabled);
             binding.minus.setEnabled(threadsEnabled);
-            binding.threads.setText(threadsEnabled ? String.valueOf(numThreads) : "N/A");
+            binding.threads.setText(
+                threadsEnabled ? String.valueOf(numThreads) : getString(R.string.n_a));
             if (threadsEnabled) binding.threads.setTextColor(Color.BLACK);
             else binding.threads.setTextColor(Color.GRAY);
             preferencesManager.setDevice(device.ordinal());

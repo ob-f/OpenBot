@@ -9,7 +9,7 @@
     android:layout_width="75dp"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:hint="Forward [m]">
+    android:hint="@string/forward_hint_m">
 
     <com.google.android.material.textfield.TextInputEditText
       android:id="@+id/forward"
@@ -24,7 +24,7 @@
     android:layout_width="75dp"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:hint="Left [m]">
+    android:hint="@string/left_hint_m">
 
     <com.google.android.material.textfield.TextInputEditText
       android:id="@+id/left"
