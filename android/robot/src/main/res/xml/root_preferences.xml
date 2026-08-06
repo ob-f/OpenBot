@@ -84,12 +84,17 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Web Controller">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:layout="@layout/preference_category_custom"
+        app:title="@string/web_controller_category">
 
         <EditTextPreference
             app:defaultValue="ws://192.168.1.45:8080/ws"
+            app:iconSpaceReserved="false"
             app:key="web_signaling_server"
-            app:title="Web Signaling Server"
+            app:layout="@layout/preference_icon_end_last"
+            app:title="@string/web_signaling_server"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
