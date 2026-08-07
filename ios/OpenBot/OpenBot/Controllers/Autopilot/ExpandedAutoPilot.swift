@@ -10,7 +10,9 @@ class expandedAutoPilot: UIView {
     let autoModeButton = UISwitch()
     var autoModeLabel = UILabel()
     var serverLabel = UILabel()
+    var speedTitleLabel = UILabel()
     var speedLabel = UILabel()
+    var inputTitleLabel = UILabel()
     var leftSpeedLabel = UILabel()
     var deviceDropDown = DropDown()
     var deviceDropDownLabel = UILabel()
@@ -47,14 +49,29 @@ class expandedAutoPilot: UIView {
         createSwitchButton()
         addSubview(createLabel(text: Strings.server, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 50, to: .height))))
         addSubview(createLabel(text: Strings.model, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 90, to: .height))))
-        addSubview(createLabel(text: Strings.speed, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 120, to: .height))))
+        speedTitleLabel = createLabel(text: Strings.speed, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 120, to: .height)))
+        speedTitleLabel.numberOfLines = 1
+        speedTitleLabel.adjustsFontSizeToFitWidth = true
+        speedTitleLabel.minimumScaleFactor = 0.5
+        speedTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(speedTitleLabel)
+        speedTitleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: adapted(dimensionSize: 20, to: .height)).isActive = true
+        speedTitleLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 120, to: .height)).isActive = true
+        speedTitleLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 100).isActive = true
         setupSpeed()
         addSubview(createLabel(text: Strings.device, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 160, to: .height))))
         createDeviceDropDown()
         createServerDropDown()
         serverDropDown.hide()
         createModelDropDown()
-        addSubview(createLabel(text: Strings.input, leadingAnchor: 180, topAnchor: Int(adapted(dimensionSize: 120, to: .height))))
+        inputTitleLabel = createLabel(text: Strings.input, leadingAnchor: 180, topAnchor: Int(adapted(dimensionSize: 120, to: .height)))
+        inputTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(inputTitleLabel)
+        inputTitleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: speedLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredInputPosition = inputTitleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 180)
+        preferredInputPosition.priority = .defaultLow
+        preferredInputPosition.isActive = true
+        inputTitleLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 120, to: .height)).isActive = true
         setupInput();
         addSubview(createLabel(text: Strings.threads, leadingAnchor: 180, topAnchor: Int(adapted(dimensionSize: 160, to: .height))))
         setupThreads();
@@ -302,15 +319,27 @@ class expandedAutoPilot: UIView {
 
     /// function to create input label frame of model
     func setupInput() {
-        imageInputLabel.frame = CGRect(x: width - 80, y: adapted(dimensionSize: 120, to: .height), width: 100, height: 40)
         imageInputLabel.text = "256x96";
+        imageInputLabel.textColor = Colors.border
+        imageInputLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(imageInputLabel)
+        imageInputLabel.leadingAnchor.constraint(greaterThanOrEqualTo: inputTitleLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredImageInputPosition = imageInputLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: width - 80)
+        preferredImageInputPosition.priority = .defaultLow
+        preferredImageInputPosition.isActive = true
+        imageInputLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 120, to: .height)).isActive = true
     }
 
     /// function to create the ui of speed
     func setupSpeed() {
         speedLabel = createLabel(text: "*** fps", leadingAnchor: 90, topAnchor: Int(adapted(dimensionSize: 120, to: .height)))
+        speedLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(speedLabel)
+        speedLabel.leadingAnchor.constraint(greaterThanOrEqualTo: speedTitleLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredPosition = speedLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 90)
+        preferredPosition.priority = .defaultLow
+        preferredPosition.isActive = true
+        speedLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 120, to: .height)).isActive = true
     }
 
     /// Create a dropdown list
