@@ -37,6 +37,7 @@ enum LocalizationManager {
             } else {
                 UserDefaults.standard.removeObject(forKey: languageDefaultsKey)
             }
+            cachedBundle = nil
         }
     }
 
@@ -45,15 +46,25 @@ enum LocalizationManager {
         options.first(where: { $0.tag == currentTag })?.flagEmoji ?? options[0].flagEmoji
     }
 
+    private static var cachedBundle: Bundle?
+
     /// The bundle every localized string lookup should use: the user's chosen language if set,
     /// otherwise the best match between the system's preferred languages and what we support.
+    /// Cached until `currentTag` changes, since resolving it hits the file system.
     static var bundle: Bundle {
-        let tag = currentTag ?? bestSystemMatch()
-        guard let path = Bundle.main.path(forResource: tag, ofType: "lproj"),
-              let bundle = Bundle(path: path) else {
-            return .main
+        if let cachedBundle = cachedBundle {
+            return cachedBundle
         }
-        return bundle
+        let tag = currentTag ?? bestSystemMatch()
+        let resolved: Bundle
+        if let path = Bundle.main.path(forResource: tag, ofType: "lproj"),
+           let bundle = Bundle(path: path) {
+            resolved = bundle
+        } else {
+            resolved = .main
+        }
+        cachedBundle = resolved
+        return resolved
     }
 
     private static func bestSystemMatch() -> String {
