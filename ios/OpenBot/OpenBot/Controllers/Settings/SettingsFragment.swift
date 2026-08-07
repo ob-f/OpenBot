@@ -35,7 +35,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         createMicrophoneSwitch()
         scrollView.addSubview(createLabel(text: Strings.bluetooth, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 200, to: .height)))
         createBluetoothSwitch()
-        scrollView.addSubview(createLabel(text: "Web Signaling Server", leadingAnchor: 40, topAnchor: adapted(dimensionSize: 250, to: .height)))
+        scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 250, to: .height)))
         createWebSignalingServerField()
         updateSwitchPosition()
     }
@@ -133,7 +133,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     /// creates a text field for the web signaling server URL, prefilled from stored settings
     func createWebSignalingServerField() {
         webSignalingServerField.text = sharedPreferences.getWebSignalingServerUrl()
-        webSignalingServerField.placeholder = "ws://<host>:8080/ws"
+        webSignalingServerField.placeholder = Strings.webSignalingServerPlaceholder
         webSignalingServerField.borderStyle = .roundedRect
         webSignalingServerField.autocapitalizationType = .none
         webSignalingServerField.autocorrectionType = .no

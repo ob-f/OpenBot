@@ -8,7 +8,7 @@ import FirebaseAuth
 
 @available(iOS 13.0, *)
 class NativeWebSocket: NSObject, WebSocketProvider {
-    // configurable in Settings; falls back to the LAN default if unset
+    // Default IP. Replace it with your own server IP address in Settings.
     var url: URL {
         let urlString = SharedPreferencesManager().getWebSignalingServerUrl()
         return URL(string: urlString) ?? URL(string: "ws://192.168.1.40:8080/ws")!

@@ -146,6 +146,7 @@ public class SharedPreferencesManager {
     }
 
     public func getWebSignalingServerUrl() -> String {
+        // Default IP. Replace it with your own server IP address in Settings.
         return userDefaults.string(forKey: web_signaling_server_url) ?? "ws://192.168.1.40:8080/ws"
     }
 }

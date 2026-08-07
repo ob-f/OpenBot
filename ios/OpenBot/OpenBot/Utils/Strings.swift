@@ -71,6 +71,8 @@ struct Strings {
     static let permission: String = "Permissions"
     static let videoStreaming: String = "Video Streaming"
     static let bluetooth: String = "Bluetooth"
+    static let webSignalingServer: String = "Web Signaling Server"
+    static let webSignalingServerPlaceholder: String = "ws://192.168.1.40:8080/ws"
 
     // Notifications
     static let controllerConnected: String = "connectedWithControllerSuccessfully"
