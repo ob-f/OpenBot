@@ -291,13 +291,22 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
 
     /// Configure the video(camera output) rotation when screen orientation changes.
     private func configureVideoOrientation() {
-        let orientation = UIDevice.current.orientation
-        if let previewLayer = videoPreviewLayer, let previewConnection = videoPreviewLayer.connection {
-            if previewConnection.isVideoOrientationSupported, let previewOrientation = AVCaptureVideoOrientation(rawValue: orientation.rawValue) {
-                previewLayer.frame = view.bounds
-                previewConnection.videoOrientation = previewOrientation
-                videoOutput.connection(with: .video)?.videoOrientation = previewOrientation
-            }
+        var orientation: AVCaptureVideoOrientation = .portrait
+        switch currentOrientation {
+        case .portraitUpsideDown:
+            orientation = .portraitUpsideDown
+        case .landscapeLeft:
+            orientation = .landscapeRight
+        case .landscapeRight:
+            orientation = .landscapeLeft
+        default:
+            break
+        }
+        if let previewLayer = videoPreviewLayer, let previewConnection = videoPreviewLayer.connection,
+           previewConnection.isVideoOrientationSupported {
+            previewLayer.frame = cameraView.frame
+            previewConnection.videoOrientation = orientation
+            videoOutput.connection(with: .video)?.videoOrientation = orientation
         }
     }
 
