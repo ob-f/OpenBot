@@ -50,6 +50,11 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 350, to: .height)))
         createWebSignalingServerField()
         updateSwitchPosition()
+        registerKeyboardNotifications()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     /// Called when the view controller's view's size is changed by its parent (i.e. for the root view controller when its window rotates or is resized).
@@ -213,6 +218,34 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard textField == webSignalingServerField, let text = textField.text, !text.isEmpty else { return }
         sharedPreferences.setWebSignalingServerUrl(value: text)
+    }
+
+    /// dismisses the keyboard when the user taps return
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+
+    /// listens for the keyboard so the scroll view can be nudged out of its way
+    func registerKeyboardNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    /// pushes the scroll view's bottom inset up by the keyboard's height and scrolls the field into view
+    @objc func keyboardWillShow(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+        let keyboardHeight = scrollView.convert(keyboardFrame, from: nil).height
+        scrollView.contentInset.bottom = keyboardHeight
+        scrollView.scrollIndicatorInsets.bottom = keyboardHeight
+        scrollView.scrollRectToVisible(webSignalingServerField.frame.insetBy(dx: 0, dy: -20), animated: true)
+    }
+
+    /// restores the scroll view's original insets once the keyboard is dismissed
+    @objc func keyboardWillHide(_ notification: Notification) {
+        scrollView.contentInset.bottom = 0
+        scrollView.scrollIndicatorInsets.bottom = 0
     }
 
     /// function to set the positions of the buttons.
