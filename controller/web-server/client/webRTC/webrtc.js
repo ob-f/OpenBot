@@ -1,17 +1,7 @@
-/**
- * function to enable webRTC connection
- * @param connection
- * @constructor
- */
 export function WebRTC (connection) {
     const {RTCPeerConnection} = window
 
     let peerConnection = null
-    let onDataMessageReceivedCallback = null
-
-    this.onDataMessageReceived = (callback) => {
-        onDataMessageReceivedCallback = callback
-    }
 
     this.handle = (data) => {
         if (!peerConnection) {
@@ -20,7 +10,6 @@ export function WebRTC (connection) {
 
         const {RTCSessionDescription, RTCIceCandidate} = window
         let webRtcEvent
-        console.log(typeof data)
         if (typeof data === 'string') {
             webRtcEvent = JSON.parse(data)
         } else {
@@ -57,38 +46,17 @@ export function WebRTC (connection) {
         connection.send(JSON.stringify({webrtc_event: answer}))
     }
 
-    // starting webrtc connection
     this.start = () => {
-        console.log('WebRTC: start...')
-
         peerConnection = new RTCPeerConnection()
-        peerConnection.onconnectionstatechange = () => {
-            if (peerConnection?.connectionState === 'connected') {
-            }
-        }
 
-        this.dataChannel = peerConnection.createDataChannel('dataChannel') // Use this.dataChannel to set it as a property
-        console.log("readyState::", this.dataChannel.readyState)
-        console.log('DataChannel Open:::', this.dataChannel.onopen)
-        console.log('DataChannel On Message:::', this.dataChannel.onmessage)
+        this.dataChannel = peerConnection.createDataChannel('dataChannel')
 
         peerConnection.ondatachannel = (event) => {
-            const dataChannel = event.channel
-            dataChannel.onopen = () => {
-                // eventHandlers.onDataChannelOpened(dataChannel);
-            }
+            event.channel.onopen = () => {}
         }
 
-        this.dataChannel.onopen = () => {
-            console.log('DataChannel is open Ready to send the message:')
-        }
-        this.dataChannel.onmessage = (event) => {
-            // Handle incoming messages here
-            const message = event.data
-            if (onDataMessageReceivedCallback) {
-                onDataMessageReceivedCallback(message)
-            }
-        }
+        this.dataChannel.onopen = () => {}
+        this.dataChannel.onmessage = () => {}
         const video = document.getElementById('video')
 
         video.srcObject = new MediaStream()
@@ -100,8 +68,6 @@ export function WebRTC (connection) {
     }
 
     this.stop = () => {
-        console.log('WebRTC: stop...')
-
         if (peerConnection) {
             peerConnection.close()
         }
@@ -109,12 +75,8 @@ export function WebRTC (connection) {
     }
 
     this.send = (message) => {
-        console.log(this.dataChannel)
         if (this.dataChannel && this.dataChannel.readyState === 'open') {
             this.dataChannel.send(message)
-            // console.log(`Message is send ::: ${message}`)
-        } else {
-            console.log('WebRTC: Data channel is not open. Cannot send message.')
         }
     }
 }

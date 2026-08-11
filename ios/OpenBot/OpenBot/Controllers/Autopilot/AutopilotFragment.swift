@@ -163,7 +163,6 @@ class AutopilotFragment: CameraController {
             vehicleControl = control
             bluetooth.sendData(payload: "c" + String(left) + "," + String(right) + "\n")
             NotificationCenter.default.post(name: .updateSpeedLabel, object: String(Int(left)) + "," + String(Int(right)))
-            NotificationCenter.default.post(name: .updateRpmLabel, object: String(Int(control.getLeft())) + "," + String(Int(control.getRight())))
         }
     }
 

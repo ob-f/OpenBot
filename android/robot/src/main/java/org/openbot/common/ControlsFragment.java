@@ -92,6 +92,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
             Constants.GENERIC_MOTION_EVENT,
             this,
             (requestKey, result) -> {
+              if (vehicle == null) {
+                return;
+              }
               MotionEvent motionEvent = result.getParcelable(Constants.DATA);
               vehicle.setControl(vehicle.getGameController().processJoystickInput(motionEvent, -1));
               processControllerKeyData(Constants.CMD_DRIVE);
@@ -102,6 +105,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
             Constants.KEY_EVENT,
             this,
             (requestKey, result) -> {
+              if (vehicle == null) {
+                return;
+              }
               KeyEvent event = result.getParcelable(Constants.DATA);
               if (KeyEvent.ACTION_UP == event.getAction()) {
                 processKeyEvent(result.getParcelable(Constants.DATA));
@@ -119,6 +125,17 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
     mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
     vehicle = mViewModel.getVehicle().getValue();
+    if (vehicle == null) {
+      mViewModel
+          .getVehicle()
+          .observe(
+              getViewLifecycleOwner(),
+              v -> {
+                if (v != null) {
+                  vehicle = v;
+                }
+              });
+    }
     startAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.blink);
 
     mViewModel
@@ -126,6 +143,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
         .observe(
             getViewLifecycleOwner(),
             data -> {
+              if (vehicle == null || data == null || data.isEmpty()) {
+                return;
+              }
               char header = data.charAt(0);
               String body = data.substring(1);
 
@@ -186,6 +206,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
   }
 
   protected void processKeyEvent(KeyEvent keyCode) {
+    if (vehicle == null) {
+      return;
+    }
     if (Enums.ControlMode.getByID(preferencesManager.getControlMode())
         == Enums.ControlMode.GAMEPAD) {
       switch (keyCode.getKeyCode()) {
@@ -213,7 +236,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
           audioPlayer.playDriveMode(voice, vehicle.getDriveMode());
           break;
         case KeyEvent.KEYCODE_BUTTON_R1:
-          processControllerKeyData(Constants.CMD_NETWORK);
+          handleNetworkCommand();
           break;
         case KeyEvent.KEYCODE_BUTTON_THUMBL:
           processControllerKeyData(Constants.CMD_SPEED_DOWN);
@@ -234,72 +257,155 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
   }
 
   private void handlePhoneControllerEvents() {
+    String subscriber = this.getClass().getSimpleName();
+    ControllerToBotEventBus.unsubscribe(subscriber);
     ControllerToBotEventBus.subscribe(
-        this.getClass().getSimpleName(),
+        subscriber,
         event -> {
-          String commandType = "";
-          if (event.has("command")) {
-            commandType = event.getString("command");
-          } else if (event.has("driveCmd")) {
-            commandType = Constants.CMD_DRIVE;
-          } else if (event.has("server")) {
-            for (int i = 0; i < serverSpinner.getAdapter().getCount(); i++) {
-              if(event.getString("server").equals("noServerFound")){
-                serverSpinner.setSelection(0);
-              } else if(event.getString("server").equals(serverSpinner.getAdapter().getItem(i))){
-                serverSpinner.setSelection(i);
-              }
-            }
+          if (getActivity() == null) {
+            return;
           }
+          getActivity().runOnUiThread(() -> handleControllerEvent(event));
+        },
+        error -> Timber.e(error, "ControllerToBotEventBus error in %s", getClass().getSimpleName()),
+        event -> event.has("command") || event.has("driveCmd") || event.has("server"));
+  }
 
-          switch (commandType) {
-            case Constants.CMD_DRIVE:
-              JSONObject driveValue = event.getJSONObject("driveCmd");
+  private void handleControllerEvent(JSONObject event) {
+    try {
+      if (event.has("server")) {
+        updateServerSpinnerFromEvent(event);
+        return;
+      }
 
-              vehicle.setControl(
-                  new Control(
-                      Float.parseFloat(driveValue.getString("l")),
-                      Float.parseFloat(driveValue.getString("r"))));
-              break;
+      String commandType = resolveCommandType(event);
+      if (commandType == null) {
+        return;
+      }
+      if (!ensureVehicleForCommand(commandType)) {
+        return;
+      }
 
-            case Constants.CMD_INDICATOR_LEFT:
-              toggleIndicatorEvent(Enums.VehicleIndicator.LEFT.getValue());
-              break;
+      switch (commandType) {
+        case Constants.CMD_DRIVE:
+          applyDriveCommand(event.getJSONObject("driveCmd"));
+          processControllerKeyData(Constants.CMD_DRIVE);
+          break;
 
-            case Constants.CMD_INDICATOR_RIGHT:
-              toggleIndicatorEvent(Enums.VehicleIndicator.RIGHT.getValue());
-              break;
+        case Constants.CMD_NOISE:
+          toggleNoise();
+          break;
 
-            case Constants.CMD_INDICATOR_STOP:
-              toggleIndicatorEvent(Enums.VehicleIndicator.STOP.getValue());
-              break;
+        case Constants.CMD_NETWORK:
+          handleNetworkCommand();
+          break;
 
-              // We re connected to the controller, send back status info
-            case Constants.CMD_CONNECTED:
-              // PhoneController class will receive this event and resent it to the
-              // controller.
-              // Other controllers can subscribe to this event as well.
-              // That is why we are not calling phoneController.send() here directly.
-              BotToControllerEventBus.emitEvent(
-                  ConnectionUtils.getStatus(
-                      false, false, false, currentDriveMode.toString(), vehicle.getIndicator()));
-              break;
+        case Constants.CMD_INDICATOR_LEFT:
+          toggleIndicatorEvent(Enums.VehicleIndicator.LEFT.getValue());
+          processControllerKeyData(Constants.CMD_INDICATOR_LEFT);
+          break;
 
-            case Constants.CMD_DISCONNECTED:
-              vehicle.setControl(0, 0);
-              break;
-          }
+        case Constants.CMD_INDICATOR_RIGHT:
+          toggleIndicatorEvent(Enums.VehicleIndicator.RIGHT.getValue());
+          processControllerKeyData(Constants.CMD_INDICATOR_RIGHT);
+          break;
 
+        case Constants.CMD_INDICATOR_STOP:
+          toggleIndicatorEvent(Enums.VehicleIndicator.STOP.getValue());
+          processControllerKeyData(Constants.CMD_INDICATOR_STOP);
+          break;
+
+        case Constants.CMD_CONNECTED:
+          sendConnectedStatus();
+          break;
+
+        case Constants.CMD_DISCONNECTED:
+          vehicle.setControl(0, 0);
+          processControllerKeyData(Constants.CMD_DISCONNECTED);
+          break;
+
+        default:
           processControllerKeyData(commandType);
-        },
-        error -> {
-          Log.d(null, "Error occurred in ControllerToBotEventBus: " + error);
-        },
-        event -> event.has("command") || event.has("driveCmd") || event.has("server") // filter out everything else
-        );
+          break;
+      }
+    } catch (Exception e) {
+      Timber.e(e, "Error handling controller event in %s", getClass().getSimpleName());
+    }
+  }
+
+  private String resolveCommandType(JSONObject event) throws org.json.JSONException {
+    if (event.has("command")) {
+      return event.getString("command");
+    }
+    if (event.has("driveCmd")) {
+      return Constants.CMD_DRIVE;
+    }
+    return null;
+  }
+
+  private boolean ensureVehicleForCommand(String commandType) {
+    if (vehicle == null && mViewModel != null) {
+      vehicle = mViewModel.getVehicle().getValue();
+    }
+    if (vehicle == null) {
+      Timber.w("Ignoring web command %s: vehicle not ready", commandType);
+      return false;
+    }
+    return true;
+  }
+
+  private void applyDriveCommand(JSONObject driveValue) {
+    vehicle.setControl(
+        new Control(
+            (float) driveValue.optDouble("l", 0), (float) driveValue.optDouble("r", 0)));
+  }
+
+  private void sendConnectedStatus() {
+    BotToControllerEventBus.emitEvent(
+        ConnectionUtils.getStatus(
+            isLoggingEnabledForStatus(),
+            vehicle.isNoiseEnabled(),
+            isNetworkModeEnabled(),
+            currentDriveMode.toString(),
+            vehicle.getIndicator()));
+  }
+
+  private void updateServerSpinnerFromEvent(JSONObject event) throws org.json.JSONException {
+    if (serverSpinner == null || serverSpinner.getAdapter() == null) {
+      return;
+    }
+    String server = event.getString("server");
+    for (int i = 0; i < serverSpinner.getAdapter().getCount(); i++) {
+      if (server.equals("noServerFound")) {
+        serverSpinner.setSelection(0);
+        return;
+      }
+      if (server.equals(serverSpinner.getAdapter().getItem(i))) {
+        serverSpinner.setSelection(i);
+        return;
+      }
+    }
+  }
+
+  // Override in Autopilot / Object Nav — they use network mode for ML, not just a toggle.
+  protected void handleNetworkCommand() {}
+
+  protected boolean isNetworkModeEnabled() {
+    return false;
+  }
+
+  protected boolean isLoggingEnabledForStatus() {
+    return false;
+  }
+
+  protected void emitNetworkStatus(boolean enabled) {
+    BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("NETWORK", enabled));
   }
 
   protected void toggleNoise() {
+    if (vehicle == null) {
+      return;
+    }
     vehicle.toggleNoise();
     BotToControllerEventBus.emitEvent(
         ConnectionUtils.createStatus("NOISE", vehicle.isNoiseEnabled()));
@@ -344,7 +450,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
   public void onDestroy() {
     Timber.d("onDestroy");
     ControllerToBotEventBus.unsubscribe(this.getClass().getSimpleName());
-    vehicle.setControl(0, 0);
+    if (vehicle != null) {
+      vehicle.setControl(0, 0);
+    }
     super.onDestroy();
   }
 
@@ -352,7 +460,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
   public synchronized void onPause() {
     Timber.d("onPause");
     serverCommunication.stop();
-    vehicle.setControl(0, 0);
+    if (vehicle != null) {
+      vehicle.setControl(0, 0);
+    }
     super.onPause();
   }
 

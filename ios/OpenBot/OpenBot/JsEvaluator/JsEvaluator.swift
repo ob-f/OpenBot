@@ -625,15 +625,15 @@ class jsEvaluator {
             switch speedMode {
             case "slow":
                 gameController.selectedSpeedMode = .SLOW;
-                preferencesManager.setSpeedMode(value: SpeedMode.FAST.rawValue);
+                preferencesManager.setSpeedMode(value: SpeedMode.SLOW.rawValue);
                 break
             case "medium":
                 gameController.selectedSpeedMode = .NORMAL;
-                preferencesManager.setSpeedMode(value: SpeedMode.SLOW.rawValue);
+                preferencesManager.setSpeedMode(value: SpeedMode.NORMAL.rawValue);
                 break
             case "fast":
                 gameController.selectedSpeedMode = .FAST;
-                preferencesManager.setSpeedMode(value: SpeedMode.NORMAL.rawValue);
+                preferencesManager.setSpeedMode(value: SpeedMode.FAST.rawValue);
                 break
             default:
                 break

@@ -312,27 +312,36 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
 
     /// Switch between front camera and back camera
     func switchCameraView() {
-        let currentCameraInput: AVCaptureInput = captureSession.inputs[0]
-        captureSession.removeInput(currentCameraInput)
-        var newCamera: AVCaptureDevice
-        newCamera = AVCaptureDevice.default(for: AVMediaType.video)!
+        guard let captureSession = captureSession, !captureSession.inputs.isEmpty else { return }
+        let currentCameraInput = captureSession.inputs[0]
+        guard let currentDeviceInput = currentCameraInput as? AVCaptureDeviceInput else { return }
 
-        if (currentCameraInput as! AVCaptureDeviceInput).device.position == .back {
-            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromLeft, animations: {
-                newCamera = self.cameraWithPosition(.front)!
-            }, completion: nil)
+        let isBackCamera = currentDeviceInput.device.position == .back
+        let newPosition: AVCaptureDevice.Position = isBackCamera ? .front : .back
+        guard let newCamera = cameraWithPosition(newPosition) else { return }
+
+        if isBackCamera {
+            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromLeft, animations: nil, completion: nil)
             preferencesManager.setCameraSwitch(value: "front");
         } else {
-            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromRight, animations: {
-                newCamera = self.cameraWithPosition(.back)!
-            }, completion: nil)
+            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromRight, animations: nil, completion: nil)
             preferencesManager.setCameraSwitch(value: "back");
         }
+
+        // Apply input swap and orientation together so no wrong-orientation frame reaches the web feed
+        captureSession.beginConfiguration()
+        captureSession.removeInput(currentCameraInput)
         do {
-            try captureSession?.addInput(AVCaptureDeviceInput(device: newCamera))
+            try captureSession.addInput(AVCaptureDeviceInput(device: newCamera))
+            // Re-apply orientation after camera switch as iOS resets it to default on new input
+            if let connection = videoOutput.connection(with: .video),
+               connection.isVideoOrientationSupported {
+                connection.videoOrientation = AVCaptureVideoOrientation(rawValue: currentOrientation.rawValue) ?? .portrait
+            }
         } catch {
             print("error: \(error.localizedDescription)")
         }
+        captureSession.commitConfiguration()
     }
 
     /// To set the camera position for switching camera

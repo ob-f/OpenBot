@@ -36,13 +36,11 @@ import org.openbot.tflite.Network.Device;
 import org.openbot.utils.Constants;
 import org.openbot.utils.PermissionUtils;
 import org.openbot.vehicle.Control;
-import org.openbot.vehicle.Vehicle;
 import timber.log.Timber;
 
 public class PointGoalNavigationFragment extends ControlsFragment implements ArCoreListener {
 
   private MainViewModel mainViewModel;
-  private Vehicle vehicle;
   private Handler handlerMain;
   private ArCore arCore;
   private FragmentPointGoalNavigationBinding binding;
@@ -82,12 +80,25 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
     super.onViewCreated(view, savedInstanceState);
 
     mainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-    vehicle = mainViewModel.getVehicle().getValue();
 
     handlerMain = new Handler(Looper.getMainLooper());
-
     arCore = new ArCore(requireContext(), binding.surfaceView, handlerMain);
 
+    if (vehicle == null) {
+      mainViewModel
+          .getVehicle()
+          .observe(
+              getViewLifecycleOwner(),
+              v -> {
+                if (v != null && vehicle == null) {
+                  vehicle = v;
+                  if (isAdded()) {
+                    showStartDialog();
+                  }
+                }
+              });
+      return;
+    }
     showStartDialog();
   }
 
@@ -97,7 +108,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       ImageFrame rgb,
       CameraIntrinsics cameraIntrinsics,
       long timestamp) {
-    if (isRunning) {
+    if (isRunning && vehicle != null) {
       float goalDistance =
           computeDistance(navigationPoses.getTargetPose(), navigationPoses.getCurrentPose());
 
@@ -237,7 +248,9 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
 
   private void stop() {
     arCore.detachAnchors();
-    vehicle.stopBot();
+    if (vehicle != null) {
+      vehicle.stopBot();
+    }
     isRunning = false;
   }
 

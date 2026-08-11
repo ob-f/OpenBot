@@ -40,6 +40,7 @@ export function Keyboard () {
     listItems.forEach(liItem => rootElement.appendChild(liItem))
 
     processKeys(onKeyPress, listItems, onQuit)
+    processPointerActions(onKeyPress, listItems)
   }
 
   // create HTML "li" elements from 'menuTable'
@@ -69,7 +70,6 @@ export function Keyboard () {
     list.forEach(liItem => {
       const keypressName = liItem.getAttribute('keypressCode')
 
-      // set class according to press state
       if (pressedKeys.has(keypressName)) {
         liItem.classList.add('key-pressed')
       } else {
@@ -86,14 +86,12 @@ export function Keyboard () {
         return
       }
 
-      // keep track of pressed key
       pressedKeys.add(event.key)
       highlightPressedKeys(keyList)
 
       const { key, type } = event
       onKeypress({ key: key, type: type })
 
-      // handle special cases
       if (event.key === 'Escape') {
         onQuit()
       }
@@ -110,5 +108,51 @@ export function Keyboard () {
       const { key, type } = event
       onKeypress({ key: key, type: type })
     }, false)
+
+    window.addEventListener('blur', () => {
+      pressedKeys.clear()
+      highlightPressedKeys(keyList)
+    })
+  }
+
+  // Tap rows in the sidebar like pressing keys (mobile / mouse).
+  const processPointerActions = (onKeyPress, keyList) => {
+    const pressedByPointer = new Set()
+
+    const sendKey = (key, type) => {
+      onKeyPress({ key, type })
+      if (type === 'keydown') {
+        pressedKeys.add(key)
+      } else {
+        pressedKeys.delete(key)
+      }
+      highlightPressedKeys(keyList)
+    }
+
+    keyList.forEach((liItem) => {
+      const key = liItem.getAttribute('keypressCode')
+
+      liItem.addEventListener('pointerdown', (event) => {
+        event.preventDefault()
+        if (pressedByPointer.has(key)) {
+          return
+        }
+        pressedByPointer.add(key)
+        liItem.setPointerCapture(event.pointerId)
+        sendKey(key, 'keydown')
+      })
+
+      const release = () => {
+        if (!pressedByPointer.has(key)) {
+          return
+        }
+        pressedByPointer.delete(key)
+        sendKey(key, 'keyup')
+      }
+
+      liItem.addEventListener('pointerup', release)
+      liItem.addEventListener('pointercancel', release)
+      liItem.addEventListener('pointerleave', release)
+    })
   }
 }

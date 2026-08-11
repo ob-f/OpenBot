@@ -84,4 +84,20 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:layout="@layout/preference_category_custom"
+        app:title="@string/web_controller_category">
+
+        <!-- Default IP. Replace it with your own server IP address in Settings. -->
+        <EditTextPreference
+            app:defaultValue="ws://192.168.1.40:8080/ws"
+            app:iconSpaceReserved="false"
+            app:key="web_signaling_server"
+            app:layout="@layout/preference_icon_end_last"
+            app:title="@string/web_signaling_server"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

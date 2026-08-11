@@ -52,5 +52,9 @@ public class Constants {
   public static final String CMD_DISCONNECTED = "DISCONNECTED";
   public static final String CMD_SPEED_UP = "SPEED_UP";
   public static final String CMD_SPEED_DOWN = "SPEED_DOWN";
+
+  // Local-only commands to coordinate camera handoff between CameraFragment and WebRtcServer.
+  public static final String CMD_PAUSE_LOCAL_CAMERA = "PAUSE_LOCAL_CAMERA";
+  public static final String CMD_RESUME_LOCAL_CAMERA = "RESUME_LOCAL_CAMERA";
   // endregion
 }

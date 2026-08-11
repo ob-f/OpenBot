@@ -76,6 +76,8 @@ struct Strings {
     static var languageSubtitle: String { L10n.string("languageSubtitle") }
     static var systemDefault: String { L10n.string("systemDefault") }
     static var applyingLanguage: String { L10n.string("applyingLanguage") }
+    static let webSignalingServer: String = "Web Signaling Server"
+    static let webSignalingServerPlaceholder: String = "ws://192.168.1.40:8080/ws"
 
     // Notifications
     static let controllerConnected: String = "connectedWithControllerSuccessfully"

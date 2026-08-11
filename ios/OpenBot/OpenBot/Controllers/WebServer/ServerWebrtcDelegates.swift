@@ -9,6 +9,8 @@ import WebRTC
 import FirebaseAuth
 /// function to create webRTC Delegate
 class ServerWebrtcDelegate: WebRTCClientDelegate {
+    /// tracks the active web controller delegate to avoid duplicate message handling
+    static weak var activeDelegate: ServerWebrtcDelegate?
     var mSocket = NativeWebSocket.shared;
     var useCustomCapturer: Bool = true
     let webSocketMsgHandler = WebSocketMessageHandler();
@@ -45,7 +47,7 @@ class ServerWebrtcDelegate: WebRTCClientDelegate {
             print(cmd.driveCmd.l);
             self.webSocketMsgHandler.driveCommand(control: Control(left: cmd.driveCmd.l, right: cmd.driveCmd.r));
         } else if message.contains("command") {
-            let cmd = try! jsonDecoder.decode(serverCmd.self, from: text)
+            guard let cmd = try? jsonDecoder.decode(serverCmd.self, from: text) else { return }
             print(cmd.command);
             switch cmd.command {
             case "INDICATOR_LEFT":
@@ -64,6 +66,13 @@ class ServerWebrtcDelegate: WebRTCClientDelegate {
                 break;
             case "DRIVE_MODE":
                 self.webSocketMsgHandler.driveMode()
+                break;
+            case "NETWORK":
+                self.webSocketMsgHandler.toggleNetwork()
+                break;
+            case "LOGS":
+                self.webSocketMsgHandler.toggleLogging()
+                break
             case "SWITCH_CAMERA":
                 NotificationCenter.default.post(name: .switchCamera, object: nil);
                 break;
@@ -112,6 +121,7 @@ class ServerWebrtcDelegate: WebRTCClientDelegate {
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
         webRTCClient.setup(videoTrack: true, audioTrack: true, dataChannel: true, customFrameCapturer: useCustomCapturer)
+        ServerWebrtcDelegate.activeDelegate = self
         NotificationCenter.default.addObserver(self, selector: #selector(websocketDidReceiveMessage), name: .updateDataFromControllerApp, object: nil)
         if useCustomCapturer {
             _ = CameraController.shared.captureSession;
@@ -136,25 +146,18 @@ class ServerWebrtcDelegate: WebRTCClientDelegate {
 
     /// function to read the message from the controller connection
     @objc func websocketDidReceiveMessage(_ notification: Notification) {
+        guard ServerWebrtcDelegate.activeDelegate === self else { return }
         let msg = notification.object as! String
         let jsonDecoder = JSONDecoder();
         let text: Data = msg.data(using: .utf8)!;
         print("inside websocketDidReceiveMessage",msg)
-
-
-
-        //returning because of webrtc command transfer
-        if (msg.contains("driveCmd") || msg.contains("command")){
-            print("returning");
-            return;
-        }
 
         if msg.contains("driveCmd") {
             let cmd = try! jsonDecoder.decode(serverMessage.self, from: text);
             print(cmd.driveCmd.l);
             self.webSocketMsgHandler.driveCommand(control: Control(left: cmd.driveCmd.l, right: cmd.driveCmd.r));
         } else if msg.contains("command") {
-            let cmd = try! jsonDecoder.decode(serverCmd.self, from: text)
+            guard let cmd = try? jsonDecoder.decode(serverCmd.self, from: text) else { return }
             print(cmd.command);
             switch cmd.command {
             case "INDICATOR_LEFT":
@@ -173,6 +176,13 @@ class ServerWebrtcDelegate: WebRTCClientDelegate {
                 break;
             case "DRIVE_MODE":
                 self.webSocketMsgHandler.driveMode()
+                break
+            case "LOGS":
+                self.webSocketMsgHandler.toggleLogging()
+                break
+            case "NETWORK":
+                self.webSocketMsgHandler.toggleNetwork()
+                break
             case "SWITCH_CAMERA":
                 NotificationCenter.default.post(name: .switchCamera, object: nil);
                 break;
@@ -225,6 +235,6 @@ struct serverCommand: Decodable {
 
 struct serverCmd: Decodable {
     var command: String
-    var roomId: String
+    var roomId: String?
 }
 

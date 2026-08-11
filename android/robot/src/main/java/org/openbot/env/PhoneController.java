@@ -24,23 +24,22 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import okio.ByteString;
 import timber.log.Timber;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class PhoneController {
-  private static final String TAG = "PhoneController";
+  private static final String REQUEST_ROOM_ID = "request-roomId";
   private static PhoneController _phoneController;
   private ConnectionSelector connectionSelector;
   private IVideoServer videoServer;
   private View view = null;
   private WebSocket webSocket;
+  // Web mode only: CONNECTED starts WebRTC for browser. Phone/Flutter/gamepad stay off.
+  private boolean webVideoEnabled = false;
 
   public static PhoneController getInstance(Context context) {
-    if (_phoneController == null) { // Check for the first time
-
-      synchronized (PhoneController.class) { // Check for the second time.
-        // if there is no instance available... create new one
+    if (_phoneController == null) {
+      synchronized (PhoneController.class) {
         if (_phoneController == null) _phoneController = new PhoneController();
         _phoneController.init(context);
       }
@@ -109,6 +108,7 @@ public class PhoneController {
   }
 
   public void connect(Context context) {
+    setWebVideoEnabled(false);
     ILocalConnection connection = connectionSelector.getConnection();
 
     if (!connection.isConnected()) {
@@ -119,13 +119,22 @@ public class PhoneController {
     }
   }
 
-  public void connectWebServer(){
+  public void connectWebServer() {
+    setWebVideoEnabled(true);
+    closeWebSocketQuietly();
     nodeServerConnect();
   }
 
+  private void closeWebSocketQuietly() {
+    if (webSocket != null) {
+      webSocket.close(1000, "Web socket closed");
+      webSocket = null;
+    }
+  }
+
   private void nodeServerConnect() {
-//     String serverUrl = "ws://verdant-imported-peanut.glitch.me";
-           String serverUrl = "ws://192.168.1.6:8080";
+    String serverUrl = ControllerConfig.getInstance().getWebSignalingServerUrl();
+    Timber.d("Connecting to web signaling server: %s", serverUrl);
 
     OkHttpClient client = new OkHttpClient();
     Request request = new Request.Builder().url(serverUrl).build();
@@ -133,55 +142,72 @@ public class PhoneController {
     WebSocketListener webSocketListener = new WebSocketListener() {
       @Override
       public void onOpen(WebSocket webSocket, @NonNull okhttp3.Response response) {
+        PhoneController.this.webSocket = webSocket;
         ControllerToBotEventBus.emitEvent("{command: \"CONNECTED\"}");
+        sendRoomId(webSocket);
       }
 
       @Override
       public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-        // Called when text message is received from the server
+        if (text.contains(REQUEST_ROOM_ID)) {
+          sendRoomId(webSocket);
+          return;
+        }
         ControllerToBotEventBus.emitEvent(text);
       }
 
       @Override
-      public void onMessage(@NonNull WebSocket webSocket, @NonNull ByteString bytes) {
-        // Called when binary message is received from the server
-      }
-
-      @Override
-      public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-        // Called when the connection is closing
-      }
-
-      @Override
-      public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-        // Called when the connection is closed
-      }
-
-      @Override
       public void onFailure(@NonNull WebSocket webSocket, Throwable t, okhttp3.Response response) {
-        // Called when an error occurs
+        Timber.e(t, "Web signaling WebSocket failed (check web_signaling_server URL and Wi-Fi)");
       }
     };
 
     webSocket = client.newWebSocket(request, webSocketListener);
   }
 
+  // Same email on robot and browser = same room (must be signed in with Google).
+  private void sendRoomId(WebSocket socket) {
+    if (socket == null || FirebaseAuth.getInstance().getCurrentUser() == null) {
+      Timber.w("Cannot join web room: WebSocket or Firebase user is missing");
+      return;
+    }
+    try {
+      JSONObject room = new JSONObject();
+      room.put("roomId", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+      room.put("clientType", "robot");
+      socket.send(room.toString());
+      Timber.d("Sent web roomId for signaling");
+    } catch (JSONException e) {
+      Timber.e(e, "Failed to send web roomId");
+    }
+  }
+
   public void disconnect() {
+    setWebVideoEnabled(false);
+    closeWebSocketQuietly();
     connectionSelector.getConnection().stop();
   }
 
+  private void setWebVideoEnabled(boolean enabled) {
+    webVideoEnabled = enabled;
+    if (!enabled) {
+      videoServer.setConnected(false);
+    }
+  }
+
   public void send(JSONObject info) {
-    if (webSocket != null && FirebaseAuth.getInstance().getCurrentUser() != null)
+    if (webSocket != null && FirebaseAuth.getInstance().getCurrentUser() != null) {
       try {
-        info.put("roomId", FirebaseAuth.getInstance().getCurrentUser().getEmail()); // Add the roomId to the JSON object
-        String messageString = info.toString();
-        webSocket.send(messageString);
+        info.put("roomId", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        webSocket.send(info.toString());
       } catch (JSONException e) {
         throw new RuntimeException(e);
       }
+    }
 
-     if (connectionSelector.getConnection().isConnected())
-       connectionSelector.getConnection().sendMessage(info.toString());
+    if (connectionSelector.getConnection().isConnected()) {
+      connectionSelector.getConnection().sendMessage(info.toString());
+    }
   }
 
   public boolean isConnected() {
@@ -193,30 +219,29 @@ public class PhoneController {
         this::send, error -> Timber.d("Error occurred in BotToControllerEventBus: %s", error));
   }
 
+  // Nearby CONNECTED also fires here; only start camera when web mode set webVideoEnabled.
   private void monitorConnection() {
     ControllerToBotEventBus.subscribe(
-        this.getClass().getSimpleName(),
+        "PhoneController.monitor",
         event -> {
-          switch (event.getString("command")) {
-            case "CONNECTED":
-              new Handler(Looper.getMainLooper()).post(() -> videoServer.setConnected(true));
-//              videoServer.setConnected(true);
-              break;
-
-            case "DISCONNECTED":
-              new Handler(Looper.getMainLooper()).post(() -> videoServer.setConnected(false));
-//              videoServer.setConnected(false);
-              break;
-          }
+          String command = event.getString("command");
+          new Handler(Looper.getMainLooper())
+              .post(
+                  () -> {
+                    if ("CONNECTED".equals(command)) {
+                      if (webVideoEnabled) {
+                        videoServer.setConnected(true);
+                      }
+                    } else if ("DISCONNECTED".equals(command)) {
+                      videoServer.setConnected(false);
+                    }
+                  });
         },
-        error -> {
-          Log.d(null, "Error occurred in monitorConnection: " + error);
-        },
+        error -> Log.d(null, "Error occurred in monitorConnection: " + error),
         event ->
             event.has("command")
                 && ("CONNECTED".equals(event.getString("command"))
-                    || "DISCONNECTED".equals(event.getString("command"))) // filter everything else
-        );
+                    || "DISCONNECTED".equals(event.getString("command"))));
   }
 
   private PhoneController() {

@@ -90,6 +90,27 @@ public class LoggerFragment extends CameraFragment {
             "FRAGMENT_TYPE", Enums.FragmentType.DATACOLLECTION.getFragment()));
     binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
 
+    if (vehicle == null) {
+      mViewModel
+          .getVehicle()
+          .observe(
+              getViewLifecycleOwner(),
+              v -> {
+                if (v != null && vehicle == null) {
+                  vehicle = v;
+                  setupLoggerUi();
+                }
+              });
+      return;
+    }
+    setupLoggerUi();
+  }
+
+  private void setupLoggerUi() {
+    if (vehicle == null || binding == null) {
+      return;
+    }
+
     intentSensorService = new Intent(requireActivity(), SensorService.class);
     setSpeedMode(Enums.SpeedMode.getByID(preferencesManager.getSpeedMode()));
     setControlMode(Enums.ControlMode.getByID(preferencesManager.getControlMode()));
@@ -116,10 +137,11 @@ public class LoggerFragment extends CameraFragment {
       }
     });
 
-    if (vehicle.getConnectionType().equals("USB")) {
+    String connectionType = vehicle.getConnectionType();
+    if (connectionType != null && connectionType.equals("USB")) {
       binding.usbToggle.setVisibility(View.VISIBLE);
       binding.bleToggle.setVisibility(View.GONE);
-    } else if (vehicle.getConnectionType().equals("Bluetooth")) {
+    } else if (connectionType != null && connectionType.equals("Bluetooth")) {
       binding.bleToggle.setVisibility(View.VISIBLE);
       binding.usbToggle.setVisibility(View.GONE);
     }
@@ -255,7 +277,9 @@ public class LoggerFragment extends CameraFragment {
     handlerThread = new HandlerThread("logging");
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
-    binding.bleToggle.setChecked(vehicle.bleConnected());
+    if (vehicle != null && binding != null) {
+      binding.bleToggle.setChecked(vehicle.bleConnected());
+    }
     super.onResume();
   }
 
@@ -516,10 +540,17 @@ public class LoggerFragment extends CameraFragment {
                 Enums.Direction.UP.getValue(),
                 Enums.SpeedMode.getByID(preferencesManager.getSpeedMode())));
         break;
-      case Constants.CMD_NETWORK:
-        cancelLogging();
-        break;
     }
+  }
+
+  @Override
+  protected void handleNetworkCommand() {
+    cancelLogging();
+  }
+
+  @Override
+  protected boolean isLoggingEnabledForStatus() {
+    return loggingEnabled;
   }
 
   protected void handleDriveCommand() {
