@@ -227,7 +227,7 @@ class openCodeRunBottomSheet: UIView {
         DispatchQueue.main.async {
             self.createErrorHeading()
             self.createErrorMsg()
-            fileName == "" ?  self.createCancel(btnName: "Scan Qr") : self.createCancel(btnName: "Cancel")
+            fileName == "" ?  self.createCancel(btnName: Strings.scanQrButton) : self.createCancel(btnName: Strings.cancel)
 
         }
 
@@ -251,14 +251,14 @@ class openCodeRunBottomSheet: UIView {
     }
 
     private func createBottomSheetHeading() {
-        let heading = CustomLabel(text: "QR scanned successfully",
+        let heading = CustomLabel(text: Strings.qrScanSuccessHeading,
                 fontSize: 18, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 19, y: 33, width: 290, height: 40));
         heading.font = HelveticaNeue.bold(size: 15);
         bottomSheet.addSubview(heading);
     }
 
     private func createBottomSheetMsg(fileName: String,isScannerFragment : Bool) {
-        let message = "\(fileName) file detected. Start to execute the code on your OpenBot."
+        let message = String(format: Strings.qrFileDetectedMessageFormat, fileName)
         let font = UIFont(name: "HelveticaNeue", size: 16)!
         _ = (message as NSString).boundingRect(with: CGSize(width: 320, height: CGFloat.greatestFiniteMagnitude), options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil)
         let msg =   isScannerFragment == true ? CustomLabel(text: message, fontSize: 15,
@@ -278,7 +278,7 @@ class openCodeRunBottomSheet: UIView {
     */
     private func createStartBtn() {
         startBtn.backgroundColor = Colors.title;
-        startBtn.setTitle("Start", for: .normal);
+        startBtn.setTitle(Strings.startButton, for: .normal);
         startBtn.addTarget(nil, action: #selector(start), for: .touchUpInside);
         startBtn.layer.cornerRadius = 10;
         bottomSheet.addSubview(startBtn);
@@ -288,7 +288,7 @@ class openCodeRunBottomSheet: UIView {
      Method to create Cancel button and reload the Scanner
      */
     private func createCancelBtn() {
-        cancelBtn.setTitle("Cancel", for: .normal);
+        cancelBtn.setTitle(Strings.cancel, for: .normal);
         cancelBtn.layer.borderWidth = 1;
         cancelBtn.layer.borderColor = Colors.title?.cgColor;
         cancelBtn.clipsToBounds = true;
@@ -340,7 +340,7 @@ class openCodeRunBottomSheet: UIView {
      Function to create Error Heading  mukerian
      */
     private func createErrorHeading() {
-        let errorHeading = CustomLabel(text: "Error",
+        let errorHeading = CustomLabel(text: Strings.errorHeading,
                 fontSize: 18, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 19, y: 23, width: 60, height: 40));
         errorHeading.font = HelveticaNeue.bold(size: 15);
         bottomSheet.addSubview(errorHeading);
@@ -350,7 +350,7 @@ class openCodeRunBottomSheet: UIView {
      Function to create Error Message
      */
     private func createErrorMsg() {
-        let msg = CustomLabel(text: "Oops! Something went wrong.Please try again.", fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 19, y: 57, width: 330, height: 40));
+        let msg = CustomLabel(text: Strings.genericErrorMessage, fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 19, y: 57, width: 330, height: 40));
         bottomSheet.addSubview(msg);
     }
 

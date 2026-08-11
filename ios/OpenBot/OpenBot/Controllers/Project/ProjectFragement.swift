@@ -25,7 +25,7 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
     var vehicleControl = Control();
     @IBOutlet weak var openCodeWebView: UIView!
     private var command: String = ""
-    private let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
+    private let alert = UIAlertController(title: nil, message: Strings.pleaseWaitMessage, preferredStyle: .alert)
     private var allProjectCommands: [ProjectData] = UserDefaults.getALlProjectsDataFromUserDefaults()
     private var myProjectLabel: CustomLabel = CustomLabel(frame: .zero)
     var fileName: String = String()
@@ -39,6 +39,7 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
     */
     override func viewDidLoad() {
         super.viewDidLoad()
+        tabBarItem.title = Strings.projectsTab
         baseView?.addSubview(animationView);
         animationView.backgroundColor = Colors.title
         view.addSubview(signInView);
@@ -156,7 +157,7 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
      Function to create my project label
      */
     func createMyProjectLabel() {
-        myProjectLabel = CustomLabel(text: "My Projects", fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(origin: .zero, size: CGSize(width: 200, height: 40)));
+        myProjectLabel = CustomLabel(text: Strings.myProjectsHeading, fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(origin: .zero, size: CGSize(width: 200, height: 40)));
         myProjectLabel.font = HelveticaNeue.regular(size: 15);
         myProjectLabel.translatesAutoresizingMaskIntoConstraints = false;
         view.addSubview(myProjectLabel)
@@ -168,8 +169,12 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
      Functions to create the message
      */
     func createPleaseSignInLabel() {
-        let firstLabel = CustomLabel(text: "Please sign in first to access your", fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: width / 2 - 115, y: 20, width: 250, height: 40));
-        let secondLabel = CustomLabel(text: "projects.", fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: width / 2 - 32.5, y: firstLabel.bottom - 5, width: 65, height: 40));
+        // Full-width and center-aligned rather than a box tuned for the English text's pixel
+        // width, since translations vary too much in length to keep a fixed narrow box centered.
+        let firstLabel = CustomLabel(text: Strings.pleaseSignInProjectsLine1, fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 20, y: 20, width: width - 40, height: 40));
+        firstLabel.textAlignment = .center;
+        let secondLabel = CustomLabel(text: Strings.pleaseSignInProjectsLine2, fontSize: 16, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 20, y: firstLabel.bottom - 5, width: width - 40, height: 40));
+        secondLabel.textAlignment = .center;
         signInView.addSubview(firstLabel);
         signInView.addSubview(secondLabel)
     }
@@ -178,10 +183,10 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
      Function will generate ui view when no project at drive
      */
     func createNoProjectMessage() {
-        let firstLabel = CustomLabel(text: "Oops! No projects found.", fontSize: 22, fontColor: Colors.title ?? .blue, frame: CGRect(x: width / 2 - 140, y: 20, width: 280, height: 40));
+        let firstLabel = CustomLabel(text: Strings.noProjectsFoundHeading, fontSize: 22, fontColor: Colors.title ?? .blue, frame: CGRect(x: width / 2 - 140, y: 20, width: 280, height: 40));
         firstLabel.textAlignment = .center;
         firstLabel.font = HelveticaNeue.bold(size: 16);
-        let label = CustomLabel(text: "Looks like there are no projects\nin your google drive yet.",
+        let label = CustomLabel(text: Strings.noProjectsFoundBody,
                 fontSize: 18,
                 fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black,
                 frame: CGRect(x: width / 2 - 140, y: firstLabel.bottom - 5, width: 280, height: 80))
@@ -717,9 +722,9 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
     }
 
     private func createDeleteProject() {
-        let alertController = UIAlertController(title: "Delete this file", message: "You cannot restore this file later", preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { (_) in
+        let alertController = UIAlertController(title: Strings.deleteFileTitle, message: Strings.deleteFileMessage, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: Strings.cancel, style: .cancel, handler: nil)
+        let deleteAction = UIAlertAction(title: Strings.deleteAction, style: .destructive) { (_) in
             self.isLoading = true;
             self.animateFloatingView();
             self.deleteProject(projectName: self.fileName, projectId: self.projectId) { error, deleteCount in

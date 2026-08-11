@@ -127,7 +127,7 @@ class RobotInfoFrame: UIViewController {
 
     /// creates heading label
     func createRobotTypeHeading() {
-        robotType = createHeadings(text: "Robot Type")
+        robotType = createHeadings(text: Strings.robotTypeHeading)
         robotType.frame.origin = CGPoint(x: 10, y: topPadding + adapted(dimensionSize: 30, to: .height))
     }
 
@@ -158,7 +158,7 @@ class RobotInfoFrame: UIViewController {
 
     /// creates sensors heading
     func createSensorHeading() {
-        sensorHeading = createHeadings(text: "Sensors")
+        sensorHeading = createHeadings(text: Strings.sensorsHeading)
     }
 
     /// creates checkboxes for sensors
@@ -224,7 +224,7 @@ class RobotInfoFrame: UIViewController {
         motorLabel = createLabels(text: Strings.motors, topAnchor: 610, leadingAnchor: 20)
         forwardButton = createButton(width: 80, height: 40, title: Strings.forward, leadingAnchor: 70, topAnchor: 610, action: #selector(forwardButton(_:)))
         backwardButton = createButton(width: 90, height: 40, title: Strings.backward, leadingAnchor: 180, topAnchor: 610, action: #selector(backwardButton(_:)))
-        stopButton = createButton(width: 60, height: 40, title: Strings.stop, leadingAnchor: 290, topAnchor: 610, action: #selector(stopButton(_:)))
+        stopButton = createButton(width: 60, height: 40, title: Strings.stopLabel, leadingAnchor: 290, topAnchor: 610, action: #selector(stopButton(_:)))
     }
 
 /// creates heading and slider for lights
@@ -258,10 +258,10 @@ class RobotInfoFrame: UIViewController {
         let label = UILabel()
         label.text = text
         label.textColor = Colors.border
-        label.frame.size.width = CGFloat(text.count * 15)
+        label.font = HelveticaNeue.bold(size: 12)
+        label.frame.size.width = measuredWidth(of: text, font: label.font) + 8
         label.frame.size.height = 40
         view.addSubview(label)
-        label.font = HelveticaNeue.bold(size: 12)
         return label
     }
 
@@ -270,8 +270,8 @@ class RobotInfoFrame: UIViewController {
         let label = UILabel()
         label.text = text
         label.textColor = Colors.border
-        label.frame.size.width = CGFloat(text.count * 10)
         label.font = label.font.withSize(12)
+        label.frame.size.width = measuredWidth(of: text, font: label.font) + 8
         label.frame.size.height = 40
         view.addSubview(label)
         label.frame.origin.x = leadingAnchor
@@ -486,7 +486,7 @@ class RobotInfoFrame: UIViewController {
     /// function to update the robot name.
     func setRobotName() {
         robotName.text = getRobotName()
-        robotName.frame.size.width = CGFloat(getRobotName().count * 10)
+        robotName.frame.size.width = measuredWidth(of: getRobotName(), font: robotName.font) + 8
     }
 
     /// function to check whether voltage is available on the robot.
@@ -608,7 +608,7 @@ class RobotInfoFrame: UIViewController {
         if sonarData != "" {
             let index = sonarData.index(after: sonarData.startIndex)
             let actualSonarValue = min(Int(String(sonarData[index...])) ?? 0, 300)
-            sonar.text = "Sonar " + String(actualSonarValue) + " cm"
+            sonar.text = String(format: Strings.sonarReadingFormat, String(actualSonarValue))
         }
     }
 
@@ -617,7 +617,7 @@ class RobotInfoFrame: UIViewController {
         let voltageData = bluetooth.voltageDivider
         if voltageData != "" {
             let index = voltageData.index(after: voltageData.startIndex)
-            battery.text = "Battery " + String(voltageData[index...]) + " V"
+            battery.text = String(format: Strings.batteryReadingFormat, String(voltageData[index...]))
         }
     }
 

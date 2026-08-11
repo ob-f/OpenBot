@@ -4,47 +4,47 @@
 
 struct Strings {
     // Screens
-    static let OpenBot: String = "OpenBot"
-    static let freeRoam: String = "Free Roam"
-    static let dataCollection: String = "Data Collection"
-    static let controllerMapping: String = "Controller Mapping"
-    static let autoPilot: String = "Auto Pilot"
-    static let objectTracking: String = "Object Tracking"
-    static let modelManagement: String = "Model Management"
-    static let robotInfo: String = "Robot Info"
-    static let navigation: String = "Point Goal Navigation"
+    static var OpenBot: String { L10n.string("OpenBot") }
+    static var freeRoam: String { L10n.string("freeRoam") }
+    static var dataCollection: String { L10n.string("dataCollection") }
+    static var controllerMapping: String { L10n.string("controllerMapping") }
+    static var autoPilot: String { L10n.string("autoPilot") }
+    static var objectTracking: String { L10n.string("objectTracking") }
+    static var modelManagement: String { L10n.string("modelManagement") }
+    static var robotInfo: String { L10n.string("robotInfo") }
+    static var navigation: String { L10n.string("navigation") }
 
     // Misc
-    static let controller: String = "Controller"
-    static let speed: String = "Speed"
-    static let driveMode: String = "Drive Mode"
-    static let gamepad: String = "Gamepad"
-    static let phone: String = "Phone"
-    static let web: String = "Web"
-    static let joystick: String = "Joystick"
-    static let game: String = "Game"
-    static let dual: String = "Dual"
-    static let slow: String = "Slow"
-    static let medium: String = "Medium"
-    static let fast: String = "Fast"
-    static let logData: String = "Log Data"
-    static let previewResolutionMedium: String = "Preview Resolution (1280 x 720)"
-    static let previewResolutionLow: String = "Preview Resolution (960 x 540)"
-    static let previewResolutionHigh: String = "Preview Resolution (1920 x 1080)"
-    static let low: String = "Low"
-    static let high: String = "High"
-    static let modelResolution: String = "Model Resolution "
-    static let server: String = "Server"
+    static var controller: String { L10n.string("controller") }
+    static var speed: String { L10n.string("speed") }
+    static var driveMode: String { L10n.string("driveMode") }
+    static var gamepad: String { L10n.string("gamepad") }
+    static var phone: String { L10n.string("phone") }
+    static var web: String { L10n.string("web") }
+    static var joystick: String { L10n.string("joystick") }
+    static var game: String { L10n.string("game") }
+    static var dual: String { L10n.string("dual") }
+    static var slow: String { L10n.string("slow") }
+    static var medium: String { L10n.string("medium") }
+    static var fast: String { L10n.string("fast") }
+    static var logData: String { L10n.string("logData") }
+    static var previewResolutionMedium: String { L10n.string("previewResolutionMedium") }
+    static var previewResolutionLow: String { L10n.string("previewResolutionLow") }
+    static var previewResolutionHigh: String { L10n.string("previewResolutionHigh") }
+    static var low: String { L10n.string("low") }
+    static var high: String { L10n.string("high") }
+    static var modelResolution: String { L10n.string("modelResolution") }
+    static var server: String { L10n.string("server") }
     static let expendSetting: String = "expendSetting"
-    static let preview: String = "Preview"
-    static let training: String = "Training"
-    static let sensorData: String = "Sensor Data"
-    static let vehicle: String = "Vehicle"
-    static let gps: String = "GPS"
-    static let accelerometer: String = "Accelerometer"
-    static let magnetic: String = "Magnetic"
-    static let gyroscope: String = "Gyroscope"
-    static let delay: String = "Delay (ms)"
+    static var preview: String { L10n.string("preview") }
+    static var training: String { L10n.string("training") }
+    static var sensorData: String { L10n.string("sensorData") }
+    static var vehicle: String { L10n.string("vehicle") }
+    static var gps: String { L10n.string("gps") }
+    static var accelerometer: String { L10n.string("accelerometer") }
+    static var magnetic: String { L10n.string("magnetic") }
+    static var gyroscope: String { L10n.string("gyroscope") }
+    static var delay: String { L10n.string("delay") }
     static let images: String = "images"
     static let sensor: String = "sensor_data"
     static let timestamp: String = "timestamp[ns],frame\n"
@@ -53,26 +53,31 @@ struct Strings {
     static let comma: String = ","
     static let newLine: String = "\n"
     static let forwardSlash: String = "/"
-    static let Autopilot: String = "Autopilot"
-    static let ObjectTracking: String = "Object Tracking"
-    static let autoMode: String = "Auto Mode"
-    static let model: String = "Model"
-    static let input: String = "Input"
-    static let device: String = "Device"
-    static let threads: String = "Threads"
-    static let object: String = "Object"
-    static let confidence: String = "Confidence"
-    static let dynamicSpeed: String = "Dynamic Speed"
+    static var Autopilot: String { L10n.string("Autopilot") }
+    static var ObjectTracking: String { L10n.string("ObjectTracking") }
+    static var autoMode: String { L10n.string("autoMode") }
+    static var model: String { L10n.string("model") }
+    static var input: String { L10n.string("input") }
+    static var device: String { L10n.string("device") }
+    static var threads: String { L10n.string("threads") }
+    static var object: String { L10n.string("object") }
+    static var confidence: String { L10n.string("confidence") }
+    static var dynamicSpeed: String { L10n.string("dynamicSpeed") }
 
     // Settings
-    static let camera: String = "Camera"
-    static let microphone: String = "Microphone"
-    static let location: String = "Location"
-    static let permission: String = "Permissions"
+    static var camera: String { L10n.string("camera") }
+    static var microphone: String { L10n.string("microphone") }
+    static var location: String { L10n.string("location") }
+    static var permission: String { L10n.string("permission") }
     static let videoStreaming: String = "Video Streaming"
-    static let bluetooth: String = "Bluetooth"
-    static let webSignalingServer: String = "Web Signaling Server"
-    static let webSignalingServerPlaceholder: String = "ws://192.168.1.40:8080/ws"
+    static var bluetooth: String { L10n.string("bluetooth") }
+    static var general: String { L10n.string("general") }
+    static var language: String { L10n.string("language") }
+    static var languageSubtitle: String { L10n.string("languageSubtitle") }
+    static var systemDefault: String { L10n.string("systemDefault") }
+    static var applyingLanguage: String { L10n.string("applyingLanguage") }
+    static var webSignalingServer: String { L10n.string("webSignalingServer") }
+    static var webSignalingServerPlaceholder: String { L10n.string("webSignalingServerPlaceholder") }
 
     // Notifications
     static let controllerConnected: String = "connectedWithControllerSuccessfully"
@@ -121,55 +126,155 @@ struct Strings {
     static let motionHeader: String = "timestamp[ns]"
 
     // Bluetooth Status
-    static let connect: String = "Connect"
-    static let disconnect: String = "Disconnect"
-    static let connecting: String = "Connecting"
-    static let disconnecting: String = "Disconnecting"
+    static var connect: String { L10n.string("connect") }
+    static var disconnect: String { L10n.string("disconnect") }
+    static var connecting: String { L10n.string("connecting") }
+    static var disconnecting: String { L10n.string("disconnecting") }
 
     // Model management
-    static let modelDetails: String = "Model Details"
-    static let name: String = "Name"
-    static let type: String = "Type"
-    static let `class`: String = "Class"
-    static let inputOfModel: String = "Input(w x h)"
+    static var modelDetails: String { L10n.string("modelDetails") }
+    static var name: String { L10n.string("name") }
+    static var type: String { L10n.string("type") }
+    static var `class`: String { L10n.string("class") }
+    static var inputOfModel: String { L10n.string("inputOfModel") }
+    /// Functional file-extension constant (file lookups, name matching) -- must stay ".tflite" in
+    /// every language. See `tfliteLabel` for the translated on-screen copy.
     static let tflite: String = ".tflite"
-    static let cancel: String = "Cancel"
-    static let done: String = "Done"
-    static let file: String = "File"
-    static let url: String = "URL"
-    static let addNewModel: String = "Add New Model"
+    static var tfliteLabel: String { L10n.string("tfliteLabel") }
+    static var cancel: String { L10n.string("cancel") }
+    static var done: String { L10n.string("done") }
+    static var file: String { L10n.string("file") }
+    static var url: String { L10n.string("url") }
+    static var addNewModel: String { L10n.string("addNewModel") }
 
     // Robot Info
-    static let voltageDivider: String = "Voltage Divider"
-    static let sonarText: String = "Sonar"
-    static let bumperText: String = "Bumpers"
-    static let wheelOdometer: String = "Wheel Odometry"
-    static let front: String = "Front"
-    static let back: String = "Back"
-    static let led: String = "Leds"
-    static let indicatorText: String = "Indicators"
-    static let status: String = "Status"
-    static let motors: String = "Motors"
-    static let forward: String = "Forward"
-    static let backward: String = "Backward"
+    static var voltageDivider: String { L10n.string("voltageDivider") }
+    static var sonarText: String { L10n.string("sonarText") }
+    static var bumperText: String { L10n.string("bumperText") }
+    static var wheelOdometer: String { L10n.string("wheelOdometer") }
+    static var front: String { L10n.string("front") }
+    static var back: String { L10n.string("back") }
+    static var led: String { L10n.string("led") }
+    static var indicatorText: String { L10n.string("indicatorText") }
+    static var status: String { L10n.string("status") }
+    static var motors: String { L10n.string("motors") }
+    static var forward: String { L10n.string("forward") }
+    static var backward: String { L10n.string("backward") }
+    /// Functional Blockly JS bridge function name -- must stay "Stop" in every language.
+    /// See `stopLabel` for the translated on-screen copy.
     static let stop: String = "Stop"
-    static let readings: String = "Readings"
-    static let battery: String = "Battery **.* V"
-    static let speedText: String = "Speed (l,r) ***,*** rpm"
-    static let sonarLabel: String = "Sonar *** cm"
-    static let sendCommand: String = "Send Commands"
-    static let lightLabel: String = "Lights"
+    static var stopLabel: String { L10n.string("stopLabel") }
+    static var readings: String { L10n.string("readings") }
+    static var battery: String { L10n.string("battery") }
+    static var speedText: String { L10n.string("speedText") }
+    static var sonarLabel: String { L10n.string("sonarLabel") }
+    static var sendCommand: String { L10n.string("sendCommand") }
+    static var lightLabel: String { L10n.string("lightLabel") }
 
-    //Navigation
-    static let setGoal: String = "Set Goal"
-    static let setGoalText: String = "Mount the phone on the robot and \n specify a goal. The robot will try to\n reach the goal after pressing start."
-    static let left: String = "Left"
-    static let meter: String = "[m]"
+    // Navigation
+    static var setGoal: String { L10n.string("setGoal") }
+    static var setGoalText: String { L10n.string("setGoalText") }
+    static var left: String { L10n.string("left") }
+    static var meter: String { L10n.string("meter") }
+    /// Functional Blockly JS bridge function name -- must stay "START" in every language.
+    /// See `startLabel` for the translated on-screen copy.
     static let start: String = "START"
-    static let canceled: String = "CANCEL"
-    static let info: String = "Info"
-    static let restart: String = "Restart"
+    static var startLabel: String { L10n.string("startLabel") }
+    static var canceled: String { L10n.string("canceled") }
+    static var info: String { L10n.string("info") }
+    static var restart: String { L10n.string("restart") }
 
+    // Settings > Permissions
+    static var important: String { L10n.string("important") }
+    static var cameraAccessRequiredMessage: String { L10n.string("cameraAccessRequiredMessage") }
+    /// Format string with one %@ placeholder for the (already-localized) permission name, e.g. "Please allow %@ access for OpenBot".
+    static var allowPermissionMessageFormat: String { L10n.string("allowPermissionMessageFormat") }
+    /// Format string with one %@ placeholder for the (already-localized) permission name, e.g. "Allow %@".
+    static var allowButtonFormat: String { L10n.string("allowButtonFormat") }
+
+    // Logout / open-code UI
+    static var logOut: String { L10n.string("logOut") }
+    static var confirmLogoutTitle: String { L10n.string("confirmLogoutTitle") }
+    static var confirmLogoutMessage: String { L10n.string("confirmLogoutMessage") }
+    static var codeExecuting: String { L10n.string("codeExecuting") }
+
+    // Tab bar
+    static var projectsTab: String { L10n.string("projectsTab") }
+    static var homeTab: String { L10n.string("homeTab") }
+    static var profileTab: String { L10n.string("profileTab") }
+
+    // Loading / generic alerts
+    static var loadingTitle: String { L10n.string("loadingTitle") }
+    static var loadingProfileMessage: String { L10n.string("loadingProfileMessage") }
+    static var loadingDataMessage: String { L10n.string("loadingDataMessage") }
+    static var pleaseWaitMessage: String { L10n.string("pleaseWaitMessage") }
+    static var errorHeading: String { L10n.string("errorHeading") }
+    static var genericErrorMessage: String { L10n.string("genericErrorMessage") }
+    static var okAction: String { L10n.string("okAction") }
+
+    // Profile screen
+    static var myProfileHeading: String { L10n.string("myProfileHeading") }
+    static var setupProfilePromptLine1: String { L10n.string("setupProfilePromptLine1") }
+    static var setupProfilePromptLine2: String { L10n.string("setupProfilePromptLine2") }
+    static var editProfile: String { L10n.string("editProfile") }
+    static var logoutMenuItem: String { L10n.string("logoutMenuItem") }
+    static var firstNameFieldLabel: String { L10n.string("firstNameFieldLabel") }
+    static var lastNameFieldLabel: String { L10n.string("lastNameFieldLabel") }
+    static var dateOfBirthFieldLabel: String { L10n.string("dateOfBirthFieldLabel") }
+    static var emailFieldLabel: String { L10n.string("emailFieldLabel") }
+    static var unknownFallback: String { L10n.string("unknownFallback") }
+    static var saveChangesButton: String { L10n.string("saveChangesButton") }
+    static var profileUpdatedSuccessToast: String { L10n.string("profileUpdatedSuccessToast") }
+    static var profilePictureLoadErrorToast: String { L10n.string("profilePictureLoadErrorToast") }
+    static var signInWithGoogle: String { L10n.string("signInWithGoogle") }
+
+    // Project screen
+    static var myProjectsHeading: String { L10n.string("myProjectsHeading") }
+    static var pleaseSignInProjectsLine1: String { L10n.string("pleaseSignInProjectsLine1") }
+    static var pleaseSignInProjectsLine2: String { L10n.string("pleaseSignInProjectsLine2") }
+    static var noProjectsFoundHeading: String { L10n.string("noProjectsFoundHeading") }
+    static var noProjectsFoundBody: String { L10n.string("noProjectsFoundBody") }
+    static var deleteFileTitle: String { L10n.string("deleteFileTitle") }
+    static var deleteFileMessage: String { L10n.string("deleteFileMessage") }
+    static var deleteAction: String { L10n.string("deleteAction") }
+
+    // QR Scanner / open-code bottom sheet
+    static var scanQrCodeHeading: String { L10n.string("scanQrCodeHeading") }
+    static var scanInstructions: String { L10n.string("scanInstructions") }
+    static var scanQrButton: String { L10n.string("scanQrButton") }
+    static var qrScannerNavTitle: String { L10n.string("qrScannerNavTitle") }
+    static var qrScanSuccessHeading: String { L10n.string("qrScanSuccessHeading") }
+    /// Format string with one %@ placeholder for the scanned project's file name.
+    static var qrFileDetectedMessageFormat: String { L10n.string("qrFileDetectedMessageFormat") }
+    static var startButton: String { L10n.string("startButton") }
+
+    // Playground (Run Robot / Blockly execution screen)
+    static var cancelledStatus: String { L10n.string("cancelledStatus") }
+    static var stopRobotButton: String { L10n.string("stopRobotButton") }
+    static var resetRobotButton: String { L10n.string("resetRobotButton") }
+    static var stopCarButton: String { L10n.string("stopCarButton") }
+    static var playgroundNavTitle: String { L10n.string("playgroundNavTitle") }
+
+    // Robot Info headings
+    static var robotTypeHeading: String { L10n.string("robotTypeHeading") }
+    static var sensorsHeading: String { L10n.string("sensorsHeading") }
+    /// Format string with one %@ placeholder for the sonar reading value, e.g. "Sonar %@ cm".
+    static var sonarReadingFormat: String { L10n.string("sonarReadingFormat") }
+    /// Format string with one %@ placeholder for the battery reading value, e.g. "Battery %@ V".
+    static var batteryReadingFormat: String { L10n.string("batteryReadingFormat") }
+
+    // Point Goal Navigation
+    static var goalReachedMessage: String { L10n.string("goalReachedMessage") }
+
+    // Model Management filter dropdown
+    static var modelFilterAll: String { L10n.string("modelFilterAll") }
+    static var modelFilterAllCaps: String { L10n.string("modelFilterAllCaps") }
+    static var modelFilterAutoPilot: String { L10n.string("modelFilterAutoPilot") }
+    static var modelFilterDetector: String { L10n.string("modelFilterDetector") }
+    static var modelFilterNavigation: String { L10n.string("modelFilterNavigation") }
+
+    // Data Collection / Autopilot server dropdown default state
+    static var noServer: String { L10n.string("noServer") }
 
     //open-code functions
     static let moveForward: String = "moveForward";

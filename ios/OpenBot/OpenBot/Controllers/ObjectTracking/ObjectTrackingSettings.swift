@@ -9,7 +9,10 @@ import DropDown
 /// Implementation of Object tracking settings.
 class ObjectTrackingSettings: UIView {
     let autoModeButton = UISwitch()
+    var autoModeLabel = UILabel()
+    var speedTitleLabel = UILabel()
     var speedLabel = UILabel()
+    var inputTitleLabel = UILabel()
     var modelDropdownLabel = UILabel()
     var imageInputLabel = UILabel()
     var threadLabel = UILabel()
@@ -48,7 +51,8 @@ class ObjectTrackingSettings: UIView {
         swipeUp.direction = .up
         addGestureRecognizer(swipeUp)
         createBar()
-        addSubview(createLabel(text: Strings.autoMode, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 15, to: .height))));
+        autoModeLabel = createLabel(text: Strings.autoMode, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 15, to: .height)));
+        addSubview(autoModeLabel);
         createBluetoothIcon()
         createCameraIcon()
         createSwitchButton()
@@ -56,9 +60,24 @@ class ObjectTrackingSettings: UIView {
         setDynamicSpeed()
         addSubview(createLabel(text: Strings.model, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 60, to: .height))))
         createModelDropDown()
-        addSubview(createLabel(text: Strings.speed, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 90, to: .height))))
+        speedTitleLabel = createLabel(text: Strings.speed, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 90, to: .height)))
+        speedTitleLabel.numberOfLines = 1
+        speedTitleLabel.adjustsFontSizeToFitWidth = true
+        speedTitleLabel.minimumScaleFactor = 0.5
+        speedTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(speedTitleLabel)
+        speedTitleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: adapted(dimensionSize: 20, to: .height)).isActive = true
+        speedTitleLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 90, to: .height)).isActive = true
+        speedTitleLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 100).isActive = true
         setupSpeed()
-        addSubview(createLabel(text: Strings.input, leadingAnchor: 180, topAnchor: Int(adapted(dimensionSize: 90, to: .height))))
+        inputTitleLabel = createLabel(text: Strings.input, leadingAnchor: 180, topAnchor: Int(adapted(dimensionSize: 90, to: .height)))
+        inputTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(inputTitleLabel)
+        inputTitleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: speedLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredInputPosition = inputTitleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 180)
+        preferredInputPosition.priority = .defaultLow
+        preferredInputPosition.isActive = true
+        inputTitleLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 90, to: .height)).isActive = true
         setupInput();
         addSubview(createLabel(text: Strings.object, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 120, to: .height))))
         setupObjectDropDown()
@@ -128,7 +147,10 @@ class ObjectTrackingSettings: UIView {
         autoModeButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(autoModeButton)
         autoModeButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        autoModeButton.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 120).isActive = true
+        autoModeButton.leadingAnchor.constraint(greaterThanOrEqualTo: autoModeLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredPosition = autoModeButton.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 120)
+        preferredPosition.priority = .defaultLow
+        preferredPosition.isActive = true
         autoModeButton.topAnchor.constraint(equalTo: topAnchor, constant: 25).isActive = true
     }
 
@@ -138,7 +160,7 @@ class ObjectTrackingSettings: UIView {
         label.text = text
         label.textColor = Colors.border
         label.frame.origin = CGPoint(x: leadingAnchor, y: topAnchor)
-        label.frame.size = resized(size: CGSize(width: text.count * 10, height: 40), basedOn: .height)
+        label.frame.size = resized(size: CGSize(width: measuredWidth(of: text, font: label.font) + 8, height: 40), basedOn: .height)
         return label
     }
 
@@ -247,15 +269,27 @@ class ObjectTrackingSettings: UIView {
 
     /// function to setup image size.
     func setupInput() {
-        imageInputLabel.frame = CGRect(x: width - 80, y: adapted(dimensionSize: 90, to: .height), width: 100, height: 40)
         imageInputLabel.text = selectedModel?.inputSize
+        imageInputLabel.textColor = Colors.border
+        imageInputLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(imageInputLabel)
+        imageInputLabel.leadingAnchor.constraint(greaterThanOrEqualTo: inputTitleLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredImageInputPosition = imageInputLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: width - 80)
+        preferredImageInputPosition.priority = .defaultLow
+        preferredImageInputPosition.isActive = true
+        imageInputLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 90, to: .height)).isActive = true
     }
 
     /// function to create speed label to display fps
     func setupSpeed() {
         speedLabel = createLabel(text: "*** fps", leadingAnchor: 90, topAnchor: Int(adapted(dimensionSize: 90, to: .height)))
+        speedLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(speedLabel)
+        speedLabel.leadingAnchor.constraint(greaterThanOrEqualTo: speedTitleLabel.trailingAnchor, constant: 12).isActive = true
+        let preferredPosition = speedLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 90)
+        preferredPosition.priority = .defaultLow
+        preferredPosition.isActive = true
+        speedLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 90, to: .height)).isActive = true
     }
     
     /// function to create checkbox to enable or disable dynamic speed

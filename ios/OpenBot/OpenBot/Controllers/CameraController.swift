@@ -110,11 +110,11 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
     /// function to trigger the popup when camera permissions are not allowed.
     func createAllowAlert(alertFor: String) {
         let alert = UIAlertController(
-                title: "IMPORTANT",
-                message: "Please allow " + alertFor + " access for OpenBot",
+                title: Strings.important,
+                message: String(format: Strings.allowPermissionMessageFormat, alertFor),
                 preferredStyle: UIAlertController.Style.alert
         )
-        alert.addAction(UIAlertAction(title: "Allow " + alertFor, style: .cancel, handler: { (alert) -> Void in
+        alert.addAction(UIAlertAction(title: String(format: Strings.allowButtonFormat, alertFor), style: .cancel, handler: { (alert) -> Void in
             guard let url = URL(string: UIApplication.openSettingsURLString), !url.absoluteString.isEmpty else {
                 return
             }
@@ -291,13 +291,22 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
 
     /// Configure the video(camera output) rotation when screen orientation changes.
     private func configureVideoOrientation() {
-        let orientation = UIDevice.current.orientation
-        if let previewLayer = videoPreviewLayer, let previewConnection = videoPreviewLayer.connection {
-            if previewConnection.isVideoOrientationSupported, let previewOrientation = AVCaptureVideoOrientation(rawValue: orientation.rawValue) {
-                previewLayer.frame = view.bounds
-                previewConnection.videoOrientation = previewOrientation
-                videoOutput.connection(with: .video)?.videoOrientation = previewOrientation
-            }
+        var orientation: AVCaptureVideoOrientation = .portrait
+        switch currentOrientation {
+        case .portraitUpsideDown:
+            orientation = .portraitUpsideDown
+        case .landscapeLeft:
+            orientation = .landscapeRight
+        case .landscapeRight:
+            orientation = .landscapeLeft
+        default:
+            break
+        }
+        if let previewLayer = videoPreviewLayer, let previewConnection = videoPreviewLayer.connection,
+           previewConnection.isVideoOrientationSupported {
+            previewLayer.frame = cameraView.frame
+            previewConnection.videoOrientation = orientation
+            videoOutput.connection(with: .video)?.videoOrientation = orientation
         }
     }
 

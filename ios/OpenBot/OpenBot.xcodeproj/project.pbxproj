@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0132784A30CAD8239CA1F112 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 5022662904BF68D64CED43E6 /* en.lproj */; };
 		0619EECA2C24208B0050EB6A /* Modes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0619EEC92C24208B0050EB6A /* Modes.swift */; };
 		06B219AD2ABD4D6100E65CEF /* SharedPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06B219AC2ABD4D6100E65CEF /* SharedPreferences.swift */; };
 		06C87ABB2B3568E700454299 /* FragmentType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C87ABA2B3568E700454299 /* FragmentType.swift */; };
+		0FC1E29C290DD4CFD6661E92 /* LanguagePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D876AB60453F7E405CAED2 /* LanguagePickerViewController.swift */; };
 		113A1E4E0F1483D107D53843 /* BlockyTasksStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113A10896533873FE2926AF5 /* BlockyTasksStorage.swift */; };
 		202ADFEAAAEDF465B47E680C /* Pods_OpenBot_OpenBotUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E6B08B2CB917BF3DADC757 /* Pods_OpenBot_OpenBotUITests.framework */; };
 		3A3C9E0D29E803AC008758C9 /* projectCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A3C9E0C29E803AC008758C9 /* projectCollectionViewCell.xib */; };
@@ -17,6 +19,8 @@
 		3A8EF46C2A6FD0FD00F60B3D /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 3A8EF46B2A6FD0FD00F60B3D /* Starscream */; };
 		3A8EF46F2A6FE22F00F60B3D /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 3A8EF46E2A6FE22F00F60B3D /* SocketIO */; };
 		3AA7193929DD42CF00DE8336 /* openCode.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3AA7193829DD42CF00DE8336 /* openCode.storyboard */; };
+		4794ACBDCA29E3CDD282D7D7 /* es.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 3544D21BE0D6FC80B9130D6C /* es.lproj */; };
+		4D0CB1162AED2754BD84D5EC /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 5802E8D0A5932C5A8EE202D1 /* de.lproj */; };
 		4FEF40039118AB286DD8CB0C /* DetectorDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEF47209A4C03D66945462E /* DetectorDefault.swift */; };
 		4FEF403935216C3C68714E27 /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEF47C56474B6324A408225 /* UIViewExtension.swift */; };
 		4FEF41E8F6D7496059371C24 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FEF4BBD0A2E51DD7BAD32C5 /* Assets.xcassets */; };
@@ -49,6 +53,7 @@
 		4FEF4DC031698B6DEEB01AEB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEF4620693FBFF8ABFC0350 /* AppDelegate.swift */; };
 		4FEF4E9F41A93B4F6CD1AEEC /* DetectorFloatYoloV4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEF4633FC7402D71728D03F /* DetectorFloatYoloV4.swift */; };
 		4FEF4F78919CCCC28C418C5B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEF4D63E4FA9FB585EF1733 /* SceneDelegate.swift */; };
+		625648814110B723B1E20904 /* LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3851548982D6168C4AE03B23 /* LocalizationManager.swift */; };
 		660FACB729BFEDE000223373 /* MTLDevice+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660FACAF29BFEDE000223373 /* MTLDevice+.swift */; };
 		660FACB829BFEDE000223373 /* CVReturnError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660FACB029BFEDE000223373 /* CVReturnError.swift */; };
 		660FACB929BFEDE000223373 /* CVPixelBuffer+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660FACB129BFEDE000223373 /* CVPixelBuffer+.swift */; };
@@ -134,7 +139,13 @@
 		727D3F785C662A5A6C00D835 /* SocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3A67A02F3F30135DFA43 /* SocketManager.swift */; };
 		727D3FA70675D0042BFBB89A /* ScannerFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3E372C09E1BADA2A03FA /* ScannerFragment.swift */; };
 		7AAD390ED6FC7AE7006497C2 /* Pods_OpenBot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7061589D8480D4960FF75E85 /* Pods_OpenBot.framework */; };
+		9DF2B487D2E84C13EEC5DA49 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C14C13C32837A657E727DE /* L10n.swift */; };
 		BF9BAED828AF94A800EF3E48 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF9BAED728AF94A800EF3E48 /* GameController.framework */; };
+		C3CCC7125418B1718A485429 /* hi.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 04AF5D31F658D5CC10BFA475 /* hi.lproj */; };
+		C7C5AF4374229CEA7D31D489 /* ko.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 68C567D4A10DB39305F83C5E /* ko.lproj */; };
+		D05873148B42EC94B04CA2D7 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 3BB0877EC1CEBF363E89AC40 /* fr.lproj */; };
+		DE140ADB3A5AD0CB5887236E /* zh-Hans.lproj in Resources */ = {isa = PBXBuildFile; fileRef = FEF69C473286A88068044136 /* zh-Hans.lproj */; };
+		E72DD15800419B5599A50187 /* LanguageApplyingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C349227CFEDFA7E55F8ACB73 /* LanguageApplyingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +166,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		04AF5D31F658D5CC10BFA475 /* hi.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = hi.lproj; sourceTree = "<group>"; };
 		0619EEC92C24208B0050EB6A /* Modes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Modes.swift; path = OpenBot/Models/Modes.swift; sourceTree = SOURCE_ROOT; };
 		06318656CBC7BD5A24BCD958 /* Pods-OpenBotTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenBotTests.release.xcconfig"; path = "Target Support Files/Pods-OpenBotTests/Pods-OpenBotTests.release.xcconfig"; sourceTree = "<group>"; };
 		06B219AC2ABD4D6100E65CEF /* SharedPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedPreferences.swift; sourceTree = "<group>"; };
@@ -162,9 +174,12 @@
 		098B4AF0C5ADA51553414CE8 /* Pods-OpenBot-OpenBotUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenBot-OpenBotUITests.debug.xcconfig"; path = "Target Support Files/Pods-OpenBot-OpenBotUITests/Pods-OpenBot-OpenBotUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		113A10896533873FE2926AF5 /* BlockyTasksStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockyTasksStorage.swift; sourceTree = "<group>"; };
 		33E6B08B2CB917BF3DADC757 /* Pods_OpenBot_OpenBotUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenBot_OpenBotUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3544D21BE0D6FC80B9130D6C /* es.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = es.lproj; sourceTree = "<group>"; };
+		3851548982D6168C4AE03B23 /* LocalizationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocalizationManager.swift; sourceTree = "<group>"; };
 		3A3C9E0C29E803AC008758C9 /* projectCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = projectCollectionViewCell.xib; sourceTree = "<group>"; };
 		3A70CA1129C98E5800E4192B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3AA7193829DD42CF00DE8336 /* openCode.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = openCode.storyboard; sourceTree = "<group>"; };
+		3BB0877EC1CEBF363E89AC40 /* fr.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = fr.lproj; sourceTree = "<group>"; };
 		3FDBC2A41BB7D226A4447AD8 /* Pods-OpenBot-OpenBotUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenBot-OpenBotUITests.release.xcconfig"; path = "Target Support Files/Pods-OpenBot-OpenBotUITests/Pods-OpenBot-OpenBotUITests.release.xcconfig"; sourceTree = "<group>"; };
 		4FEF4178D0A2805591A6A3A6 /* Strings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
 		4FEF41FCA3B501192D417D73 /* CVPixelBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CVPixelBuffer.swift; path = extensions/CVPixelBuffer.swift; sourceTree = "<group>"; };
@@ -202,6 +217,8 @@
 		4FEF4E5F632AD6ADE2049FB8 /* UIImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIImage.swift; path = extensions/UIImage.swift; sourceTree = "<group>"; };
 		4FEF4EE1E197D3F52EFF3B88 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		4FEF4F7AB94F76161A467A24 /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Notifications.swift; path = extensions/Notifications.swift; sourceTree = "<group>"; };
+		5022662904BF68D64CED43E6 /* en.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = en.lproj; sourceTree = "<group>"; };
+		5802E8D0A5932C5A8EE202D1 /* de.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = de.lproj; sourceTree = "<group>"; };
 		660FACAF29BFEDE000223373 /* MTLDevice+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MTLDevice+.swift"; sourceTree = "<group>"; };
 		660FACB029BFEDE000223373 /* CVReturnError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CVReturnError.swift; sourceTree = "<group>"; };
 		660FACB129BFEDE000223373 /* CVPixelBuffer+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CVPixelBuffer+.swift"; sourceTree = "<group>"; };
@@ -233,6 +250,7 @@
 		66AC721829B885C70022108A /* Navigation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		66B3C59B2A1D673D0079BC16 /* UIButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
 		66E7A02B297697BE00283ED6 /* DetectorFloatYoloV5.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetectorFloatYoloV5.swift; sourceTree = "<group>"; };
+		68C567D4A10DB39305F83C5E /* ko.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = ko.lproj; sourceTree = "<group>"; };
 		6D8F8740E0AB9219D371A47C /* Pods_OpenBotTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenBotTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7061589D8480D4960FF75E85 /* Pods_OpenBot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenBot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		727D300DE421E6957CB4CD67 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
@@ -290,7 +308,11 @@
 		B0C497FCA3C570745DDC0A3D /* Pods-OpenBot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenBot.release.xcconfig"; path = "Target Support Files/Pods-OpenBot/Pods-OpenBot.release.xcconfig"; sourceTree = "<group>"; };
 		BB8946D47143268197073454 /* Pods-OpenBotTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenBotTests.debug.xcconfig"; path = "Target Support Files/Pods-OpenBotTests/Pods-OpenBotTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BF9BAED728AF94A800EF3E48 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
+		C349227CFEDFA7E55F8ACB73 /* LanguageApplyingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LanguageApplyingView.swift; sourceTree = "<group>"; };
+		E2C14C13C32837A657E727DE /* L10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
+		F6D876AB60453F7E405CAED2 /* LanguagePickerViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LanguagePickerViewController.swift; sourceTree = "<group>"; };
 		FA864C211FDA0FFF7C141891 /* Pods-OpenBot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenBot.debug.xcconfig"; path = "Target Support Files/Pods-OpenBot/Pods-OpenBot.debug.xcconfig"; sourceTree = "<group>"; };
+		FEF69C473286A88068044136 /* zh-Hans.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = "zh-Hans.lproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -382,6 +404,8 @@
 				727D3E5643531AC215E4101B /* UIButton.swift */,
 				727D383824EABABFDE0806CE /* Toast.swift */,
 				727D38DAC31CD27C5DE891F4 /* Reachability.swift */,
+				E2C14C13C32837A657E727DE /* L10n.swift */,
+				3851548982D6168C4AE03B23 /* LocalizationManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -418,6 +442,13 @@
 				727D3BBE14B8FA7877902A13 /* Authentication */,
 				727D317DC854B57A8D176DA7 /* JsEvaluator */,
 				727D3004C935D2676EA98064 /* Projects */,
+				5022662904BF68D64CED43E6 /* en.lproj */,
+				5802E8D0A5932C5A8EE202D1 /* de.lproj */,
+				3544D21BE0D6FC80B9130D6C /* es.lproj */,
+				3BB0877EC1CEBF363E89AC40 /* fr.lproj */,
+				FEF69C473286A88068044136 /* zh-Hans.lproj */,
+				68C567D4A10DB39305F83C5E /* ko.lproj */,
+				04AF5D31F658D5CC10BFA475 /* hi.lproj */,
 			);
 			path = OpenBot;
 			sourceTree = "<group>";
@@ -562,6 +593,8 @@
 			isa = PBXGroup;
 			children = (
 				66AC71E329B885410022108A /* SettingsFragment.swift */,
+				C349227CFEDFA7E55F8ACB73 /* LanguageApplyingView.swift */,
+				F6D876AB60453F7E405CAED2 /* LanguagePickerViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -936,6 +969,13 @@
 				3AA7193929DD42CF00DE8336 /* openCode.storyboard in Resources */,
 				4FEF4209E4568C06F71C8E86 /* config.json in Resources */,
 				3A70CA1229C98E5800E4192B /* GoogleService-Info.plist in Resources */,
+				0132784A30CAD8239CA1F112 /* en.lproj in Resources */,
+				4D0CB1162AED2754BD84D5EC /* de.lproj in Resources */,
+				4794ACBDCA29E3CDD282D7D7 /* es.lproj in Resources */,
+				D05873148B42EC94B04CA2D7 /* fr.lproj in Resources */,
+				DE140ADB3A5AD0CB5887236E /* zh-Hans.lproj in Resources */,
+				C7C5AF4374229CEA7D31D489 /* ko.lproj in Resources */,
+				C3CCC7125418B1718A485429 /* hi.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1359,6 +1399,10 @@
 				727D3A6C79B27AE7C7AF4FB3 /* WebSocketConnection.swift in Sources */,
 				727D3C40C6A407C68234FEE8 /* WebSocketProvider.swift in Sources */,
 				727D3595B21D2EC9BDAEDF5C /* ServerSignalingMessage.swift in Sources */,
+				9DF2B487D2E84C13EEC5DA49 /* L10n.swift in Sources */,
+				625648814110B723B1E20904 /* LocalizationManager.swift in Sources */,
+				E72DD15800419B5599A50187 /* LanguageApplyingView.swift in Sources */,
+				0FC1E29C290DD4CFD6661E92 /* LanguagePickerViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,0 +1,202 @@
+/* Screens */
+"OpenBot" = "OpenBot";
+"freeRoam" = "自由漫游";
+"dataCollection" = "数据采集";
+"controllerMapping" = "控制器映射";
+"autoPilot" = "自动驾驶";
+"objectTracking" = "物体追踪";
+"modelManagement" = "模型管理";
+"robotInfo" = "机器人信息";
+"navigation" = "目标点导航";
+
+/* Misc */
+"controller" = "控制器";
+"speed" = "速度";
+"driveMode" = "驾驶模式";
+"gamepad" = "游戏手柄";
+"phone" = "手机";
+"web" = "网页";
+"joystick" = "摇杆";
+"game" = "游戏";
+"dual" = "双控";
+"slow" = "慢速";
+"medium" = "中速";
+"fast" = "快速";
+"logData" = "记录数据";
+"previewResolutionMedium" = "预览分辨率 (1280 x 720)";
+"previewResolutionLow" = "预览分辨率 (960 x 540)";
+"previewResolutionHigh" = "预览分辨率 (1920 x 1080)";
+"low" = "低";
+"high" = "高";
+"modelResolution" = "模型分辨率 ";
+"server" = "服务器";
+"preview" = "预览";
+"training" = "训练";
+"sensorData" = "传感器数据";
+"vehicle" = "车辆";
+"gps" = "GPS";
+"accelerometer" = "加速度计";
+"magnetic" = "磁力计";
+"gyroscope" = "陀螺仪";
+"delay" = "延迟 (毫秒)";
+"Autopilot" = "自动驾驶";
+"ObjectTracking" = "物体追踪";
+"autoMode" = "自动模式";
+"model" = "模型";
+"input" = "输入";
+"device" = "设备";
+"threads" = "线程数";
+"object" = "物体";
+"confidence" = "置信度";
+"dynamicSpeed" = "动态速度";
+
+/* Settings */
+"camera" = "相机";
+"microphone" = "麦克风";
+"location" = "位置";
+"permission" = "权限";
+"bluetooth" = "蓝牙";
+"general" = "通用";
+"language" = "语言";
+"languageSubtitle" = "选择应用的显示语言";
+"systemDefault" = "系统默认";
+"applyingLanguage" = "正在应用语言…";
+"webSignalingServer" = "网页信令服务器";
+"webSignalingServerPlaceholder" = "ws://192.168.1.40:8080/ws";
+
+/* Bluetooth Status */
+"connect" = "连接";
+"disconnect" = "断开连接";
+"connecting" = "正在连接";
+"disconnecting" = "正在断开";
+
+/* Model management */
+"modelDetails" = "模型详情";
+"name" = "名称";
+"type" = "类型";
+"class" = "类别";
+"inputOfModel" = "输入 (宽 x 高)";
+"tfliteLabel" = ".tflite";
+"cancel" = "取消";
+"done" = "完成";
+"file" = "文件";
+"url" = "URL";
+"addNewModel" = "添加新模型";
+
+/* Robot Info */
+"voltageDivider" = "分压器";
+"sonarText" = "声呐";
+"bumperText" = "保险杠";
+"wheelOdometer" = "车轮里程计";
+"front" = "前";
+"back" = "后";
+"led" = "指示灯";
+"indicatorText" = "转向灯";
+"status" = "状态";
+"motors" = "电机";
+"forward" = "前进";
+"backward" = "后退";
+"stopLabel" = "停止";
+"readings" = "读数";
+"battery" = "电池 **.* V";
+"speedText" = "速度 (左,右) ***,*** 转/分";
+"sonarLabel" = "声呐 *** 厘米";
+"sendCommand" = "发送指令";
+"lightLabel" = "灯光";
+
+/* Navigation */
+"setGoal" = "设置目标";
+"setGoalText" = "将手机安装到机器人上，\n 设置一个目标位置。按下开始后，\n 机器人将尝试到达该目标。";
+"left" = "左";
+"meter" = "[米]";
+"startLabel" = "开始";
+"canceled" = "取消";
+"info" = "信息";
+"restart" = "重新开始";
+
+/* Settings > Permissions */
+"important" = "重要提示";
+"cameraAccessRequiredMessage" = "OpenBot 需要访问相机权限";
+"allowPermissionMessageFormat" = "请允许 OpenBot 访问%@";
+"allowButtonFormat" = "允许访问%@";
+
+/* Logout / open-code UI */
+"logOut" = "退出登录";
+"confirmLogoutTitle" = "确认退出登录";
+"confirmLogoutMessage" = "确定要退出登录吗？";
+"codeExecuting" = "代码正在执行中……";
+
+/* Tab bar */
+"projectsTab" = "项目";
+"homeTab" = "首页";
+"profileTab" = "我的";
+
+/* Loading / generic alerts */
+"loadingTitle" = "加载中";
+"loadingProfileMessage" = "正在加载个人资料，请稍候…";
+"loadingDataMessage" = "正在加载数据，请稍候…";
+"pleaseWaitMessage" = "请稍候…";
+"errorHeading" = "错误";
+"genericErrorMessage" = "哎呀，出了点问题，请重试。";
+"okAction" = "确定";
+
+/* Profile screen */
+"myProfileHeading" = "我的资料";
+"setupProfilePromptLine1" = "登录你的";
+"setupProfilePromptLine2" = "Google 账号以设置个人资料。";
+"editProfile" = "编辑资料";
+"logoutMenuItem" = "退出登录";
+"firstNameFieldLabel" = "名";
+"lastNameFieldLabel" = "姓";
+"dateOfBirthFieldLabel" = "出生日期";
+"emailFieldLabel" = "邮箱";
+"unknownFallback" = "未知";
+"saveChangesButton" = "保存更改";
+"profileUpdatedSuccessToast" = "资料更新成功";
+"profilePictureLoadErrorToast" = "加载头像失败";
+"signInWithGoogle" = "使用 Google 账号登录";
+
+/* Project screen */
+"myProjectsHeading" = "我的项目";
+"pleaseSignInProjectsLine1" = "请先登录以访问你的";
+"pleaseSignInProjectsLine2" = "项目。";
+"noProjectsFoundHeading" = "哎呀，未找到项目。";
+"noProjectsFoundBody" = "你的 Google 云端硬盘中\n似乎还没有项目。";
+"deleteFileTitle" = "删除此文件";
+"deleteFileMessage" = "此文件删除后将无法恢复";
+"deleteAction" = "删除";
+
+/* QR Scanner / open-code bottom sheet */
+"scanQrCodeHeading" = "扫描二维码";
+"scanInstructions" = "将二维码置于框内进行扫描，请勿晃动手机以便更快获得结果。";
+"scanQrButton" = "扫描二维码";
+"qrScannerNavTitle" = "二维码扫描";
+"qrScanSuccessHeading" = "二维码扫描成功";
+"qrFileDetectedMessageFormat" = "检测到文件 %@，即将在你的 OpenBot 上开始执行代码。";
+"startButton" = "开始";
+
+/* Playground (Run Robot / Blockly execution screen) */
+"cancelledStatus" = "已取消";
+"stopRobotButton" = "停止机器人";
+"resetRobotButton" = "重置机器人";
+"stopCarButton" = "停止小车";
+"playgroundNavTitle" = "练习场";
+
+/* Robot Info headings */
+"robotTypeHeading" = "机器人类型";
+"sensorsHeading" = "传感器";
+"sonarReadingFormat" = "声呐 %@ 厘米";
+"batteryReadingFormat" = "电池 %@ V";
+
+/* Point Goal Navigation */
+"goalReachedMessage" = "已到达目标";
+
+/* Model Management filter dropdown */
+"modelFilterAll" = "全部";
+"modelFilterAllCaps" = "全部";
+"modelFilterAutoPilot" = "自动驾驶";
+"modelFilterDetector" = "检测器";
+"modelFilterNavigation" = "导航";
+
+/* Data Collection / Autopilot server dropdown default state */
+"noServer" = "无服务器";

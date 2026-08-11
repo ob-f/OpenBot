@@ -18,26 +18,43 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     let webSignalingServerField = UITextField()
     var switchButtonTrailingAnchor = width - 80;
     let locationManager = CLLocationManager()
+    /// Kept alive only long enough to trigger CoreBluetooth's system permission prompt on first ask.
+    var bluetoothPermissionProbe: CBCentralManager?
+    let flagLabel = UILabel()
     let sharedPreferences = SharedPreferencesManager()
 
     /// Called after the view fragment has loaded.
     override func viewDidLoad() {
         super.viewDidLoad()
+        locationManager.delegate = self
         createScrollView()
-        createPermissionLabel()
-        setupSwitchPositions()
         scrollView.contentSize = CGSize(width: width, height: height)
-        scrollView.addSubview(createLabel(text: Strings.camera, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 50, to: .height)))
+
+        scrollView.addSubview(createSectionHeader(text: Strings.general, topAnchor: adapted(dimensionSize: 10, to: .height)))
+        createLanguageRow()
+
+        scrollView.addSubview(createSectionHeader(text: Strings.permission, topAnchor: adapted(dimensionSize: 110, to: .height)))
+        setupSwitchPositions()
+        scrollView.addSubview(createLabel(text: Strings.camera, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 150, to: .height)))
         createCameraSwitch()
-        scrollView.addSubview(createLabel(text: Strings.location, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 100, to: .height)))
+        createPermissionIcon(systemName: "camera.fill", topAnchor: adapted(dimensionSize: 150, to: .height))
+        scrollView.addSubview(createLabel(text: Strings.location, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 200, to: .height)))
         createLocationSwitch()
-        scrollView.addSubview(createLabel(text: Strings.microphone, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 150, to: .height)))
+        createPermissionIcon(systemName: "location.fill", topAnchor: adapted(dimensionSize: 200, to: .height))
+        scrollView.addSubview(createLabel(text: Strings.microphone, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 250, to: .height)))
         createMicrophoneSwitch()
-        scrollView.addSubview(createLabel(text: Strings.bluetooth, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 200, to: .height)))
+        createPermissionIcon(systemName: "mic.fill", topAnchor: adapted(dimensionSize: 250, to: .height))
+        scrollView.addSubview(createLabel(text: Strings.bluetooth, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 300, to: .height)))
         createBluetoothSwitch()
-        scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 250, to: .height)))
+        createPermissionIcon(image: Images.bluetooth, tinted: false, topAnchor: adapted(dimensionSize: 300, to: .height))
+        scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 350, to: .height)))
         createWebSignalingServerField()
         updateSwitchPosition()
+        registerKeyboardNotifications()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     /// Called when the view controller's view's size is changed by its parent (i.e. for the root view controller when its window rotates or is resized).
@@ -52,7 +69,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         toggleSwitchButtons()
-
+        flagLabel.text = LocalizationManager.currentFlagEmoji
     }
 
     /// Creates a new scroll view with dimensions equal to the main screen size.
@@ -73,11 +90,50 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         }
     }
 
-    /// Creates a label for permissions Heading.
-    func createPermissionLabel() {
-        let permission = createLabel(text: Strings.permission, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 10, to: .height));
-        permission.font = UIFont.systemFont(ofSize: 17.0)
-        scrollView.addSubview(permission);
+    /// Creates a bold section header label (e.g. "General", "Permissions").
+    func createSectionHeader(text: String, topAnchor: CGFloat) -> UILabel {
+        let header = createLabel(text: text, leadingAnchor: 20, topAnchor: topAnchor)
+        header.font = UIFont.boldSystemFont(ofSize: 20.0)
+        header.frame.size.width = measuredWidth(of: text, font: header.font) + 8
+        return header
+    }
+
+    /// Creates the tappable "Language" row: title + subtitle on the left, current flag on the right.
+    func createLanguageRow() {
+        let rowTop = adapted(dimensionSize: 50, to: .height)
+        // Leaves room for the flag on the right; wraps instead of relying on a measured single-line
+        // width, since translated title/subtitle text varies too much in length to assume one line.
+        let textWidth = width - 40 - 90
+
+        let title = UILabel()
+        title.text = Strings.language
+        title.textColor = Colors.border
+        title.font = UIFont.systemFont(ofSize: 17.0)
+        title.numberOfLines = 1
+        title.frame = CGRect(x: 40, y: rowTop, width: textWidth, height: 22)
+        scrollView.addSubview(title)
+
+        let subtitle = UILabel()
+        subtitle.text = Strings.languageSubtitle
+        subtitle.textColor = Colors.textColor
+        subtitle.font = UIFont.systemFont(ofSize: 13.0)
+        subtitle.numberOfLines = 2
+        subtitle.frame = CGRect(x: 40, y: rowTop + 22, width: textWidth, height: 32)
+        scrollView.addSubview(subtitle)
+
+        flagLabel.text = LocalizationManager.currentFlagEmoji
+        flagLabel.font = UIFont.systemFont(ofSize: 24.0)
+        flagLabel.frame = CGRect(x: width - 70, y: rowTop, width: 40, height: 40)
+        scrollView.addSubview(flagLabel)
+
+        let tapArea = UIView(frame: CGRect(x: 0, y: rowTop - 10, width: width, height: 70))
+        tapArea.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openLanguagePicker)))
+        scrollView.addSubview(tapArea)
+    }
+
+    @objc func openLanguagePicker() {
+        let picker = LanguagePickerViewController()
+        present(picker, animated: true)
     }
 
     /// Creates a new label with the given text, leading anchor, and top anchor.
@@ -87,9 +143,25 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         label.textColor = Colors.border
         label.font = UIFont.systemFont(ofSize: 15.0)
         label.frame.origin = CGPoint(x: leadingAnchor, y: topAnchor)
-        label.frame.size = resized(size: CGSize(width: text.count * 12, height: 40), basedOn: .height)
+        label.frame.size = resized(size: CGSize(width: measuredWidth(of: text, font: label.font) + 8, height: 40), basedOn: .height)
         return label;
 
+    }
+
+    /// Creates the SF Symbol icon shown to the left of a permission's switch.
+    func createPermissionIcon(systemName: String, topAnchor: CGFloat) {
+        createPermissionIcon(image: UIImage(systemName: systemName), tinted: true, topAnchor: topAnchor)
+    }
+
+    /// Creates a permission row icon from a bundled image asset
+    func createPermissionIcon(image: UIImage?, tinted: Bool, topAnchor: CGFloat) {
+        let icon = UIImageView(image: image)
+        if tinted {
+            icon.tintColor = Colors.border
+        }
+        icon.contentMode = .scaleAspectFit
+        icon.frame = CGRect(x: switchButtonTrailingAnchor - 40, y: topAnchor + 8, width: 24, height: 24)
+        scrollView.addSubview(icon)
     }
 
     /// Creates a new switch button.
@@ -102,7 +174,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     func createCameraSwitch() {
         cameraSwitch.onTintColor = Colors.title
         scrollView.addSubview(cameraSwitch)
-        cameraSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 50, to: .height))
+        cameraSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 150, to: .height))
         cameraSwitch.addTarget(self, action: #selector(toggleCamera(_:)), for: .valueChanged)
     }
 
@@ -110,7 +182,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     func createLocationSwitch() {
         locationSwitch.onTintColor = Colors.title
         scrollView.addSubview(locationSwitch)
-        locationSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 100, to: .height))
+        locationSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 200, to: .height))
         locationSwitch.addTarget(self, action: #selector(toggleLocation(_:)), for: .valueChanged)
     }
 
@@ -118,7 +190,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     func createMicrophoneSwitch() {
         microphoneSwitch.onTintColor = Colors.title
         scrollView.addSubview(microphoneSwitch)
-        microphoneSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 150, to: .height))
+        microphoneSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 250, to: .height))
         microphoneSwitch.addTarget(self, action: #selector(toggleMicrophone(_:)), for: .valueChanged)
     }
 
@@ -126,7 +198,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     func createBluetoothSwitch() {
         bluetoothSwitch.onTintColor = Colors.title
         scrollView.addSubview(bluetoothSwitch)
-        bluetoothSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 200, to: .height))
+        bluetoothSwitch.frame.origin = CGPoint(x: width - 80, y: adapted(dimensionSize: 300, to: .height))
         bluetoothSwitch.addTarget(self, action: #selector(toggleBluetooth(_:)), for: .valueChanged)
     }
 
@@ -138,7 +210,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         webSignalingServerField.autocapitalizationType = .none
         webSignalingServerField.autocorrectionType = .no
         webSignalingServerField.delegate = self
-        webSignalingServerField.frame = CGRect(x: 40, y: adapted(dimensionSize: 280, to: .height), width: width - 80, height: 40)
+        webSignalingServerField.frame = CGRect(x: 40, y: adapted(dimensionSize: 380, to: .height), width: width - 80, height: 40)
         scrollView.addSubview(webSignalingServerField)
     }
 
@@ -146,6 +218,34 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard textField == webSignalingServerField, let text = textField.text, !text.isEmpty else { return }
         sharedPreferences.setWebSignalingServerUrl(value: text)
+    }
+
+    /// dismisses the keyboard when the user taps return
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+
+    /// listens for the keyboard so the scroll view can be nudged out of its way
+    func registerKeyboardNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    /// pushes the scroll view's bottom inset up by the keyboard's height and scrolls the field into view
+    @objc func keyboardWillShow(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+        let keyboardHeight = scrollView.convert(keyboardFrame, from: nil).height
+        scrollView.contentInset.bottom = keyboardHeight
+        scrollView.scrollIndicatorInsets.bottom = keyboardHeight
+        scrollView.scrollRectToVisible(webSignalingServerField.frame.insetBy(dx: 0, dy: -20), animated: true)
+    }
+
+    /// restores the scroll view's original insets once the keyboard is dismissed
+    @objc func keyboardWillHide(_ notification: Notification) {
+        scrollView.contentInset.bottom = 0
+        scrollView.scrollIndicatorInsets.bottom = 0
     }
 
     /// function to set the positions of the buttons.
@@ -199,9 +299,9 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         let authStatus = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
         switch authStatus {
         case .authorized:
-            createAllowAlert(alertFor: "Camera")
+            createAllowAlert(alertFor: Strings.camera)
         case .denied:
-            createAllowAlert(alertFor: "Camera")
+            createAllowAlert(alertFor: Strings.camera)
         case .notDetermined:
             createPromptForCameraAccess()
         default:
@@ -209,30 +309,60 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         }
     }
 
-    /// function to check whether location is allowed or not.
+    /// function to check whether location is allowed or not, requesting it directly the first time it's asked.
     func checkLocation() {
-        createAllowAlert(alertFor: "Location")
+        var authStatus: CLAuthorizationStatus
+        if #available(iOS 14.0, *) {
+            authStatus = locationManager.authorizationStatus
+        } else {
+            authStatus = CLLocationManager.authorizationStatus()
+        }
+        switch authStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        default:
+            createAllowAlert(alertFor: Strings.location)
+        }
     }
 
-    /// function to check whether microphone is allowed or not
+    /// function to check whether microphone is allowed or not, requesting it directly the first time it's asked.
     func checkMicrophone() {
-        createAllowAlert(alertFor: "Microphone")
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case .undetermined:
+            AVAudioSession.sharedInstance().requestRecordPermission { _ in
+                DispatchQueue.main.async {
+                    self.toggleSwitchButtons()
+                }
+            }
+        default:
+            createAllowAlert(alertFor: Strings.microphone)
+        }
     }
 
-    ///function to check whether bluetooth is allowed or not
+    ///function to check whether bluetooth is allowed or not, requesting it directly the first time it's asked.
     func checkBluetooth() {
-        createAllowAlert(alertFor: "Bluetooth")
+        switch CBCentralManager.authorization {
+        case .notDetermined:
+            // Instantiating a CBCentralManager triggers CoreBluetooth's system permission prompt.
+            bluetoothPermissionProbe = CBCentralManager()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.toggleSwitchButtons()
+                self.bluetoothPermissionProbe = nil
+            }
+        default:
+            createAllowAlert(alertFor: Strings.bluetooth)
+        }
     }
 
     /// function to show the camera alert on the screen.
     func alertToEncourageCameraAccessInitially() {
         let alert = UIAlertController(
-                title: "IMPORTANT",
-                message: "Camera access required for OpenBot",
+                title: Strings.important,
+                message: Strings.cameraAccessRequiredMessage,
                 preferredStyle: UIAlertController.Style.alert
         )
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in print(action) }))
-        alert.addAction(UIAlertAction(title: "Allow Camera", style: .cancel, handler: { (alert) -> Void in
+        alert.addAction(UIAlertAction(title: Strings.cancel, style: .default, handler: { action in print(action) }))
+        alert.addAction(UIAlertAction(title: String(format: Strings.allowButtonFormat, Strings.camera), style: .cancel, handler: { (alert) -> Void in
             guard let url = URL(string: UIApplication.openSettingsURLString), !url.absoluteString.isEmpty else {
                 return
             }
@@ -256,12 +386,12 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
     /// function to create prompts for settings
     func createAllowAlert(alertFor: String) {
         let alert = UIAlertController(
-                title: "IMPORTANT",
-                message: "Please allow " + alertFor + " access for OpenBot",
+                title: Strings.important,
+                message: String(format: Strings.allowPermissionMessageFormat, alertFor),
                 preferredStyle: UIAlertController.Style.alert
         )
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in self.toggleSwitchButtons() }))
-        alert.addAction(UIAlertAction(title: "Allow " + alertFor, style: .cancel, handler: { (alert) -> Void in
+        alert.addAction(UIAlertAction(title: Strings.cancel, style: .default, handler: { action in self.toggleSwitchButtons() }))
+        alert.addAction(UIAlertAction(title: String(format: Strings.allowButtonFormat, alertFor), style: .cancel, handler: { (alert) -> Void in
             guard let url = URL(string: UIApplication.openSettingsURLString), !url.absoluteString.isEmpty else {
                 return
             }

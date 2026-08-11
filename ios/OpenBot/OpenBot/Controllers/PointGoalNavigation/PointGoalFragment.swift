@@ -117,13 +117,13 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         infoText.translatesAutoresizingMaskIntoConstraints = false
         infoText.leadingAnchor.constraint(equalTo: infoMessageRect.leadingAnchor, constant: 30).isActive = true
         infoText.topAnchor.constraint(equalTo: infoMessageRect.topAnchor, constant: 30).isActive = true
-        let goalReachedText = createLabel(text: "Goal reached", fontSize: 16)
+        let goalReachedText = createLabel(text: Strings.goalReachedMessage, fontSize: 16)
         infoMessageRect.addSubview(goalReachedText)
         goalReachedText.translatesAutoresizingMaskIntoConstraints = false
         goalReachedText.leadingAnchor.constraint(equalTo: infoText.leadingAnchor, constant: 0).isActive = true
         goalReachedText.topAnchor.constraint(equalTo: infoText.bottomAnchor, constant: 30).isActive = true
 
-        let stopButton = createLabelButtons(title: Strings.stop, selector: #selector(stop(_:)))
+        let stopButton = createLabelButtons(title: Strings.stopLabel, selector: #selector(stop(_:)))
         infoMessageRect.addSubview(stopButton)
         stopButton.translatesAutoresizingMaskIntoConstraints = false
         stopButton.leadingAnchor.constraint(equalTo: infoMessageRect.leadingAnchor, constant: width / 2 - 30).isActive = true
@@ -197,7 +197,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.leadingAnchor.constraint(equalTo: setGoalText.leadingAnchor, constant: 0).isActive = true
         cancelButton.bottomAnchor.constraint(equalTo: setGoalRect.bottomAnchor, constant: -15).isActive = true
-        let startButton = createLabelButtons(title: Strings.start, selector: #selector(doneFun(_:)))
+        let startButton = createLabelButtons(title: Strings.startLabel, selector: #selector(doneFun(_:)))
         setGoalRect.addSubview(startButton)
         startButton.translatesAutoresizingMaskIntoConstraints = false
         startButton.bottomAnchor.constraint(equalTo: setGoalRect.bottomAnchor, constant: -15).isActive = true

@@ -1,0 +1,202 @@
+/* Screens */
+"OpenBot" = "OpenBot";
+"freeRoam" = "자유 주행";
+"dataCollection" = "데이터 수집";
+"controllerMapping" = "컨트롤러 매핑";
+"autoPilot" = "자율 주행";
+"objectTracking" = "물체 추적";
+"modelManagement" = "모델 관리";
+"robotInfo" = "로봇 정보";
+"navigation" = "목표 지점 내비게이션";
+
+/* Misc */
+"controller" = "컨트롤러";
+"speed" = "속도";
+"driveMode" = "주행 모드";
+"gamepad" = "게임패드";
+"phone" = "휴대폰";
+"web" = "웹";
+"joystick" = "조이스틱";
+"game" = "게임";
+"dual" = "듀얼";
+"slow" = "느림";
+"medium" = "보통";
+"fast" = "빠름";
+"logData" = "데이터 기록";
+"previewResolutionMedium" = "미리보기 해상도 (1280 x 720)";
+"previewResolutionLow" = "미리보기 해상도 (960 x 540)";
+"previewResolutionHigh" = "미리보기 해상도 (1920 x 1080)";
+"low" = "낮음";
+"high" = "높음";
+"modelResolution" = "모델 해상도 ";
+"server" = "서버";
+"preview" = "미리보기";
+"training" = "학습";
+"sensorData" = "센서 데이터";
+"vehicle" = "차량";
+"gps" = "GPS";
+"accelerometer" = "가속도계";
+"magnetic" = "지자기 센서";
+"gyroscope" = "자이로스코프";
+"delay" = "지연 시간 (ms)";
+"Autopilot" = "자율 주행";
+"ObjectTracking" = "물체 추적";
+"autoMode" = "자동 모드";
+"model" = "모델";
+"input" = "입력";
+"device" = "디바이스";
+"threads" = "스레드";
+"object" = "물체";
+"confidence" = "신뢰도";
+"dynamicSpeed" = "동적 속도";
+
+/* Settings */
+"camera" = "카메라";
+"microphone" = "마이크";
+"location" = "위치";
+"permission" = "권한";
+"bluetooth" = "블루투스";
+"general" = "일반";
+"language" = "언어";
+"languageSubtitle" = "앱 표시 언어를 선택하세요";
+"systemDefault" = "시스템 기본값";
+"applyingLanguage" = "언어 적용 중…";
+"webSignalingServer" = "웹 시그널링 서버";
+"webSignalingServerPlaceholder" = "ws://192.168.1.40:8080/ws";
+
+/* Bluetooth Status */
+"connect" = "연결";
+"disconnect" = "연결 해제";
+"connecting" = "연결 중";
+"disconnecting" = "연결 해제 중";
+
+/* Model management */
+"modelDetails" = "모델 상세 정보";
+"name" = "이름";
+"type" = "유형";
+"class" = "클래스";
+"inputOfModel" = "입력 (가로 x 세로)";
+"tfliteLabel" = ".tflite";
+"cancel" = "취소";
+"done" = "완료";
+"file" = "파일";
+"url" = "URL";
+"addNewModel" = "새 모델 추가";
+
+/* Robot Info */
+"voltageDivider" = "전압 분배기";
+"sonarText" = "소나";
+"bumperText" = "범퍼";
+"wheelOdometer" = "휠 오도메트리";
+"front" = "전면";
+"back" = "후면";
+"led" = "LED";
+"indicatorText" = "방향지시등";
+"status" = "상태";
+"motors" = "모터";
+"forward" = "전진";
+"backward" = "후진";
+"stopLabel" = "정지";
+"readings" = "측정값";
+"battery" = "배터리 **.* V";
+"speedText" = "속도 (좌,우) ***,*** rpm";
+"sonarLabel" = "소나 *** cm";
+"sendCommand" = "명령 전송";
+"lightLabel" = "조명";
+
+/* Navigation */
+"setGoal" = "목표 설정";
+"setGoalText" = "휴대폰을 로봇에 장착하고 \n 목표를 지정하세요. 시작을 누르면\n 로봇이 목표에 도달하려고 시도합니다.";
+"left" = "왼쪽";
+"meter" = "[m]";
+"startLabel" = "시작";
+"canceled" = "취소";
+"info" = "정보";
+"restart" = "다시 시작";
+
+/* Settings > Permissions */
+"important" = "중요";
+"cameraAccessRequiredMessage" = "OpenBot에 카메라 접근 권한이 필요합니다";
+"allowPermissionMessageFormat" = "OpenBot이 %@에 접근하도록 허용해 주세요";
+"allowButtonFormat" = "%@ 허용";
+
+/* Logout / open-code UI */
+"logOut" = "로그아웃";
+"confirmLogoutTitle" = "로그아웃 확인";
+"confirmLogoutMessage" = "정말 로그아웃하시겠습니까?";
+"codeExecuting" = "코드를 실행하는 중입니다..";
+
+/* Tab bar */
+"projectsTab" = "프로젝트";
+"homeTab" = "홈";
+"profileTab" = "프로필";
+
+/* Loading / generic alerts */
+"loadingTitle" = "불러오는 중";
+"loadingProfileMessage" = "프로필을 불러오는 중입니다...";
+"loadingDataMessage" = "데이터를 불러오는 중입니다...";
+"pleaseWaitMessage" = "잠시만 기다려 주세요...";
+"errorHeading" = "오류";
+"genericErrorMessage" = "이런! 문제가 발생했습니다. 다시 시도해 주세요.";
+"okAction" = "확인";
+
+/* Profile screen */
+"myProfileHeading" = "내 프로필";
+"setupProfilePromptLine1" = "다음으로 로그인하여";
+"setupProfilePromptLine2" = "프로필을 설정하세요: Google 계정.";
+"editProfile" = "프로필 편집";
+"logoutMenuItem" = "로그아웃";
+"firstNameFieldLabel" = "이름";
+"lastNameFieldLabel" = "성";
+"dateOfBirthFieldLabel" = "생년월일";
+"emailFieldLabel" = "이메일";
+"unknownFallback" = "알 수 없음";
+"saveChangesButton" = "변경 사항 저장";
+"profileUpdatedSuccessToast" = "프로필이 성공적으로 업데이트되었습니다";
+"profilePictureLoadErrorToast" = "프로필 사진을 불러오지 못했습니다";
+"signInWithGoogle" = "Google 계정으로 로그인";
+
+/* Project screen */
+"myProjectsHeading" = "내 프로젝트";
+"pleaseSignInProjectsLine1" = "프로젝트에 접근하려면 먼저";
+"pleaseSignInProjectsLine2" = "로그인해 주세요.";
+"noProjectsFoundHeading" = "이런! 프로젝트를 찾을 수 없습니다.";
+"noProjectsFoundBody" = "아직 Google 드라이브에\n프로젝트가 없는 것 같습니다.";
+"deleteFileTitle" = "이 파일 삭제";
+"deleteFileMessage" = "이 파일은 나중에 복원할 수 없습니다";
+"deleteAction" = "삭제";
+
+/* QR Scanner / open-code bottom sheet */
+"scanQrCodeHeading" = "QR 코드 스캔";
+"scanInstructions" = "QR 코드를 프레임 안에 놓고 스캔하세요. 빠른 인식을 위해 흔들지 마세요.";
+"scanQrButton" = "QR 스캔";
+"qrScannerNavTitle" = "QR 스캐너";
+"qrScanSuccessHeading" = "QR 코드 스캔 성공";
+"qrFileDetectedMessageFormat" = "%@ 파일이 감지되었습니다. OpenBot에서 코드 실행을 시작합니다.";
+"startButton" = "시작";
+
+/* Playground (Run Robot / Blockly execution screen) */
+"cancelledStatus" = "취소됨";
+"stopRobotButton" = "로봇 정지";
+"resetRobotButton" = "로봇 초기화";
+"stopCarButton" = "차량 정지";
+"playgroundNavTitle" = "플레이그라운드";
+
+/* Robot Info headings */
+"robotTypeHeading" = "로봇 유형";
+"sensorsHeading" = "센서";
+"sonarReadingFormat" = "소나 %@ cm";
+"batteryReadingFormat" = "배터리 %@ V";
+
+/* Point Goal Navigation */
+"goalReachedMessage" = "목표 도달";
+
+/* Model Management filter dropdown */
+"modelFilterAll" = "전체";
+"modelFilterAllCaps" = "전체";
+"modelFilterAutoPilot" = "자율 주행";
+"modelFilterDetector" = "감지기";
+"modelFilterNavigation" = "내비게이션";
+
+/* Data Collection / Autopilot server dropdown default state */
+"noServer" = "서버 없음";
