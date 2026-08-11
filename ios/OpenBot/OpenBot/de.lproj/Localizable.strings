@@ -61,6 +61,8 @@
 "languageSubtitle" = "Anzeigesprache der App wählen";
 "systemDefault" = "Systemstandard";
 "applyingLanguage" = "Sprache wird übernommen…";
+"webSignalingServer" = "Web-Signalisierungsserver";
+"webSignalingServerPlaceholder" = "ws://192.168.1.40:8080/ws";
 
 /* Bluetooth Status */
 "connect" = "Verbinden";

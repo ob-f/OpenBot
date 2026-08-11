@@ -47,7 +47,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         scrollView.addSubview(createLabel(text: Strings.bluetooth, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 300, to: .height)))
         createBluetoothSwitch()
         createPermissionIcon(image: Images.bluetooth, tinted: false, topAnchor: adapted(dimensionSize: 300, to: .height))
-        scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 250, to: .height)))
+        scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 350, to: .height)))
         createWebSignalingServerField()
         updateSwitchPosition()
     }
@@ -205,7 +205,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         webSignalingServerField.autocapitalizationType = .none
         webSignalingServerField.autocorrectionType = .no
         webSignalingServerField.delegate = self
-        webSignalingServerField.frame = CGRect(x: 40, y: adapted(dimensionSize: 280, to: .height), width: width - 80, height: 40)
+        webSignalingServerField.frame = CGRect(x: 40, y: adapted(dimensionSize: 380, to: .height), width: width - 80, height: 40)
         scrollView.addSubview(webSignalingServerField)
     }
 

@@ -61,6 +61,8 @@
 "languageSubtitle" = "ऐप की डिस्प्ले भाषा चुनें";
 "systemDefault" = "सिस्टम डिफ़ॉल्ट";
 "applyingLanguage" = "भाषा लागू की जा रही है…";
+"webSignalingServer" = "वेब सिग्नलिंग सर्वर";
+"webSignalingServerPlaceholder" = "ws://192.168.1.40:8080/ws";
 
 /* Bluetooth Status */
 "connect" = "कनेक्ट करें";

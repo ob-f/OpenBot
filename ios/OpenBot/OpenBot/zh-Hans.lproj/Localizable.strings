@@ -61,6 +61,8 @@
 "languageSubtitle" = "选择应用的显示语言";
 "systemDefault" = "系统默认";
 "applyingLanguage" = "正在应用语言…";
+"webSignalingServer" = "网页信令服务器";
+"webSignalingServerPlaceholder" = "ws://192.168.1.40:8080/ws";
 
 /* Bluetooth Status */
 "connect" = "连接";
