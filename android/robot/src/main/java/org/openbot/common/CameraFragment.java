@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.openbot.R;
+import org.openbot.env.ControllerToBotEventBus;
 import org.openbot.env.ImageUtils;
 import org.openbot.utils.Constants;
 import org.openbot.utils.Enums;
@@ -79,6 +80,49 @@ public abstract class CameraFragment extends ControlsFragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     cameraExecutor = Executors.newSingleThreadExecutor();
+    subscribeToLocalCameraLifecycleEvents();
+  }
+
+  // Allowing WebRtcServer pause/resume to handle camera preview
+  private void subscribeToLocalCameraLifecycleEvents() {
+    String subscriber = getClass().getSimpleName() + "_localCameraLifecycle";
+    ControllerToBotEventBus.unsubscribe(subscriber);
+    ControllerToBotEventBus.subscribe(
+        subscriber,
+        event -> {
+          if (getActivity() == null) {
+            return;
+          }
+          String command = event.getString("command");
+          getActivity()
+              .runOnUiThread(
+                  () -> {
+                    if (Constants.CMD_PAUSE_LOCAL_CAMERA.equals(command)) {
+                      pauseLocalCamera();
+                    } else if (Constants.CMD_RESUME_LOCAL_CAMERA.equals(command)) {
+                      resumeLocalCamera();
+                    }
+                  });
+        },
+        error ->
+            Timber.e(
+                error, "Error in %s local camera lifecycle handling", getClass().getSimpleName()),
+        event ->
+            event.has("command")
+                && (Constants.CMD_PAUSE_LOCAL_CAMERA.equals(event.getString("command"))
+                    || Constants.CMD_RESUME_LOCAL_CAMERA.equals(event.getString("command"))));
+  }
+
+  private void pauseLocalCamera() {
+    if (cameraProvider != null) {
+      cameraProvider.unbindAll();
+    }
+  }
+
+  private void resumeLocalCamera() {
+    if (cameraProvider != null) {
+      bindCameraUseCases();
+    }
   }
 
   @SuppressLint("RestrictedApi")
@@ -163,6 +207,7 @@ public abstract class CameraFragment extends ControlsFragment {
   public void onDestroy() {
     super.onDestroy();
     cameraExecutor.shutdown();
+    ControllerToBotEventBus.unsubscribe(getClass().getSimpleName() + "_localCameraLifecycle");
   }
 
   @SuppressLint("RestrictedApi")

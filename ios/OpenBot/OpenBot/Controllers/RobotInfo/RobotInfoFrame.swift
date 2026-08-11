@@ -621,17 +621,9 @@ class RobotInfoFrame: UIViewController {
         }
     }
 
-    /// updating speed values from ble data
+    /// update speed label from shared BLE RPM formatter
     func updateSpeedometer() {
-        let speedometer = bluetooth.speedometer
-        if speedometer != "" {
-            let index_1 = speedometer.index(after: speedometer.startIndex)
-            let indexOfComma = speedometer.firstIndex(of: ",") ?? index_1
-            let index_2 = speedometer.index(before: indexOfComma)
-            let leftFront = Float(speedometer[index_1...index_2])
-            let rightFront = Float(speedometer[speedometer.index(after: indexOfComma)...])
-            speed.text = Strings.speed + " (l,r) " + String(Int(leftFront!)) + "," + String(Int(rightFront!)) + " rpm"
-        }
+        speed.text = bluetooth.getFormattedRpmRobotInfo()
     }
 
     /// updating screen after disconnection

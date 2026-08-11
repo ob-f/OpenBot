@@ -298,10 +298,10 @@ class GameController: GCPhysicalInputProfile {
             NotificationCenter.default.post(name: .toggleNetworks, object: nil)
             break
         case CMD_Events.CMD_SPEED_UP:
-            NotificationCenter.default.post(name: .increaseSpeedMode, object: nil)
+            increaseSpeedMode()
             break
         case CMD_Events.CMD_SPEED_DOWN:
-            NotificationCenter.default.post(name: .decreaseSpeedMode, object: nil)
+            decreaseSpeedMode()
             break
         case CMD_Events.CMD_DRIVE_MODE:
             NotificationCenter.default.post(name: .updateDriveMode, object: nil)
@@ -324,6 +324,7 @@ class GameController: GCPhysicalInputProfile {
         }
     }
 
+    /// function to increase speed mode and notify UI on main thread
     func increaseSpeedMode(){
         switch selectedSpeedMode {
         case .SLOW:
@@ -335,8 +336,12 @@ class GameController: GCPhysicalInputProfile {
         case .FAST:
             return
         }
-        audioPlayer.playSpeedMode(speedMode: selectedSpeedMode);
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .increaseSpeedMode, object: nil)
+        }
     }
+
+    /// function to decrease speed mode and notify UI on main thread
     func decreaseSpeedMode(){
         switch selectedSpeedMode {
         case .SLOW:
@@ -348,7 +353,9 @@ class GameController: GCPhysicalInputProfile {
             selectedSpeedMode = .NORMAL;
             break;
         }
-        audioPlayer.playSpeedMode(speedMode: selectedSpeedMode);
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .decreaseSpeedMode, object: nil)
+        }
     }
 }
 

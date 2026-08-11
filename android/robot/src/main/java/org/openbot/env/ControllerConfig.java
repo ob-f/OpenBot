@@ -65,4 +65,14 @@ public class ControllerConfig {
   public void setVideoServerType(String type) {
     set("video_server", type);
   }
+
+  /** Web signaling URL (machine running controller/web-server). Override in app settings. */
+  public String getWebSignalingServerUrl() {
+    // Default IP. Replace it with your own server IP address in Settings.
+    return get("web_signaling_server", "ws://192.168.1.40:8080/ws");
+  }
+
+  public void setWebSignalingServerUrl(String url) {
+    set("web_signaling_server", url);
+  }
 }

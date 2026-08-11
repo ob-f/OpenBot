@@ -77,7 +77,7 @@ class WebRTCDelegates: WebRTCClientDelegate {
 
     /// function to read the message from the controller connection
     @objc func websocketDidReceiveMessage(_ notification: Notification) {
-        let text: Data = notification.object as! Data;
+        guard let text = notification.object as? Data else { return }
         do {
             let signalingMessage = try JSONDecoder().decode(AnswerEvent.self, from: text)
             if signalingMessage.webrtc_event.type == "offer" {

@@ -3,6 +3,8 @@ package org.openbot.env;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.ToneGenerator;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceView;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.utils.AndGate;
+import org.openbot.utils.Constants;
 import org.openbot.utils.ConnectionUtils;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
@@ -180,13 +183,23 @@ public class WebRtcServer implements IVideoServer {
     monitorCameraControlEvents();
   }
 
+  // Delay to let the local camera actually finish releasing before we switch.
+  private static final long LOCAL_CAMERA_RELEASE_DELAY_MS = 300;
+  private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
   private void monitorCameraControlEvents() {
     ControllerToBotEventBus.subscribe(
         this.getClass().getSimpleName(),
         event -> {
           switch (event.getString("command")) {
             case "SWITCH_CAMERA":
-              ((CameraVideoCapturer) videoCapturer).switchCamera(null);
+              Log.d(TAG, "Received SWITCH_CAMERA command");
+              if (!(videoCapturer instanceof CameraVideoCapturer)) {
+                Log.e(TAG, "Cannot switch camera: capturer is not ready");
+                emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
+                break;
+              }
+              switchCameraWithoutConflictingWithLocalPreview();
               break;
           }
         },
@@ -195,8 +208,51 @@ public class WebRtcServer implements IVideoServer {
         },
         event ->
             event.has("command")
-                && ("SWITCH_CAMERA".equals(event.getString("command"))) // filter everything else
+                && ("SWITCH_CAMERA".equals(event.getString("command")))
         );
+  }
+
+  // Pauses the local preview camera first so we don't open two cameras at once.
+  private void switchCameraWithoutConflictingWithLocalPreview() {
+    emitLocalCameraCommand(Constants.CMD_PAUSE_LOCAL_CAMERA);
+
+    mainHandler.postDelayed(
+        () ->
+            ((CameraVideoCapturer) videoCapturer)
+                .switchCamera(
+                    new CameraVideoCapturer.CameraSwitchHandler() {
+                      @Override
+                      public void onCameraSwitchDone(boolean isFrontCamera) {
+                        String cameraName = isFrontCamera ? "FRONT" : "BACK";
+                        Log.d(TAG, "Camera switched successfully to " + cameraName);
+                        emitSwitchCameraStatus(cameraName);
+                        resumeLocalCamera();
+                      }
+
+                      @Override
+                      public void onCameraSwitchError(String errorDescription) {
+                        Log.e(TAG, "Camera switch failed: " + errorDescription);
+                        emitSwitchCameraStatus("ERROR:" + errorDescription);
+                        resumeLocalCamera();
+                      }
+                    }),
+        LOCAL_CAMERA_RELEASE_DELAY_MS);
+  }
+
+  private void resumeLocalCamera() {
+    emitLocalCameraCommand(Constants.CMD_RESUME_LOCAL_CAMERA);
+  }
+  
+  private void emitLocalCameraCommand(String command) {
+    try {
+      ControllerToBotEventBus.emitEvent(new JSONObject().put("command", command).toString());
+    } catch (JSONException e) {
+      Timber.e(e, "Failed to emit local camera lifecycle command: %s", command);
+    }
+  }
+
+  private void emitSwitchCameraStatus(String value) {
+    BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("SWITCH_CAMERA", value));
   }
 
   private void doAnswer() {

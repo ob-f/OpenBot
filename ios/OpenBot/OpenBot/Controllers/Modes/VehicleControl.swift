@@ -14,10 +14,12 @@ class VehicleControl: UIView {
     var speedInRpm = UILabel()
     var isButtonEnable: Bool = true
     let gameController = GameController.shared
+    let bluetooth = bluetoothDataController.shared
     var downSwipe: Bool = false
     let audioPlayer = AudioPlayer.shared;
     let mSocket = NativeWebSocket.shared;
     let roomId: String = Auth.auth().currentUser?.email ?? ""
+    private var serverWebrtcDelegate: ServerWebrtcDelegate?
     var preferencesManager : SharedPreferencesManager = SharedPreferencesManager()
 
     /// initializing function
@@ -44,14 +46,16 @@ class VehicleControl: UIView {
         }
         updateControlMode(self)
         updateDriveMode(self)
-        updateSpeedMode(self)
+        refreshSpeedButton()
         createRpm()
+        speedInRpm.text = bluetooth.getFormattedRpmShort()
         createLabel(text: Strings.controller, bottomAnchor: 0, leadingAnchor: width / 2 - 100, isBoldNeeded: true)
         createLabel(text: Strings.driveMode, bottomAnchor: 0, leadingAnchor: width / 2 - 30, isBoldNeeded: true)
         createLabel(text: Strings.speed, bottomAnchor: 0, leadingAnchor: width / 2 + 50, isBoldNeeded: true)
         NotificationCenter.default.addObserver(self, selector: #selector(toggleAutoMode), name: .autoMode, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(toggleAutoMode), name: .autoModeObjectTracking, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateRpmLabel), name: .updateRpmLabel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWheelRpmFromBle), name: .updateLabel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(resetWheelRpm), name: .bluetoothDisconnected, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(decreaseSpeedMode), name: .decreaseSpeedMode, object: nil);
         NotificationCenter.default.addObserver(self, selector: #selector(increaseSpeedMode), name: .increaseSpeedMode, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateDrive), name: .updateDriveMode, object: nil)
@@ -125,8 +129,10 @@ class VehicleControl: UIView {
                 if(webRTCClient != nil){
                     webRTCClient.disconnect();
                 }
-                sendMessage();
-                _ = ServerWebrtcDelegate();
+                mSocket.connectWebServer { [weak self] in
+                    self?.sendMessage()
+                    self?.serverWebrtcDelegate = ServerWebrtcDelegate()
+                }
             }
             else{
                 controlMode = ControlMode.GAMEPAD;
@@ -181,21 +187,17 @@ class VehicleControl: UIView {
             switch (speedMode) {
             case .SLOW:
                 speedMode = .NORMAL;
-                createAndUpdateButton(iconName: Images.mediumIcon!, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true);
-                preferencesManager.setSpeedMode(value: SpeedMode.SLOW.rawValue)
                 break;
             case .NORMAL:
                 speedMode = .FAST;
-                createAndUpdateButton(iconName: Images.fastIcon!, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true);
-                preferencesManager.setSpeedMode(value: SpeedMode.NORMAL.rawValue)
                 break;
             case .FAST:
                 speedMode = .SLOW;
-                createAndUpdateButton(iconName: Images.slowIcon!, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true);
-                preferencesManager.setSpeedMode(value: SpeedMode.FAST.rawValue)
                 break;
             }
+            preferencesManager.setSpeedMode(value: speedMode.rawValue)
             gameController.selectedSpeedMode = speedMode
+            refreshSpeedButton()
         }
     }
 
@@ -236,9 +238,14 @@ class VehicleControl: UIView {
         isButtonEnable = !isButtonEnable
     }
 
-    /// function to update the RPM speed
-    @objc func updateRpmLabel(_ notification: Notification) {
-        speedInRpm.text = (notification.object as! String)
+    /// update speedInRpm from BLE wheel speed sensor data
+    @objc func updateWheelRpmFromBle(_ notification: Notification) {
+        speedInRpm.text = bluetooth.getFormattedRpmShort()
+    }
+
+    /// reset speedInRpm when BLE disconnects
+    @objc func resetWheelRpm(_ notification: Notification) {
+        speedInRpm.text = "---,--- rpm"
     }
 
     ///function to update the setting to display or not
@@ -251,34 +258,35 @@ class VehicleControl: UIView {
         }
     }
 
-    /// function to decrease the speed modes
-    @objc func decreaseSpeedMode(_ notification: Notification) {
+    /// function to update the speed mode button icon
+    private func refreshSpeedButton() {
+        let icon: UIImage
         switch speedMode {
         case .SLOW:
-            return;
+            icon = Images.slowIcon!
         case .NORMAL:
-            speedMode = .FAST
-            break;
+            icon = Images.mediumIcon!
         case .FAST:
-            speedMode = .SLOW;
-            break;
+            icon = Images.fastIcon!
         }
-        updateSpeedMode(self);
-        audioPlayer.playSpeedMode(speedMode: speedMode);
+        createAndUpdateButton(iconName: icon, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true)
+        gameController.selectedSpeedMode = speedMode
     }
 
-    ///function to increase the speed modes.
+    /// callback to sync speed mode button when speed is decreased
+    @objc func decreaseSpeedMode(_ notification: Notification) {
+        speedMode = gameController.selectedSpeedMode
+        preferencesManager.setSpeedMode(value: speedMode.rawValue)
+        refreshSpeedButton()
+        audioPlayer.playSpeedMode(speedMode: speedMode)
+    }
+
+    /// callback to sync speed mode button when speed is increased
     @objc func increaseSpeedMode(_ notification: Notification) {
-        switch speedMode {
-        case .SLOW:
-            updateSpeedMode(self);
-        case .NORMAL:
-            updateSpeedMode(self);
-            break;
-        case .FAST:
-            return;
-        }
-        audioPlayer.playSpeedMode(speedMode: speedMode);
+        speedMode = gameController.selectedSpeedMode
+        preferencesManager.setSpeedMode(value: speedMode.rawValue)
+        refreshSpeedButton()
+        audioPlayer.playSpeedMode(speedMode: speedMode)
     }
 
     /// function to update the drive modes.

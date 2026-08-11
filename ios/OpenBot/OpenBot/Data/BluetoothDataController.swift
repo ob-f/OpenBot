@@ -282,24 +282,44 @@ class bluetoothDataController: CMDeviceMotion, CBCentralManagerDelegate, CBPerip
 
     }
 
-    /**
-     return integer value speed sensors
-     - Returns:
-     */
-    func getSpeed() -> Int {
-        if speedometer != "" {
-            let index_1 = speedometer.index(after: speedometer.startIndex)
-            let indexOfComma = speedometer.firstIndex(of: ",") ?? index_1
-            let index_2 = speedometer.index(before: indexOfComma)
-            let leftFront = Float(speedometer[index_1...index_2])
-            let rightFont = Float(speedometer[speedometer.index(after: indexOfComma)...])
-            let value = Int(((leftFront ?? 0) + (rightFont ?? 0)) / 2)
-            return value;
-        }
-        return 0;
+    // Wheel RPM from BLE speed sensor.
+    private func parseWheelRpm() -> (left: Int, right: Int)? {
+        guard speedometer != "" else { return nil }
+        let index_1 = speedometer.index(after: speedometer.startIndex)
+        guard let indexOfComma = speedometer.firstIndex(of: ",") else { return nil }
+        let index_2 = speedometer.index(before: indexOfComma)
+        let leftString = String(speedometer[index_1...index_2]).trimmingCharacters(in: .whitespacesAndNewlines)
+        let rightString = String(speedometer[speedometer.index(after: indexOfComma)...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let left = Float(leftString), let right = Float(rightString) else { return nil }
+        return (Int(left), Int(right))
     }
 
+    func getLeftWheelRpm() -> Int {
+        parseWheelRpm()?.left ?? 0
+    }
 
+    func getRightWheelRpm() -> Int {
+        parseWheelRpm()?.right ?? 0
+    }
+
+    func getFormattedRpmRobotInfo() -> String {
+        guard let rpm = parseWheelRpm() else {
+            return Strings.speedText
+        }
+        return Strings.speed + " (l,r) " + String(rpm.left) + "," + String(rpm.right) + " rpm"
+    }
+
+    func getFormattedRpmShort() -> String {
+        guard let rpm = parseWheelRpm() else {
+            return "---,--- rpm"
+        }
+        return String(rpm.left) + "," + String(rpm.right) + " rpm"
+    }
+
+    func getSpeed() -> Int {
+        guard let rpm = parseWheelRpm() else { return 0 }
+        return (rpm.left + rpm.right) / 2
+    }
 
     /**
      return integer value voltage divider
