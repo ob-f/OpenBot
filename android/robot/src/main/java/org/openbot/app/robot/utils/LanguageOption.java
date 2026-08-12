@@ -1,4 +1,4 @@
-package org.openbot.utils;
+package org.openbot.app.robot.utils;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;

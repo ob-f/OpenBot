@@ -1,4 +1,4 @@
-package org.openbot.main;
+package org.openbot.app.robot.main;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
-import org.openbot.databinding.ItemLanguageBinding;
-import org.openbot.utils.LanguageOption;
+import org.openbot.app.robot.databinding.ItemLanguageBinding;
+import org.openbot.app.robot.utils.LanguageOption;
 
 public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHolder> {
 

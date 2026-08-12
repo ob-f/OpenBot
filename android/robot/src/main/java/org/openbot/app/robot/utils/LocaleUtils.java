@@ -1,11 +1,11 @@
-package org.openbot.utils;
+package org.openbot.app.robot.utils;
 
 import android.content.Context;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 import java.util.Arrays;
 import java.util.List;
-import org.openbot.R;
+import org.openbot.app.robot.R;
 
 /**
  * Supported in-app display languages, backed by AndroidX's per-app language API. See {@code

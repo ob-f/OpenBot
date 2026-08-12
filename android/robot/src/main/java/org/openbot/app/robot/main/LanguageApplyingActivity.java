@@ -1,11 +1,11 @@
-package org.openbot.main;
+package org.openbot.app.robot.main;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import org.openbot.R;
-import org.openbot.utils.LocaleUtils;
+import org.openbot.app.robot.R;
+import org.openbot.app.robot.utils.LocaleUtils;
 
 /**
  * Branded loading screen shown as its own window while the app locale changes.

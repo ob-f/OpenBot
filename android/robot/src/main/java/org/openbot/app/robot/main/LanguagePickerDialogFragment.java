@@ -1,4 +1,4 @@
-package org.openbot.main;
+package org.openbot.app.robot.main;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,9 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import org.jetbrains.annotations.NotNull;
-import org.openbot.R;
-import org.openbot.databinding.DialogLanguagePickerBinding;
-import org.openbot.utils.LocaleUtils;
+import org.openbot.app.robot.R;
+import org.openbot.app.robot.databinding.DialogLanguagePickerBinding;
+import org.openbot.app.robot.utils.LocaleUtils;
 
 public class LanguagePickerDialogFragment extends DialogFragment {
 
