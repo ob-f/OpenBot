@@ -131,6 +131,8 @@
     <string name="stream_mode">Mode de diffusion</string>
     <string name="connection_type_category">Type de connexion</string>
     <string name="connectivity_mode">Mode de connectivité</string>
+    <string name="web_controller_category">Contrôleur Web</string>
+    <string name="web_signaling_server">Serveur de signalisation Web</string>
     <string name="tile_general">Général</string>
     <string name="tile_ai">IA</string>
     <string name="tile_legacy">Legacy</string>

@@ -131,6 +131,8 @@
     <string name="stream_mode">Streaming-Modus</string>
     <string name="connection_type_category">Verbindungs-&#8203;Art</string>
     <string name="connectivity_mode">Verbindungs-&#8203;Modus</string>
+    <string name="web_controller_category">Web-&#8203;Controller</string>
+    <string name="web_signaling_server">Web-&#8203;Signalisierungsserver</string>
     <string name="tile_general">Allgemein</string>
     <string name="tile_ai">KI</string>
     <string name="tile_legacy">Legacy</string>
