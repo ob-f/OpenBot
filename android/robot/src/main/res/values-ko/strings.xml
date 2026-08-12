@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="description_info">정보</string>
+    <string name="camera_error">이 기기는 Camera2 API를 지원하지 않습니다.</string>
+    <string name="threads">스레드</string>
+    <string name="camera_permission_denied">카메라 권한이 필요합니다</string>
+    <string name="storage_permission_denied">외부 저장소 권한이 필요합니다</string>
+    <string name="location_permission_denied">위치 권한이 필요합니다</string>
+    <string name="record_audio_permission_denied">오디오 녹음 권한이 필요합니다</string>
+    <string name="nearby_permission_denied">주변 기기 권한이 필요합니다</string>
+    <string name="permission_reason_logging"> 데이터셋을 기록하기 위해.</string>
+    <string name="permission_reason_ai"> AI 모델을 실행하기 위해.</string>
+    <string name="permission_reason_ar_core"> AR Core를 실행하기 위해.</string>
+    <string name="permission_reason_stream_video"> 컨트롤러로 영상을 스트리밍하기 위해.</string>
+    <string name="permission_reason_preview"> 영상을 미리 보기 위해.</string>
+    <string name="permission_reason_stream_audio"> 컨트롤러로 오디오를 스트리밍하기 위해.</string>
+    <string name="permission_reason_find_controller"> 컨트롤러를 찾기 위해.</string>
+    <string name="permission_reason_model_from_phone"> 휴대폰 저장소에서 모델을 선택하기 위해.</string>
+    <string name="permission_reason_settings"> 앱의 모든 기능을 사용하기 위해.</string>
+
+    <string name="off">끄기</string>
+    <string name="on">켜기</string>
+
+    <string name="server">서버</string>
+    <string name="save_as">다른 이름으로 저장</string>
+    <string name="model">모델</string>
+
+    <string name="device">기기</string>
+    <string name="baud_rate">보드레이트</string>
+
+    <string name="log_setting">로그 설정</string>
+    <string name="camera_facing_back">후면</string>
+    <string name="camera_facing_front">전면</string>
+    <string name="logging">기록 중</string>
+    <string name="not_logging">기록 안 함</string>
+    <string name="no_device">기기 없음</string>
+    <string name="data_log">데이터 로그</string>
+    <string name="usb_connection">USB 연결</string>
+    <string name="camera">카메라</string>
+
+    <string name="control">제어</string>
+    <string name="battery">배터리</string>
+    <string name="speed">회전수 (좌,우)</string>
+    <string name="sonar">소나</string>
+    <string name="drive_mode">주행 모드</string>
+    <string name="speed_mode">속도 모드</string>
+    <string name="plus">플러스</string>
+    <string name="arrow">화살표</string>
+    <string name="minus">마이너스</string>
+    <string name="controller">컨트롤러</string>
+    <string name="control_mode">제어 모드</string>
+    <string name="crop">자르기</string>
+    <string name="frame">프레임</string>
+    <string name="settings">설정</string>
+    <string name="bluetooth">블루투스</string>
+    <string name="inference">추론</string>
+    <string name="input">해상도</string>
+    <string name="confidence">신뢰도</string>
+    <string name="object">객체</string>
+    <string name="speedTitle">속도</string>
+    <string name="preview_resolution">미리보기 해상도</string>
+    <string name="save_option">저장 옵션</string>
+    <string name="file_available_body">동일한 이름의 모델이 이미 있습니다. 교체하시겠습니까?</string>
+    <string name="file_available_title">파일을 찾았습니다</string>
+    <string name="model_delete_body">이 모델을 삭제하시겠습니까?</string>
+    <string name="model_delete_title">확인</string>
+    <string name="permissions">권한</string>
+    <string name="goal_reached">목표에 도달했습니다.</string>
+    <string name="model_download_body">뒤로 가면 다운로드가 취소됩니다. 계속하시겠습니까?</string>
+    <string name="model_download_title">모델 다운로드 중</string>
+    <string name="save">저장</string>
+    <string name="confirm_title">확실합니까?</string>
+    <string name="stream_change_body">이 설정을 적용하려면 앱을 다시 시작해야 합니다</string>
+    <string name="selectAll">전체 선택</string>
+    <string name="clearAll">전체 지우기</string>
+    <string name="tracking_lost">추적이 끊겼습니다.</string>
+    <string name="no_initial_ar_core_pose">초기 AR Core 포즈가 없습니다.</string>
+    <string name="ar_core_session_paused">AR Core 세션이 일시 중지되었습니다.</string>
+    <string name="tips_connect_timeout">연결 시간 초과</string>
+    <string name="tips_connect_fail">연결 실패</string>
+    <string name="tips_connection_disconnected">연결이 끊어졌습니다</string>
+    <string name="tips_write_operation">16진수 문자열을 입력하세요</string>
+    <string name="profile">프로필</string>
+    <string name="projects">프로젝트</string>
+    <string name="scanner">스캐너</string>
+    <string name="home">홈</string>
+    <string name="scan_qr_code">QR 코드 스캔</string>
+    <string name="playground">플레이그라운드</string>
+    <string name="text_on_qr_screen">QR 코드를 프레임 안에 놓고 스캔하세요. 빠른 결과를 위해 흔들지 마세요.</string>
+    <string name="edit_profile">프로필 편집</string>
+    <string name="logout">로그아웃</string>
+    <string name="auto_mode">자동 모드</string>
+    <string name="dynamic_speed">동적 속도</string>
+    <string name="bumpers">범퍼</string>
+    <string name="robot_type">로봇 유형:</string>
+    <string name="indicators">방향지시등</string>
+    <string name="back">후면</string>
+    <string name="voltage_divider">전압 분배기</string>
+    <string name="status">상태</string>
+    <string name="front">전면</string>
+    <string name="robot_icon">로봇 아이콘</string>
+    <string name="wheel_odometry_front">전방 휠 오도메트리</string>
+    <string name="wheel_odometry_back">후방 휠 오도메트리</string>
+    <string name="backward">후진</string>
+    <string name="forward">전진</string>
+    <string name="stop">정지</string>
+    <string name="motors">모터</string>
+    <string name="leds">LED</string>
+    <string name="lights">조명</string>
+    <string name="sensors">센서</string>
+    <string name="send_commands">명령 전송</string>
+    <string name="wheel_odometry">휠 오도메트리</string>
+    <string name="readings">측정값</string>
+    <string name="lights_slider">조명 슬라이더</string>
+    <string name="indicator_leds">방향지시등 LED</string>
+    <string name="back_leds">후면 LED</string>
+    <string name="status_leds">상태 LED</string>
+    <string name="front_leds">전면 LED</string>
+    <string name="cancel">취소</string>
+
+    <string name="general">일반</string>
+    <string name="language">언어</string>
+    <string name="language_summary">앱 표시 언어를 선택하세요</string>
+    <string name="applying_language">언어 적용 중…</string>
+    <string name="system_default">시스템 기본값</string>
+    <string name="storage">저장소</string>
+    <string name="location">위치</string>
+    <string name="microphone">마이크</string>
+    <string name="nearby">주변 기기</string>
+    <string name="video_streaming">동영상 스트리밍</string>
+    <string name="stream_mode">스트림 모드</string>
+    <string name="connection_type_category">연결 유형</string>
+    <string name="connectivity_mode">연결 모드</string>
+    <string name="tile_general">일반</string>
+    <string name="tile_ai">AI</string>
+    <string name="tile_legacy">레거시</string>
+    <string name="tile_free_roam">자유 주행</string>
+    <string name="tile_data_collection">데이터 수집</string>
+    <string name="tile_controller_mapping">컨트롤러 매핑</string>
+    <string name="tile_robot_info">로봇 정보</string>
+    <string name="tile_autopilot">자율주행</string>
+    <string name="tile_object_nav">객체 추적</string>
+    <string name="tile_point_goal_navigation">목표 내비게이션</string>
+    <string name="tile_model_management">모델 관리</string>
+    <string name="tile_default_mode">기본값</string>
+
+    <string-array name="preview_resolutions">
+        <item>낮음</item>
+        <item>중간</item>
+        <item>높음</item>
+    </string-array>
+    <string-array name="save_data">
+        <item>로컬 저장소</item>
+        <item>Google Drive</item>
+        <item>로컬 서버</item>
+    </string-array>
+
+    <string name="set_goal_title">목표 설정</string>
+    <string name="set_goal_message">로봇에 휴대폰을 장착하고 목표를 지정하세요. 시작을 누르면 로봇이 목표에 도달하려고 시도합니다.</string>
+    <string name="start">시작</string>
+    <string name="forward_hint_m">전진 [m]</string>
+    <string name="left_hint_m">왼쪽 [m]</string>
+    <string name="log_data">데이터 기록</string>
+    <string name="model_resolution">모델 해상도</string>
+    <string name="sensor_data">센서 데이터</string>
+    <string name="preview_images">미리보기 이미지</string>
+    <string name="training_images">학습 이미지</string>
+    <string name="sign_in_description">Google 계정으로 로그인하여 프로필을 설정하세요.</string>
+    <string name="sign_in_with_google">Google로 로그인</string>
+    <string name="no_projects_found_title">이런! 프로젝트를 찾을 수 없습니다.</string>
+    <string name="no_projects_found_body">아직 Google 드라이브에 프로젝트가 없는 것 같습니다.</string>
+    <string name="project_file_detected">%1$s 파일이 감지되었습니다. 시작을 눌러 OpenBot에서 코드를 실행하세요.</string>
+    <string name="usb_check_connection">USB 연결을 확인해 주세요.</string>
+    <string name="ble_connecting">연결 중</string>
+    <string name="ble_disconnect">연결 해제</string>
+    <string name="ble_connect">연결</string>
+</resources>

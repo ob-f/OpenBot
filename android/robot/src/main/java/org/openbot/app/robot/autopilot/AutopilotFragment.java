@@ -91,7 +91,7 @@ public class AutopilotFragment extends CameraFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
-        binding.deviceSpinner.setSelection(preferencesManager.getDevice());
+        initDeviceSpinner(binding.deviceSpinner, preferencesManager.getDevice());
         setNumThreads(preferencesManager.getNumThreads());
         binding.threads.setText(String.valueOf(getNumThreads()));
         binding.cameraToggle.setOnClickListener(v -> toggleCamera());
@@ -366,10 +366,17 @@ public class AutopilotFragment extends CameraFragment {
                                 Enums.SpeedMode.getByID(preferencesManager.getSpeedMode())));
                 break;
 
-            case Constants.CMD_NETWORK:
-                setNetworkEnabledWithAudio(!binding.autoSwitch.isChecked());
-                break;
         }
+    }
+
+    @Override
+    protected void handleNetworkCommand() {
+        setNetworkEnabledWithAudio(!binding.autoSwitch.isChecked());
+    }
+
+    @Override
+    protected boolean isNetworkModeEnabled() {
+        return binding.autoSwitch.isChecked();
     }
 
     private void setNetworkEnabledWithAudio(boolean b) {
@@ -393,6 +400,7 @@ public class AutopilotFragment extends CameraFragment {
 
     private void setNetworkEnabled(boolean b) {
         binding.autoSwitch.setChecked(b);
+        emitNetworkStatus(b);
         binding.controllerContainer.controlMode.setEnabled(!b);
         binding.controllerContainer.driveMode.setEnabled(!b);
         binding.controllerContainer.speedMode.setEnabled(!b);
@@ -499,7 +507,8 @@ public class AutopilotFragment extends CameraFragment {
             final boolean threadsEnabled = device == Network.Device.CPU;
             binding.plus.setEnabled(threadsEnabled);
             binding.minus.setEnabled(threadsEnabled);
-            binding.threads.setText(threadsEnabled ? String.valueOf(numThreads) : "N/A");
+            binding.threads.setText(
+                threadsEnabled ? String.valueOf(numThreads) : getString(R.string.n_a));
             if (threadsEnabled) binding.threads.setTextColor(Color.BLACK);
             else binding.threads.setTextColor(Color.GRAY);
             preferencesManager.setDevice(device.ordinal());

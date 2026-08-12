@@ -152,7 +152,7 @@ public class ObjectNavFragment extends CameraFragment {
           @Override
           public void onNothingSelected(AdapterView<?> parent) {}
         });
-    binding.deviceSpinner.setSelection(preferencesManager.getDevice());
+    initDeviceSpinner(binding.deviceSpinner, preferencesManager.getDevice());
     setNumThreads(preferencesManager.getNumThreads());
     binding.threads.setText(String.valueOf(getNumThreads()));
 
@@ -336,10 +336,8 @@ public class ObjectNavFragment extends CameraFragment {
           .runOnUiThread(
               () -> {
                 ArrayAdapter<String> adapter =
-                    new ArrayAdapter<>(
-                        getContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        detector.getLabels());
+                    new ArrayAdapter<>(getContext(), R.layout.spinner_item, detector.getLabels());
+                adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
                 binding.classType.setAdapter(adapter);
                 binding.classType.setSelection(
                     detector.getLabels().indexOf(preferencesManager.getObjectType()));
@@ -412,10 +410,17 @@ public class ObjectNavFragment extends CameraFragment {
             String.format(Locale.US, "%.0f,%.0f", vehicle.getLeftSpeed(), vehicle.getRightSpeed()));
         break;
 
-      case Constants.CMD_NETWORK:
-        setNetworkEnabledWithAudio(!binding.autoSwitch.isChecked());
-        break;
     }
+  }
+
+  @Override
+  protected void handleNetworkCommand() {
+    setNetworkEnabledWithAudio(!binding.autoSwitch.isChecked());
+  }
+
+  @Override
+  protected boolean isNetworkModeEnabled() {
+    return binding.autoSwitch.isChecked();
   }
 
   private void setNetworkEnabledWithAudio(boolean b) {
@@ -427,6 +432,7 @@ public class ObjectNavFragment extends CameraFragment {
 
   private void setNetworkEnabled(boolean b) {
     binding.autoSwitch.setChecked(b);
+    emitNetworkStatus(b);
 
     binding.controllerContainer.controlMode.setEnabled(!b);
     binding.controllerContainer.driveMode.setEnabled(!b);

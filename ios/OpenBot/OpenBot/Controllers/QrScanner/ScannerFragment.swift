@@ -13,7 +13,7 @@ class scannerFragment: CameraController,autopilotDelegate {
     var previewLayer = AVCaptureVideoPreviewLayer();
     var whiteSheet = openCodeRunBottomSheet(frame: UIScreen.main.bounds)
     @IBOutlet weak var cancelBtn: UIView!
-    let alert = UIAlertController(title: "Loading", message: "Please wait while we load data...", preferredStyle: .alert)
+    let alert = UIAlertController(title: Strings.loadingTitle, message: Strings.loadingDataMessage, preferredStyle: .alert)
     var userToken: String = ""
     private var commands: String = ""
     private var projectFileId: String = "";
@@ -88,7 +88,7 @@ class scannerFragment: CameraController,autopilotDelegate {
      Create Heading of Fragment
      */
     private func createScanHeading() {
-        heading = CustomLabel.init(text: "Scan Qr Code", fontSize: 22, fontColor: Colors.textColor ?? .black, frame: CGRect(x: width / 2 - 65, y: 20, width: 145, height: 40))
+        heading = CustomLabel.init(text: Strings.scanQrCodeHeading, fontSize: 22, fontColor: Colors.textColor ?? .black, frame: CGRect(x: width / 2 - 65, y: 20, width: 145, height: 40))
         heading.textAlignment = .center;
         firstHalfView.addSubview(heading);
     }
@@ -97,7 +97,7 @@ class scannerFragment: CameraController,autopilotDelegate {
      Create Message of Fragment
      */
     private func createScanMessage() {
-        let message = "Place qr code inside the frame to scan. Please avoid shake to get results quickly."
+        let message = Strings.scanInstructions
         let font = UIFont(name: "HelveticaNeue", size: 15)!
         let messageSize = (message as NSString).boundingRect(with: CGSize(width: 320, height: CGFloat.greatestFiniteMagnitude), options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil)
         let messageHeight = ceil(messageSize.height)
@@ -273,7 +273,7 @@ class scannerFragment: CameraController,autopilotDelegate {
      Function to create Error Heading  mukerian
      */
     private func createErrorHeading() {
-        let errorHeading = CustomLabel(text: "Error",
+        let errorHeading = CustomLabel(text: Strings.errorHeading,
                 fontSize: 18, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 19, y: 23, width: 60, height: 40));
         errorHeading.font = HelveticaNeue.bold(size: 15);
         bottomSheet.addSubview(errorHeading);
@@ -283,7 +283,7 @@ class scannerFragment: CameraController,autopilotDelegate {
      Function to create Error Message
      */
     private func createErrorMsg() {
-        let msg = CustomLabel(text: "Oops! Something went wrong.Please try again.", fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 19, y: 57, width: 330, height: 40));
+        let msg = CustomLabel(text: Strings.genericErrorMessage, fontSize: 15, fontColor: Colors.textColor ?? .black, frame: CGRect(x: 19, y: 57, width: 330, height: 40));
         bottomSheet.addSubview(msg);
     }
 
@@ -293,7 +293,7 @@ class scannerFragment: CameraController,autopilotDelegate {
     private func createScanQrBtn() {
         let scanQr = UIButton(frame: CGRect(x: 19, y: 120, width: 120, height: 40));
         scanQr.backgroundColor = Colors.title;
-        scanQr.setTitle("Scan QR", for: .normal);
+        scanQr.setTitle(Strings.scanQrButton, for: .normal);
         scanQr.addTarget(nil, action: #selector(scan), for: .touchUpInside);
         scanQr.layer.cornerRadius = 10;
         bottomSheet.addSubview(scanQr);
@@ -343,7 +343,7 @@ class scannerFragment: CameraController,autopilotDelegate {
     func setupNavigationBarItem() {
         if UIImage(named: "back") != nil {
             let backNavigationIcon = (UIImage(named: "back")?.withRenderingMode(.alwaysOriginal))!
-            let newBackButton = UIBarButtonItem(image: backNavigationIcon, title: "Qr Scanner", target: self, action: #selector(back(sender:)), titleColor: Colors.navigationColor ?? .white)
+            let newBackButton = UIBarButtonItem(image: backNavigationIcon, title: Strings.qrScannerNavTitle, target: self, action: #selector(back(sender:)), titleColor: Colors.navigationColor ?? .white)
             navigationItem.leftBarButtonItem = newBackButton
         }
     }

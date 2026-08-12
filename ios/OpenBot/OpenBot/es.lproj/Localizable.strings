@@ -1,0 +1,202 @@
+/* Screens */
+"OpenBot" = "OpenBot";
+"freeRoam" = "Modo Libre";
+"dataCollection" = "Recopilación de Datos";
+"controllerMapping" = "Asignación del Mando";
+"autoPilot" = "Piloto Automático";
+"objectTracking" = "Seguimiento de Objetos";
+"modelManagement" = "Gestión de Modelos";
+"robotInfo" = "Información del Robot";
+"navigation" = "Navegación a un Punto";
+
+/* Misc */
+"controller" = "Mando";
+"speed" = "Velocidad";
+"driveMode" = "Modo de Conducción";
+"gamepad" = "Mando de Juego";
+"phone" = "Teléfono";
+"web" = "Web";
+"joystick" = "Joystick";
+"game" = "Juego";
+"dual" = "Dual";
+"slow" = "Lento";
+"medium" = "Medio";
+"fast" = "Rápido";
+"logData" = "Registrar Datos";
+"previewResolutionMedium" = "Resolución de Vista Previa (1280 x 720)";
+"previewResolutionLow" = "Resolución de Vista Previa (960 x 540)";
+"previewResolutionHigh" = "Resolución de Vista Previa (1920 x 1080)";
+"low" = "Baja";
+"high" = "Alta";
+"modelResolution" = "Resolución del Modelo ";
+"server" = "Servidor";
+"preview" = "Vista Previa";
+"training" = "Entrenamiento";
+"sensorData" = "Datos de Sensores";
+"vehicle" = "Vehículo";
+"gps" = "GPS";
+"accelerometer" = "Acelerómetro";
+"magnetic" = "Magnético";
+"gyroscope" = "Giroscopio";
+"delay" = "Retraso (ms)";
+"Autopilot" = "Piloto Automático";
+"ObjectTracking" = "Seguimiento de Objetos";
+"autoMode" = "Modo Automático";
+"model" = "Modelo";
+"input" = "Entrada";
+"device" = "Dispositivo";
+"threads" = "Hilos";
+"object" = "Objeto";
+"confidence" = "Confianza";
+"dynamicSpeed" = "Velocidad Dinámica";
+
+/* Settings */
+"camera" = "Cámara";
+"microphone" = "Micrófono";
+"location" = "Ubicación";
+"permission" = "Permisos";
+"bluetooth" = "Bluetooth";
+"general" = "General";
+"language" = "Idioma";
+"languageSubtitle" = "Elige el idioma de visualización de la app";
+"systemDefault" = "Predeterminado del sistema";
+"applyingLanguage" = "Aplicando idioma…";
+"webSignalingServer" = "Servidor de señalización web";
+"webSignalingServerPlaceholder" = "ws://192.168.1.40:8080/ws";
+
+/* Bluetooth Status */
+"connect" = "Conectar";
+"disconnect" = "Desconectar";
+"connecting" = "Conectando";
+"disconnecting" = "Desconectando";
+
+/* Model management */
+"modelDetails" = "Detalles del Modelo";
+"name" = "Nombre";
+"type" = "Tipo";
+"class" = "Clase";
+"inputOfModel" = "Entrada (an x al)";
+"tfliteLabel" = ".tflite";
+"cancel" = "Cancelar";
+"done" = "Hecho";
+"file" = "Archivo";
+"url" = "URL";
+"addNewModel" = "Añadir Nuevo Modelo";
+
+/* Robot Info */
+"voltageDivider" = "Divisor de Voltaje";
+"sonarText" = "Sonar";
+"bumperText" = "Parachoques";
+"wheelOdometer" = "Odometría de Ruedas";
+"front" = "Frente";
+"back" = "Atrás";
+"led" = "Luces LED";
+"indicatorText" = "Intermitentes";
+"status" = "Estado";
+"motors" = "Motores";
+"forward" = "Adelante";
+"backward" = "Atrás";
+"stopLabel" = "Detener";
+"readings" = "Lecturas";
+"battery" = "Batería **.* V";
+"speedText" = "Velocidad (i,d) ***,*** rpm";
+"sonarLabel" = "Sonar *** cm";
+"sendCommand" = "Enviar Comandos";
+"lightLabel" = "Luces";
+
+/* Navigation */
+"setGoal" = "Establecer Meta";
+"setGoalText" = "Monta el teléfono en el robot y \n especifica una meta. El robot intentará\n alcanzarla después de pulsar iniciar.";
+"left" = "Izquierda";
+"meter" = "[m]";
+"startLabel" = "INICIAR";
+"canceled" = "CANCELAR";
+"info" = "Información";
+"restart" = "Reiniciar";
+
+/* Settings > Permissions */
+"important" = "IMPORTANTE";
+"cameraAccessRequiredMessage" = "OpenBot necesita acceso a la cámara";
+"allowPermissionMessageFormat" = "Permite que OpenBot acceda a %@";
+"allowButtonFormat" = "Permitir %@";
+
+/* Logout / open-code UI */
+"logOut" = "CERRAR SESIÓN";
+"confirmLogoutTitle" = "Confirmar Cierre de Sesión";
+"confirmLogoutMessage" = "¿Seguro que quieres cerrar sesión?";
+"codeExecuting" = "Tu código se está ejecutando..";
+
+/* Tab bar */
+"projectsTab" = "Proyectos";
+"homeTab" = "Inicio";
+"profileTab" = "Perfil";
+
+/* Loading / generic alerts */
+"loadingTitle" = "Cargando";
+"loadingProfileMessage" = "Espera mientras cargamos el perfil...";
+"loadingDataMessage" = "Espera mientras cargamos los datos...";
+"pleaseWaitMessage" = "Espera un momento...";
+"errorHeading" = "Error";
+"genericErrorMessage" = "¡Vaya! Algo salió mal. Inténtalo de nuevo.";
+"okAction" = "Aceptar";
+
+/* Profile screen */
+"myProfileHeading" = "Mi Perfil";
+"setupProfilePromptLine1" = "Configura tu perfil iniciando sesión con";
+"setupProfilePromptLine2" = "tu cuenta de Google.";
+"editProfile" = "Editar Perfil";
+"logoutMenuItem" = "Cerrar sesión";
+"firstNameFieldLabel" = "Nombre";
+"lastNameFieldLabel" = "Apellido";
+"dateOfBirthFieldLabel" = "Fecha de Nacimiento";
+"emailFieldLabel" = "Correo electrónico";
+"unknownFallback" = "Desconocido";
+"saveChangesButton" = "Guardar Cambios";
+"profileUpdatedSuccessToast" = "Perfil actualizado correctamente";
+"profilePictureLoadErrorToast" = "Error al cargar la foto de perfil";
+"signInWithGoogle" = "Iniciar sesión con Google";
+
+/* Project screen */
+"myProjectsHeading" = "Mis Proyectos";
+"pleaseSignInProjectsLine1" = "Inicia sesión primero para acceder a tus";
+"pleaseSignInProjectsLine2" = "proyectos.";
+"noProjectsFoundHeading" = "¡Vaya! No se encontraron proyectos.";
+"noProjectsFoundBody" = "Parece que todavía no hay proyectos\nen tu Google Drive.";
+"deleteFileTitle" = "Eliminar este archivo";
+"deleteFileMessage" = "No podrás restaurar este archivo más tarde";
+"deleteAction" = "Eliminar";
+
+/* QR Scanner / open-code bottom sheet */
+"scanQrCodeHeading" = "Escanear Código QR";
+"scanInstructions" = "Coloca el código QR dentro del marco para escanearlo. Evita mover el teléfono para obtener resultados más rápido.";
+"scanQrButton" = "Escanear QR";
+"qrScannerNavTitle" = "Escáner QR";
+"qrScanSuccessHeading" = "Código QR escaneado correctamente";
+"qrFileDetectedMessageFormat" = "Archivo %@ detectado. Comenzando a ejecutar el código en tu OpenBot.";
+"startButton" = "Iniciar";
+
+/* Playground (Run Robot / Blockly execution screen) */
+"cancelledStatus" = "Cancelado";
+"stopRobotButton" = "Detener Robot";
+"resetRobotButton" = "Reiniciar Robot";
+"stopCarButton" = "Detener Vehículo";
+"playgroundNavTitle" = "Zona de Pruebas";
+
+/* Robot Info headings */
+"robotTypeHeading" = "Tipo de Robot";
+"sensorsHeading" = "Sensores";
+"sonarReadingFormat" = "Sonar %@ cm";
+"batteryReadingFormat" = "Batería %@ V";
+
+/* Point Goal Navigation */
+"goalReachedMessage" = "Meta alcanzada";
+
+/* Model Management filter dropdown */
+"modelFilterAll" = "Todos";
+"modelFilterAllCaps" = "TODOS";
+"modelFilterAutoPilot" = "Piloto Automático";
+"modelFilterDetector" = "Detector";
+"modelFilterNavigation" = "Navegación";
+
+/* Data Collection / Autopilot server dropdown default state */
+"noServer" = "Sin Servidor";

@@ -20,6 +20,13 @@ public class Constants {
   public static final String PERMISSION_BLUETOOTH = Manifest.permission.BLUETOOTH;
   public static final String PERMISSION_AUDIO = Manifest.permission.RECORD_AUDIO;
 
+  // "Nearby devices" permission group (Android 12+/API 31+). On older versions Bluetooth
+  // access is covered by the normal (auto-granted) BLUETOOTH/BLUETOOTH_ADMIN permissions
+  // declared with maxSdkVersion=30 in the manifest, so no runtime request is needed there.
+  public static final String PERMISSION_BLUETOOTH_SCAN = Manifest.permission.BLUETOOTH_SCAN;
+  public static final String PERMISSION_BLUETOOTH_CONNECT =
+      Manifest.permission.BLUETOOTH_CONNECT;
+
   public static final String[] PERMISSIONS_LOGGING =
       new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE, PERMISSION_LOCATION};
   public static final String[] PERMISSIONS_CONTROLLER =
@@ -45,5 +52,9 @@ public class Constants {
   public static final String CMD_DISCONNECTED = "DISCONNECTED";
   public static final String CMD_SPEED_UP = "SPEED_UP";
   public static final String CMD_SPEED_DOWN = "SPEED_DOWN";
+
+  // Local-only commands to coordinate camera handoff between CameraFragment and WebRtcServer.
+  public static final String CMD_PAUSE_LOCAL_CAMERA = "PAUSE_LOCAL_CAMERA";
+  public static final String CMD_RESUME_LOCAL_CAMERA = "RESUME_LOCAL_CAMERA";
   // endregion
 }

@@ -19,13 +19,16 @@ class ModelManagementTable: UITableViewController {
     var modelClassLabel = UILabel()
     var popupWindow = UIView();
     var models: [String]!
+    /// Functional filter keys, matched positionally against the (translated) dropdown display
+    /// text -- `updateModelItemList(type:)` switches on these, never on the localized labels.
+    private let modelFilterKeys = ["All", "AutoPilot", "Detector", "Navigation"]
     var selectedIndex: IndexPath!
     var popupWindowWidth: NSLayoutConstraint?
     var popupWindowHeight: NSLayoutConstraint?
     var popupWindowLeadingAnchor: NSLayoutConstraint?
     var popupWindowTopAnchor: NSLayoutConstraint?
     var dropDown = UIView()
-    let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
+    let alert = UIAlertController(title: nil, message: Strings.pleaseWaitMessage, preferredStyle: .alert)
     var timer = Timer()
     let autoSyncIcon = currentOrientation == .portrait ? UIImageView(frame: CGRect(x: width - 60, y: 15, width: 25, height: 20)) :
             UIImageView(frame: CGRect(x: height - 100, y: 15, width: 25, height: 20))
@@ -54,7 +57,7 @@ class ModelManagementTable: UITableViewController {
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView {
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 50));
-        let modelLabel = createLabel(text: "Model");
+        let modelLabel = createLabel(text: Strings.model);
         modelLabel.frame.size = CGSize(width: headerView.frame.width - 10, height: headerView.frame.height - 10);
         modelLabel.font = UIFont.boldSystemFont(ofSize: 25.0)
         headerView.addSubview(modelLabel)
@@ -134,7 +137,7 @@ class ModelManagementTable: UITableViewController {
         ddView.frame = CGRect(x: Int(width) / 2, y: 0, width: 100, height: 50);
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(showModelDropdown(_:)))
         ddView.addGestureRecognizer(tapGesture)
-        modelClassLabel = createLabel(text: "All");
+        modelClassLabel = createLabel(text: Strings.modelFilterAll);
         modelClassLabel.frame = CGRect(x: 0, y: 0, width: 100, height: 40);
         ddView.addSubview(modelClassLabel)
         let downwardImage = UIImageView()
@@ -154,12 +157,12 @@ class ModelManagementTable: UITableViewController {
         modelDropdown.textColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black;
         let dropDownView = UIView(frame: CGRect(x: width / 2 + 20, y: 100, width: width / 2 - 80, height: 200));
         view.addSubview(dropDownView);
-        modelDropdown.dataSource = ["All", "AutoPilot", "Detector", "Navigation"];
+        modelDropdown.dataSource = [Strings.modelFilterAll, Strings.modelFilterAutoPilot, Strings.modelFilterDetector, Strings.modelFilterNavigation];
         modelDropdown.anchorView = dropDownView
         modelDropdown.width = 100;
         modelDropdown.selectionAction = { [unowned self] (index: Int, item: String) in
             modelClassLabel.text = item
-            updateModelItemList(type: item)
+            updateModelItemList(type: modelFilterKeys[index])
         }
     }
 
@@ -168,19 +171,19 @@ class ModelManagementTable: UITableViewController {
         switch type {
         case "All":
             models = Common.loadAllModelsName()
-            modelClassLabel.text = "ALL"
+            modelClassLabel.text = Strings.modelFilterAllCaps
         case "AutoPilot":
             models = Common.returnAllModelItemsName(mode: "AUTOPILOT")
-            modelClassLabel.text = "AutoPilot"
+            modelClassLabel.text = Strings.modelFilterAutoPilot
         case "Detector":
             models = Common.returnAllModelItemsName(mode: "DETECTOR")
-            modelClassLabel.text = "Detector"
+            modelClassLabel.text = Strings.modelFilterDetector
         case "Navigation":
             models = []
-            modelClassLabel.text = "Navigation"
+            modelClassLabel.text = Strings.modelFilterNavigation
         default:
             models = Common.loadAllModelsName()
-            modelClassLabel.text = "ALL"
+            modelClassLabel.text = Strings.modelFilterAllCaps
         }
         updateTable()
     }

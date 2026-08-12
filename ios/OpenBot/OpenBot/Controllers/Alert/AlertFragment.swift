@@ -10,10 +10,17 @@ import GoogleSignIn
  */
 class alertFragment : UIViewController {
     @IBOutlet weak var confirmLogoutLabel: UILabel!
+    @IBOutlet weak var confirmLogoutMessageLabel: UILabel!
+    @IBOutlet weak var cancelButton: UIButton!
+    @IBOutlet weak var logOutButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad();
         view.backgroundColor = UIColor.black.withAlphaComponent(0.6);
         confirmLogoutLabel.font = HelveticaNeue.regular(size: 16);
+        confirmLogoutLabel.text = Strings.confirmLogoutTitle
+        confirmLogoutMessageLabel.text = Strings.confirmLogoutMessage
+        cancelButton.configuration?.title = Strings.canceled
+        logOutButton.configuration?.title = Strings.logOut
     }
     
     @IBAction func cancelBtn(_ sender: Any) {

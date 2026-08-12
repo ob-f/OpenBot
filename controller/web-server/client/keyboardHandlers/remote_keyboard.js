@@ -10,10 +10,15 @@
 
 export function RemoteKeyboard (commandHandler) {
   const pressedKeys = new Set()
+
+  // Stop stuck keys when user leaves the browser tab.
+  if (typeof window !== 'undefined') {
+    window.addEventListener('blur', () => pressedKeys.clear())
+  }
+
   this.processKey = keyPress => {
     switch (keyPress?.type) {
       case 'keyup':
-        // keep track of what keys are currently pressed
         pressedKeys.delete(keyPress.key)
         if (['w', 's'].includes(keyPress.key)) {
           commandHandler.reset()
@@ -33,7 +38,9 @@ export function RemoteKeyboard (commandHandler) {
         }
         break
 
-      case 'keydown':
+      case 'keydown': {
+        // One command per key hold for toggles (N = noise, etc.), not every repeat tick.
+        const isRepeat = pressedKeys.has(keyPress.key)
         pressedKeys.add(keyPress.key)
         switch (keyPress.key) {
           case 'w':
@@ -77,36 +84,38 @@ export function RemoteKeyboard (commandHandler) {
             }
             break
           case 'n':
-            commandHandler.sendCommand('NOISE')
+            if (!isRepeat) commandHandler.sendCommand('NOISE')
             break
           case ' ':
-            commandHandler.sendCommand('LOGS')
+            if (!isRepeat) commandHandler.sendCommand('LOGS')
             break
           case 'ArrowRight':
-            commandHandler.sendCommand('INDICATOR_RIGHT')
+            if (!isRepeat) commandHandler.sendCommand('INDICATOR_RIGHT')
             break
           case 'ArrowLeft':
-            commandHandler.sendCommand('INDICATOR_LEFT')
+            if (!isRepeat) commandHandler.sendCommand('INDICATOR_LEFT')
             break
           case 'ArrowUp':
-            commandHandler.sendCommand('INDICATOR_STOP')
+            if (!isRepeat) commandHandler.sendCommand('INDICATOR_STOP')
             break
           case 'ArrowDown':
-            commandHandler.sendCommand('NETWORK')
+            if (!isRepeat) commandHandler.sendCommand('NETWORK')
             break
           case 'm':
-            commandHandler.sendCommand('DRIVE_MODE')
+            if (!isRepeat) commandHandler.sendCommand('DRIVE_MODE')
             break
           case 'q':
-            commandHandler.sendCommand('SPEED_DOWN')
+            if (!isRepeat) commandHandler.sendCommand('SPEED_DOWN')
             break
           case 'e':
-            commandHandler.sendCommand('SPEED_UP')
+            if (!isRepeat) commandHandler.sendCommand('SPEED_UP')
             break
           case 'Escape':
-            commandHandler.reset()
+            if (!isRepeat) commandHandler.reset()
             break
         }
+        break
+      }
     }
   }
 }

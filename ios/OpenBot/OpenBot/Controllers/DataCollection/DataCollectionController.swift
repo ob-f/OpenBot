@@ -280,10 +280,9 @@ class DataCollectionController: CameraController {
     @objc func toggleLogging() {
         loggingEnabled = !loggingEnabled;
         isLoggedButtonPressed = true;
+        updateLoggingUI()
 
         if (loggingEnabled) {
-            expandSettingView.logData.isOn = true
-
             // Create the folders that will contain the data
             dataLogger.createOpenBotFolders()
 
@@ -298,8 +297,6 @@ class DataCollectionController: CameraController {
                 dataLogger.recordLogs();
             }
         } else {
-            expandSettingView.logData.isOn = false
-
             // Save the collected sensor data
             dataLogger.saveSensorData()
             if let url = URL(string: dataLogger.openbotPath) {
@@ -309,6 +306,14 @@ class DataCollectionController: CameraController {
             }
             // Reset data logger
             dataLogger.reset()
+        }
+    }
+
+    /// function to update logging switch and sensor buttons
+    private func updateLoggingUI() {
+        expandSettingView.logData.setOn(loggingEnabled, animated: true)
+        for sensor in expandSettingView.sensorButtons {
+            sensor.isEnabled = !loggingEnabled
         }
     }
 

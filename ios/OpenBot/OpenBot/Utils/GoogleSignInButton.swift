@@ -29,8 +29,17 @@ class GoogleSignInBtn : UIView {
     func createSignInBtn(frame: CGRect) {
         self.backgroundColor = UIColor(named: "signInButtonColor");
         layer.cornerRadius = 10;
-        addSubview(createGoogleIcon(frame: CGRect(x: self.frame.width / 2 - 100, y: 16, width: 20, height: 20)));
-        addSubview(createSingInText(frame: CGRect(x: self.frame.width / 2 - 69, y: 5, width: 160, height: 40)))
+        // Icon + text are centered as a group based on the text's real measured width, since a
+        // fixed offset/width tuned for the English string leaves other languages off-center or
+        // truncated (translations vary a lot in length).
+        let font = UIFont.systemFont(ofSize: 18)
+        let textWidth = measuredWidth(of: Strings.signInWithGoogle, font: font)
+        let iconWidth: CGFloat = 20
+        let spacing: CGFloat = 12
+        let groupWidth = iconWidth + spacing + textWidth
+        let groupStartX = (self.frame.width - groupWidth) / 2
+        addSubview(createGoogleIcon(frame: CGRect(x: groupStartX, y: 16, width: iconWidth, height: iconWidth)));
+        addSubview(createSingInText(frame: CGRect(x: groupStartX + iconWidth + spacing, y: 5, width: textWidth + 4, height: 40), font: font))
     }
 
     /**
@@ -49,11 +58,11 @@ class GoogleSignInBtn : UIView {
      - Parameter frame:
      - Returns:
      */
-    private func createSingInText(frame: CGRect) -> UILabel {
+    private func createSingInText(frame: CGRect, font: UIFont) -> UILabel {
         let signInText = UILabel(frame: frame);
-        signInText.text = "Sign-in with Google";
+        signInText.text = Strings.signInWithGoogle;
         signInText.textColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black
-        signInText.font = signInText.font?.withSize(18);
+        signInText.font = font;
         return signInText;
     }
 

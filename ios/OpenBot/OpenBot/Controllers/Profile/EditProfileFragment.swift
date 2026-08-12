@@ -19,7 +19,7 @@ class editProfileFragment: UIViewController, UIImagePickerControllerDelegate, UI
     private let authentication = Authentication()
     private var firstName: UILabel!
     private var lastName: UILabel!
-    let alert = UIAlertController(title: "Loading", message: "Please wait while we load the profile...", preferredStyle: .alert)
+    let alert = UIAlertController(title: Strings.loadingTitle, message: Strings.loadingProfileMessage, preferredStyle: .alert)
     private var email: UILabel!
     private var dob: UILabel!
     private var firstNameField: UITextField!
@@ -101,10 +101,10 @@ class editProfileFragment: UIViewController, UIImagePickerControllerDelegate, UI
      This function creates the labels for the text fields.
      */
     private func createLabels() {
-        firstName = CustomLabel(text: "First Name", fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: 0, width: 150, height: 40))
-        lastName = CustomLabel(text: "Last Name", fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: (firstName.frame.origin.y + 100.0), width: 150, height: 40))
-        dob = CustomLabel(text: "Date Of Birth", fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: (lastName.frame.origin.y + 100.0), width: 150, height: 40))
-        email = CustomLabel(text: "Email", fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: (dob.frame.origin.y + 100.0), width: 150, height: 40))
+        firstName = CustomLabel(text: Strings.firstNameFieldLabel, fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: 0, width: 150, height: 40))
+        lastName = CustomLabel(text: Strings.lastNameFieldLabel, fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: (firstName.frame.origin.y + 100.0), width: 150, height: 40))
+        dob = CustomLabel(text: Strings.dateOfBirthFieldLabel, fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: (lastName.frame.origin.y + 100.0), width: 150, height: 40))
+        email = CustomLabel(text: Strings.emailFieldLabel, fontSize: 16, fontColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black, frame: CGRect(x: 26, y: (dob.frame.origin.y + 100.0), width: 150, height: 40))
         scrollView.addSubview(firstName);
         scrollView.addSubview(lastName);
         scrollView.addSubview(dob);
@@ -117,7 +117,7 @@ class editProfileFragment: UIViewController, UIImagePickerControllerDelegate, UI
     private func createTextFields() {
         firstNameField = CustomTextField(frame: CGRect(x: 17, y: firstName.frame.origin.y + adapted(dimensionSize: 30, to: .height), width: width - 34, height: 47));
         view.addSubview(firstNameField);
-        setTextField(textField: firstNameField, value: getFirstName(name: Auth.auth().currentUser?.displayName ?? "Unknown"));
+        setTextField(textField: firstNameField, value: getFirstName(name: Auth.auth().currentUser?.displayName ?? Strings.unknownFallback));
         lastNameField = CustomTextField(frame: CGRect(x: 17, y: lastName.frame.origin.y + adapted(dimensionSize: 30, to: .height), width: width - 34, height: 47));
         setTextField(textField: lastNameField, value: getLastName(name: Auth.auth().currentUser?.displayName ?? ""));
         dobField = CustomTextField(frame: CGRect(x: 17, y: dob.frame.origin.y + adapted(dimensionSize: 30, to: .height), width: width - 34, height: 47));
@@ -247,9 +247,9 @@ class editProfileFragment: UIViewController, UIImagePickerControllerDelegate, UI
      Function to create button named cancel and done.
      */
     private func createButtons() {
-        let cancelBtn = CustomButton(text: "Cancel", frame: CGRect(x: 17, y: email.bottom + adapted(dimensionSize: 60, to: .height), width: 147, height: 47), selector: #selector(cancel))
+        let cancelBtn = CustomButton(text: Strings.cancel, frame: CGRect(x: 17, y: email.bottom + adapted(dimensionSize: 60, to: .height), width: 147, height: 47), selector: #selector(cancel))
         scrollView.addSubview(cancelBtn);
-        saveChangesBtn = CustomButton(text: "Save Changes", frame: CGRect(x: cancelBtn.frame.origin.x + 194.0, y: cancelBtn.frame.origin.y, width: 147, height: 47), selector: #selector(saveChanges))
+        saveChangesBtn = CustomButton(text: Strings.saveChangesButton, frame: CGRect(x: cancelBtn.frame.origin.x + 194.0, y: cancelBtn.frame.origin.y, width: 147, height: 47), selector: #selector(saveChanges))
         scrollView.addSubview(saveChangesBtn)
         saveChangesBtn.backgroundColor = Colors.title
         saveChangesBtn.setTitleColor(UIColor.white, for: .normal);
@@ -283,7 +283,7 @@ class editProfileFragment: UIViewController, UIImagePickerControllerDelegate, UI
                         print("Error updating profile: \(error.localizedDescription)")
                     } else {
                         self.alert.dismiss(animated: true);
-                        self.showToast("Profile Updated Successfully", icon: UIImage(named: "check")!);
+                        self.showToast(Strings.profileUpdatedSuccessToast, icon: UIImage(named: "check")!);
                     }
                 }
             }
@@ -389,7 +389,7 @@ class editProfileFragment: UIViewController, UIImagePickerControllerDelegate, UI
      Toast message on error while loading profile picture
      */
     func imageLoadFailed() {
-        showToast("Error while loading profile picture", icon: UIImage(named: "check")!);
+        showToast(Strings.profilePictureLoadErrorToast, icon: UIImage(named: "check")!);
         alert.dismiss(animated: true);
     }
 
@@ -399,7 +399,7 @@ class editProfileFragment: UIViewController, UIImagePickerControllerDelegate, UI
     func setupNavigationBarItem() {
         if UIImage(named: "back") != nil {
             let backNavigationIcon = (UIImage(named: "back")?.withRenderingMode(.alwaysOriginal))!
-            let newBackButton = UIBarButtonItem(image: backNavigationIcon, title: "Edit Profile", target: self, action: #selector(back(sender:)), titleColor: Colors.navigationColor ?? .white)
+            let newBackButton = UIBarButtonItem(image: backNavigationIcon, title: Strings.editProfile, target: self, action: #selector(back(sender:)), titleColor: Colors.navigationColor ?? .white)
             navigationItem.leftBarButtonItem = newBackButton
         }
     }

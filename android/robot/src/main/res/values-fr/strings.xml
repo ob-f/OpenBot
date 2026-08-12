@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="description_info">Infos</string>
+    <string name="camera_error">Cet appareil ne prend pas en charge l\'API Camera2.</string>
+    <string name="threads">Threads</string>
+    <string name="camera_permission_denied">L\'autorisation de la caméra est nécessaire</string>
+    <string name="storage_permission_denied">L\'autorisation de stockage externe est nécessaire</string>
+    <string name="location_permission_denied">L\'autorisation de localisation est nécessaire</string>
+    <string name="record_audio_permission_denied">L\'autorisation d\'enregistrement audio est nécessaire</string>
+    <string name="nearby_permission_denied">L\'autorisation des appareils à proximité est nécessaire</string>
+    <string name="permission_reason_logging"> pour enregistrer les jeux de données.</string>
+    <string name="permission_reason_ai"> pour exécuter les modèles d\'IA.</string>
+    <string name="permission_reason_ar_core"> pour exécuter AR Core.</string>
+    <string name="permission_reason_stream_video"> pour diffuser la vidéo vers le contrôleur.</string>
+    <string name="permission_reason_preview"> pour prévisualiser la vidéo.</string>
+    <string name="permission_reason_stream_audio"> pour diffuser l\'audio vers le contrôleur.</string>
+    <string name="permission_reason_find_controller"> pour trouver le contrôleur.</string>
+    <string name="permission_reason_model_from_phone"> pour sélectionner un modèle depuis le stockage du téléphone.</string>
+    <string name="permission_reason_settings"> pour utiliser toutes les fonctionnalités de l\'app.</string>
+
+    <string name="off">Désactivé</string>
+    <string name="on">Activé</string>
+
+    <string name="server">Serveur</string>
+    <string name="save_as">Enregistrer sous</string>
+    <string name="model">Modèle</string>
+
+    <string name="device">Appareil</string>
+    <string name="baud_rate">Débit en bauds</string>
+
+    <string name="log_setting">Paramètre de journalisation</string>
+    <string name="camera_facing_back">Arrière</string>
+    <string name="camera_facing_front">Avant</string>
+    <string name="logging">Journalisation</string>
+    <string name="not_logging">Aucune journalisation</string>
+    <string name="no_device">Aucun appareil</string>
+    <string name="data_log">Journal de données</string>
+    <string name="usb_connection">Connexion USB</string>
+    <string name="camera">Caméra</string>
+
+    <string name="control">Contrôle</string>
+    <string name="battery">Batterie</string>
+    <string name="speed">Régime (g,d)</string>
+    <string name="sonar">Sonar</string>
+    <string name="drive_mode">Mode de conduite</string>
+    <string name="speed_mode">Mode de vitesse</string>
+    <string name="plus">plus</string>
+    <string name="arrow">flèche</string>
+    <string name="minus">moins</string>
+    <string name="controller">Manette</string>
+    <string name="control_mode">Mode de contrôle</string>
+    <string name="crop">Recadrer</string>
+    <string name="frame">Cadre</string>
+    <string name="settings">Paramètres</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="inference">Inférence</string>
+    <string name="input">Résolution</string>
+    <string name="confidence">Confiance</string>
+    <string name="object">Objet</string>
+    <string name="speedTitle">Vitesse</string>
+    <string name="preview_resolution">Résolution de l\'aperçu</string>
+    <string name="save_option">Options d\'enregistrement</string>
+    <string name="file_available_body">Un modèle portant le même nom existe déjà. Voulez-vous le remplacer ?</string>
+    <string name="file_available_title">Fichier trouvé</string>
+    <string name="model_delete_body">Voulez-vous vraiment supprimer ce modèle ?</string>
+    <string name="model_delete_title">Confirmer</string>
+    <string name="permissions">Autorisations</string>
+    <string name="goal_reached">Objectif atteint.</string>
+    <string name="model_download_body">Revenir en arrière annulerait le téléchargement. Êtes-vous sûr ?</string>
+    <string name="model_download_title">Téléchargement du modèle en cours</string>
+    <string name="save">Enregistrer</string>
+    <string name="confirm_title">Êtes-vous sûr ?</string>
+    <string name="stream_change_body">L\'app doit être redémarrée pour que ce paramètre prenne effet</string>
+    <string name="selectAll">Tout sélectionner</string>
+    <string name="clearAll">Tout effacer</string>
+    <string name="tracking_lost">Suivi perdu.</string>
+    <string name="no_initial_ar_core_pose">Aucune pose initiale AR Core.</string>
+    <string name="ar_core_session_paused">Session AR Core en pause.</string>
+    <string name="tips_connect_timeout">délai de connexion dépassé</string>
+    <string name="tips_connect_fail">échec de la connexion</string>
+    <string name="tips_connection_disconnected">la connexion a été interrompue</string>
+    <string name="tips_write_operation">veuillez saisir une chaîne hexadécimale</string>
+    <string name="profile">Profil</string>
+    <string name="projects">Projets</string>
+    <string name="scanner">Scanner</string>
+    <string name="home">Accueil</string>
+    <string name="scan_qr_code">Scanner le code QR</string>
+    <string name="playground">Bac à sable</string>
+    <string name="text_on_qr_screen">Placez le code QR dans le cadre pour le scanner. Évitez de bouger pour obtenir un résultat plus rapide.</string>
+    <string name="edit_profile">Modifier le profil</string>
+    <string name="logout">Déconnexion</string>
+    <string name="auto_mode">Mode automatique</string>
+    <string name="dynamic_speed">Vitesse dynamique</string>
+    <string name="bumpers">Pare-chocs</string>
+    <string name="robot_type">Type de robot :</string>
+    <string name="indicators">Clignotants</string>
+    <string name="back">Arrière</string>
+    <string name="voltage_divider">Diviseur de tension</string>
+    <string name="status">Statut</string>
+    <string name="front">Avant</string>
+    <string name="robot_icon">Icône du robot</string>
+    <string name="wheel_odometry_front">Odométrie des roues avant</string>
+    <string name="wheel_odometry_back">Odométrie des roues arrière</string>
+    <string name="backward">Marche arrière</string>
+    <string name="forward">Marche avant</string>
+    <string name="stop">Arrêt</string>
+    <string name="motors">Moteurs</string>
+    <string name="leds">LED</string>
+    <string name="lights">Lumières</string>
+    <string name="sensors">Capteurs</string>
+    <string name="send_commands">Envoyer des commandes</string>
+    <string name="wheel_odometry">Odométrie des roues</string>
+    <string name="readings">Relevés</string>
+    <string name="lights_slider">curseur de lumières</string>
+    <string name="indicator_leds">LED des clignotants</string>
+    <string name="back_leds">LED arrière</string>
+    <string name="status_leds">LED de statut</string>
+    <string name="front_leds">LED avant</string>
+    <string name="cancel">Annuler</string>
+
+    <string name="general">Général</string>
+    <string name="language">Langue</string>
+    <string name="language_summary">Choisir la langue d\'affichage de l\'app</string>
+    <string name="applying_language">Application de la langue…</string>
+    <string name="system_default">Système par défaut</string>
+    <string name="storage">Stockage</string>
+    <string name="location">Localisation</string>
+    <string name="microphone">Microphone</string>
+    <string name="nearby">Appareils à proximité</string>
+    <string name="video_streaming">Diffusion vidéo</string>
+    <string name="stream_mode">Mode de diffusion</string>
+    <string name="connection_type_category">Type de connexion</string>
+    <string name="connectivity_mode">Mode de connectivité</string>
+    <string name="tile_general">Général</string>
+    <string name="tile_ai">IA</string>
+    <string name="tile_legacy">Legacy</string>
+    <string name="tile_free_roam">Conduite libre</string>
+    <string name="tile_data_collection">Collecte de données</string>
+    <string name="tile_controller_mapping">Mappage du contrôleur</string>
+    <string name="tile_robot_info">Infos robot</string>
+    <string name="tile_autopilot">Autopilote</string>
+    <string name="tile_object_nav">Suivi d\'objet</string>
+    <string name="tile_point_goal_navigation">Navigation ciblée</string>
+    <string name="tile_model_management">Gestion des modèles</string>
+    <string name="tile_default_mode">Par défaut</string>
+
+    <string-array name="preview_resolutions">
+        <item>Basse</item>
+        <item>Moyenne</item>
+        <item>Haute</item>
+    </string-array>
+    <string-array name="save_data">
+        <item>Local</item>
+        <item>Google Drive</item>
+        <item>Serveur local</item>
+    </string-array>
+
+    <string name="set_goal_title">Définir un objectif</string>
+    <string name="set_goal_message">Montez le téléphone sur le robot et définissez un objectif. Le robot essaiera d\'atteindre l\'objectif après avoir appuyé sur Démarrer.</string>
+    <string name="start">Démarrer</string>
+    <string name="forward_hint_m">Avant [m]</string>
+    <string name="left_hint_m">Gauche [m]</string>
+    <string name="log_data">Enregistrer les données</string>
+    <string name="model_resolution">Résolution du modèle</string>
+    <string name="sensor_data">Données des capteurs</string>
+    <string name="preview_images">Images d\'aperçu</string>
+    <string name="training_images">Images d\'entraînement</string>
+    <string name="sign_in_description">Configurez votre profil en vous connectant avec votre compte Google.</string>
+    <string name="sign_in_with_google">Se connecter avec Google</string>
+    <string name="no_projects_found_title">Oups ! Aucun projet trouvé.</string>
+    <string name="no_projects_found_body">Il semble qu\'il n\'y ait pas encore de projets dans votre Google Drive.</string>
+    <string name="project_file_detected">Fichier %1$s détecté. Appuyez sur Démarrer pour exécuter le code sur votre OpenBot.</string>
+    <string name="usb_check_connection">Veuillez vérifier la connexion USB.</string>
+    <string name="ble_connecting">Connexion en cours</string>
+    <string name="ble_disconnect">Déconnecter</string>
+    <string name="ble_connect">Connecter</string>
+</resources>

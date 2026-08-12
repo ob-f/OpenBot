@@ -35,6 +35,8 @@ public class SharedPreferencesManager {
 
     public var blocklyCode : String = "blocklyCode";
 
+    public var web_signaling_server_url : String = "web_signaling_server_url";
+
     public func setControlMode(value:String){
         userDefaults.set(value, forKey: control_mode)
     }
@@ -137,5 +139,14 @@ public class SharedPreferencesManager {
     
     public func getBlocklyCode() -> String?{
         userDefaults.string(forKey: blocklyCode);
+    }
+
+    public func setWebSignalingServerUrl(value: String) {
+        userDefaults.set(value, forKey: web_signaling_server_url)
+    }
+
+    public func getWebSignalingServerUrl() -> String {
+        // Default IP. Replace it with your own server IP address in Settings.
+        return userDefaults.string(forKey: web_signaling_server_url) ?? "ws://192.168.1.40:8080/ws"
     }
 }

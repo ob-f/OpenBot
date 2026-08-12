@@ -38,6 +38,11 @@ func resized(size: CGSize, basedOn dimension: Dimension) -> CGSize {
     return CGSize(width: width, height: height)
 }
 
+/// Measures the real rendered width of `text` at `font`
+func measuredWidth(of text: String, font: UIFont) -> CGFloat {
+    ceil((text as NSString).size(withAttributes: [.font: font]).width)
+}
+
 /// This function allows finetuning a reference dimension to match the user interface screen
 ///
 /// - Parameters:

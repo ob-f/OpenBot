@@ -110,11 +110,11 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
     /// function to trigger the popup when camera permissions are not allowed.
     func createAllowAlert(alertFor: String) {
         let alert = UIAlertController(
-                title: "IMPORTANT",
-                message: "Please allow " + alertFor + " access for OpenBot",
+                title: Strings.important,
+                message: String(format: Strings.allowPermissionMessageFormat, alertFor),
                 preferredStyle: UIAlertController.Style.alert
         )
-        alert.addAction(UIAlertAction(title: "Allow " + alertFor, style: .cancel, handler: { (alert) -> Void in
+        alert.addAction(UIAlertAction(title: String(format: Strings.allowButtonFormat, alertFor), style: .cancel, handler: { (alert) -> Void in
             guard let url = URL(string: UIApplication.openSettingsURLString), !url.absoluteString.isEmpty else {
                 return
             }
@@ -291,39 +291,57 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
 
     /// Configure the video(camera output) rotation when screen orientation changes.
     private func configureVideoOrientation() {
-        let orientation = UIDevice.current.orientation
-        if let previewLayer = videoPreviewLayer, let previewConnection = videoPreviewLayer.connection {
-            if previewConnection.isVideoOrientationSupported, let previewOrientation = AVCaptureVideoOrientation(rawValue: orientation.rawValue) {
-                previewLayer.frame = view.bounds
-                previewConnection.videoOrientation = previewOrientation
-                videoOutput.connection(with: .video)?.videoOrientation = previewOrientation
-            }
+        var orientation: AVCaptureVideoOrientation = .portrait
+        switch currentOrientation {
+        case .portraitUpsideDown:
+            orientation = .portraitUpsideDown
+        case .landscapeLeft:
+            orientation = .landscapeRight
+        case .landscapeRight:
+            orientation = .landscapeLeft
+        default:
+            break
+        }
+        if let previewLayer = videoPreviewLayer, let previewConnection = videoPreviewLayer.connection,
+           previewConnection.isVideoOrientationSupported {
+            previewLayer.frame = cameraView.frame
+            previewConnection.videoOrientation = orientation
+            videoOutput.connection(with: .video)?.videoOrientation = orientation
         }
     }
 
     /// Switch between front camera and back camera
     func switchCameraView() {
-        let currentCameraInput: AVCaptureInput = captureSession.inputs[0]
-        captureSession.removeInput(currentCameraInput)
-        var newCamera: AVCaptureDevice
-        newCamera = AVCaptureDevice.default(for: AVMediaType.video)!
+        guard let captureSession = captureSession, !captureSession.inputs.isEmpty else { return }
+        let currentCameraInput = captureSession.inputs[0]
+        guard let currentDeviceInput = currentCameraInput as? AVCaptureDeviceInput else { return }
 
-        if (currentCameraInput as! AVCaptureDeviceInput).device.position == .back {
-            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromLeft, animations: {
-                newCamera = self.cameraWithPosition(.front)!
-            }, completion: nil)
+        let isBackCamera = currentDeviceInput.device.position == .back
+        let newPosition: AVCaptureDevice.Position = isBackCamera ? .front : .back
+        guard let newCamera = cameraWithPosition(newPosition) else { return }
+
+        if isBackCamera {
+            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromLeft, animations: nil, completion: nil)
             preferencesManager.setCameraSwitch(value: "front");
         } else {
-            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromRight, animations: {
-                newCamera = self.cameraWithPosition(.back)!
-            }, completion: nil)
+            UIView.transition(with: cameraView, duration: 0.5, options: .transitionFlipFromRight, animations: nil, completion: nil)
             preferencesManager.setCameraSwitch(value: "back");
         }
+
+        // Apply input swap and orientation together so no wrong-orientation frame reaches the web feed
+        captureSession.beginConfiguration()
+        captureSession.removeInput(currentCameraInput)
         do {
-            try captureSession?.addInput(AVCaptureDeviceInput(device: newCamera))
+            try captureSession.addInput(AVCaptureDeviceInput(device: newCamera))
+            // Re-apply orientation after camera switch as iOS resets it to default on new input
+            if let connection = videoOutput.connection(with: .video),
+               connection.isVideoOrientationSupported {
+                connection.videoOrientation = AVCaptureVideoOrientation(rawValue: currentOrientation.rawValue) ?? .portrait
+            }
         } catch {
             print("error: \(error.localizedDescription)")
         }
+        captureSession.commitConfiguration()
     }
 
     /// To set the camera position for switching camera

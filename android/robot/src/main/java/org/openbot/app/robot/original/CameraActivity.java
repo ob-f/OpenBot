@@ -907,48 +907,56 @@ public abstract class CameraActivity extends AppCompatActivity
   }
 
   private void setControlMode(ControlMode controlMode) {
-    if (this.controlMode != controlMode) {
-      LOGGER.d("Updating  controlMode: " + controlMode);
-      this.controlMode = controlMode;
-      switch (controlMode) {
-        case GAMEPAD:
-          disconnectPhoneController();
-          break;
-        case PHONE:
-          handleControllerEvents();
-          if (!PermissionUtils.hasControllerPermissions(this)) {
-            PermissionUtils.requestControllerPermissions(this);
-          } else connectPhoneController();
-          break;
-        case WEBSERVER:
-          handleControllerEvents();
-          if (!PermissionUtils.hasControllerPermissions(this)) {
-            PermissionUtils.requestControllerPermissions(this);
-          } else connectWebController();
-          break;
-        default:
-          throw new IllegalStateException("Unexpected value: " + controlMode);
-      }
-      preferencesManager.setControlMode(controlMode.getValue());
-      controlModeSpinner.setSelection(controlMode.ordinal());
+    if (controlMode == null || this.controlMode == controlMode) {
+      return;
     }
+    LOGGER.d("Updating  controlMode: " + controlMode);
+    this.controlMode = controlMode;
+    handleControllerEvents();
+    switch (controlMode) {
+      case GAMEPAD:
+        disconnectPhoneController();
+        break;
+      case PHONE:
+        if (!PermissionUtils.hasControllerPermissions(this)) {
+          PermissionUtils.requestControllerPermissions(this);
+          preferencesManager.setControlMode(controlMode.getValue());
+          controlModeSpinner.setSelection(controlMode.ordinal());
+          return;
+        }
+        connectPhoneController();
+        break;
+      case WEBSERVER:
+        if (!PermissionUtils.hasControllerPermissions(this)) {
+          PermissionUtils.requestControllerPermissions(this);
+          preferencesManager.setControlMode(controlMode.getValue());
+          controlModeSpinner.setSelection(controlMode.ordinal());
+          return;
+        }
+        connectWebController();
+        break;
+      default:
+        throw new IllegalStateException("Unexpected value: " + controlMode);
+    }
+    preferencesManager.setControlMode(controlMode.getValue());
+    controlModeSpinner.setSelection(controlMode.ordinal());
   }
 
   private void connectPhoneController() {
     phoneController.connect(this);
     DriveMode oldDriveMode = driveMode;
-    // Currently only dual drive mode supported
     setDriveMode(DriveMode.DUAL);
     driveModeSpinner.setAlpha(0.5f);
+    driveModeSpinner.setEnabled(false);
     preferencesManager.setDriveMode(oldDriveMode.getValue());
   }
 
   private void connectWebController() {
     phoneController.connectWebServer();
     DriveMode oldDriveMode = driveMode;
-    // Currently only dual drive mode supported
-    setDriveMode(Enums.DriveMode.GAME);
+    setDriveMode(DriveMode.GAME);
     driveModeSpinner.setAlpha(0.5f);
+    driveModeSpinner.setEnabled(false);
     preferencesManager.setDriveMode(oldDriveMode.getValue());
   }
 
@@ -1284,17 +1292,6 @@ public abstract class CameraActivity extends AppCompatActivity
     }
   }
 
-  /*
-     Classes to handle events from a Controller.
-     This can be the entry point to other external controllers
-     See how PhoneController emits events.
-
-     Expected JSON format:
-     {command: "LOGS"}
-        or
-     {driveCmd: {l:0.2, r:-0.34}}
-  */
-
   private void handleControllerEvents() {
     ControllerToBotEventBus.subscribe(
         this.getClass().getSimpleName(),
@@ -1343,12 +1340,7 @@ public abstract class CameraActivity extends AppCompatActivity
               controllerHandler.handleDriveMode();
               break;
 
-              // We re connected to the controller, send back status info
             case "CONNECTED":
-              // PhoneController class will receive this event and resent it to the
-              // controller.
-              // Other controllers can subscribe to this event as well.
-              // That is why we are not calling phoneController.send() here directly.
               BotToControllerEventBus.emitEvent(
                   ConnectionUtils.getStatus(
                       loggingEnabled,
@@ -1361,7 +1353,9 @@ public abstract class CameraActivity extends AppCompatActivity
 
             case "DISCONNECTED":
               controllerHandler.handleDriveCommand(0.f, 0.f);
-              setControlMode(ControlMode.GAMEPAD);
+              if (preferencesManager.getControlMode() != ControlMode.WEBSERVER.getValue()) {
+                setControlMode(ControlMode.GAMEPAD);
+              }
               break;
           }
         },

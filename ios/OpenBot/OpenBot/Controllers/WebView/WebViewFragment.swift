@@ -135,7 +135,7 @@ class openCodeWebView: UIViewController, WKUIDelegate, WKNavigationDelegate {
             textField.text = defaultText
         }
 
-        alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+        alertController.addAction(UIAlertAction(title: Strings.okAction, style: .default, handler: { (action) in
             if let text = alertController.textFields?.first?.text {
                 completionHandler(text)
             } else {
@@ -143,7 +143,7 @@ class openCodeWebView: UIViewController, WKUIDelegate, WKNavigationDelegate {
             }
         }))
 
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+        alertController.addAction(UIAlertAction(title: Strings.cancel, style: .cancel, handler: { (action) in
             completionHandler(nil)
         }))
 
