@@ -36,6 +36,10 @@ building great user experiences.
   retrieves files from the user's Google Drive, which is created by Firebase Google Drive services. It's important to
   use the same Firebase project for both the IOS and web applications for Google Drive services to work properly.
 
+  The `GoogleService-Info.plist` file committed in this repo is a **dummy placeholder** with fake keys and identifiers.
+  Google Sign-In and other Firebase features will not work until you replace it with the real file downloaded from
+  your own Firebase project, as described below.
+
 - ### Prerequisites
   To integrate Firebase into an IOS OpenBot application for Google Sign-In, we will need a few prerequisites.
 - **Google Account:** To use Google Sign-In with Firebase, you must have a Google account. If you don't have one, click
