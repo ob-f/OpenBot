@@ -10,7 +10,8 @@
     "dev:server": "npm run start --prefix server",
     "dev:start-client": "vite --port 8081 --host",
     "build": "vite build",
-    "lint": "eslint server/*.js --fix && eslint client/*.js --fix"
+    "lint": "eslint server/*.js --fix && eslint client/*.js --fix",
+    "test": "node --test"
   },
   "author": "Ivo Zivkov",
   "devDependencies": {

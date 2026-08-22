@@ -42,7 +42,7 @@ function DriveValue () {
   }
 
   this.read = () => {
-    return Math.round(value, 3)
+    return Math.round(value * 1000) / 1000
   }
 }
 
@@ -121,4 +121,4 @@ function DriveCommandReducer () {
   }
 }
 
-module.exports = { Commands, CommandHandler }
+module.exports = { Commands, CommandHandler, DriveValue }
