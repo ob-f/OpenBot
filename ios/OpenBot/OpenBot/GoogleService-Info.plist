@@ -3,23 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>955078484078-4m63lascf45ranfmedahhcgo10ainnfa.apps.googleusercontent.com</string>
+	<string>000000000000-0000000000000000000000000000.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.955078484078-4m63lascf45ranfmedahhcgo10ainnfa</string>
+	<string>com.googleusercontent.apps.000000000000-0000000000000000000000000000</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>955078484078-234hcdks9b2fv94n77d6guek1sfsk30r.apps.googleusercontent.com</string>
+	<string>000000000000-0000000000000000000000000000.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCMmaGPZ7rWxQXPIFU0zf9EKM82jH9kn2M</string>
+	<string>AIzaSyDUMMYDUMMYDUMMYDUMMYDUMMYDUMMYD</string>
 	<key>GCM_SENDER_ID</key>
-	<string>955078484078</string>
+	<string>000000000000</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>org.openbot</string>
+	<string>org.openbot.app.robot</string>
 	<key>PROJECT_ID</key>
-	<string>opencode-openbot</string>
+	<string>example-project</string>
 	<key>STORAGE_BUCKET</key>
-	<string>opencode-openbot.appspot.com</string>
+	<string>example-project.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +31,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:955078484078:ios:dd1d0a2f4d0a7f9a65867f</string>
+	<string>1:000000000000:ios:0000000000000000000000</string>
 	<key>DATABASE_URL</key>
-	<string>https://opencode-openbot-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+	<string>https://example-project-default-rtdb.firebasedatabase.app</string>
 </dict>
 </plist>
