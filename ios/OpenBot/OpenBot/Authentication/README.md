@@ -74,9 +74,12 @@ building great user experiences.
        <img src="../../../../docs/images/firebase_bundle_id.jpg" alt="Bundle ID Name" width="30.5%"/>
        </p>
 
-    6. Click on the `Next` button and skip the third (Add Firebase SDK) and fourth (Add initialization code) steps as
+    6. Copy the `REVERSED_CLIENT_ID` value from your new `GoogleService-Info.plist` and paste it into the
+       `CFBundleURLSchemes` entry (under `CFBundleURLTypes`) in `Info.plist`. Google Sign-In will not work until this
+       value matches your own Firebase project.
+    7. Click on the `Next` button and skip the third (Add Firebase SDK) and fourth (Add initialization code) steps as
        it's already done for this project.
-    7. Continue to the Firebase Console to configure the Firebase services you want to use in your IOS app.
+    8. Continue to the Firebase Console to configure the Firebase services you want to use in your IOS app.
 
    <p>
      <img src="../../../../docs/images/firebase_google_service_info_plist.jpg" alt="Add IOS Application" width="35%"/>
