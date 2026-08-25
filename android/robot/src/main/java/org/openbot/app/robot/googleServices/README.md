@@ -22,6 +22,11 @@ Google Firebase is a mobile and web application development platform that offers
   
   If you do not want to use OpenBot Playground services, you do not need to set up Firebase authentication or Google Sign-In authentication.
 
+  The `google-services.json` files committed in this repo (`android/robot/google-services.json` and
+  `android/robot/src/main/assets/google-services.json`) are **dummy placeholders** with fake keys and identifiers.
+  Google Sign-In and other Firebase features will not work until you replace them with the real file downloaded from
+  your own Firebase project, as described below.
+
 ### Prerequisites
 To integrate Firebase into an Android OpenBot application for Google Sign-In, we will need a few prerequisites.
 - **Google Account:** To use Google Sign-In with Firebase, you must have a Google account. If you don't have one, click here to [create](https://accounts.google.com/signup) free Google account.
@@ -72,7 +77,7 @@ To integrate Firebase into an Android OpenBot application for Google Sign-In, we
     ```
     This command is similar to the Mac command, but uses a `different path` to locate the debug.keystore file. `%USERPROFILE%` is a system environment variable that points to the current user's profile directory, which contains the `.android` directory where the `debug.keystore` file is located.
 
-- Download the `google-services.json` file and `add` it to your Application's `app directory` and also `assets directory`.
+- Download the `google-services.json` file and `add` it to your Application's `app directory` (`android/robot/google-services.json`) and also `assets directory` (`android/robot/src/main/assets/google-services.json`).
 - Click on the next button, And you have to skip the third step because we already **add firebase SDK** in gradle file for this project.
 - Continue to the Firebase Console to configure the Firebase services you want to use in your Android app.
 
