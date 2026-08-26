@@ -52,7 +52,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             versionNameSuffix '1.0'
-            signingConfig signingConfigs.release
+            if (project.hasProperty('android.injected.signing.store.file')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
