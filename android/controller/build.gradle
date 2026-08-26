@@ -77,6 +77,14 @@ android {
 // Define the path to the comlib lib directory
 def comlibDir = file("${project.rootDir}/comlib/libs")
 
+// The comlib AAR fileTree dependency below reads files produced by :comlib:downloadAars.
+// Gradle can't infer that ordering from a raw fileTree, so declare it explicitly.
+afterEvaluate {
+    tasks.matching { it.name =~ /^collect.*Dependencies$/ }.configureEach {
+        dependsOn(':comlib:downloadAars')
+    }
+}
+
 dependencies {
 
     // WiFi direct + WebRTC
