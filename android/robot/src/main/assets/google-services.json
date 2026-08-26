@@ -1,57 +1,49 @@
 {
   "project_info": {
-    "project_number": "955078484078",
-    "firebase_url": "https://opencode-openbot-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "opencode-openbot",
-    "storage_bucket": "opencode-openbot.appspot.com"
+    "project_number": "000000000000",
+    "firebase_url": "https://example-project-default-rtdb.firebasedatabase.app",
+    "project_id": "example-project",
+    "storage_bucket": "example-project.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:955078484078:android:42efc0c06fa6583165867f",
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
         "android_client_info": {
-          "package_name": "org.openbot"
+          "package_name": "org.openbot.app.robot"
         }
       },
       "oauth_client": [
         {
-          "client_id": "955078484078-91d6gg3p2qt9eilolpqp8o9j6nqjaqdf.apps.googleusercontent.com",
+          "client_id": "000000000000-0000000000000000000000000000.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "org.openbot",
-            "certificate_hash": "224d8f13596161c1d53e2008aee1650856446ce7"
+            "package_name": "org.openbot.app.robot",
+            "certificate_hash": "0000000000000000000000000000000000000"
           }
         },
         {
-          "client_id": "955078484078-kiqt23b9043p6lpevmdd2c42bid22rct.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "org.openbot",
-            "certificate_hash": "d6550cd35e6f79362f3d379f65f5bf7b607830f5"
-          }
-        },
-        {
-          "client_id": "955078484078-kbadvp54dljcpk0g0j5bnf5c17q63ir2.apps.googleusercontent.com",
+          "client_id": "000000000000-1111111111111111111111111111.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA7AhVQcAsZJtYIrJqcvmlxNlcPgmt5bGw"
+          "current_key": "AIzaSyDUMMYDUMMYDUMMYDUMMYDUMMYDUMMYD"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "955078484078-kbadvp54dljcpk0g0j5bnf5c17q63ir2.apps.googleusercontent.com",
+              "client_id": "000000000000-1111111111111111111111111111.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "955078484078-4m63lascf45ranfmedahhcgo10ainnfa.apps.googleusercontent.com",
+              "client_id": "000000000000-2222222222222222222222222222.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "org.openbot"
+                "bundle_id": "org.openbot.app.robot"
               }
             }
           ]

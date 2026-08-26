@@ -10,7 +10,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
-        android:name="org.openbot.CategoryFragment"
+        android:name="org.openbot.app.robot.CategoryFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layoutManager="LinearLayoutManager"

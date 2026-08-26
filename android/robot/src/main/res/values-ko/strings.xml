@@ -131,6 +131,8 @@
     <string name="stream_mode">스트림 모드</string>
     <string name="connection_type_category">연결 유형</string>
     <string name="connectivity_mode">연결 모드</string>
+    <string name="web_controller_category">웹 컨트롤러</string>
+    <string name="web_signaling_server">웹 시그널링 서버</string>
     <string name="tile_general">일반</string>
     <string name="tile_ai">AI</string>
     <string name="tile_legacy">레거시</string>

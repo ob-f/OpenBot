@@ -15,12 +15,12 @@ appVersioning {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion "33.0.1"
+    compileSdkVersion 36
+    buildToolsVersion '36.0.0'
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 36
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

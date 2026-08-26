@@ -18,12 +18,12 @@ appVersioning {
 
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion '33.0.1'
+    compileSdkVersion 36
+    buildToolsVersion '36.0.0'
     defaultConfig {
-        applicationId "org.openbot"
+        applicationId "org.openbot.app.robot"
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 36
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
@@ -38,6 +38,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     compileOptions {
@@ -56,7 +57,7 @@ android {
         abortOnError false
         checkReleaseBuilds false
     }
-    namespace 'org.openbot'
+    namespace 'org.openbot.app.robot'
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
@@ -65,6 +66,14 @@ android {
 // Download default models
 project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
 apply from: 'download.gradle'
+
+// The comlib AAR fileTree dependency below reads files produced by :comlib:downloadAars.
+// Gradle can't infer that ordering from a raw fileTree, so declare it explicitly.
+afterEvaluate {
+    tasks.matching { it.name =~ /^collect.*Dependencies$/ }.configureEach {
+        dependsOn(':comlib:downloadAars')
+    }
+}
 
 // Define the path to the comlib lib directory
 def comlibDir = file("${project.rootDir}/comlib/libs")
@@ -100,6 +109,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:16.0.1'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.recyclerview:recyclerview:1.2.0'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.3.1'
@@ -161,7 +171,7 @@ dependencies {
     // classpath.
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
 
-    implementation platform('com.google.firebase:firebase-bom:31.5.0')
+    implementation platform('com.google.firebase:firebase-bom:32.7.1')
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
     // Declare the dependencies for the Crashlytics and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
