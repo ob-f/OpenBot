@@ -17,19 +17,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <org.openbot.customview.AutoFitTextureView
+    <org.openbot.app.robot.customview.AutoFitTextureView
         android:id="@+id/texture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
 
-    <org.openbot.customview.RecognitionScoreView
+    <org.openbot.app.robot.customview.RecognitionScoreView
         android:id="@+id/results"
         android:layout_width="match_parent"
         android:layout_height="112dp"
         android:layout_alignParentTop="true" />
 
-    <org.openbot.customview.OverlayView
+    <org.openbot.app.robot.customview.OverlayView
         android:id="@+id/debug_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

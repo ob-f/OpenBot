@@ -131,6 +131,8 @@
     <string name="stream_mode">स्ट्रीम मोड</string>
     <string name="connection_type_category">कनेक्शन प्रकार</string>
     <string name="connectivity_mode">कनेक्टिविटी मोड</string>
+    <string name="web_controller_category">वेब नियंत्रक</string>
+    <string name="web_signaling_server">वेब सिग्नलिंग सर्वर</string>
     <string name="tile_general">सामान्य</string>
     <string name="tile_ai">AI</string>
     <string name="tile_legacy">लीगेसी</string>

@@ -131,6 +131,8 @@
     <string name="stream_mode">Modo de transmisión</string>
     <string name="connection_type_category">Tipo de conexión</string>
     <string name="connectivity_mode">Modo de conectividad</string>
+    <string name="web_controller_category">Controlador Web</string>
+    <string name="web_signaling_server">Servidor de señalización web</string>
     <string name="tile_general">General</string>
     <string name="tile_ai">IA</string>
     <string name="tile_legacy">Legado</string>
