@@ -35,3 +35,12 @@ jobs:
 
       - name: Pod install
         run: pod install
+
+      - name: Build for Device
+        run: |
+          xcodebuild build \
+            -workspace OpenBot.xcworkspace \
+            -scheme OpenBot \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO
