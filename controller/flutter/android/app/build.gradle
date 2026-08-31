@@ -4,8 +4,14 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
-    namespace "org.openbot.flutter_controller"
+    namespace "org.openbot.app.controller"
 
     // 1. Updated to match the new plugin requirements
     compileSdk 36
@@ -14,7 +20,7 @@ android {
     ndkVersion = "28.2.13676358"
 
     defaultConfig {
-        applicationId "org.openbot.flutter_controller"
+        applicationId "org.openbot.app.controller"
 
         // 3. Changed from 'flutter.minSdkVersion' to 24 to support modern WebRTC/Sensors
         minSdkVersion 24
@@ -26,9 +32,18 @@ android {
         versionName flutter.versionName
     }
 
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 

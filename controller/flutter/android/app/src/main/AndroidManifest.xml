@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.openbot.flutter_controller">
+    package="org.openbot.app.controller">
    <application
         android:label="OpenBot Controller"
         android:name="${applicationName}"

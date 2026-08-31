@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Openbot Controller</string>
+	<string>OpenBot&#x2002;Controller</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -32,6 +32,8 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to the camera</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app needs access to the local network to discover and connect to your Openbot robot</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to the microphone</string>
 	<key>UIApplicationSceneManifest</key>
