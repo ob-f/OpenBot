@@ -189,6 +189,19 @@ public class RealCartSafetyControllerTest {
     frame.behaviorDecision =
         new BehaviorDecisionResult(FollowState.FOLLOW, action, "test", null, 1f);
     frame.distanceEstimate = distance(0.75f, DistanceState.TOO_FAR);
+    frame.steeringEvidence =
+        new SteeringEvidence(
+            true,
+            "test",
+            0f,
+            0f,
+            0f,
+            0f,
+            0f,
+            0,
+            SteeringEvidence.Direction.NONE,
+            SteeringEvidence.Level.CENTER,
+            400);
     return frame;
   }
 

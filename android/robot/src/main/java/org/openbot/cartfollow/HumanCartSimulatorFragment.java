@@ -1,12 +1,10 @@
 package org.openbot.cartfollow;
 
-import android.graphics.RectF;
 import android.view.View;
 import org.openbot.R;
 
 /** Human-in-the-loop view of the shared cart-follow perception and behavior pipeline. */
 public class HumanCartSimulatorFragment extends BaseCartFollowFragment {
-  private final SteeringDemandEstimator steeringDemandEstimator = new SteeringDemandEstimator();
   private int predictionHorizonMs = 400;
 
   @Override
@@ -26,31 +24,8 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment {
   }
 
   @Override
-  protected void enrichFrameResult(
-      FollowStateMachine.FrameResult frameResult,
-      int frameW,
-      int frameH,
-      int sensorOrientation,
-      long nowMs) {
-    boolean following =
-        frameResult != null
-            && (frameResult.state == FollowState.FOLLOW || frameResult.state == FollowState.FOLLOW_CAUTION)
-            && frameResult.target != null
-            && frameResult.target.getLocation() != null;
-    if (!following) {
-      steeringDemandEstimator.reset();
-      if (frameResult != null) {
-        frameResult.steeringEvidence =
-            SteeringEvidence.unavailable("not_following", predictionHorizonMs);
-      }
-      return;
-    }
-    int trackId =
-        frameResult.identityEvidence == null ? -1 : frameResult.identityEvidence.trackId;
-    RectF bbox = new RectF(frameResult.target.getLocation());
-    frameResult.steeringEvidence =
-        steeringDemandEstimator.update(
-            bbox, frameW, frameH, sensorOrientation, trackId, nowMs, predictionHorizonMs);
+  protected int steeringPredictionHorizonMs() {
+    return predictionHorizonMs;
   }
 
   @Override

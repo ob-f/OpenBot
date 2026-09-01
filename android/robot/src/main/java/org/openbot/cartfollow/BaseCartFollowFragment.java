@@ -242,13 +242,45 @@ public class BaseCartFollowFragment extends CameraFragment {
   /** Lets real hardware screens stop synchronously when the shared Start switch changes. */
   protected void onFollowEnabledChanged(boolean enabled) {}
 
+  /** Shared continuous steering evidence used by both simulator and real-cart follow screens. */
+  protected final SteeringDemandEstimator steeringDemandEstimator = new SteeringDemandEstimator();
+
+  /** Concrete screens may select a fixed or user-configured prediction horizon. */
+  protected int steeringPredictionHorizonMs() {
+    return 400;
+  }
+
   /** Lets a concrete screen attach non-control evidence to a completed perception frame. */
   protected void enrichFrameResult(
       FollowStateMachine.FrameResult frameResult,
       int frameW,
       int frameH,
       int sensorOrientation,
-      long nowMs) {}
+      long nowMs) {
+    int horizonMs = steeringPredictionHorizonMs();
+    boolean following =
+        frameResult != null
+            && (frameResult.state == FollowState.FOLLOW || frameResult.state == FollowState.FOLLOW_CAUTION)
+            && frameResult.target != null
+            && frameResult.target.getLocation() != null;
+    if (!following) {
+      steeringDemandEstimator.reset();
+      if (frameResult != null) {
+        frameResult.steeringEvidence = SteeringEvidence.unavailable("not_following", horizonMs);
+      }
+      return;
+    }
+    int trackId = frameResult.identityEvidence == null ? -1 : frameResult.identityEvidence.trackId;
+    frameResult.steeringEvidence =
+        steeringDemandEstimator.update(
+            new RectF(frameResult.target.getLocation()),
+            frameW,
+            frameH,
+            sensorOrientation,
+            trackId,
+            nowMs,
+            horizonMs);
+  }
 
   /** Lets a concrete screen reset its own per-session visual state. */
   protected void onFollowSessionReset() {}
@@ -260,6 +292,7 @@ public class BaseCartFollowFragment extends CameraFragment {
     targetTrackManager.reset();
     beliefAccumulator.reset();
     resetRecoveryRelock();
+    steeringDemandEstimator.reset();
     onFollowSessionReset();
     stopDiagnosticSession();
     stateMachine.cancel();

@@ -19,6 +19,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private static final long HANDSHAKE_RETRY_MS = 500L;
   private static final long AUTO_UNLOCK_HOLD_MS = 2000L;
   private static final long AUTO_LOG_INTERVAL_MS = 250L;
+  private static final int REAL_CART_PREDICTION_HORIZON_MS = 400;
 
   private final RealCartSafetyController safetyController = new RealCartSafetyController();
   private final ManualTouchRouter manualTouchRouter =
@@ -69,6 +70,9 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     stateMachine.SEARCH_TIMEOUT_MS = Long.MAX_VALUE;
     vehicle.useBluetoothConnection();
     binding.realControlPanel.setVisibility(View.VISIBLE);
+    binding.steeringPanel.setVisibility(View.VISIBLE);
+    binding.predictionHorizonGroup.setVisibility(View.GONE);
+    updateSteeringUi(SteeringEvidence.unavailable("idle", REAL_CART_PREDICTION_HORIZON_MS));
     binding.realModeGroup.check(R.id.real_mode_manual);
     binding.startSwitch.setChecked(false);
     binding.startSwitch.setEnabled(false);
@@ -172,12 +176,24 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   }
 
   @Override
+  protected int steeringPredictionHorizonMs() {
+    return REAL_CART_PREDICTION_HORIZON_MS;
+  }
+
+  @Override
   protected void onFollowFrame(FollowStateMachine.FrameResult frameResult) {
     latestOutput = safetyController.auto(frameResult, SystemClock.elapsedRealtime());
     logAutoDecision(frameResult);
     RealCartAutoDriveController.Result autoResult = safetyController.getAutoDriveResult();
     updateCommandText(commandForAutoResult(autoResult));
+    updateSteeringUi(frameResult == null ? null : frameResult.steeringEvidence);
     if (autoResult.lockout) finishAutoSession(autoResult.reason, false);
+  }
+
+  @Override
+  protected void onFollowSessionReset() {
+    updateSteeringUi(
+        SteeringEvidence.unavailable("session_reset", REAL_CART_PREDICTION_HORIZON_MS));
   }
 
   @Override
@@ -473,9 +489,21 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
       case MOVING_STRAIGHT:
         return "小车直行";
       case CURVE_LEFT:
-        return "小车左缓弯";
+        return String.format(
+            java.util.Locale.US,
+            "小车向左%s缓弯 · %d%% · 输出 %d,%d",
+            result.levelLabel(),
+            result.demandPercent,
+            result.left,
+            result.right);
       case CURVE_RIGHT:
-        return "小车右缓弯";
+        return String.format(
+            java.util.Locale.US,
+            "小车向右%s缓弯 · %d%% · 输出 %d,%d",
+            result.levelLabel(),
+            result.demandPercent,
+            result.left,
+            result.right);
       case WAIT_CENTER:
         return "目标偏差过大，停车等待";
       case RECOVERY_STOP:
@@ -511,6 +539,12 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
             + result.rawTurn
             + ",filtered_turn="
             + result.filteredTurn
+            + ",steering_direction="
+            + result.direction
+            + ",steering_demand="
+            + result.demandPercent
+            + ",steering_level="
+            + result.level
             + ",height_scale="
             + result.heightScale
             + ",output="
@@ -554,6 +588,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
                               + String.format(java.util.Locale.US, "%.2f", autoResult.heightScale)
                               + " turn="
                               + String.format(java.util.Locale.US, "%.2f", autoResult.filteredTurn)
+                              + " demand="
+                              + autoResult.demandPercent
+                              + " dir="
+                              + autoResult.direction
                               + " reason="
                               + autoResult.reason
                               + " last_end="
@@ -569,6 +607,38 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
                 binding.realSafetyNotice.setText("急停已锁存，请重启 ESP32 后重新连接");
               } else {
                 binding.realSafetyNotice.setText("近场传感器未接入，仅限空旷实验");
+              }
+            });
+  }
+
+  private void updateSteeringUi(SteeringEvidence evidence) {
+    if (binding == null || getActivity() == null) return;
+    SteeringEvidence safeEvidence =
+        evidence == null
+            ? SteeringEvidence.unavailable("idle", REAL_CART_PREDICTION_HORIZON_MS)
+            : evidence;
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              if (binding == null) return;
+              binding.steeringGauge.setEvidence(safeEvidence);
+              if (!safeEvidence.valid) {
+                binding.steeringSummary.setText("转向需求等待可信跟随目标");
+              } else if (safeEvidence.direction == SteeringEvidence.Direction.NONE) {
+                binding.steeringSummary.setText(
+                    String.format(
+                        java.util.Locale.US,
+                        "实际转向：直行 · 需求 %d%%\n预测提前 %d ms",
+                        safeEvidence.demandPercent, safeEvidence.predictionHorizonMs));
+              } else {
+                binding.steeringSummary.setText(
+                    String.format(
+                        java.util.Locale.US,
+                        "实际转向：向%s%s缓弯 · %d%%\n预测提前 %d ms",
+                        safeEvidence.directionLabel(),
+                        safeEvidence.levelLabel(),
+                        safeEvidence.demandPercent,
+                        safeEvidence.predictionHorizonMs));
               }
             });
   }
