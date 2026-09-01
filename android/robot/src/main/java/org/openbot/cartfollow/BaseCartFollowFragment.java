@@ -242,6 +242,17 @@ public class BaseCartFollowFragment extends CameraFragment {
   /** Lets real hardware screens stop synchronously when the shared Start switch changes. */
   protected void onFollowEnabledChanged(boolean enabled) {}
 
+  /** Lets a concrete screen attach non-control evidence to a completed perception frame. */
+  protected void enrichFrameResult(
+      FollowStateMachine.FrameResult frameResult,
+      int frameW,
+      int frameH,
+      int sensorOrientation,
+      long nowMs) {}
+
+  /** Lets a concrete screen reset its own per-session visual state. */
+  protected void onFollowSessionReset() {}
+
   protected final void resetFollowSession() {
     if (binding == null) return;
     binding.modelSpinner.setEnabled(true);
@@ -249,6 +260,7 @@ public class BaseCartFollowFragment extends CameraFragment {
     targetTrackManager.reset();
     beliefAccumulator.reset();
     resetRecoveryRelock();
+    onFollowSessionReset();
     stopDiagnosticSession();
     stateMachine.cancel();
     clearDrawState();
@@ -273,7 +285,7 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   protected final void resetUiToIdle() {
     updateCommandText(getString(R.string.cart_sim_idle));
-    updateDebugInfo(FollowState.IDLE, new Control(0f, 0f), 0, 0f, null, null, null);
+    updateDebugInfo(FollowState.IDLE, new Control(0f, 0f), 0, 0f, null, null, null, null);
     if (binding != null) {
       binding.confirmPanel.setVisibility(View.GONE);
       binding.countdownText.setVisibility(View.GONE);
@@ -492,6 +504,8 @@ public class BaseCartFollowFragment extends CameraFragment {
                       identity);
               fr.behaviorDecision = decideBehavior(fr, frameW, frameH);
               maybeRelockAfterRecovery(fr);
+              enrichFrameResult(
+                  fr, frameW, frameH, sensorOrientation, SystemClock.elapsedRealtime());
 
               updateDrawState(fr, frameW, frameH, sensorOrientation);
               String commandText = commandForState(fr);
@@ -506,7 +520,8 @@ public class BaseCartFollowFragment extends CameraFragment {
                   fps,
                   fr.distanceEstimate,
                   fr.behaviorDecision,
-                  fr.identityEvidence);
+                  fr.identityEvidence,
+                  fr.steeringEvidence);
               updateUiForState(fr);
               onFollowFrame(fr);
               binding.trackingOverlay.postInvalidate();
@@ -716,6 +731,9 @@ public class BaseCartFollowFragment extends CameraFragment {
       case FOLLOW:
       case FOLLOW_CAUTION:
         if (fr.distanceEstimate != null) {
+          if (fr.steeringEvidence != null) {
+            return interpreter.interpret(fr.steeringEvidence, fr.distanceEstimate.state);
+          }
           return interpreter.interpret(fr.control, fr.state, fr.distanceEstimate.state);
         }
         return interpreter.interpret(fr.control, fr.state, fr.tooClose);
@@ -890,6 +908,7 @@ public class BaseCartFollowFragment extends CameraFragment {
         fr.behaviorDecision,
         commandText,
         fr.identityEvidence,
+        fr.steeringEvidence,
         locked,
         suspected,
         bestReid,
@@ -958,7 +977,8 @@ public class BaseCartFollowFragment extends CameraFragment {
       float fps,
       ImageSetpointDistanceEstimator.DistanceEstimate dist,
       BehaviorDecisionResult behaviorDecision,
-      IdentityEvidence identityEvidence) {
+      IdentityEvidence identityEvidence,
+      SteeringEvidence steeringEvidence) {
     if (binding == null) return;
     float forward = (control.getLeft() + control.getRight()) / 2f;
     float turn = (control.getRight() - control.getLeft()) / 2f;
@@ -1002,10 +1022,11 @@ public class BaseCartFollowFragment extends CameraFragment {
       behaviorLine = "action=-\nactionReason=-\nsafetyBlock=-\nactionConf=0.00";
     }
     String identityLine = buildIdentityDebugLine(identityEvidence);
+    String steeringLine = buildSteeringDebugLine(steeringEvidence);
     String fullInfo =
         String.format(
             Locale.US,
-            "state=%s\nforward=%.2f\nturn=%.2f\nleft=%.2f\nright=%.2f\npersons=%d\nfps=%.1f\n%s\n%s\n%s",
+            "state=%s\nforward=%.2f\nturn=%.2f\nleft=%.2f\nright=%.2f\npersons=%d\nfps=%.1f\n%s\n%s\n%s\n%s",
             state.name(),
             forward,
             turn,
@@ -1015,7 +1036,8 @@ public class BaseCartFollowFragment extends CameraFragment {
             fps,
             distLine,
             behaviorLine,
-            identityLine);
+            identityLine,
+            steeringLine);
     String compactInfo =
         String.format(
             Locale.US,
@@ -1084,6 +1106,24 @@ public class BaseCartFollowFragment extends CameraFragment {
         identity.beliefStableFrames,
         identity.beliefUncertainFrames,
         identity.beliefReason == null ? "-" : identity.beliefReason);
+  }
+
+  private String buildSteeringDebugLine(SteeringEvidence evidence) {
+    if (evidence == null || !evidence.valid) {
+      return "steering=unavailable";
+    }
+    return String.format(
+        Locale.US,
+        "steering=%s%s demand=%d%%\nraw=%+.3f filtered=%+.3f rate=%+.3f/s predicted=%+.3f edge=%.2f horizon=%dms",
+        evidence.directionLabel(),
+        evidence.levelLabel(),
+        evidence.demandPercent,
+        evidence.rawError,
+        evidence.filteredError,
+        evidence.lateralRatePerSec,
+        evidence.predictedError,
+        evidence.edgeUrgency,
+        evidence.predictionHorizonMs);
   }
 
   private BehaviorDecisionResult decideBehavior(

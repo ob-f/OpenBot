@@ -14,6 +14,7 @@ import org.openbot.cartfollow.BehaviorDecisionResult;
 import org.openbot.cartfollow.BboxContinuityEvidence;
 import org.openbot.cartfollow.IdentityEvidence;
 import org.openbot.cartfollow.ReIDMatchResult;
+import org.openbot.cartfollow.SteeringEvidence;
 import org.openbot.tflite.Detector.Recognition;
 import timber.log.Timber;
 
@@ -34,6 +35,7 @@ public class CartFollowDiagnosticSaver {
       BehaviorDecisionResult decision,
       String commandText,
       IdentityEvidence identity,
+      SteeringEvidence steering,
       Recognition locked,
       Recognition suspected,
       Recognition bestReid,
@@ -79,7 +81,8 @@ public class CartFollowDiagnosticSaver {
               action,
               actionReason,
               safetyBlock,
-              safeCommand);
+              safeCommand,
+              steering);
           appendIdentityLog(
               session,
               frameNum,
@@ -146,11 +149,14 @@ public class CartFollowDiagnosticSaver {
       String action,
       String actionReason,
       String safetyBlock,
-      String commandText) {
+      String commandText,
+      SteeringEvidence steering) {
+    SteeringEvidence snapshot =
+        steering == null ? SteeringEvidence.unavailable("not_collected", 0) : steering;
     String row =
         String.format(
             Locale.US,
-            "%s,%d,%d,%d,%.2f,%d,%s,%s,%s,%s,%s\n",
+            "%s,%d,%d,%d,%.2f,%d,%s,%s,%s,%s,%s,%s,%s,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%s,%s,%d\n",
             csv(session.sessionId),
             frameNum,
             timestampMs,
@@ -161,7 +167,18 @@ public class CartFollowDiagnosticSaver {
             csv(action),
             csv(actionReason),
             csv(safetyBlock),
-            csv(commandText));
+            csv(commandText),
+            snapshot.valid ? "1" : "0",
+            csv(snapshot.reason),
+            snapshot.rawError,
+            snapshot.filteredError,
+            snapshot.lateralRatePerSec,
+            snapshot.predictedError,
+            snapshot.edgeUrgency,
+            snapshot.demandPercent,
+            csv(snapshot.direction.name()),
+            csv(snapshot.level.name()),
+            snapshot.predictionHorizonMs);
     append(session.frameLogCsv, row, "frame_log.csv");
     session.frameRows++;
   }

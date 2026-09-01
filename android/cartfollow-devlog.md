@@ -1315,3 +1315,53 @@ FollowSessionGuardTest          3/3
 :robot:assembleDebug            通过
 Debug APK                       android/robot/build/outputs/apk/debug/robot-debug.apk
 ```
+
+## 21. Human Cart Simulator 连续转向证据（2026-08-31）
+
+### 21.1 目的与边界
+
+本轮只增强 Human Cart Simulator 的视觉侧表达：原来连续的目标横向偏差会被压缩为
+“左转 / 右转”文字，现在保留为可查看、可记录的连续转向需求。该需求是图像平面上的
+归一化证据，不是未经底盘标定的转向角、曲率或米制半径；真实车的 BLE 输出和 ESP32
+固件均未修改。
+
+### 21.2 算法定义
+
+`SteeringDemandEstimator` 以目标框中心计算横向误差：画面左侧为 `-1`，中央为 `0`，
+右侧为 `+1`。它用 `alpha=0.55`、`beta=0.10` 的 alpha-beta 滤波器估计平滑位置和
+横移速度，并分别给出 `0 / 400 / 800 ms` 的短期预测。目标 track 改变、目标丢失或
+相邻样本间隔超过 `500 ms` 时，滤波器会重置，避免把旧目标的速度带给新目标。
+
+当目标框靠近对应画面边缘的 `15%` 区域时，边缘紧迫度会抬高需求，避免“人物框尚未
+完全离屏，提示却仍然偏小”。需求等级带滞回，分为居中、轻微、中等、大幅和接近边缘，
+降低人物轻微晃动造成的提示跳变。
+
+方向文字以项目既有 `ControlGenerator.FLIP_TURN=true` 的控制口径为准：目标图像偏左时，
+Simulator 显示向右转；目标图像偏右时，显示向左转。`HumanCommandInterpreter` 与连续
+仪表共用这一口径，避免新旧页面的左右提示相反，并增加左右对称测试。
+
+### 21.3 页面、日志与后续使用
+
+Simulator 页面新增固定尺寸的转向仪表：白色标记表示滤波后的当前位置，蓝色描边标记
+表示预测位置。主提示显示需求百分比、方向、等级、当前偏差和预测偏差；预测提前量
+只在 Simulator 页面可切换。身份不确定、距离过近、受阻或目标丢失时，安全停车提示
+仍优先，转向证据仅保留在诊断信息中。
+
+`cartfollow_diagnostics` 的 CSV 在既有列末尾追加 raw/filter/prediction/edge urgency/
+demand/direction/level 等字段，旧日志读取方式不受影响。后续应先用人肉模拟记录三档
+预测提前量，再用真车实测的延迟、起转阈值和轮速反馈建立多档曲率映射；在没有轮速
+反馈前，上位机不能猜测某一个轮子的补偿量。
+
+### 21.4 验证状态
+
+已添加 `SteeringDemandEstimatorTest`、`HumanCommandInterpreterTest` 和
+`SteeringDemandViewTest`，覆盖左右对称、预测提前、停止后回落、边缘紧迫度、重置、
+预测档位、等级滞回、方向语义及仪表绑定。首次运行时 Google Maven 依赖下载曾发生 TLS
+握手失败；依赖恢复后已在 JDK 17 下重新执行验证：
+
+```text
+全部 Debug 单元测试             57/57
+:robot:check                    通过
+:robot:assembleDebug            通过
+Debug APK                       android/robot/build/outputs/apk/debug/robot-debug.apk
+```

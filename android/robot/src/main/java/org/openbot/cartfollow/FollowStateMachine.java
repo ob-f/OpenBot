@@ -23,6 +23,7 @@ public class FollowStateMachine {
     public ImageSetpointDistanceEstimator.DistanceEstimate distanceEstimate;
     public BehaviorDecisionResult behaviorDecision;
     public IdentityEvidence identityEvidence;
+    public SteeringEvidence steeringEvidence;
 
     public FrameResult(
         FollowState state,
