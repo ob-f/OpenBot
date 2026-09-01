@@ -62,4 +62,15 @@ public class HumanCommandInterpreter {
     if (turningRight) return CMD_TURN_RIGHT;
     return CMD_FORWARD;
   }
+
+  public String interpret(SteeringEvidence evidence, DistanceState distState) {
+    if (distState == DistanceState.UNKNOWN) return CMD_DIST_UNKNOWN;
+    if (distState == DistanceState.TOO_CLOSE) return CMD_TOO_CLOSE;
+    if (evidence == null || !evidence.valid || evidence.direction == SteeringEvidence.Direction.NONE) {
+      return distState == DistanceState.TOO_FAR ? CMD_FORWARD : CMD_KEEP;
+    }
+    String turn =
+        "向" + evidence.directionLabel() + evidence.levelLabel() + "转弯 · " + evidence.demandPercent + "%";
+    return distState == DistanceState.TOO_FAR ? "请向前并" + turn : "保持距离，" + turn;
+  }
 }

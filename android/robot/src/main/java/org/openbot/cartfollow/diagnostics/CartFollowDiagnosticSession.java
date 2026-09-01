@@ -18,7 +18,10 @@ public class CartFollowDiagnosticSession {
 
   private static final String FRAME_LOG_HEADER =
       "session_id,frame_id,timestamp_ms,elapsed_ms,fps,num_persons,follow_state,"
-          + "selected_action,action_reason,safety_block_reason,command_text";
+          + "selected_action,action_reason,safety_block_reason,command_text,"
+          + "steering_valid,steering_reason,steering_raw_error,steering_filtered_error,"
+          + "steering_lateral_rate_per_s,steering_predicted_error,steering_edge_urgency,"
+          + "steering_demand_percent,steering_direction,steering_level,steering_prediction_horizon_ms";
   private static final String IDENTITY_LOG_HEADER =
       "session_id,frame_id,timestamp_ms,track_id,locked_track_id,suspected_track_id,"
           + "active_track_count,track_age,missed_frames,best_score,second_score,margin,"
