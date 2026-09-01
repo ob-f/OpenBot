@@ -159,6 +159,14 @@ public final class RealCartSafetyController {
     return autoDriveController.getLastResult();
   }
 
+  public synchronized void setSteeringStrengthPercent(int percent) {
+    autoDriveController.setSteeringStrengthPercent(percent);
+  }
+
+  public synchronized int getSteeringStrengthPercent() {
+    return autoDriveController.getSteeringStrengthPercent();
+  }
+
   private boolean canMove() {
     return foreground && connected && firmwareReady && !emergencyLatched;
   }

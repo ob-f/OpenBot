@@ -353,6 +353,61 @@
             android:textColor="#FFFF8A80"
             android:textSize="12sp"
             android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/steering_strength_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/steering_strength_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="转弯强度 100% · 最大差速 10,14"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/steering_strength_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="100"
+                android:stepSize="5"
+                android:valueFrom="20"
+                android:valueTo="200" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/steering_tuning_note"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFFFFF"
+                    android:hint="本轮备注（可选）"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="#BDBDBD"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/record_steering_tuning"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:text="记录参数"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

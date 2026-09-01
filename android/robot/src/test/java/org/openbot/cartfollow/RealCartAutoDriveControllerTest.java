@@ -54,6 +54,14 @@ public class RealCartAutoDriveControllerTest {
   }
 
   @Test
+  public void steeringStrengthScalesCurveWithoutReversingAWheel() {
+    assertEquals(13, RealCartAutoDriveController.innerSpeedForDemand(100, 20));
+    assertEquals(10, RealCartAutoDriveController.innerSpeedForDemand(100, 100));
+    assertEquals(6, RealCartAutoDriveController.innerSpeedForDemand(100, 200));
+    assertEquals(14, RealCartAutoDriveController.innerSpeedForDemand(0, 200));
+  }
+
+  @Test
   public void missingSteeringEvidenceStopsInsteadOfGuessingControlSign() {
     RealCartAutoDriveController controller = new RealCartAutoDriveController();
     FollowStateMachine.FrameResult frame = rawFollowFrame(0.75f);

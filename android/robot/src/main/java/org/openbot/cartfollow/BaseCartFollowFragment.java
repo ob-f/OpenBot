@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import org.jetbrains.annotations.NotNull;
 import org.openbot.R;
 import org.openbot.cartfollow.diagnostics.CartFollowDiagnosticConfig;
@@ -51,14 +53,13 @@ public class BaseCartFollowFragment extends CameraFragment {
   private Handler handler;
   private HandlerThread handlerThread;
 
-  private boolean computingNetwork = false;
+  private final AtomicBoolean computingNetwork = new AtomicBoolean(false);
+  private final AtomicLong modelConfigGeneration = new AtomicLong(0L);
+  private volatile boolean modelConfigPending;
   private float minConfidence = 0.5f;
 
-  private Detector detector;
-  private Matrix frameToCropTransform;
-  private Bitmap croppedBitmap;
+  private volatile InferenceResources inferenceResources;
   private int sensorOrientation;
-  private Matrix cropToFrameTransform;
 
   private Model model;
   private Network.Device device = Network.Device.CPU;
@@ -90,6 +91,8 @@ public class BaseCartFollowFragment extends CameraFragment {
   private int recoveryRelockTrackId = -1;
   private int recoveryRelockFrames = 0;
   private Bitmap latestConfirmSnapshot;
+  private long uiGeneration;
+  private long latestAppliedFrameSequence;
 
   private final List<DrawBox> drawBoxes = new ArrayList<>();
   private int drawFrameWidth = 0;
@@ -194,6 +197,10 @@ public class BaseCartFollowFragment extends CameraFragment {
                 latestConfirmSnapshot, diagnosticSession, "confirmed_snapshot");
           }
           stateMachine.confirm();
+          invalidatePendingUiSnapshots();
+          binding.confirmPanel.setVisibility(View.GONE);
+          binding.countdownText.setVisibility(View.GONE);
+          updateCommandText("已确认，请回到车前");
         });
     binding.btnRetake.setOnClickListener(
         v -> {
@@ -208,6 +215,7 @@ public class BaseCartFollowFragment extends CameraFragment {
           stopDiagnosticSession();
           startDiagnosticSession();
           stateMachine.retake();
+          invalidatePendingUiSnapshots();
         });
     binding.btnCancel.setOnClickListener(
         v -> {
@@ -227,6 +235,7 @@ public class BaseCartFollowFragment extends CameraFragment {
             resetRecoveryRelock();
             startDiagnosticSession();
             stateMachine.startCapture();
+            invalidatePendingUiSnapshots();
             onFollowEnabledChanged(true);
           } else {
             resetFollowSession();
@@ -296,6 +305,7 @@ public class BaseCartFollowFragment extends CameraFragment {
     onFollowSessionReset();
     stopDiagnosticSession();
     stateMachine.cancel();
+    invalidatePendingUiSnapshots();
     clearDrawState();
     resetUiToIdle();
   }
@@ -327,15 +337,43 @@ public class BaseCartFollowFragment extends CameraFragment {
   }
 
   protected void onInferenceConfigurationChanged() {
-    computingNetwork = false;
-    if (croppedBitmap == null) return;
-    final Network.Device device = getDevice();
-    final Model model = getModel();
-    final int numThreads = getNumThreads();
-    runInBackground(() -> recreateNetwork(model, device, numThreads));
+    modelConfigGeneration.incrementAndGet();
+    modelConfigPending = false;
+    computingNetwork.set(false);
+    InferenceResources stale = inferenceResources;
+    inferenceResources = null;
+    if (stale != null) runInBackground(() -> closeDetector(stale.detector));
   }
 
-  private void recreateNetwork(Model model, Network.Device device, int numThreads) {
+  private void requestNetworkConfiguration(int frameWidth, int frameHeight) {
+    if (frameWidth <= 0 || frameHeight <= 0 || modelConfigPending) return;
+    Model selectedModel = getModel();
+    if (selectedModel == null) return;
+    final long generation = modelConfigGeneration.incrementAndGet();
+    final int orientation = 90 - ImageUtils.getScreenOrientation(requireActivity());
+    final Network.Device selectedDevice = getDevice();
+    final int selectedThreads = getNumThreads();
+    modelConfigPending = true;
+    runInBackground(
+        () ->
+            recreateNetwork(
+                generation,
+                selectedModel,
+                selectedDevice,
+                selectedThreads,
+                frameWidth,
+                frameHeight,
+                orientation));
+  }
+
+  private void recreateNetwork(
+      long generation,
+      Model model,
+      Network.Device device,
+      int numThreads,
+      int frameWidth,
+      int frameHeight,
+      int orientation) {
     if (model == null) return;
     Detector newDetector = null;
     try {
@@ -346,44 +384,62 @@ public class BaseCartFollowFragment extends CameraFragment {
           model.pathType == Model.PATH_TYPE.URL
               ? "该模型未下载，请先在主菜单 Model Management 中下载: " + model.name
               : "模型加载失败: " + e.getMessage();
-      requireActivity()
-          .runOnUiThread(
-              () ->
-                  Toast.makeText(requireContext().getApplicationContext(), msg, Toast.LENGTH_LONG)
-                      .show());
+      postModelErrorIfCurrent(generation, msg);
       return;
     }
 
-    if (detector != null) {
-      detector.close();
-    }
-    detector = newDetector;
     try {
-      croppedBitmap =
+      Bitmap croppedBitmap =
           Bitmap.createBitmap(
-              detector.getImageSizeX(), detector.getImageSizeY(), Bitmap.Config.ARGB_8888);
-      frameToCropTransform =
+              newDetector.getImageSizeX(), newDetector.getImageSizeY(), Bitmap.Config.ARGB_8888);
+      Matrix frameToCropTransform =
           ImageUtils.getTransformationMatrix(
-              getMaxAnalyseImageSize().getWidth(),
-              getMaxAnalyseImageSize().getHeight(),
+              frameWidth,
+              frameHeight,
               croppedBitmap.getWidth(),
               croppedBitmap.getHeight(),
-              sensorOrientation,
-              detector.getCropRect(),
-              detector.getMaintainAspect());
-      cropToFrameTransform = new Matrix();
+              orientation,
+              newDetector.getCropRect(),
+              newDetector.getMaintainAspect());
+      Matrix cropToFrameTransform = new Matrix();
       frameToCropTransform.invert(cropToFrameTransform);
+      if (generation != modelConfigGeneration.get() || !isAdded()) {
+        closeDetector(newDetector);
+        return;
+      }
+      InferenceResources old = inferenceResources;
+      inferenceResources =
+          new InferenceResources(
+              newDetector,
+              croppedBitmap,
+              frameToCropTransform,
+              cropToFrameTransform,
+              frameWidth,
+              frameHeight,
+              orientation);
+      sensorOrientation = orientation;
+      if (old != null) closeDetector(old.detector);
     } catch (Exception e) {
+      closeDetector(newDetector);
       Timber.e(e, "Failed to configure detector.");
-      requireActivity()
-          .runOnUiThread(
-              () ->
-                  Toast.makeText(
-                          requireContext().getApplicationContext(),
-                          "模型配置失败: " + e.getMessage(),
-                          Toast.LENGTH_LONG)
-                      .show());
+      postModelErrorIfCurrent(generation, "模型配置失败: " + e.getMessage());
+    } finally {
+      if (generation == modelConfigGeneration.get()) modelConfigPending = false;
     }
+  }
+
+  private void postModelErrorIfCurrent(long generation, String message) {
+    if (generation != modelConfigGeneration.get() || !isAdded()) return;
+    requireActivity()
+        .runOnUiThread(
+            () -> {
+              if (generation != modelConfigGeneration.get() || !isAdded()) return;
+              Toast.makeText(requireContext().getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            });
+  }
+
+  private static void closeDetector(Detector detector) {
+    if (detector != null) detector.close();
   }
 
   @Override
@@ -398,11 +454,25 @@ public class BaseCartFollowFragment extends CameraFragment {
   public synchronized void onPause() {
     onCartFollowPause();
     stopDiagnosticSession();
+    modelConfigGeneration.incrementAndGet();
+    modelConfigPending = false;
+    if (handlerThread == null) {
+      InferenceResources stale = inferenceResources;
+      inferenceResources = null;
+      closeDetector(stale == null ? null : stale.detector);
+      computingNetwork.set(false);
+      super.onPause();
+      return;
+    }
     handlerThread.quitSafely();
     try {
       handlerThread.join();
       handlerThread = null;
       handler = null;
+      InferenceResources stale = inferenceResources;
+      inferenceResources = null;
+      closeDetector(stale == null ? null : stale.detector);
+      computingNetwork.set(false);
     } catch (final InterruptedException e) {
       e.printStackTrace();
     }
@@ -436,26 +506,25 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   @Override
   protected void processFrame(Bitmap bitmap, ImageProxy image) {
-    if (detector == null) {
-      updateCropImageInfo();
-      if (detector == null) return;
-    }
-    if (croppedBitmap == null || frameToCropTransform == null || cropToFrameTransform == null) {
-      Timber.w("Inference buffers were missing; rebuilding the detector configuration.");
-      updateCropImageInfo();
-      if (croppedBitmap == null || frameToCropTransform == null || cropToFrameTransform == null)
-        return;
+    if (bitmap == null) return;
+    InferenceResources resources = inferenceResources;
+    if (resources == null
+        || !resources.matches(bitmap.getWidth(), bitmap.getHeight(), 90 - ImageUtils.getScreenOrientation(requireActivity()))) {
+      requestNetworkConfiguration(bitmap.getWidth(), bitmap.getHeight());
+      return;
     }
 
     ++frameNum;
     if (binding == null || !isInferenceEnabled()) return;
-    if (computingNetwork) return;
+    if (!computingNetwork.compareAndSet(false, true)) return;
 
-    final Detector activeDetector = detector;
-    final Bitmap activeCroppedBitmap = croppedBitmap;
-    final Matrix activeFrameToCropTransform = frameToCropTransform;
-    final Matrix activeCropToFrameTransform = cropToFrameTransform;
-    computingNetwork = true;
+    final Detector activeDetector = resources.detector;
+    final Bitmap activeCroppedBitmap = resources.croppedBitmap;
+    final Matrix activeFrameToCropTransform = resources.frameToCropTransform;
+    final Matrix activeCropToFrameTransform = resources.cropToFrameTransform;
+    final int frameW = resources.frameWidth;
+    final int frameH = resources.frameHeight;
+    final int activeSensorOrientation = resources.sensorOrientation;
     runInBackground(
         () -> {
           try {
@@ -485,8 +554,6 @@ public class BaseCartFollowFragment extends CameraFragment {
                 }
               }
 
-              int frameW = getMaxAnalyseImageSize().getWidth();
-              int frameH = getMaxAnalyseImageSize().getHeight();
               targetTrackManager.update(
                   mappedRecognitions, frameW, frameH, SystemClock.elapsedRealtime());
               FollowState currentState = stateMachine.getState();
@@ -494,9 +561,9 @@ public class BaseCartFollowFragment extends CameraFragment {
               if (currentState == FollowState.CAPTURE_TARGET) {
                 if (reidCoordinator != null) {
                   reidCoordinator.collectInitializationCandidate(
-                      workingFrame, largestPerson, sensorOrientation);
+                      workingFrame, largestPerson, activeSensorOrientation);
                 }
-                maybeSaveGalleryCandidate(workingFrame, largestPerson, sensorOrientation);
+                maybeSaveGalleryCandidate(workingFrame, largestPerson, activeSensorOrientation);
               }
               TargetMatcher.MatchResult legacyMatch =
                   matcher.match(
@@ -511,7 +578,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                           currentState,
                           frameW,
                           frameH,
-                          sensorOrientation,
+                          activeSensorOrientation,
                           legacyMatch.score,
                           legacyMatch.matched,
                           legacyMatch.best);
@@ -533,19 +600,19 @@ public class BaseCartFollowFragment extends CameraFragment {
                       workingFrame,
                       frameW,
                       frameH,
-                      sensorOrientation,
+                      activeSensorOrientation,
                       identity);
               fr.behaviorDecision = decideBehavior(fr, frameW, frameH);
               maybeRelockAfterRecovery(fr);
               enrichFrameResult(
-                  fr, frameW, frameH, sensorOrientation, SystemClock.elapsedRealtime());
+                  fr, frameW, frameH, activeSensorOrientation, SystemClock.elapsedRealtime());
 
-              updateDrawState(fr, frameW, frameH, sensorOrientation);
-              String commandText = commandForState(fr);
-              updateCommandText(commandText);
+              updateDrawState(fr, frameW, frameH, activeSensorOrientation);
+              onFollowFrame(fr);
+              String commandText = commandForFrame(fr, commandForState(fr));
               float fps = lastProcessingTimeMs > 0 ? 1000f / lastProcessingTimeMs : 0f;
               maybeSaveDiagnostics(
-                  workingFrame, fr, fps, commandText, frameW, frameH, sensorOrientation);
+                  workingFrame, fr, fps, commandText, frameW, frameH, activeSensorOrientation);
               updateDebugInfo(
                   fr.state,
                   fr.control,
@@ -555,22 +622,15 @@ public class BaseCartFollowFragment extends CameraFragment {
                   fr.behaviorDecision,
                   fr.identityEvidence,
                   fr.steeringEvidence);
-              updateUiForState(fr);
-              onFollowFrame(fr);
-              binding.trackingOverlay.postInvalidate();
+              postFrameUi(fr, commandText, frameNum);
             }
           } catch (RuntimeException e) {
             Timber.e(e, "Cart follow inference failed.");
             onInferenceFailure(e);
           } finally {
-            computingNetwork = false;
+            computingNetwork.set(false);
           }
         });
-  }
-
-  private void updateCropImageInfo() {
-    sensorOrientation = 90 - ImageUtils.getScreenOrientation(requireActivity());
-    recreateNetwork(getModel(), getDevice(), getNumThreads());
   }
 
   protected boolean isInferenceEnabled() {
@@ -579,6 +639,11 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   /** Receives the final behavior decision after all identity and safety arbitration. */
   protected void onFollowFrame(FollowStateMachine.FrameResult frameResult) {}
+
+  /** Lets real-hardware pages replace a visual suggestion with the actual safe output. */
+  protected String commandForFrame(FollowStateMachine.FrameResult frameResult, String defaultText) {
+    return defaultText;
+  }
 
   /** Called after an inference task fails so real vehicle screens can stop safely. */
   protected void onInferenceFailure(RuntimeException error) {}
@@ -650,11 +715,18 @@ public class BaseCartFollowFragment extends CameraFragment {
   private synchronized void updateDrawState(
       FollowStateMachine.FrameResult fr, int frameW, int frameH, int sensorOrientation) {
     drawBoxes.clear();
+    Detector.Recognition pendingCandidate =
+        fr.state == FollowState.LOCKED_PENDING_CONFIRM ? selectLargest(fr.persons) : null;
     for (Detector.Recognition r : fr.persons) {
       if (r == null || r.getLocation() == null) continue;
       int colorType = COLOR_NORMAL;
       TargetTrack track = targetTrackManager.getTrackForRecognition(r);
-      if (track != null && targetTrackManager.isLockedTrack(track)) {
+      boolean pendingConfirmation = fr.state == FollowState.LOCKED_PENDING_CONFIRM;
+      boolean recovering =
+          fr.state == FollowState.IDENTITY_UNCERTAIN || fr.state == FollowState.REACQUIRE_TARGET;
+      if (pendingConfirmation && r == pendingCandidate) {
+        colorType = COLOR_CANDIDATE;
+      } else if (track != null && targetTrackManager.isLockedTrack(track) && !recovering) {
         colorType = COLOR_TARGET;
       } else if (track != null && track.trackId == targetTrackManager.getSuspectedTrackId()) {
         colorType = COLOR_CANDIDATE;
@@ -664,7 +736,11 @@ public class BaseCartFollowFragment extends CameraFragment {
         colorType = COLOR_CANDIDATE;
       }
       String label = null;
-      if (track != null) {
+      if (pendingConfirmation && r == pendingCandidate) {
+        label = "待确认";
+      } else if (recovering && r == fr.target) {
+        label = "重捕确认中";
+      } else if (track != null) {
         label =
             String.format(
                 Locale.US, "T%d b=%.2f", track.trackId, beliefAccumulator.getBeliefForTrack(track));
@@ -788,6 +864,11 @@ public class BaseCartFollowFragment extends CameraFragment {
     requireActivity().runOnUiThread(() -> binding.commandText.setText(text));
   }
 
+  private synchronized void invalidatePendingUiSnapshots() {
+    uiGeneration++;
+    latestAppliedFrameSequence = 0L;
+  }
+
   synchronized void clearDrawState() {
     drawBoxes.clear();
     drawFrameWidth = 0;
@@ -796,12 +877,22 @@ public class BaseCartFollowFragment extends CameraFragment {
     if (binding != null) binding.trackingOverlay.postInvalidate();
   }
 
-  private void updateUiForState(FollowStateMachine.FrameResult fr) {
-    if (binding == null) return;
+  private void postFrameUi(FollowStateMachine.FrameResult fr, String commandText, long frameSequence) {
+    if (binding == null || !isAdded()) return;
+    final long generation;
+    synchronized (this) {
+      generation = uiGeneration;
+    }
     requireActivity()
         .runOnUiThread(
             () -> {
               if (binding == null) return;
+              synchronized (this) {
+                if (!shouldApplyUiSnapshot(
+                    generation, uiGeneration, frameSequence, latestAppliedFrameSequence)) return;
+                latestAppliedFrameSequence = frameSequence;
+              }
+              binding.commandText.setText(commandText);
               boolean showConfirm =
                   updateConfirmationVisibility(
                       binding.confirmPanel, binding.startSwitch.isChecked(), fr.state);
@@ -815,7 +906,13 @@ public class BaseCartFollowFragment extends CameraFragment {
                 binding.countdownText.setText(
                     fr.countdownSec >= 0 ? String.valueOf(fr.countdownSec) : "");
               }
+              binding.trackingOverlay.invalidate();
             });
+  }
+
+  static boolean shouldApplyUiSnapshot(
+      long snapshotGeneration, long activeGeneration, long snapshotFrame, long latestFrame) {
+    return snapshotGeneration == activeGeneration && snapshotFrame >= latestFrame;
   }
 
   private void startDiagnosticSession() {
@@ -1272,10 +1369,44 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   protected SystemSafetyEvidence createSystemSafetyEvidence() {
     return new SystemSafetyEvidence(
-        false, true, detector != null, detector == null ? "detector_not_ready" : "ok");
+        false,
+        true,
+        inferenceResources != null,
+        inferenceResources == null ? "detector_initializing" : "ok");
   }
 
   protected boolean isDetectorReady() {
-    return detector != null;
+    return inferenceResources != null;
+  }
+
+  private static final class InferenceResources {
+    final Detector detector;
+    final Bitmap croppedBitmap;
+    final Matrix frameToCropTransform;
+    final Matrix cropToFrameTransform;
+    final int frameWidth;
+    final int frameHeight;
+    final int sensorOrientation;
+
+    InferenceResources(
+        Detector detector,
+        Bitmap croppedBitmap,
+        Matrix frameToCropTransform,
+        Matrix cropToFrameTransform,
+        int frameWidth,
+        int frameHeight,
+        int sensorOrientation) {
+      this.detector = detector;
+      this.croppedBitmap = croppedBitmap;
+      this.frameToCropTransform = frameToCropTransform;
+      this.cropToFrameTransform = cropToFrameTransform;
+      this.frameWidth = frameWidth;
+      this.frameHeight = frameHeight;
+      this.sensorOrientation = sensorOrientation;
+    }
+
+    boolean matches(int width, int height, int orientation) {
+      return frameWidth == width && frameHeight == height && sensorOrientation == orientation;
+    }
   }
 }

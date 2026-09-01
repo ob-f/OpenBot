@@ -13,8 +13,10 @@ public final class RealCartAutoDriveController {
   }
 
   public static final int STRAIGHT_SPEED = 14;
-  public static final int MIN_INNER_SPEED = 10;
-  public static final int MAX_INNER_REDUCTION = STRAIGHT_SPEED - MIN_INNER_SPEED;
+  public static final int MIN_INNER_SPEED = 6;
+  public static final int BASE_MAX_INNER_REDUCTION = 4;
+  public static final int MIN_STEERING_STRENGTH_PERCENT = 20;
+  public static final int MAX_STEERING_STRENGTH_PERCENT = 200;
   public static final int CENTER_DEMAND_PERCENT = 10;
   public static final float START_HEIGHT_SCALE = 0.80f;
   public static final int START_STABLE_FRAMES = 3;
@@ -80,6 +82,7 @@ public final class RealCartAutoDriveController {
   }
 
   private boolean moving;
+  private int steeringStrengthPercent = 100;
   private int centeredFrames;
   private long targetMissingStartMs = -1L;
   private Result lastResult = stopped(Phase.LOCKED, "auto_locked", false, null, Float.NaN);
@@ -140,6 +143,15 @@ public final class RealCartAutoDriveController {
     return lastResult;
   }
 
+  public synchronized void setSteeringStrengthPercent(int percent) {
+    steeringStrengthPercent =
+        Math.max(MIN_STEERING_STRENGTH_PERCENT, Math.min(MAX_STEERING_STRENGTH_PERCENT, percent));
+  }
+
+  public synchronized int getSteeringStrengthPercent() {
+    return steeringStrengthPercent;
+  }
+
   private Result recoveryStop(
       FollowStateMachine.FrameResult frame,
       long nowMs,
@@ -187,7 +199,7 @@ public final class RealCartAutoDriveController {
               false));
     }
 
-    int innerSpeed = innerSpeedForDemand(evidence.demandPercent);
+    int innerSpeed = innerSpeedForDemand(evidence.demandPercent, steeringStrengthPercent);
     boolean turnLeft = evidence.direction == SteeringEvidence.Direction.LEFT;
     return remember(
         new Result(
@@ -201,8 +213,15 @@ public final class RealCartAutoDriveController {
   }
 
   static int innerSpeedForDemand(int demandPercent) {
+    return innerSpeedForDemand(demandPercent, 100);
+  }
+
+  static int innerSpeedForDemand(int demandPercent, int steeringStrengthPercent) {
     int clampedDemand = Math.max(0, Math.min(100, demandPercent));
-    int reduction = Math.round(MAX_INNER_REDUCTION * clampedDemand / 100f);
+    int clampedStrength =
+        Math.max(MIN_STEERING_STRENGTH_PERCENT, Math.min(MAX_STEERING_STRENGTH_PERCENT, steeringStrengthPercent));
+    int reduction =
+        Math.round(BASE_MAX_INNER_REDUCTION * clampedDemand * clampedStrength / 10000f);
     return Math.max(MIN_INNER_SPEED, STRAIGHT_SPEED - reduction);
   }
 

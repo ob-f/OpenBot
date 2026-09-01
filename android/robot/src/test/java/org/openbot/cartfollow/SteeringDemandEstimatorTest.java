@@ -18,8 +18,8 @@ public class SteeringDemandEstimatorTest {
     SteeringEvidence left = new SteeringDemandEstimator().update(box(100f), 1000, 600, 0, 1, 0, 400);
     SteeringEvidence right = new SteeringDemandEstimator().update(box(900f), 1000, 600, 0, 1, 0, 400);
 
-    assertEquals(SteeringEvidence.Direction.RIGHT, left.direction);
-    assertEquals(SteeringEvidence.Direction.LEFT, right.direction);
+    assertEquals(SteeringEvidence.Direction.LEFT, left.direction);
+    assertEquals(SteeringEvidence.Direction.RIGHT, right.direction);
     assertEquals(Math.abs(left.rawError), Math.abs(right.rawError), 0.001f);
     assertEquals(left.demandPercent, right.demandPercent);
   }
@@ -32,7 +32,7 @@ public class SteeringDemandEstimatorTest {
 
     assertTrue(moving.predictedError > moving.filteredError);
     assertTrue(moving.demandPercent > 0);
-    assertEquals(SteeringEvidence.Direction.LEFT, moving.direction);
+    assertEquals(SteeringEvidence.Direction.RIGHT, moving.direction);
   }
 
   @Test
@@ -110,6 +110,41 @@ public class SteeringDemandEstimatorTest {
 
     assertFalse(unavailable.valid);
     assertEquals(SteeringEvidence.Direction.NONE, unavailable.direction);
+  }
+
+  @Test
+  public void portraitRotationMapsDisplayedRightToPositiveError() {
+    SteeringDemandEstimator estimator = new SteeringDemandEstimator();
+    // With a 90-degree camera-to-display rotation, a small source y is on displayed right.
+    SteeringEvidence right =
+        estimator.update(new RectF(100f, 20f, 300f, 120f), 600, 1000, 90, 9, 0, 400);
+
+    assertTrue(right.rawError > 0f);
+    assertEquals(SteeringEvidence.Direction.RIGHT, right.direction);
+  }
+
+  @Test
+  public void allQuarterTurnsKeepLeftAndRightSemantics() {
+    assertEquals(
+        SteeringEvidence.Direction.LEFT,
+        new SteeringDemandEstimator()
+            .update(new RectF(20f, 100f, 120f, 300f), 1000, 600, 0, 10, 0, 0)
+            .direction);
+    assertEquals(
+        SteeringEvidence.Direction.RIGHT,
+        new SteeringDemandEstimator()
+            .update(new RectF(100f, 20f, 300f, 120f), 600, 1000, 90, 10, 0, 0)
+            .direction);
+    assertEquals(
+        SteeringEvidence.Direction.LEFT,
+        new SteeringDemandEstimator()
+            .update(new RectF(880f, 100f, 980f, 300f), 1000, 600, 180, 10, 0, 0)
+            .direction);
+    assertEquals(
+        SteeringEvidence.Direction.RIGHT,
+        new SteeringDemandEstimator()
+            .update(new RectF(100f, 880f, 300f, 980f), 600, 1000, 270, 10, 0, 0)
+            .direction);
   }
 
   private static RectF box(float centerX) {

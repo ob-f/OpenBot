@@ -3,8 +3,8 @@ package org.openbot.cartfollow;
 import android.graphics.RectF;
 
 /**
- * Estimates a smooth, short-horizon image-plane steering demand without commanding the vehicle.
- * A positive error means that the target is on the right side of the displayed image.
+ * Estimates a smooth, short-horizon steering demand in displayed-image coordinates. A positive
+ * error always means that the target is on the right side of the phone screen.
  */
 public final class SteeringDemandEstimator {
   public static final float ALPHA = 0.55f;
@@ -35,14 +35,14 @@ public final class SteeringDemandEstimator {
       return SteeringEvidence.unavailable("target_unavailable", horizonMs);
     }
 
-    boolean rotated = sensorOrientation % 180 == 90;
-    float imageWidth = rotated ? frameH : frameW;
-    float center = rotated ? bbox.centerY() : bbox.centerX();
-    if (imageWidth <= 0f || Float.isNaN(center) || Float.isInfinite(center)) {
+    DisplayHorizontalBounds displayed = displayedHorizontalBounds(bbox, frameW, frameH, sensorOrientation);
+    if (displayed.width <= 0f
+        || Float.isNaN(displayed.center)
+        || Float.isInfinite(displayed.center)) {
       reset();
       return SteeringEvidence.unavailable("frame_invalid", horizonMs);
     }
-    float rawError = clamp(2f * (center / imageWidth - 0.5f), -1f, 1f);
+    float rawError = clamp(2f * (displayed.center / displayed.width - 0.5f), -1f, 1f);
     boolean resetRequired =
         !initialized
             || activeTrackId != trackId
@@ -66,7 +66,7 @@ public final class SteeringDemandEstimator {
 
     float predictedError =
         clamp(filteredError + lateralRatePerSec * horizonMs / 1000f, -1f, 1f);
-    float edgeUrgency = edgeUrgency(bbox, imageWidth, rotated, predictedError);
+    float edgeUrgency = edgeUrgency(displayed, predictedError);
     float centerDemand =
         Math.max(0f, (Math.abs(predictedError) - CENTER_DEAD_ZONE) / (1f - CENTER_DEAD_ZONE));
     int demandPercent = Math.round(100f * Math.max(centerDemand, edgeUrgency));
@@ -97,16 +97,10 @@ public final class SteeringDemandEstimator {
     level = SteeringEvidence.Level.CENTER;
   }
 
-  private static float edgeUrgency(
-      RectF bbox, float imageWidth, boolean rotated, float predictedError) {
-    if (Math.abs(predictedError) <= CENTER_DEAD_ZONE || imageWidth <= 0f) return 0f;
-    float edgeDistance;
-    if (predictedError < 0f) {
-      edgeDistance = rotated ? bbox.top : bbox.left;
-    } else {
-      edgeDistance = imageWidth - (rotated ? bbox.bottom : bbox.right);
-    }
-    float edgeZone = imageWidth * EDGE_ZONE_RATIO;
+  private static float edgeUrgency(DisplayHorizontalBounds displayed, float predictedError) {
+    if (Math.abs(predictedError) <= CENTER_DEAD_ZONE || displayed.width <= 0f) return 0f;
+    float edgeDistance = predictedError < 0f ? displayed.left : displayed.width - displayed.right;
+    float edgeZone = displayed.width * EDGE_ZONE_RATIO;
     return clamp((edgeZone - edgeDistance) / edgeZone, 0f, 1f);
   }
 
@@ -115,9 +109,8 @@ public final class SteeringDemandEstimator {
       direction = SteeringEvidence.Direction.NONE;
       return;
     }
-    // Keep the simulator display aligned with ControlGenerator.FLIP_TURN=true.
     SteeringEvidence.Direction candidate =
-        predictedError < 0f ? SteeringEvidence.Direction.RIGHT : SteeringEvidence.Direction.LEFT;
+        predictedError < 0f ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
     if (direction != SteeringEvidence.Direction.NONE
         && direction != candidate
         && Math.abs(predictedError) < 0.10f) return;
@@ -160,5 +153,35 @@ public final class SteeringDemandEstimator {
 
   private static float clamp(float value, float min, float max) {
     return Math.max(min, Math.min(max, value));
+  }
+
+  /** Converts a source-frame bbox into the horizontal axis visible on the phone preview. */
+  private static DisplayHorizontalBounds displayedHorizontalBounds(
+      RectF bbox, int frameW, int frameH, int sensorOrientation) {
+    switch (((sensorOrientation % 360) + 360) % 360) {
+      case 90:
+        return new DisplayHorizontalBounds(frameH - bbox.bottom, frameH - bbox.top, frameH);
+      case 180:
+        return new DisplayHorizontalBounds(frameW - bbox.right, frameW - bbox.left, frameW);
+      case 270:
+        return new DisplayHorizontalBounds(bbox.top, bbox.bottom, frameH);
+      case 0:
+      default:
+        return new DisplayHorizontalBounds(bbox.left, bbox.right, frameW);
+    }
+  }
+
+  private static final class DisplayHorizontalBounds {
+    final float left;
+    final float right;
+    final float width;
+    final float center;
+
+    DisplayHorizontalBounds(float left, float right, float width) {
+      this.left = left;
+      this.right = right;
+      this.width = width;
+      this.center = (left + right) * 0.5f;
+    }
   }
 }

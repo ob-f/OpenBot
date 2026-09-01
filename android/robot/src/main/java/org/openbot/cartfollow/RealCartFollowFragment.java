@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 import androidx.navigation.Navigation;
 import org.openbot.BuildConfig;
 import org.openbot.R;
@@ -20,6 +21,8 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private static final long AUTO_UNLOCK_HOLD_MS = 2000L;
   private static final long AUTO_LOG_INTERVAL_MS = 250L;
   private static final int REAL_CART_PREDICTION_HORIZON_MS = 400;
+  private static final String TUNING_PREFS = "real_cart_steering_tuning";
+  private static final String TUNING_STRENGTH_KEY = "strength_percent";
 
   private final RealCartSafetyController safetyController = new RealCartSafetyController();
   private final ManualTouchRouter manualTouchRouter =
@@ -33,6 +36,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private RealCartAutoDriveController.Phase lastLoggedAutoPhase;
   private View activeManualButton;
   private String lastSessionEndReason = "none";
+  private SteeringTuningRecorder tuningRecorder;
 
   private final Runnable commandScheduler =
       new Runnable() {
@@ -73,6 +77,8 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     binding.steeringPanel.setVisibility(View.VISIBLE);
     binding.predictionHorizonGroup.setVisibility(View.GONE);
     updateSteeringUi(SteeringEvidence.unavailable("idle", REAL_CART_PREDICTION_HORIZON_MS));
+    tuningRecorder = new SteeringTuningRecorder(requireContext());
+    installSteeringStrengthTuning();
     binding.realModeGroup.check(R.id.real_mode_manual);
     binding.startSwitch.setChecked(false);
     binding.startSwitch.setEnabled(false);
@@ -80,7 +86,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     binding.realModeGroup.addOnButtonCheckedListener(
         (group, checkedId, isChecked) -> {
           if (!isChecked) return;
-          setMode(
+      setMode(
               checkedId == R.id.real_mode_auto
                   ? RealCartSafetyController.Mode.AUTO
                   : RealCartSafetyController.Mode.MANUAL);
@@ -158,12 +164,14 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
       lastSessionEndReason = "none";
       logSession("start", "enabled");
       safetyController.setAutoRunEnabled(true, SystemClock.elapsedRealtime());
+      recordTuning("session_start");
       refreshRealUi();
       return;
     }
     latestOutput = safetyController.resetAutoDrive("start_off", false);
     lastSessionEndReason = "user_start_off";
     logSession("end", lastSessionEndReason);
+    recordTuning("session_end");
     sendOutput(latestOutput);
     refreshRealUi();
   }
@@ -185,9 +193,13 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     latestOutput = safetyController.auto(frameResult, SystemClock.elapsedRealtime());
     logAutoDecision(frameResult);
     RealCartAutoDriveController.Result autoResult = safetyController.getAutoDriveResult();
-    updateCommandText(commandForAutoResult(autoResult));
     updateSteeringUi(frameResult == null ? null : frameResult.steeringEvidence);
     if (autoResult.lockout) finishAutoSession(autoResult.reason, false);
+  }
+
+  @Override
+  protected String commandForFrame(FollowStateMachine.FrameResult frameResult, String defaultText) {
+    return commandForAutoResult(safetyController.getAutoDriveResult());
   }
 
   @Override
@@ -227,6 +239,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     binding.manualDriveControls.setVisibility(auto ? View.GONE : View.VISIBLE);
     binding.unlockAuto.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.realSafetyNotice.setVisibility(auto ? View.VISIBLE : View.GONE);
+    binding.steeringStrengthPanel.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.startSwitch.setEnabled(false);
     refreshRealUi();
   }
@@ -411,6 +424,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     if (binding == null || safetyController.getMode() != RealCartSafetyController.Mode.AUTO) return;
     lastSessionEndReason = reason;
     logSession("end", reason);
+    recordTuning("session_end_" + reason);
     latestOutput = safetyController.resetAutoDrive(reason, revokeUnlock);
     sendOutput(latestOutput);
     if (binding.startSwitch.isChecked()) binding.startSwitch.setChecked(false);
@@ -641,5 +655,67 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
                         safeEvidence.predictionHorizonMs));
               }
             });
+  }
+
+  @Override
+  public void onDestroy() {
+    if (tuningRecorder != null) tuningRecorder.shutdown();
+    super.onDestroy();
+  }
+
+  private void installSteeringStrengthTuning() {
+    int saved =
+        requireContext()
+            .getSharedPreferences(TUNING_PREFS, 0)
+            .getInt(TUNING_STRENGTH_KEY, 100);
+    int strength =
+        Math.max(
+            RealCartAutoDriveController.MIN_STEERING_STRENGTH_PERCENT,
+            Math.min(RealCartAutoDriveController.MAX_STEERING_STRENGTH_PERCENT, saved));
+    safetyController.setSteeringStrengthPercent(strength);
+    binding.steeringStrengthSlider.setValue(strength);
+    updateSteeringStrengthUi(strength);
+    binding.steeringStrengthSlider.addOnChangeListener(
+        (slider, value, fromUser) -> {
+          int updated = Math.round(value / 5f) * 5;
+          safetyController.setSteeringStrengthPercent(updated);
+          updateSteeringStrengthUi(updated);
+        });
+    binding.steeringStrengthSlider.addOnSliderTouchListener(
+        new com.google.android.material.slider.Slider.OnSliderTouchListener() {
+          @Override
+          public void onStartTrackingTouch(com.google.android.material.slider.Slider slider) {}
+
+          @Override
+          public void onStopTrackingTouch(com.google.android.material.slider.Slider slider) {
+            int updated = Math.round(slider.getValue() / 5f) * 5;
+            requireContext()
+                .getSharedPreferences(TUNING_PREFS, 0)
+                .edit()
+                .putInt(TUNING_STRENGTH_KEY, updated)
+                .apply();
+            recordTuning("strength_changed");
+          }
+        });
+    binding.recordSteeringTuning.setOnClickListener(
+        v -> {
+          recordTuning("manual_mark");
+          binding.steeringTuningNote.setText("");
+          Toast.makeText(requireContext(), "已记录转弯参数", Toast.LENGTH_SHORT).show();
+        });
+  }
+
+  private void updateSteeringStrengthUi(int strength) {
+    if (binding == null) return;
+    int minimumInner = RealCartAutoDriveController.innerSpeedForDemand(100, strength);
+    binding.steeringStrengthValue.setText(
+        String.format(
+            java.util.Locale.US, "转弯强度 %d%% · 最大差速 %d,14 / 14,%d", strength, minimumInner, minimumInner));
+  }
+
+  private void recordTuning(String event) {
+    if (tuningRecorder == null) return;
+    String note = binding == null ? "" : binding.steeringTuningNote.getText().toString().trim();
+    tuningRecorder.record(event, safetyController.getSteeringStrengthPercent(), safetyController.getAutoDriveResult(), note);
   }
 }

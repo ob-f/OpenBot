@@ -43,6 +43,13 @@ public class FollowSessionGuardTest {
   }
 
   @Test
+  public void oldFrameOrOldSessionCannotOverwriteCurrentUi() {
+    assertTrue(BaseCartFollowFragment.shouldApplyUiSnapshot(4, 4, 12, 11));
+    assertFalse(BaseCartFollowFragment.shouldApplyUiSnapshot(3, 4, 99, 11));
+    assertFalse(BaseCartFollowFragment.shouldApplyUiSnapshot(4, 4, 10, 11));
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void clearingSessionDrawStateRemovesFrozenOverlayBoxes() throws Exception {
     BaseCartFollowFragment fragment = new HumanCartSimulatorFragment();
