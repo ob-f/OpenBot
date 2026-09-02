@@ -23,6 +23,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private static final int REAL_CART_PREDICTION_HORIZON_MS = 400;
   private static final String TUNING_PREFS = "real_cart_steering_tuning";
   private static final String TUNING_STRENGTH_KEY = "strength_percent";
+  private static final String MANUAL_SPEED_KEY = "manual_forward_logical";
 
   private final RealCartSafetyController safetyController = new RealCartSafetyController();
   private final ManualTouchRouter manualTouchRouter =
@@ -37,6 +38,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private View activeManualButton;
   private String lastSessionEndReason = "none";
   private SteeringTuningRecorder tuningRecorder;
+  private int manualForwardLogical = ManualSpeedProfile.DEFAULT_FORWARD_LOGICAL;
 
   private final Runnable commandScheduler =
       new Runnable() {
@@ -79,6 +81,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     updateSteeringUi(SteeringEvidence.unavailable("idle", REAL_CART_PREDICTION_HORIZON_MS));
     tuningRecorder = new SteeringTuningRecorder(requireContext());
     installSteeringStrengthTuning();
+    installManualSpeedSelector();
     binding.realModeGroup.check(R.id.real_mode_manual);
     binding.startSwitch.setChecked(false);
     binding.startSwitch.setEnabled(false);
@@ -237,6 +240,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     resetFollowSession();
     boolean auto = mode == RealCartSafetyController.Mode.AUTO;
     binding.manualDriveControls.setVisibility(auto ? View.GONE : View.VISIBLE);
+    binding.manualSpeedPanel.setVisibility(auto ? View.GONE : View.VISIBLE);
     binding.unlockAuto.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.realSafetyNotice.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.steeringStrengthPanel.setVisibility(auto ? View.VISIBLE : View.GONE);
@@ -330,10 +334,11 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     switch (control) {
       case FORWARD:
         return safetyController.manual(
-            RealCartSafetyController.MANUAL_FORWARD, RealCartSafetyController.MANUAL_FORWARD);
+            manualForwardLogical, manualForwardLogical);
       case BACKWARD:
+        int reverseLogical = ManualSpeedProfile.reverseForForward(manualForwardLogical);
         return safetyController.manual(
-            -RealCartSafetyController.MANUAL_REVERSE, -RealCartSafetyController.MANUAL_REVERSE);
+            -reverseLogical, -reverseLogical);
       case LEFT:
         return safetyController.manual(
             -RealCartSafetyController.MANUAL_TURN, RealCartSafetyController.MANUAL_TURN);
@@ -379,6 +384,54 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private void clearManualButtonState() {
     if (activeManualButton != null) activeManualButton.setPressed(false);
     activeManualButton = null;
+  }
+
+  private void installManualSpeedSelector() {
+    int saved =
+        requireContext()
+            .getSharedPreferences(TUNING_PREFS, 0)
+            .getInt(MANUAL_SPEED_KEY, ManualSpeedProfile.DEFAULT_FORWARD_LOGICAL);
+    manualForwardLogical = ManualSpeedProfile.clampForward(saved);
+    binding.manualSpeedSlider.setValue(manualForwardLogical);
+    updateManualSpeedUi();
+    binding.manualSpeedSlider.addOnChangeListener(
+        (slider, value, fromUser) -> {
+          manualForwardLogical = ManualSpeedProfile.clampForward(Math.round(value));
+          updateManualSpeedUi();
+          ManualControlArbiter.Control active = manualTouchRouter.getActiveControl();
+          if (active == ManualControlArbiter.Control.FORWARD
+              || active == ManualControlArbiter.Control.BACKWARD) {
+            latestOutput = manualOutput(active);
+          }
+        });
+    binding.manualSpeedSlider.addOnSliderTouchListener(
+        new com.google.android.material.slider.Slider.OnSliderTouchListener() {
+          @Override
+          public void onStartTrackingTouch(com.google.android.material.slider.Slider slider) {}
+
+          @Override
+          public void onStopTrackingTouch(com.google.android.material.slider.Slider slider) {
+            requireContext()
+                .getSharedPreferences(TUNING_PREFS, 0)
+                .edit()
+                .putInt(MANUAL_SPEED_KEY, manualForwardLogical)
+                .apply();
+            logControl("manual_speed", "forward=" + manualForwardLogical);
+          }
+        });
+  }
+
+  private void updateManualSpeedUi() {
+    if (binding == null) return;
+    int reverseLogical = ManualSpeedProfile.reverseForForward(manualForwardLogical);
+    binding.manualSpeedValue.setText(
+        String.format(
+            java.util.Locale.US,
+            "手动直行速度：前进 c%d（约 %d mm/s） · 后退 c-%d（约 %d mm/s）",
+            manualForwardLogical,
+            ManualSpeedProfile.estimatedMmps(manualForwardLogical),
+            reverseLogical,
+            ManualSpeedProfile.estimatedMmps(reverseLogical)));
   }
 
   private void installAutoUnlock() {

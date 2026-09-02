@@ -316,6 +316,33 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/manual_speed_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/manual_speed_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="手动直行速度：前进 c14（约 160 mm/s） · 后退 c-12（约 137 mm/s）"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/manual_speed_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="手动直行速度"
+                android:stepSize="1"
+                android:value="14"
+                android:valueFrom="9"
+                android:valueTo="21" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
