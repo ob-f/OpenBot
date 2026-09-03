@@ -53,6 +53,11 @@ public class Vehicle {
   private boolean cartFirmwareReady = false;
   private long emergencySequence = 0L;
   private BluetoothManager bluetoothManager;
+
+  public void setControlDiagnosticObserver(ControlDiagnosticObserver observer) {
+    if (bluetoothManager != null) bluetoothManager.setDiagnosticObserver(observer);
+  }
+
   SharedPreferences sharedPreferences;
   public String connectionType;
 

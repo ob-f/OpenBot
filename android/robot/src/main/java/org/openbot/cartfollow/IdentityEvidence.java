@@ -120,6 +120,42 @@ public class IdentityEvidence {
     return trackId >= 0 || activeTrackCount > 0 || lockedTrackId >= 0;
   }
 
+  /**
+   * Simulator authorization observes the scored detection, never an unscored belief-selected box.
+   */
+  public IdentityEvidence forSimulatorCandidate(
+      TargetTrack track,
+      int lockedId,
+      ReIDMatchResult scored,
+      BboxContinuityEvidence bbox,
+      float belief) {
+    boolean valid = track != null && scored != null && scored.isBoundToTrack(track.trackId);
+    return new IdentityEvidence(
+        valid ? scored.bestScore : 0f,
+        valid ? scored.bestScore : 0f,
+        valid && scored.weakOk,
+        reason,
+        scored,
+        bbox,
+        stableMatchCount,
+        candidateSwitchCount,
+        track == null ? null : track.recognition,
+        track == null ? -1 : track.trackId,
+        lockedId,
+        suspectedTrackId,
+        activeTrackCount,
+        track == null ? 0 : track.ageFrames,
+        track == null ? 0 : track.missedFrames,
+        belief,
+        reidContribution,
+        bboxContribution,
+        predictionContribution,
+        switchPenalty,
+        beliefStableFrames,
+        beliefUncertainFrames,
+        beliefReason);
+  }
+
   public boolean beliefConfirmed() {
     return hasBelief() && targetBelief >= IdentityBelief.BELIEF_CONFIRM;
   }
@@ -158,5 +194,32 @@ public class IdentityEvidence {
 
   public boolean predictionOk() {
     return bboxContinuity != null && bboxContinuity.predictionOk;
+  }
+
+  public IdentityEvidence withoutMotionCandidate(String suppressedReason) {
+    return new IdentityEvidence(
+        0f,
+        confidence,
+        false,
+        suppressedReason,
+        reidMatch,
+        bboxContinuity,
+        stableMatchCount,
+        candidateSwitchCount,
+        null,
+        trackId,
+        lockedTrackId,
+        suspectedTrackId,
+        activeTrackCount,
+        trackAge,
+        missedFrames,
+        targetBelief,
+        reidContribution,
+        bboxContribution,
+        predictionContribution,
+        switchPenalty,
+        beliefStableFrames,
+        beliefUncertainFrames,
+        beliefReason);
   }
 }

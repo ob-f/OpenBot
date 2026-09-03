@@ -24,6 +24,7 @@ android {
     buildToolsVersion '33.0.1'
     defaultConfig {
         applicationId "org.openbot"
+        buildConfigField "String", "CART_BUILD_STAMP", "\"continuity-v2-${new Date().format('yyyyMMdd-HHmmss', TimeZone.getTimeZone('UTC'))}\""
         minSdkVersion 21
         targetSdkVersion 32
         ndk {
@@ -40,6 +41,10 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+
+    testOptions {
+        unitTests.includeAndroidResources = true
     }
 
     compileOptions {

@@ -12,6 +12,7 @@ public class TargetTrack {
   public int missedFrames;
   public int stableFrames;
   public long lastSeenTimestampMs;
+  public long previousSeenTimestampMs = -1L;
   public String matchReason;
 
   TargetTrack(int trackId, Recognition recognition, long timestampMs) {
@@ -29,6 +30,7 @@ public class TargetTrack {
   void update(Recognition recognition, long timestampMs, String reason) {
     if (recognition == null || recognition.getLocation() == null) return;
     if (lastBbox != null) previousBbox = new RectF(lastBbox);
+    previousSeenTimestampMs = lastSeenTimestampMs;
     lastBbox = new RectF(recognition.getLocation());
     this.recognition = recognition;
     ageFrames++;

@@ -47,6 +47,7 @@ public class BaseCartFollowFragment extends CameraFragment {
   private static final int COLOR_CANDIDATE = 1;
   private static final int COLOR_NORMAL = 2;
   private static final int COLOR_FAIL = 3;
+  private static final int COLOR_LOW_CONFIDENCE = 4;
   private static final int RECOVERY_RELOCK_MIN_FRAMES = 2;
 
   protected FragmentHumanCartSimulatorBinding binding;
@@ -80,7 +81,10 @@ public class BaseCartFollowFragment extends CameraFragment {
   private ReIDCoordinator reidCoordinator;
   private final CartFollowDiagnosticConfig diagnosticConfig = new CartFollowDiagnosticConfig();
   private final CartFollowDiagnosticSaver diagnosticSaver = new CartFollowDiagnosticSaver();
-  private CartFollowDiagnosticSession diagnosticSession;
+  private volatile CartFollowDiagnosticSession diagnosticSession;
+  private CartFollowDiagnosticSession closingDiagnosticSession;
+  private long loggedGalleryRevision = -1;
+  private boolean diagnosticViewActive;
   private boolean diagnosticEnabled = false;
   private boolean diagnosticActive = false;
   private boolean targetEventAwaitingReturn = false;
@@ -88,11 +92,33 @@ public class BaseCartFollowFragment extends CameraFragment {
   private long lastDiagnosticFrameLogMs = 0L;
   private long lastDiagnosticCropMs = 0L;
   private long lastDiagnosticGalleryMs = 0L;
+  private long lastPresentationLogMs;
   private int recoveryRelockTrackId = -1;
   private int recoveryRelockFrames = 0;
+  private final GlobalReacquireGate globalReacquireGate = new GlobalReacquireGate();
+  private final SimulatorIdentityGuard simulatorIdentityGuard = new SimulatorIdentityGuard();
+  private final SimulatorContinuityTracker simulatorContinuity = new SimulatorContinuityTracker();
+
+  protected final void configureRecentGallery(boolean enabled) {
+    if (reidCoordinator != null) reidCoordinator.setRecentEnabled(enabled);
+  }
+
+  private List<Detector.Recognition> lastPresentedPersons = java.util.Collections.emptyList();
+  private boolean enhancedRecoveryEnabled;
+  private FollowPolicy followPolicy =
+      new FollowPolicy(false, GalleryUpdateStatus.Mode.STATIC, false, false);
+  private boolean dualConfidenceEnabled;
+  private long lastSavedAdaptiveRevision;
   private Bitmap latestConfirmSnapshot;
-  private long uiGeneration;
+  private volatile long uiGeneration;
   private long latestAppliedFrameSequence;
+  private final ThreadLocal<long[]> admittedUiFrame = new ThreadLocal<>();
+  private long droppedInferenceFrames;
+  private long fpsWindowStartMs;
+  private int completedFrames;
+  private float completedFps;
+  private long lastSteeringObservationMs = -1L;
+  private volatile long drawObservedAtMs;
 
   private final List<DrawBox> drawBoxes = new ArrayList<>();
   private int drawFrameWidth = 0;
@@ -103,6 +129,7 @@ public class BaseCartFollowFragment extends CameraFragment {
   private final Paint candidateBoxPaint = new Paint();
   private final Paint personBoxPaint = new Paint();
   private final Paint failBoxPaint = new Paint();
+  private final Paint lowConfidenceBoxPaint = new Paint();
   private final Paint boxTextPaint = new Paint();
 
   @Override
@@ -120,6 +147,11 @@ public class BaseCartFollowFragment extends CameraFragment {
     failBoxPaint.setColor(Color.RED);
     failBoxPaint.setStyle(Paint.Style.STROKE);
     failBoxPaint.setStrokeWidth(8.0f);
+    lowConfidenceBoxPaint.setColor(Color.LTGRAY);
+    lowConfidenceBoxPaint.setStyle(Paint.Style.STROKE);
+    lowConfidenceBoxPaint.setStrokeWidth(5.0f);
+    lowConfidenceBoxPaint.setPathEffect(
+        new android.graphics.DashPathEffect(new float[] {18f, 12f}, 0f));
     boxTextPaint.setColor(Color.WHITE);
     boxTextPaint.setTextSize(40.0f);
   }
@@ -134,6 +166,7 @@ public class BaseCartFollowFragment extends CameraFragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    diagnosticViewActive = true;
     reidCoordinator = new ReIDCoordinator(requireActivity(), getNumThreads());
 
     binding.confidenceValue.setText((int) (minConfidence * 100) + "%");
@@ -167,17 +200,45 @@ public class BaseCartFollowFragment extends CameraFragment {
           showFullDebug = !showFullDebug;
           binding.btnDebugDetails.setText(showFullDebug ? "收起详情" : "调试详情");
         });
+    binding.diagnosticHealth.post(
+        new Runnable() {
+          @Override
+          public void run() {
+            if (!diagnosticViewActive || binding == null) return;
+            CartFollowDiagnosticSession session =
+                diagnosticSession != null ? diagnosticSession : closingDiagnosticSession;
+            binding.diagnosticHealth.setText(
+                session == null
+                    ? "日志关闭"
+                    : session.io.isClosed()
+                        ? session.io.error.isEmpty()
+                            ? "记录已保存，可在测试记录中导出"
+                            : "日志写入异常：" + session.io.error
+                        : session.health());
+            binding.diagnosticHealth.postDelayed(this, 1000);
+          }
+        });
     resetTargetEventButton();
     binding.btnTargetEvent.setOnClickListener(v -> recordTargetEvent());
+    binding.btnTestRecords.setOnClickListener(
+        v -> {
+          if (binding.startSwitch.isChecked()) {
+            Toast.makeText(requireContext(), "请先停止测试，再查看或导出记录", Toast.LENGTH_SHORT).show();
+            return;
+          }
+          startActivity(
+              new android.content.Intent(
+                  requireContext(),
+                  org.openbot.cartfollow.diagnostics.DiagnosticRecordsActivity.class));
+        });
     binding.diagnosticSwitch.setChecked(false);
     onDiagnosticLoggingChanged(false);
     binding.diagnosticSwitch.setOnClickListener(
         v -> {
           diagnosticEnabled = binding.diagnosticSwitch.isChecked();
           onDiagnosticLoggingChanged(diagnosticEnabled);
-          if (!diagnosticEnabled) {
-            stopDiagnosticSession();
-          }
+          if (!diagnosticEnabled) stopDiagnosticSession();
+          else startDiagnosticSession();
           resetTargetEventButton();
         });
 
@@ -196,8 +257,10 @@ public class BaseCartFollowFragment extends CameraFragment {
             diagnosticSaver.saveGallerySnapshotAsync(
                 latestConfirmSnapshot, diagnosticSession, "confirmed_snapshot");
           }
+          recordControlEvent("target_confirmed", "locked_track=" + lockedTrackId);
           stateMachine.confirm();
           invalidatePendingUiSnapshots();
+          if (enhancedRecoveryEnabled) rememberDistractors(lockedTrackId, lastPresentedPersons);
           binding.confirmPanel.setVisibility(View.GONE);
           binding.countdownText.setVisibility(View.GONE);
           updateCommandText("已确认，请回到车前");
@@ -219,9 +282,9 @@ public class BaseCartFollowFragment extends CameraFragment {
         });
     binding.btnCancel.setOnClickListener(
         v -> {
-          resetFollowSession();
           if (binding.startSwitch.isChecked()) binding.startSwitch.setChecked(false);
           onFollowEnabledChanged(false);
+          resetFollowSession();
         });
 
     binding.startSwitch.setChecked(false);
@@ -232,14 +295,16 @@ public class BaseCartFollowFragment extends CameraFragment {
             if (reidCoordinator != null) reidCoordinator.reset();
             targetTrackManager.reset();
             beliefAccumulator.reset();
+            globalReacquireGate.reset();
             resetRecoveryRelock();
             startDiagnosticSession();
             stateMachine.startCapture();
+            recordControlEvent("capture_start", "start_enabled");
             invalidatePendingUiSnapshots();
             onFollowEnabledChanged(true);
           } else {
-            resetFollowSession();
             onFollowEnabledChanged(false);
+            resetFollowSession();
           }
         });
     onCartFollowViewCreated();
@@ -250,6 +315,35 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   /** Lets real hardware screens stop synchronously when the shared Start switch changes. */
   protected void onFollowEnabledChanged(boolean enabled) {}
+
+  protected final void configureSimulatorExperiments(
+      GalleryUpdateStatus.Mode galleryMode, boolean enhancedRecovery) {
+    configureFollowPolicy(new FollowPolicy(enhancedRecovery, galleryMode, true, true));
+  }
+
+  protected final void configureFollowPolicy(FollowPolicy policy) {
+    followPolicy = policy;
+    boolean enhancedRecovery = policy.enhancedIdentity;
+    GalleryUpdateStatus.Mode galleryMode = policy.galleryMode;
+    enhancedRecoveryEnabled = enhancedRecovery;
+    dualConfidenceEnabled = enhancedRecovery;
+    stateMachine.setSimulatorFastRecoveryEnabled(enhancedRecovery);
+    stateMachine.getMemory().setBoundedColorSampling(enhancedRecovery);
+    targetTrackManager.setGlobalAssociationEnabled(enhancedRecovery);
+    beliefAccumulator.setStrictReidProvenance(enhancedRecovery);
+    if (reidCoordinator != null) {
+      reidCoordinator.setEnhancedRecovery(enhancedRecovery);
+      reidCoordinator.setGalleryMode(galleryMode);
+    }
+    globalReacquireGate.reset();
+    lastSavedAdaptiveRevision = 0L;
+  }
+
+  protected final GalleryUpdateStatus getGalleryUpdateStatus() {
+    return reidCoordinator == null ? null : reidCoordinator.getGalleryStatus();
+  }
+
+  protected void onGalleryStatusUpdated(GalleryUpdateStatus status) {}
 
   /** Shared continuous steering evidence used by both simulator and real-cart follow screens. */
   protected final SteeringDemandEstimator steeringDemandEstimator = new SteeringDemandEstimator();
@@ -267,9 +361,33 @@ public class BaseCartFollowFragment extends CameraFragment {
       int sensorOrientation,
       long nowMs) {
     int horizonMs = steeringPredictionHorizonMs();
+    if (enhancedRecoveryEnabled && frameResult != null) {
+      TargetObservationEvidence observation = frameResult.targetObservation;
+      if (observation != null && observation.current) {
+        RectF box = observation.screenBox;
+        frameResult.steeringEvidence =
+            steeringDemandEstimator.update(
+                new RectF(box.left * 1000f, box.top * 1000f, box.right * 1000f, box.bottom * 1000f),
+                1000,
+                1000,
+                0,
+                observation.trackId,
+                observation.observedAtMs,
+                horizonMs);
+        lastSteeringObservationMs = observation.observedAtMs;
+      } else {
+        if (lastSteeringObservationMs < 0 || nowMs - lastSteeringObservationMs > 500L) {
+          steeringDemandEstimator.reset();
+        }
+        frameResult.steeringEvidence =
+            SteeringEvidence.unavailable("no_current_observation", horizonMs);
+      }
+      return;
+    }
     boolean following =
         frameResult != null
-            && (frameResult.state == FollowState.FOLLOW || frameResult.state == FollowState.FOLLOW_CAUTION)
+            && (frameResult.state == FollowState.FOLLOW
+                || frameResult.state == FollowState.FOLLOW_CAUTION)
             && frameResult.target != null
             && frameResult.target.getLocation() != null;
     if (!following) {
@@ -300,14 +418,26 @@ public class BaseCartFollowFragment extends CameraFragment {
     if (reidCoordinator != null) reidCoordinator.reset();
     targetTrackManager.reset();
     beliefAccumulator.reset();
+    globalReacquireGate.reset();
     resetRecoveryRelock();
     steeringDemandEstimator.reset();
+    lastSteeringObservationMs = -1L;
     onFollowSessionReset();
     stopDiagnosticSession();
     stateMachine.cancel();
     invalidatePendingUiSnapshots();
     clearDrawState();
     resetUiToIdle();
+  }
+
+  protected final void recaptureSimulatorTarget() {
+    if (!enhancedRecoveryEnabled || binding == null) return;
+    resetFollowSession();
+    binding.startSwitch.setChecked(true);
+    binding.modelSpinner.setEnabled(false);
+    startDiagnosticSession();
+    stateMachine.startCapture();
+    onFollowEnabledChanged(true);
   }
 
   protected final boolean isFollowConfirmationPending() {
@@ -339,7 +469,6 @@ public class BaseCartFollowFragment extends CameraFragment {
   protected void onInferenceConfigurationChanged() {
     modelConfigGeneration.incrementAndGet();
     modelConfigPending = false;
-    computingNetwork.set(false);
     InferenceResources stale = inferenceResources;
     inferenceResources = null;
     if (stale != null) runInBackground(() -> closeDetector(stale.detector));
@@ -434,7 +563,8 @@ public class BaseCartFollowFragment extends CameraFragment {
         .runOnUiThread(
             () -> {
               if (generation != modelConfigGeneration.get() || !isAdded()) return;
-              Toast.makeText(requireContext().getApplicationContext(), message, Toast.LENGTH_LONG).show();
+              Toast.makeText(requireContext().getApplicationContext(), message, Toast.LENGTH_LONG)
+                  .show();
             });
   }
 
@@ -488,8 +618,22 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   protected void onDiagnosticLoggingChanged(boolean enabled) {}
 
+  protected void onDiagnosticSessionChanged(CartFollowDiagnosticSession session) {}
+
+  protected void recordControlEvent(String event, String details) {
+    CartFollowDiagnosticSession session = diagnosticSession;
+    if (session != null) session.control(event, details);
+  }
+
+  @Override
+  public void onDestroyView() {
+    diagnosticViewActive = false;
+    super.onDestroyView();
+  }
+
   @Override
   public void onDestroy() {
+    stopDiagnosticSession();
     diagnosticSaver.shutdown();
     super.onDestroy();
   }
@@ -506,17 +650,45 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   @Override
   protected void processFrame(Bitmap bitmap, ImageProxy image) {
+    processFrame(bitmap, image, SystemClock.elapsedRealtime(), 0L, getRotationDegrees());
+  }
+
+  @Override
+  protected void processFrame(
+      Bitmap bitmap, ImageProxy image, long receivedAtMs, long sensorTimestampNs, int rotation) {
     if (bitmap == null) return;
     InferenceResources resources = inferenceResources;
     if (resources == null
-        || !resources.matches(bitmap.getWidth(), bitmap.getHeight(), 90 - ImageUtils.getScreenOrientation(requireActivity()))) {
+        || !resources.matches(
+            bitmap.getWidth(),
+            bitmap.getHeight(),
+            90 - ImageUtils.getScreenOrientation(requireActivity()))) {
       requestNetworkConfiguration(bitmap.getWidth(), bitmap.getHeight());
       return;
     }
 
-    ++frameNum;
+    final long acceptedSequence = ++frameNum;
     if (binding == null || !isInferenceEnabled()) return;
-    if (!computingNetwork.compareAndSet(false, true)) return;
+    if (!computingNetwork.compareAndSet(false, true)) {
+      droppedInferenceFrames++;
+      return;
+    }
+
+    final long acceptedGeneration = uiGeneration;
+    final ReIDCoordinator acceptedReidCoordinator = reidCoordinator;
+    final long acceptedReidSession =
+        acceptedReidCoordinator == null ? -1L : acceptedReidCoordinator.getSessionEpoch();
+    final Bitmap ownedFrame;
+    final long copyStartedMs = SystemClock.elapsedRealtime();
+    try {
+      ownedFrame = copyInferenceFrame(bitmap);
+    } catch (RuntimeException e) {
+      computingNetwork.set(false);
+      onInferenceFailure(e);
+      return;
+    }
+    final boolean frontFacing = lensFacing == CameraSelector.LENS_FACING_FRONT;
+    final long copyMs = SystemClock.elapsedRealtime() - copyStartedMs;
 
     final Detector activeDetector = resources.detector;
     final Bitmap activeCroppedBitmap = resources.croppedBitmap;
@@ -525,17 +697,21 @@ public class BaseCartFollowFragment extends CameraFragment {
     final int frameW = resources.frameWidth;
     final int frameH = resources.frameHeight;
     final int activeSensorOrientation = resources.sensorOrientation;
-    runInBackground(
+    final Runnable task =
         () -> {
+          Bitmap workingFrame = ownedFrame;
           try {
+            admittedUiFrame.set(new long[] {acceptedGeneration, acceptedSequence});
+            if (acceptedGeneration != uiGeneration
+                || resources != inferenceResources
+                || enhancedRecoveryEnabled && acceptedReidCoordinator != reidCoordinator) return;
             final Canvas canvas = new Canvas(activeCroppedBitmap);
-            Bitmap workingFrame = bitmap;
-            if (lensFacing == CameraSelector.LENS_FACING_FRONT) {
-              Bitmap flipped = CameraUtils.flipBitmapHorizontal(bitmap);
+            if (frontFacing) {
+              Bitmap flipped = CameraUtils.flipBitmapHorizontal(ownedFrame);
               canvas.drawBitmap(flipped, activeFrameToCropTransform, null);
               workingFrame = flipped;
             } else {
-              canvas.drawBitmap(bitmap, activeFrameToCropTransform, null);
+              canvas.drawBitmap(ownedFrame, activeFrameToCropTransform, null);
             }
 
             if (activeDetector != null) {
@@ -543,36 +719,72 @@ public class BaseCartFollowFragment extends CameraFragment {
               final List<Detector.Recognition> results =
                   activeDetector.recognizeImage(activeCroppedBitmap, classType);
               lastProcessingTimeMs = SystemClock.elapsedRealtime() - startTime;
+              if (acceptedGeneration != uiGeneration || resources != inferenceResources) return;
 
               final List<Detector.Recognition> mappedRecognitions = new ArrayList<>();
+              final List<Detector.Recognition> lowConfidenceRecognitions = new ArrayList<>();
+              float lowConfidenceThreshold = lowConfidenceThreshold(minConfidence);
               for (final Detector.Recognition result : results) {
                 final RectF location = result.getLocation();
-                if (location != null && result.getConfidence() >= minConfidence) {
+                if (location != null
+                    && result.getConfidence()
+                        >= (dualConfidenceEnabled ? lowConfidenceThreshold : minConfidence)) {
                   activeCropToFrameTransform.mapRect(location);
                   result.setLocation(location);
-                  mappedRecognitions.add(result);
+                  if (result.getConfidence() >= minConfidence) mappedRecognitions.add(result);
+                  else lowConfidenceRecognitions.add(result);
                 }
               }
 
-              targetTrackManager.update(
-                  mappedRecognitions, frameW, frameH, SystemClock.elapsedRealtime());
+              TargetTrackManager.TwoStageUpdateResult tierUpdate =
+                  dualConfidenceEnabled
+                      ? targetTrackManager.updateWithLowConfidence(
+                          mappedRecognitions,
+                          lowConfidenceRecognitions,
+                          frameW,
+                          frameH,
+                          receivedAtMs)
+                      : null;
+              if (!dualConfidenceEnabled) {
+                targetTrackManager.update(mappedRecognitions, frameW, frameH, receivedAtMs);
+              }
+              List<Detector.Recognition> continuedLowConfidence =
+                  tierUpdate == null
+                      ? java.util.Collections.emptyList()
+                      : tierUpdate.continuedLowConfidence;
+              List<Detector.Recognition> identityCandidates = new ArrayList<>(mappedRecognitions);
+              identityCandidates.addAll(continuedLowConfidence);
               FollowState currentState = stateMachine.getState();
               Detector.Recognition largestPerson = selectLargest(mappedRecognitions);
+              long initializationStartedMs = SystemClock.elapsedRealtime();
               if (currentState == FollowState.CAPTURE_TARGET) {
                 if (reidCoordinator != null) {
                   reidCoordinator.collectInitializationCandidate(
-                      workingFrame, largestPerson, activeSensorOrientation);
+                      workingFrame,
+                      largestPerson,
+                      activeSensorOrientation,
+                      enhancedRecoveryEnabled ? receivedAtMs : -1L,
+                      enhancedRecoveryEnabled
+                          ? acceptedReidSession
+                          : reidCoordinator.getSessionEpoch());
                 }
                 maybeSaveGalleryCandidate(workingFrame, largestPerson, activeSensorOrientation);
               }
+              long initializationMs = SystemClock.elapsedRealtime() - initializationStartedMs;
+              long matchStartedMs = SystemClock.elapsedRealtime();
               TargetMatcher.MatchResult legacyMatch =
                   matcher.match(
                       mappedRecognitions, workingFrame, stateMachine.getMemory(), frameW, frameH);
+              long matchMs = SystemClock.elapsedRealtime() - matchStartedMs;
+              if (reidCoordinator != null && enhancedRecoveryEnabled) {
+                reidCoordinator.setFrameContext(targetTrackManager, receivedAtMs, acceptedSequence);
+              }
+              long reidStartMs = SystemClock.elapsedRealtime();
               IdentityEvidence identity =
                   reidCoordinator == null
                       ? null
                       : reidCoordinator.evaluate(
-                          mappedRecognitions,
+                          identityCandidates,
                           workingFrame,
                           stateMachine.getMemory(),
                           currentState,
@@ -581,10 +793,23 @@ public class BaseCartFollowFragment extends CameraFragment {
                           activeSensorOrientation,
                           legacyMatch.score,
                           legacyMatch.matched,
-                          legacyMatch.best);
+                          legacyMatch.best,
+                          enhancedRecoveryEnabled
+                              ? acceptedReidSession
+                              : reidCoordinator.getSessionEpoch());
+              long reidMs = SystemClock.elapsedRealtime() - reidStartMs;
+              long decisionStartedMs = SystemClock.elapsedRealtime();
+              if (acceptedGeneration != uiGeneration) return;
+              IdentityEvidence galleryIdentity = identity;
+              Detector.Recognition galleryTarget = identity == null ? null : identity.bestCandidate;
+              boolean selectedLowConfidence = false;
               if (identity != null) {
+                boolean lowConfidenceBest = continuedLowConfidence.contains(identity.bestCandidate);
                 TargetTrack reidCandidateTrack =
                     targetTrackManager.getTrackForRecognition(identity.bestCandidate);
+                if (!lowConfidenceBest && !enhancedRecoveryEnabled) {
+                  maybeGlobalReacquire(currentState, identity, reidCandidateTrack);
+                }
                 identity =
                     beliefAccumulator.update(
                         identity,
@@ -593,44 +818,435 @@ public class BaseCartFollowFragment extends CameraFragment {
                         stateMachine.getMemory(),
                         frameW,
                         frameH);
+                galleryIdentity = identity;
+                galleryTarget = identity.bestCandidate;
+                selectedLowConfidence = continuedLowConfidence.contains(identity.bestCandidate);
+                if (selectedLowConfidence && !enhancedRecoveryEnabled) {
+                  identity = identity.withoutMotionCandidate("low_confidence_observation_only");
+                }
               }
+              SimulatorIdentityGuard.Decision authorization = null;
+              SimulatorContinuityTracker.Evidence continuity = null;
+              boolean identityStage =
+                  currentState != FollowState.IDLE
+                      && currentState != FollowState.CAPTURE_TARGET
+                      && currentState != FollowState.LOCKED_PENDING_CONFIRM
+                      && currentState != FollowState.STOP;
+              boolean stale =
+                  enhancedRecoveryEnabled && SystemClock.elapsedRealtime() - receivedAtMs > 500L;
+              if (enhancedRecoveryEnabled && identityStage) {
+                // Preserve exact feature/detection provenance even when belief still prefers a
+                // ghost.
+                if (identity != null && reidCoordinator != null) {
+                  TargetTrack lockedObservation = targetTrackManager.getLockedTrack();
+                  TargetTrack scoredTrack =
+                      stateMachine.hasFollowedInSession()
+                              && lockedObservation != null
+                              && lockedObservation.isVisible()
+                              && simulatorIdentityGuard.prefersContinuity(
+                                  lockedObservation.trackId, receivedAtMs)
+                          ? lockedObservation
+                          : targetTrackManager.getTrackForRecognition(
+                              reidCoordinator.getLastBestCandidate());
+                  if (scoredTrack != null)
+                    identity =
+                        identity.forSimulatorCandidate(
+                            scoredTrack,
+                            targetTrackManager.getLockedTrackId(),
+                            reidCoordinator.getScoredTrack(scoredTrack.trackId),
+                            reidCoordinator.getLastBboxEvidence(),
+                            beliefAccumulator.getBeliefForTrack(scoredTrack));
+                  galleryIdentity = identity;
+                  galleryTarget = identity.bestCandidate;
+                }
+                TargetTrack candidateTrack =
+                    identity == null
+                        ? null
+                        : targetTrackManager.getTrackForRecognition(identity.bestCandidate);
+                boolean high =
+                    identity != null && mappedRecognitions.contains(identity.bestCandidate);
+                boolean local =
+                    identity != null
+                        && SimulatorContinuityTracker.hasHistoricalLocalSupport(
+                            identity.bboxDefaultOk(),
+                            identity.predictionOk(),
+                            candidateTrack == null ? -1 : candidateTrack.trackId,
+                            targetTrackManager.getLockedTrackId(),
+                            targetTrackManager.isNearLockedGhost(
+                                candidateTrack, frameW, frameH, receivedAtMs));
+                continuity =
+                    simulatorContinuity.observe(
+                        acceptedGeneration,
+                        identity == null ? -1 : identity.trackId,
+                        identity == null || identity.bestCandidate == null
+                            ? null
+                            : identity.bestCandidate.getLocation(),
+                        acceptedSequence,
+                        receivedAtMs,
+                        SystemClock.elapsedRealtime(),
+                        frameW,
+                        frameH,
+                        candidateTrack != null
+                            && candidateTrack.missedFrames == 0
+                            && (high
+                                || continuedLowConfidence.contains(candidateTrack.recognition)),
+                        targetTrackManager.isLockedAssociationCompeting());
+                if (identity != null
+                    && candidateTrack != null
+                    && continuity.observedGeometry != null) {
+                  local = continuity.reliable || "continuity_warming".equals(continuity.reason);
+                  identity =
+                      identity.forSimulatorCandidate(
+                          candidateTrack,
+                          targetTrackManager.getLockedTrackId(),
+                          identity.reidMatch,
+                          continuity.observedGeometry,
+                          beliefAccumulator.getBeliefForTrack(candidateTrack));
+                  galleryIdentity = identity;
+                  galleryTarget = identity.bestCandidate;
+                }
+                ReIDMatchResult verification = identity == null ? null : identity.reidMatch;
+                if (identity != null
+                    && reidCoordinator != null
+                    && (!local || identity.trackId != targetTrackManager.getLockedTrackId()))
+                  verification = reidCoordinator.getGlobalScoredTrack(identity.trackId);
+                if (reidCoordinator != null)
+                  simulatorIdentityGuard.inspectCandidates(
+                      reidCoordinator.getGlobalScores(),
+                      mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                      targetTrackManager.getLockedTrackId(),
+                      acceptedSequence,
+                      receivedAtMs);
+                authorization =
+                    simulatorIdentityGuard.update(
+                        acceptedGeneration,
+                        acceptedSequence,
+                        receivedAtMs,
+                        SystemClock.elapsedRealtime(),
+                        identity == null ? -1 : identity.trackId,
+                        targetTrackManager.getLockedTrackId(),
+                        high,
+                        local,
+                        identity == null ? null : identity.reidMatch,
+                        mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                        targetTrackManager.isLockedAssociationCompeting(),
+                        candidateTrack == null || candidateTrack.missedFrames > 0,
+                        identity == null || reidCoordinator == null
+                            ? null
+                            : reidCoordinator.getGlobalScoredTrack(identity.trackId),
+                        continuity,
+                        stateMachine.hasFollowedInSession());
+                if (!followPolicy.continuityMotion)
+                  authorization = authorization.withoutContinuityMotion();
+                if (reidCoordinator != null)
+                  reidCoordinator.setAutomaticVerification(
+                      !authorization.authorized && !authorization.isContinuous());
+                if (authorization.motionAllowed
+                    && identity != null
+                    && identity.reidMatch != null
+                    && identity.reidMatch.fresh
+                    && identity.reidMatch.bestScore >= .85f
+                    && identity.reidMatch.margin >= .08f) {
+                  rememberDistractors(authorization.trackId, mappedRecognitions);
+                }
+                if (authorization.authorized
+                    && authorization.trackId != targetTrackManager.getLockedTrackId()) {
+                  if (targetTrackManager.lockTrack(
+                      authorization.trackId, "simulator_fresh_authorization")) {
+                    beliefAccumulator.lockTrack(authorization.trackId);
+                    identity =
+                        identity.forSimulatorCandidate(
+                            candidateTrack,
+                            authorization.trackId,
+                            verification,
+                            identity.bboxContinuity,
+                            beliefAccumulator.getBeliefForTrack(candidateTrack));
+                    stateMachine.acceptSimulatorRecovery(authorization, identity.bestCandidate);
+                  }
+                }
+                if (authorization.authorized
+                    && (!local || currentState == FollowState.DIRECTED_REACQUIRE))
+                  stateMachine.acceptSimulatorRecovery(authorization, identity.bestCandidate);
+              }
+              boolean holdIdentity = authorization != null && !authorization.authorized;
               FollowStateMachine.FrameResult fr =
-                  stateMachine.onFrame(
-                      mappedRecognitions,
-                      workingFrame,
+                  !stale && holdIdentity && authorization.retainTarget
+                      ? stateMachine.continuityFrame(
+                          mappedRecognitions,
+                          identity,
+                          authorization,
+                          frameW,
+                          frameH,
+                          activeSensorOrientation)
+                      : stale || holdIdentity
+                          ? stateMachine.observationOnly(mappedRecognitions, identity)
+                          : stateMachine.onFrame(
+                              mappedRecognitions,
+                              workingFrame,
+                              frameW,
+                              frameH,
+                              activeSensorOrientation,
+                              identity,
+                              enhancedRecoveryEnabled ? legacyMatch : null);
+              fr.simulatorIdentity = authorization;
+              fr.trackingDecision = authorization == null ? null : authorization.tracking;
+              fr.frameSequence = acceptedSequence;
+              fr.sessionGeneration = acceptedGeneration;
+              fr.targetObservation =
+                  targetObservation(
+                      continuedLowConfidence,
+                      mappedRecognitions.size() + lowConfidenceRecognitions.size(),
                       frameW,
                       frameH,
                       activeSensorOrientation,
-                      identity);
+                      receivedAtMs);
+              fr.distanceDiagnosticText = distanceDiagnostic(fr.targetObservation);
+              selectedLowConfidence =
+                  identity != null && continuedLowConfidence.contains(identity.bestCandidate);
+              fr.detectionTierEvidence =
+                  dualConfidenceEnabled
+                      ? new DetectionTierEvidence(
+                          minConfidence,
+                          lowConfidenceThreshold,
+                          lowConfidenceRecognitions,
+                          continuedLowConfidence,
+                          selectedLowConfidence)
+                      : DetectionTierEvidence.disabled(minConfidence);
               fr.behaviorDecision = decideBehavior(fr, frameW, frameH);
-              maybeRelockAfterRecovery(fr);
-              enrichFrameResult(
-                  fr, frameW, frameH, activeSensorOrientation, SystemClock.elapsedRealtime());
+              if (!enhancedRecoveryEnabled) maybeRelockAfterRecovery(fr);
+              if (enhancedRecoveryEnabled) {
+                fr.frameTiming =
+                    new FrameTimingEvidence(
+                        receivedAtMs,
+                        sensorTimestampNs,
+                        lastProcessingTimeMs,
+                        reidMs,
+                        SystemClock.elapsedRealtime() - startTime,
+                        SystemClock.elapsedRealtime() - receivedAtMs,
+                        completedFps,
+                        droppedInferenceFrames);
+                prepareSimulatorLearningFrame(fr, SystemClock.elapsedRealtime());
+              }
+              if (enhancedRecoveryEnabled && reidCoordinator != null)
+                reidCoordinator.setGalleryImageLogging(diagnosticEnabled && diagnosticActive);
+              boolean exitLearningRisk =
+                  enhancedRecoveryEnabled
+                      && simulatorExitLearningRisk(SystemClock.elapsedRealtime());
+              GalleryUpdateStatus galleryStatus =
+                  reidCoordinator == null
+                      ? null
+                      : exitLearningRisk
+                          ? reidCoordinator.freezeGallery("side_exit_learning_frozen")
+                          : enhancedRecoveryEnabled
+                              ? reidCoordinator.updateSimulatorGallery(
+                                  galleryTarget != null ? galleryTarget : fr.target,
+                                  fr.state,
+                                  fr.behaviorDecision,
+                                  galleryIdentity,
+                                  mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                                  frameW,
+                                  frameH,
+                                  activeSensorOrientation,
+                                  SystemClock.elapsedRealtime(),
+                                  authorization,
+                                  stale,
+                                  continuity != null
+                                      && continuity.reliable
+                                      && authorization != null
+                                      && authorization.isContinuous())
+                              : reidCoordinator.maybeUpdateAdaptiveGallery(
+                                  galleryTarget != null ? galleryTarget : fr.target,
+                                  fr.state,
+                                  fr.behaviorDecision,
+                                  galleryIdentity,
+                                  mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                                  frameW,
+                                  frameH,
+                                  activeSensorOrientation,
+                                  SystemClock.elapsedRealtime());
+              fr.galleryUpdateStatus = galleryStatus;
+              if (enhancedRecoveryEnabled && reidCoordinator != null) {
+                fr.recentGallery = reidCoordinator.getRecentStatus(SystemClock.elapsedRealtime());
+                fr.deferredGalleryStatus = reidCoordinator.getDeferredGalleryStatus();
+                fr.recentMatchingSupport = reidCoordinator.hasRecentMatchingSupport();
+                for (java.util.Map.Entry<String, Bitmap> entry :
+                    reidCoordinator.consumeDeferredCrops().entrySet()) {
+                  if (diagnosticEnabled && diagnosticActive && diagnosticSession != null)
+                    diagnosticSaver.saveGallerySnapshotAsync(
+                        entry.getValue(), diagnosticSession, entry.getKey());
+                  entry.getValue().recycle();
+                }
+              }
+              fr.galleryGeometry =
+                  reidCoordinator == null ? null : reidCoordinator.getCropGeometry();
+              onGalleryStatusUpdated(galleryStatus);
+              Bitmap recentCrop =
+                  reidCoordinator == null ? null : reidCoordinator.consumeRecentCrop();
+              if (recentCrop != null) {
+                if (diagnosticEnabled && diagnosticActive)
+                  diagnosticSaver.saveGallerySnapshotAsync(
+                      recentCrop, diagnosticSession, "recent_frame_" + acceptedSequence);
+                recentCrop.recycle();
+              }
+              Bitmap isolatedCrop =
+                  reidCoordinator == null ? null : reidCoordinator.consumeQuarantineCrop();
+              if (isolatedCrop != null) {
+                if (diagnosticEnabled && diagnosticActive && diagnosticSession != null) {
+                  diagnosticSaver.saveGallerySnapshotAsync(
+                      isolatedCrop, diagnosticSession, "quarantine_frame_" + acceptedSequence);
+                }
+                isolatedCrop.recycle();
+              }
+              if (galleryStatus != null
+                  && ("promoted".equals(galleryStatus.event)
+                      || "quarantine_promoted".equals(galleryStatus.event))
+                  && galleryStatus.revision > lastSavedAdaptiveRevision) {
+                lastSavedAdaptiveRevision = galleryStatus.revision;
+                Bitmap promotedCrop = reidCoordinator.consumePromotedCrop();
+                if (promotedCrop != null) {
+                  if (diagnosticEnabled && diagnosticActive && diagnosticSession != null) {
+                    diagnosticSaver.saveGallerySnapshotAsync(
+                        promotedCrop, diagnosticSession, "adaptive_" + galleryStatus.adaptiveSize);
+                  }
+                  promotedCrop.recycle();
+                }
+              }
+              enrichFrameResult(fr, frameW, frameH, activeSensorOrientation, receivedAtMs);
 
-              updateDrawState(fr, frameW, frameH, activeSensorOrientation);
+              if (acceptedGeneration != uiGeneration) return;
+              fr.frameTiming =
+                  new FrameTimingEvidence(
+                      receivedAtMs,
+                      sensorTimestampNs,
+                      lastProcessingTimeMs,
+                      reidMs,
+                      SystemClock.elapsedRealtime() - startTime,
+                      SystemClock.elapsedRealtime() - receivedAtMs,
+                      completedFps,
+                      droppedInferenceFrames);
+              CartFollowDiagnosticSession currentLog = diagnosticSession;
+              if (currentLog != null) {
+                currentLog.latestFrame = fr.frameSequence;
+                currentLog.latestSourceMs = receivedAtMs;
+                currentLog.latestGeneration = fr.sessionGeneration;
+              }
               onFollowFrame(fr);
               String commandText = commandForFrame(fr, commandForState(fr));
-              float fps = lastProcessingTimeMs > 0 ? 1000f / lastProcessingTimeMs : 0f;
+              long decisionMs = SystemClock.elapsedRealtime() - decisionStartedMs;
+              long completedAtMs = SystemClock.elapsedRealtime();
+              if (fpsWindowStartMs == 0L) fpsWindowStartMs = receivedAtMs;
+              completedFrames++;
+              if (completedAtMs - fpsWindowStartMs >= 1000L) {
+                completedFps = completedFrames * 1000f / (completedAtMs - fpsWindowStartMs);
+                fpsWindowStartMs = completedAtMs;
+                completedFrames = 0;
+              }
+              float fps = completedFps;
+              fr.frameTiming =
+                  new FrameTimingEvidence(
+                          receivedAtMs,
+                          sensorTimestampNs,
+                          lastProcessingTimeMs,
+                          reidMs,
+                          completedAtMs - startTime,
+                          completedAtMs - receivedAtMs,
+                          fps,
+                          droppedInferenceFrames)
+                      .withStages(
+                          copyMs, matchMs, initializationMs, decisionMs, -1L, completedAtMs);
+              long logStartedMs = SystemClock.elapsedRealtime();
               maybeSaveDiagnostics(
                   workingFrame, fr, fps, commandText, frameW, frameH, activeSensorOrientation);
-              updateDebugInfo(
-                  fr.state,
-                  fr.control,
-                  fr.persons.size(),
-                  fps,
-                  fr.distanceEstimate,
-                  fr.behaviorDecision,
-                  fr.identityEvidence,
-                  fr.steeringEvidence);
-              postFrameUi(fr, commandText, frameNum);
+              long logSubmitMs = SystemClock.elapsedRealtime() - logStartedMs;
+              fr.frameTiming =
+                  fr.frameTiming.withStages(
+                      copyMs,
+                      matchMs,
+                      initializationMs,
+                      decisionMs,
+                      logSubmitMs,
+                      SystemClock.elapsedRealtime());
+              postFrameUi(
+                  fr,
+                  commandText,
+                  acceptedSequence,
+                  acceptedGeneration,
+                  frameW,
+                  frameH,
+                  activeSensorOrientation);
             }
           } catch (RuntimeException e) {
             Timber.e(e, "Cart follow inference failed.");
-            onInferenceFailure(e);
+            if (acceptedGeneration == uiGeneration) onInferenceFailure(e);
           } finally {
+            if (workingFrame != ownedFrame) workingFrame.recycle();
+            ownedFrame.recycle();
+            admittedUiFrame.remove();
             computingNetwork.set(false);
           }
-        });
+        };
+    synchronized (this) {
+      if (handler == null || !handler.post(task)) {
+        ownedFrame.recycle();
+        computingNetwork.set(false);
+      }
+    }
+  }
+
+  static Bitmap copyInferenceFrame(Bitmap bitmap) {
+    Bitmap copy = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+    if (copy == null) throw new IllegalStateException("Cannot copy inference frame");
+    return copy;
+  }
+
+  private TargetObservationEvidence targetObservation(
+      List<Detector.Recognition> low,
+      int personCount,
+      int width,
+      int height,
+      int rotation,
+      long time) {
+    TargetTrack locked = targetTrackManager.getLockedTrack();
+    if (!enhancedRecoveryEnabled
+        || locked == null
+        || !locked.isVisible()
+        || locked.recognition == null
+        || locked.recognition.getLocation() == null) return null;
+    RectF screenBox =
+        TargetObservationEvidence.toScreen(
+            locked.recognition.getLocation(), width, height, rotation);
+    if (!screenBox.intersect(0f, 0f, 1f, 1f)) return null;
+    return new TargetObservationEvidence(
+        screenBox,
+        locked.trackId,
+        time,
+        beliefAccumulator.getBeliefForTrack(locked),
+        low.contains(locked.recognition),
+        SystemClock.elapsedRealtime() - time <= 500L,
+        personCount,
+        low.contains(locked.recognition) ? "low_continuation" : "locked_detection");
+  }
+
+  private String distanceDiagnostic(TargetObservationEvidence observation) {
+    ImageSetpointDistanceEstimator.Setpoint setpoint =
+        stateMachine.getMemory().getDistanceSetpoint();
+    if (setpoint == null) return "相对图像尺度：尚未标定";
+    if (observation == null)
+      return String.format(
+          Locale.US,
+          "相对尺度 标定高=%.3f 面积=%.3f | 无当前目标",
+          setpoint.desiredHeightRatio,
+          setpoint.desiredAreaRatio);
+    RectF box = observation.screenBox;
+    return String.format(
+        Locale.US,
+        "相对尺度 标定高/面积=%.3f/%.3f 当前=%.3f/%.3f\n取景裁切 上=%s 下=%s（非米制距离）",
+        setpoint.desiredHeightRatio,
+        setpoint.desiredAreaRatio,
+        box.height(),
+        box.width() * box.height(),
+        box.top <= 0.01f ? "是" : "否",
+        box.bottom >= 0.99f ? "是" : "否");
   }
 
   protected boolean isInferenceEnabled() {
@@ -639,6 +1255,24 @@ public class BaseCartFollowFragment extends CameraFragment {
 
   /** Receives the final behavior decision after all identity and safety arbitration. */
   protected void onFollowFrame(FollowStateMachine.FrameResult frameResult) {}
+
+  /** Runs on the UI thread together with boxes, confirmation and the main action text. */
+  protected void onFrameUiApplied(FollowStateMachine.FrameResult frameResult) {}
+
+  protected final void postCurrentFrameUi(Runnable action) {
+    Activity activity = getActivity();
+    if (activity == null) return;
+    long[] token = admittedUiFrame.get();
+    final long generation = token == null ? uiGeneration : token[0];
+    final long sequence = token == null ? Long.MAX_VALUE : token[1];
+    activity.runOnUiThread(
+        () -> {
+          if (binding == null
+              || generation != uiGeneration
+              || sequence < latestAppliedFrameSequence) return;
+          action.run();
+        });
+  }
 
   /** Lets real-hardware pages replace a visual suggestion with the actual safe output. */
   protected String commandForFrame(FollowStateMachine.FrameResult frameResult, String defaultText) {
@@ -649,6 +1283,7 @@ public class BaseCartFollowFragment extends CameraFragment {
   protected void onInferenceFailure(RuntimeException error) {}
 
   private void maybeRelockAfterRecovery(FollowStateMachine.FrameResult fr) {
+    if (enhancedRecoveryEnabled) return;
     if (fr == null || fr.identityEvidence == null || fr.behaviorDecision == null) {
       resetRecoveryRelock();
       return;
@@ -686,6 +1321,39 @@ public class BaseCartFollowFragment extends CameraFragment {
     resetRecoveryRelock();
   }
 
+  static float lowConfidenceThreshold(float highThreshold) {
+    return Math.min(0.25f, highThreshold);
+  }
+
+  private void maybeGlobalReacquire(
+      FollowState state, IdentityEvidence identity, TargetTrack candidateTrack) {
+    if (!enhancedRecoveryEnabled || !isRecoveryState(state) || identity == null) {
+      globalReacquireGate.reset();
+      return;
+    }
+    TargetTrack locked = targetTrackManager.getLockedTrack();
+    boolean lockedVisible = locked != null && locked.isVisible();
+    int candidateTrackId = candidateTrack == null ? -1 : candidateTrack.trackId;
+    if (globalReacquireGate.update(
+        candidateTrackId,
+        lockedVisible,
+        identity.reidMatch,
+        reidCoordinator == null ? 0L : reidCoordinator.getLastRunTimeMs())) {
+      if (targetTrackManager.lockTrack(candidateTrackId, "global_reid_reacquire")) {
+        beliefAccumulator.lockTrack(candidateTrackId);
+      }
+      globalReacquireGate.reset();
+    }
+  }
+
+  static boolean isRecoveryState(FollowState state) {
+    return state == FollowState.IDENTITY_UNCERTAIN
+        || state == FollowState.LOST
+        || state == FollowState.SEARCH
+        || state == FollowState.REACQUIRE_TARGET
+        || state == FollowState.DIRECTED_REACQUIRE;
+  }
+
   private static boolean isRelockState(FollowState state) {
     return state == FollowState.REACQUIRE_TARGET
         || state == FollowState.READY_TO_FOLLOW
@@ -701,6 +1369,28 @@ public class BaseCartFollowFragment extends CameraFragment {
     return identity.bboxDefaultOk() || identity.predictionOk();
   }
 
+  private void rememberDistractors(int targetId, List<Detector.Recognition> persons) {
+    TargetTrack target = targetTrackManager.getTrackById(targetId);
+    if (target == null || target.recognition == null) return;
+    RectF targetBox = target.recognition.getLocation();
+    for (Detector.Recognition person : persons) {
+      TargetTrack other = targetTrackManager.getTrackForRecognition(person);
+      if (other != null
+          && other.trackId != targetId
+          && separatePersonBoxes(targetBox, person.getLocation())) {
+        simulatorIdentityGuard.rememberDistractor(other.trackId);
+      }
+    }
+  }
+
+  static boolean separatePersonBoxes(RectF a, RectF b) {
+    if (a == null || b == null || a.isEmpty() || b.isEmpty()) return false;
+    float overlap =
+        Math.max(0f, Math.min(a.right, b.right) - Math.max(a.left, b.left))
+            * Math.max(0f, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+    return overlap / (a.width() * a.height() + b.width() * b.height() - overlap) < 0.10f;
+  }
+
   private void resetRecoveryRelock() {
     recoveryRelockTrackId = -1;
     recoveryRelockFrames = 0;
@@ -712,9 +1402,9 @@ public class BaseCartFollowFragment extends CameraFragment {
     return reason + "|" + addition;
   }
 
-  private synchronized void updateDrawState(
+  private List<DrawBox> buildDrawBoxes(
       FollowStateMachine.FrameResult fr, int frameW, int frameH, int sensorOrientation) {
-    drawBoxes.clear();
+    List<DrawBox> boxes = new ArrayList<>();
     Detector.Recognition pendingCandidate =
         fr.state == FollowState.LOCKED_PENDING_CONFIRM ? selectLargest(fr.persons) : null;
     for (Detector.Recognition r : fr.persons) {
@@ -723,11 +1413,18 @@ public class BaseCartFollowFragment extends CameraFragment {
       TargetTrack track = targetTrackManager.getTrackForRecognition(r);
       boolean pendingConfirmation = fr.state == FollowState.LOCKED_PENDING_CONFIRM;
       boolean recovering =
-          fr.state == FollowState.IDENTITY_UNCERTAIN || fr.state == FollowState.REACQUIRE_TARGET;
+          fr.state == FollowState.IDENTITY_UNCERTAIN
+              || fr.state == FollowState.REACQUIRE_TARGET
+              || fr.state == FollowState.DIRECTED_REACQUIRE;
       if (pendingConfirmation && r == pendingCandidate) {
         colorType = COLOR_CANDIDATE;
-      } else if (track != null && targetTrackManager.isLockedTrack(track) && !recovering) {
+      } else if (track != null
+          && targetTrackManager.isLockedTrack(track)
+          && !recovering
+          && beliefAccumulator.getBeliefForTrack(track) >= IdentityBelief.BELIEF_CAUTION) {
         colorType = COLOR_TARGET;
+      } else if (track != null && targetTrackManager.isLockedTrack(track)) {
+        colorType = COLOR_CANDIDATE;
       } else if (track != null && track.trackId == targetTrackManager.getSuspectedTrackId()) {
         colorType = COLOR_CANDIDATE;
       } else if (r == fr.target) {
@@ -735,6 +1432,13 @@ public class BaseCartFollowFragment extends CameraFragment {
       } else if (r == fr.candidate) {
         colorType = COLOR_CANDIDATE;
       }
+      if (fr.simulatorIdentity != null
+          && !fr.simulatorIdentity.authorized
+          && !fr.simulatorIdentity.isContinuous()
+          && (r == fr.candidate
+              || (track != null
+                  && (track.trackId == fr.simulatorIdentity.trackId
+                      || targetTrackManager.isLockedTrack(track))))) colorType = COLOR_CANDIDATE;
       String label = null;
       if (pendingConfirmation && r == pendingCandidate) {
         label = "待确认";
@@ -745,15 +1449,40 @@ public class BaseCartFollowFragment extends CameraFragment {
             String.format(
                 Locale.US, "T%d b=%.2f", track.trackId, beliefAccumulator.getBeliefForTrack(track));
       }
-      drawBoxes.add(new DrawBox(new RectF(r.getLocation()), colorType, label));
+      if (fr.simulatorIdentity != null
+          && track != null
+          && track.trackId == fr.simulatorIdentity.trackId) {
+        SimulatorIdentityGuard.Decision permit = fr.simulatorIdentity;
+        boolean green = permit.motionAllowed && (permit.authorized || permit.isContinuous());
+        colorType = green ? COLOR_TARGET : COLOR_CANDIDATE;
+        label =
+            permit.tracking != null
+                ? permit.tracking.label()
+                : permit.authorized
+                    ? "身份已验证"
+                    : permit.state == SimulatorIdentityGuard.State.TRACK_STABLE
+                        ? "连续跟踪"
+                        : permit.state == SimulatorIdentityGuard.State.APPEARANCE_TRANSITION
+                            ? "外观变化中 · 低档"
+                            : green ? "连续保持" : permit.retainTarget ? "姿态适应中" : "身份存疑";
+      }
+      boxes.add(new DrawBox(new RectF(r.getLocation()), colorType, label));
     }
-    drawFrameWidth = frameW;
-    drawFrameHeight = frameH;
-    drawSensorOrientation = sensorOrientation;
+    if (fr.detectionTierEvidence != null) {
+      for (Detector.Recognition r : fr.detectionTierEvidence.lowConfidencePersons) {
+        if (r == null || r.getLocation() == null || fr.persons.contains(r)) continue;
+        boolean continued = fr.detectionTierEvidence.continuedLowConfidencePersons.contains(r);
+        String label =
+            String.format(Locale.US, "%s %.2f", continued ? "低置信续接" : "低置信候选", r.getConfidence());
+        boxes.add(new DrawBox(new RectF(r.getLocation()), COLOR_LOW_CONFIDENCE, label));
+      }
+    }
+    return boxes;
   }
 
   private void drawOverlay(Canvas canvas) {
     if (drawFrameWidth <= 0 || drawFrameHeight <= 0) return;
+    if (enhancedRecoveryEnabled && SystemClock.elapsedRealtime() - drawObservedAtMs > 500L) return;
     final boolean rotated = drawSensorOrientation % 180 == 90;
     final float multiplier =
         Math.min(
@@ -790,6 +1519,10 @@ public class BaseCartFollowFragment extends CameraFragment {
         case COLOR_FAIL:
           paint = failBoxPaint;
           if (label == null) label = "匹配失败";
+          break;
+        case COLOR_LOW_CONFIDENCE:
+          paint = lowConfidenceBoxPaint;
+          if (label == null) label = "低置信续接";
           break;
         default:
           paint = personBoxPaint;
@@ -860,14 +1593,21 @@ public class BaseCartFollowFragment extends CameraFragment {
   }
 
   protected final void updateCommandText(String text) {
-    if (binding == null) return;
-    requireActivity().runOnUiThread(() -> binding.commandText.setText(text));
+    postCurrentFrameUi(() -> binding.commandText.setText(text));
   }
 
   private synchronized void invalidatePendingUiSnapshots() {
     uiGeneration++;
+    simulatorIdentityGuard.begin(uiGeneration);
+    simulatorContinuity.reset();
     latestAppliedFrameSequence = 0L;
+    fpsWindowStartMs = 0L;
+    completedFrames = 0;
+    completedFps = 0f;
+    onFollowGenerationChanged(uiGeneration);
   }
+
+  protected void onFollowGenerationChanged(long generation) {}
 
   synchronized void clearDrawState() {
     drawBoxes.clear();
@@ -877,12 +1617,16 @@ public class BaseCartFollowFragment extends CameraFragment {
     if (binding != null) binding.trackingOverlay.postInvalidate();
   }
 
-  private void postFrameUi(FollowStateMachine.FrameResult fr, String commandText, long frameSequence) {
+  private void postFrameUi(
+      FollowStateMachine.FrameResult fr,
+      String commandText,
+      long frameSequence,
+      long generation,
+      int frameWidth,
+      int frameHeight,
+      int orientation) {
     if (binding == null || !isAdded()) return;
-    final long generation;
-    synchronized (this) {
-      generation = uiGeneration;
-    }
+    final List<DrawBox> boxes = buildDrawBoxes(fr, frameWidth, frameHeight, orientation);
     requireActivity()
         .runOnUiThread(
             () -> {
@@ -891,7 +1635,16 @@ public class BaseCartFollowFragment extends CameraFragment {
                 if (!shouldApplyUiSnapshot(
                     generation, uiGeneration, frameSequence, latestAppliedFrameSequence)) return;
                 latestAppliedFrameSequence = frameSequence;
+                lastPresentedPersons = new ArrayList<>(fr.persons);
+                drawBoxes.clear();
+                drawBoxes.addAll(boxes);
+                drawFrameWidth = frameWidth;
+                drawFrameHeight = frameHeight;
+                drawSensorOrientation = orientation;
+                drawObservedAtMs = fr.frameTiming.receivedAtMs;
               }
+              FrameTimingEvidence timing = fr.frameTiming;
+              fr.frameTiming = timing.presentedAt(SystemClock.elapsedRealtime());
               binding.commandText.setText(commandText);
               boolean showConfirm =
                   updateConfirmationVisibility(
@@ -907,6 +1660,49 @@ public class BaseCartFollowFragment extends CameraFragment {
                     fr.countdownSec >= 0 ? String.valueOf(fr.countdownSec) : "");
               }
               binding.trackingOverlay.invalidate();
+              if (enhancedRecoveryEnabled) binding.trackingOverlay.postInvalidateDelayed(501L);
+              updateDebugInfo(
+                  fr.state,
+                  fr.control,
+                  fr.persons.size(),
+                  timing.completedFps,
+                  fr.distanceEstimate,
+                  fr.behaviorDecision,
+                  fr.identityEvidence,
+                  fr.steeringEvidence);
+              onFrameUiApplied(fr);
+              if (diagnosticEnabled && diagnosticSession != null) {
+                long now = SystemClock.elapsedRealtime();
+                if (now - lastPresentationLogMs >= diagnosticConfig.frameLogIntervalMs) {
+                  lastPresentationLogMs = now;
+                  diagnosticSaver.saveEventAsync(
+                      diagnosticSession,
+                      fr.frameSequence,
+                      "frame_presented",
+                      "source_age_ms="
+                          + fr.frameTiming.sourceAgeMs
+                          + ";generation="
+                          + generation
+                          + ";copy_ms="
+                          + timing.copyMs
+                          + ";match_ms="
+                          + timing.matchMs
+                          + ";initialization_ms="
+                          + timing.initializationMs
+                          + ";decision_ms="
+                          + timing.decisionMs
+                          + ";log_submit_ms="
+                          + timing.logSubmitMs
+                          + ";ui_wait_ms="
+                          + fr.frameTiming.uiWaitMs
+                          + ";identity_gate="
+                          + (fr.simulatorIdentity == null
+                              ? "not_applicable"
+                              : fr.simulatorIdentity.reason)
+                          + ";fresh_matches="
+                          + (fr.simulatorIdentity == null ? 0 : fr.simulatorIdentity.freshMatches));
+                }
+              }
             });
   }
 
@@ -916,14 +1712,19 @@ public class BaseCartFollowFragment extends CameraFragment {
   }
 
   private void startDiagnosticSession() {
-    stopDiagnosticSession();
+    if (diagnosticSession != null) return;
     if (!diagnosticEnabled) {
       resetDiagnosticState();
       return;
     }
     diagnosticSession = new CartFollowDiagnosticSession(requireContext().getApplicationContext());
+    diagnosticSession.mode = this instanceof RealCartFollowFragment ? "真实小车" : "HumanCartSimulator";
     diagnosticSession.initCsvFiles();
-    diagnosticActive = false;
+    diagnosticActive = true;
+    loggedGalleryRevision = -1;
+    activateDiagnosticSession();
+    recordControlEvent("recording_start", "enabled");
+    onDiagnosticSessionChanged(diagnosticSession);
     targetEventAwaitingReturn = false;
     latestConfirmSnapshot = null;
     lastDiagnosticFrameLogMs = 0L;
@@ -963,8 +1764,27 @@ public class BaseCartFollowFragment extends CameraFragment {
   }
 
   private void stopDiagnosticSession() {
-    if (diagnosticEnabled && diagnosticSession != null && diagnosticActive) {
-      diagnosticSaver.saveEventAsync(diagnosticSession, frameNum, "session_stop", "");
+    CartFollowDiagnosticSession ending = diagnosticSession;
+    if (ending == null && !diagnosticEnabled && closingDiagnosticSession != null) {
+      onDiagnosticSessionChanged(null);
+      closingDiagnosticSession.finish("logging_disabled");
+    }
+    if (ending != null) {
+      diagnosticSaver.saveEventAsync(ending, frameNum, "session_stop", "");
+      closingDiagnosticSession = ending;
+      if (diagnosticEnabled && this instanceof RealCartFollowFragment) {
+        // Bound the final transport observation window; no images or new frame records enter it.
+        new android.os.Handler(android.os.Looper.getMainLooper())
+            .postDelayed(
+                () -> {
+                  if (diagnosticSession == null) onDiagnosticSessionChanged(null);
+                  ending.finish("recording_stopped");
+                },
+                500);
+      } else {
+        onDiagnosticSessionChanged(null);
+        ending.finish("recording_stopped");
+      }
     }
     resetDiagnosticState();
   }
@@ -1008,14 +1828,42 @@ public class BaseCartFollowFragment extends CameraFragment {
       int frameH,
       int sensorOrientation) {
     if (!diagnosticEnabled || !diagnosticActive || diagnosticSession == null || fr == null) return;
+    CartFollowDiagnosticSession session = diagnosticSession;
+    if (session == null) return;
+    session.latestFrame = fr.frameSequence;
+    session.latestSourceMs = fr.frameTiming == null ? -1 : fr.frameTiming.receivedAtMs;
+    session.latestGeneration = fr.sessionGeneration;
     long now = SystemClock.elapsedRealtime();
+    if (diagnosticConfig.saveOverlays
+        && session.sceneDue(
+            now,
+            (fr.simulatorIdentity == null
+                    ? "none"
+                    : fr.simulatorIdentity.state + ":" + fr.simulatorIdentity.reason)
+                + ":"
+                + (fr.galleryUpdateStatus == null ? "" : fr.galleryUpdateStatus.event)))
+      diagnosticSaver.saveSceneAsync(workingFrame, session, fr.frameSequence, sensorOrientation);
+    if (reidCoordinator != null
+        && fr.galleryUpdateStatus != null
+        && loggedGalleryRevision != fr.galleryUpdateStatus.revision) {
+      loggedGalleryRevision = fr.galleryUpdateStatus.revision;
+      for (String record : reidCoordinator.provenanceManifest()) session.provenance(record);
+    }
     boolean shouldLog =
         lastDiagnosticFrameLogMs == 0L
             || now - lastDiagnosticFrameLogMs >= diagnosticConfig.frameLogIntervalMs;
     boolean shouldSaveCrop =
         lastDiagnosticCropMs == 0L || now - lastDiagnosticCropMs >= diagnosticConfig.cropIntervalMs;
     if (!shouldLog && !shouldSaveCrop) return;
-    if (shouldLog) lastDiagnosticFrameLogMs = now;
+    if (shouldLog) {
+      lastDiagnosticFrameLogMs = now;
+      session.control(
+          "association",
+          "margin="
+              + targetTrackManager.getLockedAssociationMargin()
+              + ";pairs="
+              + targetTrackManager.getAssociationScores());
+    }
     if (shouldSaveCrop) lastDiagnosticCropMs = now;
 
     Detector.Recognition locked = recognitionForTrack(targetTrackManager.getLockedTrack());
@@ -1028,7 +1876,7 @@ public class BaseCartFollowFragment extends CameraFragment {
         workingFrame,
         diagnosticSession,
         diagnosticConfig,
-        frameNum,
+        fr.frameSequence,
         frameW,
         frameH,
         sensorOrientation,
@@ -1039,6 +1887,19 @@ public class BaseCartFollowFragment extends CameraFragment {
         commandText,
         fr.identityEvidence,
         fr.steeringEvidence,
+        fr.galleryUpdateStatus,
+        fr.galleryGeometry,
+        fr.simulatorDriveResult,
+        fr.detectionTierEvidence,
+        fr.directedReacquireEvidence,
+        fr.frameTiming,
+        fr.targetObservation,
+        fr.distanceDiagnosticText,
+        fr.simulatorIdentity,
+        fr.recentGallery,
+        fr.deferredGalleryStatus,
+        fr.recentMatchingSupport,
+        fr.realDriveResult,
         locked,
         suspected,
         bestReid,
@@ -1065,6 +1926,25 @@ public class BaseCartFollowFragment extends CameraFragment {
     crop.recycle();
   }
 
+  protected boolean simulatorExitLearningRisk(long nowMs) {
+    return false;
+  }
+
+  protected void prepareSimulatorLearningFrame(FollowStateMachine.FrameResult frame, long nowMs) {}
+
+  private void saveAdaptiveGalleryCrop(
+      Bitmap frame, Detector.Recognition candidate, int sensorOrientation, int adaptiveSize) {
+    if (!diagnosticEnabled || diagnosticSession == null || frame == null || candidate == null)
+      return;
+    Bitmap crop =
+        cropPerson(
+            frame, candidate.getLocation(), diagnosticConfig.paddingRatio, sensorOrientation);
+    if (crop == null) return;
+    diagnosticSaver.saveGallerySnapshotAsync(
+        crop, diagnosticSession, "adaptive_promoted_" + adaptiveSize);
+    crop.recycle();
+  }
+
   private static Detector.Recognition recognitionForTrack(TargetTrack track) {
     return track == null || !track.isVisible() ? null : track.recognition;
   }
@@ -1083,13 +1963,14 @@ public class BaseCartFollowFragment extends CameraFragment {
     if (width <= 0 || height <= 0) return null;
     try {
       Bitmap rawCrop = Bitmap.createBitmap(frame, left, top, width, height);
+      if (rawCrop == frame) rawCrop = frame.copy(Bitmap.Config.ARGB_8888, false);
       int rotation = ((sensorOrientation % 360) + 360) % 360;
       if (rotation == 0) return rawCrop;
       Matrix matrix = new Matrix();
       matrix.postRotate(rotation);
       Bitmap upright =
           Bitmap.createBitmap(rawCrop, 0, 0, rawCrop.getWidth(), rawCrop.getHeight(), matrix, true);
-      rawCrop.recycle();
+      if (upright != rawCrop) rawCrop.recycle();
       return upright;
     } catch (Exception e) {
       return null;
@@ -1187,7 +2068,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                 ? 0f
                 : identityEvidence.reidMatch.margin);
     String info = showFullDebug ? fullInfo : compactInfo;
-    requireActivity().runOnUiThread(() -> binding.debugInfo.setText(info));
+    postCurrentFrameUi(() -> binding.debugInfo.setText(info));
   }
 
   private String buildIdentityDebugLine(IdentityEvidence identity) {
@@ -1280,7 +2161,14 @@ public class BaseCartFollowFragment extends CameraFragment {
     SystemSafetyEvidence safety = createSystemSafetyEvidence();
     BehaviorDecisionResult decision =
         actionArbitrator.decide(
-            fr.state, identity, distance, traversability, safety, stateMachine.getMemory(), frameW);
+            fr.state,
+            identity,
+            distance,
+            traversability,
+            safety,
+            stateMachine.getMemory(),
+            frameW,
+            enhancedRecoveryEnabled ? fr.simulatorIdentity : null);
     return new BehaviorDecisionResult(
         decision.state,
         decision.selectedAction,

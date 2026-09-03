@@ -125,11 +125,15 @@ public abstract class CameraFragment extends ControlsFragment {
             bitmapBuffer =
                 Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
 
+          long receivedAtMs = android.os.SystemClock.elapsedRealtime();
+          long sensorTimestampNs = image.getImageInfo().getTimestamp();
           rotationDegrees = image.getImageInfo().getRotationDegrees();
-          converter.yuvToRgb(image.getImage(), bitmapBuffer);
-          image.close();
-
-          processFrame(bitmapBuffer, image);
+          try {
+            converter.yuvToRgb(image.getImage(), bitmapBuffer);
+            processFrame(bitmapBuffer, image, receivedAtMs, sensorTimestampNs, rotationDegrees);
+          } finally {
+            image.close();
+          }
         });
     try {
       if (cameraProvider != null) {
@@ -194,4 +198,14 @@ public abstract class CameraFragment extends ControlsFragment {
   }
 
   protected abstract void processFrame(Bitmap image, ImageProxy imageProxy);
+
+  /** Metadata is captured while the proxy is open; legacy screens keep their existing callback. */
+  protected void processFrame(
+      Bitmap image,
+      ImageProxy imageProxy,
+      long receivedAtMs,
+      long sensorTimestampNs,
+      int rotation) {
+    processFrame(image, imageProxy);
+  }
 }

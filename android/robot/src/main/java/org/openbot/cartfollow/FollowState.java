@@ -12,5 +12,6 @@ public enum FollowState {
   IDENTITY_UNCERTAIN,
   LOST,
   SEARCH,
+  DIRECTED_REACQUIRE,
   STOP
 }

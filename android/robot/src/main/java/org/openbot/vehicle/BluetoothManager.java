@@ -334,7 +334,24 @@ public class BluetoothManager {
             + sanitize(payload));
   }
 
+  private volatile ControlDiagnosticObserver diagnosticObserver;
+
+  public void setDiagnosticObserver(ControlDiagnosticObserver observer) {
+    diagnosticObserver = observer;
+  }
+
+  private void observe(String event, String details) {
+    ControlDiagnosticObserver observer = diagnosticObserver;
+    if (observer != null)
+      try {
+        observer.onEvent(event, details);
+      } catch (RuntimeException ignored) {
+        /* Observation must not affect transport. */
+      }
+  }
+
   private void logControl(String event, String details) {
+    observe(event, details);
     if (!controlDiagnosticsEnabled) return;
     Log.i(
         CONTROL_LOG_TAG, "ms=" + SystemClock.elapsedRealtime() + ",event=" + event + "," + details);
@@ -599,6 +616,7 @@ public class BluetoothManager {
     String address = device == null ? "none" : device.address;
     String message =
         "event=" + event + ",generation=" + generation + ",address=" + address + "," + details;
+    observe("ble_" + event, message);
     Log.i("Bluetooth_Connection", message);
     Logger.i(message);
   }

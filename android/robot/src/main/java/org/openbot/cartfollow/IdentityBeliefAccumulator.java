@@ -17,8 +17,15 @@ public class IdentityBeliefAccumulator {
   private int lockedTrackId = -1;
   private int lastSelectedTrackId = -1;
   private int candidateSwitchCount = 0;
+  private boolean strictReidProvenance;
+  private final Map<Integer, Long> contributedObservations = new HashMap<>();
+
+  public void setStrictReidProvenance(boolean enabled) {
+    strictReidProvenance = enabled;
+  }
 
   public void reset() {
+    contributedObservations.clear();
     beliefs.clear();
     stableFrames.clear();
     uncertainFrames.clear();
@@ -68,7 +75,8 @@ public class IdentityBeliefAccumulator {
 
     for (TargetTrack track : tracks) {
       IdentityBelief belief =
-          updateTrackBelief(base, track, trackManager, reidCandidateTrack, lockedTrack, memory, frameW, frameH);
+          updateTrackBelief(
+              base, track, trackManager, reidCandidateTrack, lockedTrack, memory, frameW, frameH);
       BboxContinuityEvidence bbox = bboxEvidence(track, memory, frameW, frameH);
       if (!track.isVisible()) continue;
       if (selectedTrack == null || shouldSelect(track, belief, selectedTrack, selectedBelief)) {
@@ -196,7 +204,8 @@ public class IdentityBeliefAccumulator {
 
     boolean isLocked = track.trackId == lockedTrackId;
     boolean lockedVisible = lockedTrack != null && lockedTrack.isVisible();
-    boolean isReidCandidate = reidCandidateTrack != null && reidCandidateTrack.trackId == track.trackId;
+    boolean isReidCandidate =
+        reidCandidateTrack != null && reidCandidateTrack.trackId == track.trackId;
     long now = SystemClock.elapsedRealtime();
     boolean nearLockedGhost =
         trackManager != null && trackManager.isNearLockedGhost(track, frameW, frameH, now);
@@ -205,6 +214,20 @@ public class IdentityBeliefAccumulator {
     boolean spatialSupport = hasSpatialSupport(track, bbox, trackManager, frameW, frameH);
     boolean missingSpatialSupport = !isLocked && !spatialSupport;
     float rawReidContribution = reidContribution(base, isReidCandidate);
+    if (strictReidProvenance && rawReidContribution > 0f) {
+      ReIDMatchResult reid = base == null ? null : base.reidMatch;
+      long previous =
+          contributedObservations.containsKey(track.trackId)
+              ? contributedObservations.get(track.trackId)
+              : -1L;
+      if (reid == null
+          || !reid.fresh
+          || !reid.isBoundToTrack(track.trackId)
+          || reid.observationId <= previous
+          || now - reid.observationTimeMs > 500L
+          || now < reid.observationTimeMs) rawReidContribution = 0f;
+      else contributedObservations.put(track.trackId, reid.observationId);
+    }
     float reidContribution =
         missingSpatialSupport ? Math.min(rawReidContribution, 0.04f) : rawReidContribution;
     float bboxContribution = bbox.bboxStrictOk ? 0.15f : (bbox.bboxDefaultOk ? 0.10f : 0f);
@@ -217,9 +240,10 @@ public class IdentityBeliefAccumulator {
     float ghostContribution = !lockedVisible && nearLockedGhost && track.isVisible() ? 0.06f : 0f;
     float ageContribution = track.ageFrames >= 3 && track.isVisible() ? 0.04f : 0f;
     float switchPenalty =
-        isReidCandidate && lastSelectedTrackId >= 0 && track.trackId != lastSelectedTrackId ? 0.12f : 0f;
-    float lockedProtectionPenalty =
-        !isLocked && lockedVisible && isReidCandidate ? 0.18f : 0f;
+        isReidCandidate && lastSelectedTrackId >= 0 && track.trackId != lastSelectedTrackId
+            ? 0.12f
+            : 0f;
+    float lockedProtectionPenalty = !isLocked && lockedVisible && isReidCandidate ? 0.18f : 0f;
     float missedPenalty = Math.min(0.30f, track.missedFrames * 0.08f);
     float weakMarginPenalty =
         isReidCandidate && base != null && base.reidAvailable() && !base.weakOk() ? 0.08f : 0f;
@@ -296,6 +320,9 @@ public class IdentityBeliefAccumulator {
     ReIDMatchResult reid =
         base == null ? ReIDMatchResult.unavailable("identity_base_missing", 0) : base.reidMatch;
     Recognition candidate = selectedTrack == null ? null : selectedTrack.recognition;
+    if (strictReidProvenance && base != null && candidate != base.bestCandidate) {
+      reid = ReIDMatchResult.unavailable("selected_track_not_scored", 0);
+    }
     float belief = selectedTrack == null ? 0f : getBeliefForTrack(selectedTrack);
     boolean matched = selectedTrack != null && belief >= IdentityBelief.BELIEF_CAUTION;
     float confidence = Math.max(base == null ? 0f : base.confidence, belief);

@@ -140,11 +140,7 @@ final class BleSerialWriteQueue {
     inFlight = pending.removeFirst();
     status = "writing:" + summarize(inFlight.payload);
     eventListener.onQueueEvent(
-        "dispatch",
-        inFlight.type,
-        inFlight.payload,
-        inFlight.generation,
-        pending.size());
+        "dispatch", inFlight.type, inFlight.payload, inFlight.generation, pending.size());
     sender.send(inFlight.payload);
   }
 
@@ -175,7 +171,12 @@ final class BleSerialWriteQueue {
   private void removePending(Type type) {
     Iterator<Entry> iterator = pending.iterator();
     while (iterator.hasNext()) {
-      if (iterator.next().type == type) iterator.remove();
+      Entry removed = iterator.next();
+      if (removed.type == type) {
+        iterator.remove();
+        eventListener.onQueueEvent(
+            "replaced", removed.type, removed.payload, removed.generation, pending.size());
+      }
     }
   }
 

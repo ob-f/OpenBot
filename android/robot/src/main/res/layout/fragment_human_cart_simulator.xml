@@ -102,6 +102,288 @@
         </com.google.android.material.button.MaterialButtonToggleGroup>
     </LinearLayout>
 
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/simulator_experiment_scroll"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintBottom_toTopOf="@id/confirm_panel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/steering_panel">
+
+    <LinearLayout
+        android:id="@+id/simulator_experiment_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#A6000000"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/real_experiment_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/auto_gear_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/auto_gear_14"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="40dp" android:text="最高 c14" android:textSize="12sp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/auto_gear_18"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="40dp" android:text="最高 c18" android:textSize="12sp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/auto_gear_21"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="40dp" android:text="最高 c21" android:textSize="12sp" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/real_search_enabled"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="本次允许主动旋转搜索" android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/gallery_mode_group"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/gallery_static"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:minHeight="0dp"
+                    android:text="固定 Gallery"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/gallery_adaptive"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:minHeight="0dp"
+                    android:text="动态 Gallery"
+                    android:textSize="11sp" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/recent_gallery_switch"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:checked="true"
+                android:text="近期记忆"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/recovery_timeout_group"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/recovery_2s"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:minHeight="0dp"
+                    android:text="普通重捕 2s"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/recovery_5s"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:minHeight="0dp"
+                    android:text="普通重捕 5s"
+                    android:textSize="11sp" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/directed_search_controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/search_speed_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="模拟旋转档位 c18"
+                android:textColor="@android:color/white"
+                android:textSize="11sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/search_speed_slider"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:contentDescription="模拟旋转档位"
+                android:stepSize="1"
+                android:value="18"
+                android:valueFrom="5"
+                android:valueTo="21" />
+
+            <TextView
+                android:id="@+id/search_angle_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="最大搜索角度 90°"
+                android:textColor="@android:color/white"
+                android:textSize="11sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/search_angle_slider"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:contentDescription="最大搜索角度"
+                android:stepSize="15"
+                android:value="90"
+                android:valueFrom="30"
+                android:valueTo="180" />
+
+            <TextView
+                android:id="@+id/search_timeout_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="最大搜索时间 5.0 秒"
+                android:textColor="@android:color/white"
+                android:textSize="11sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/search_timeout_slider"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:contentDescription="最大搜索时间"
+                android:stepSize="0.5"
+                android:value="5"
+                android:valueFrom="1"
+                android:valueTo="10" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/gyro_test_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="独立转角测试=待命 0°/90°"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/gyro_test_left"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:padding="0dp"
+                android:contentDescription="独立陀螺仪向左测试"
+                android:tooltipText="向左测试"
+                android:text="↶" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/gyro_test_right"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:padding="0dp"
+                android:contentDescription="独立陀螺仪向右测试"
+                android:tooltipText="向右测试"
+                android:text="↷" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/gyro_test_stop"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:padding="0dp"
+                android:contentDescription="停止独立陀螺仪测试"
+                android:tooltipText="停止测试"
+                android:text="■" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/gyro_test_reset"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:padding="0dp"
+                android:contentDescription="复位独立陀螺仪测试"
+                android:tooltipText="复位测试"
+                android:text="↺" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/simulator_frame_health"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="等待相机帧"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/simulator_reconfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="重新采集并确认目标"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/simulator_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text="流程=待命 | 身份=未确认 | Gallery=0+0\n距离=- | 模拟停车 c0,0"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
     <LinearLayout
         android:id="@+id/debug_panel"
         android:layout_width="wrap_content"
@@ -137,6 +419,15 @@
                 android:minWidth="0dp"
                 android:paddingHorizontal="10dp"
                 android:text="调试详情"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_test_records"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text="测试记录"
                 android:textSize="12sp" />
 
             <Button
@@ -532,6 +823,14 @@
                 android:text="@string/cart_sim_start"
                 android:textColor="@android:color/white" />
         </LinearLayout>
+        <TextView
+            android:id="@+id/diagnostic_health"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:text="日志关闭"
+            android:textSize="11sp"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

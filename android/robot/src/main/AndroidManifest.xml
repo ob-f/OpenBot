@@ -86,6 +86,8 @@
 
         <service android:name="net.majorkernelpanic.streaming.rtsp.RtspServer" />
 
+        <activity android:name=".cartfollow.diagnostics.DiagnosticRecordsActivity" android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

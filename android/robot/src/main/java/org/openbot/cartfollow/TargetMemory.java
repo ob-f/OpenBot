@@ -9,6 +9,17 @@ public class TargetMemory {
   private static final int H_BINS = 8;
   private static final int S_BINS = 4;
   private static final int HIST_SIZE = H_BINS * S_BINS;
+  private boolean boundedColorSampling;
+
+  public void setBoundedColorSampling(boolean enabled) {
+    boundedColorSampling = enabled;
+  }
+
+  private float[] colorHistogram(Bitmap bitmap, RectF rect) {
+    return boundedColorSampling
+        ? computeSampledHsvHist(bitmap, rect)
+        : computeHsvHist(bitmap, rect);
+  }
 
   private RectF confirmedBbox;
   private float confirmedArea;
@@ -36,8 +47,8 @@ public class TargetMemory {
     confirmedBbox = new RectF(bbox);
     confirmedArea = bbox.width() * bbox.height();
     confirmedAspectRatio = bbox.width() / Math.max(1f, bbox.height());
-    upperColorHist = computeHsvHist(bitmap, upperHalf(bbox));
-    lowerColorHist = computeHsvHist(bitmap, lowerHalf(bbox));
+    upperColorHist = colorHistogram(bitmap, upperHalf(bbox));
+    lowerColorHist = colorHistogram(bitmap, lowerHalf(bbox));
     lastBbox = new RectF(bbox);
     previousBbox = null;
     lastCenterX = bbox.centerX();
@@ -47,8 +58,7 @@ public class TargetMemory {
     computeDistanceSetpoint(bbox, frameW, frameH, sensorOrientation);
   }
 
-  private void computeDistanceSetpoint(
-      RectF bbox, int frameW, int frameH, int sensorOrientation) {
+  private void computeDistanceSetpoint(RectF bbox, int frameW, int frameH, int sensorOrientation) {
     if (frameW <= 0 || frameH <= 0 || bbox == null) {
       desiredHeightRatio = 0f;
       desiredAreaRatio = 0f;
@@ -115,7 +125,9 @@ public class TargetMemory {
   }
 
   public RectF getLastBbox() {
-    return lastBbox != null ? new RectF(lastBbox) : (confirmedBbox != null ? new RectF(confirmedBbox) : null);
+    return lastBbox != null
+        ? new RectF(lastBbox)
+        : (confirmedBbox != null ? new RectF(confirmedBbox) : null);
   }
 
   public RectF getPreviousBbox() {
@@ -186,8 +198,8 @@ public class TargetMemory {
   }
 
   public float colorScore(Bitmap bitmap, RectF bbox) {
-    float[] upper = computeHsvHist(bitmap, upperHalf(bbox));
-    float[] lower = computeHsvHist(bitmap, lowerHalf(bbox));
+    float[] upper = colorHistogram(bitmap, upperHalf(bbox));
+    float[] lower = colorHistogram(bitmap, lowerHalf(bbox));
     float upperScore = histIntersection(upper, upperColorHist);
     float lowerScore = histIntersection(lower, lowerColorHist);
     return (upperScore + lowerScore) / 2f;
@@ -195,5 +207,38 @@ public class TargetMemory {
 
   private static int clamp(int v, int lo, int hi) {
     return v < lo ? lo : (v > hi ? hi : v);
+  }
+
+  static int colorSampleCount(int width, int height) {
+    return Math.max(0, Math.min(64, width)) * Math.max(0, Math.min(64, height));
+  }
+
+  static float[] computeSampledHsvHist(Bitmap bitmap, RectF rect) {
+    float[] hist = new float[HIST_SIZE];
+    if (bitmap == null || rect == null) return hist;
+    int left = clamp((int) rect.left, 0, bitmap.getWidth());
+    int top = clamp((int) rect.top, 0, bitmap.getHeight());
+    int width = clamp((int) rect.right, 0, bitmap.getWidth()) - left;
+    int height = clamp((int) rect.bottom, 0, bitmap.getHeight()) - top;
+    int nx = Math.min(64, width), ny = Math.min(64, height);
+    if (nx <= 0 || ny <= 0) return hist;
+    float[] hsv = new float[3];
+    int count = 0;
+    // Sample cell centers without allocating a full-resolution crop or pixel array.
+    for (int y = 0; y < ny; y++) {
+      for (int x = 0; x < nx; x++) {
+        int px =
+            bitmap.getPixel(
+                left + (int) ((x + 0.5f) * width / nx), top + (int) ((y + 0.5f) * height / ny));
+        Color.RGBToHSV(Color.red(px), Color.green(px), Color.blue(px), hsv);
+        if (hsv[1] < 0.1f) continue;
+        int hb = Math.min(H_BINS - 1, (int) (hsv[0] / 360f * H_BINS));
+        int sb = Math.min(S_BINS - 1, (int) (hsv[1] * S_BINS));
+        hist[hb * S_BINS + sb]++;
+        count++;
+      }
+    }
+    if (count > 0) for (int i = 0; i < hist.length; i++) hist[i] /= count;
+    return hist;
   }
 }

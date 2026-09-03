@@ -1,5 +1,10 @@
 package org.openbot.cartfollow;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -13,7 +18,7 @@ import org.openbot.R;
 import org.openbot.vehicle.Control;
 
 /** Camera-based cart following with BLE manual control and guarded experimental autonomy. */
-public class RealCartFollowFragment extends BaseCartFollowFragment {
+public class RealCartFollowFragment extends BaseCartFollowFragment implements SensorEventListener {
   private static final String CONTROL_LOG_TAG = "CartControl";
   private static final String SESSION_LOG_TAG = "CartFollow_Session";
   private static final long COMMAND_REPEAT_MS = 100L;
@@ -39,6 +44,22 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private String lastSessionEndReason = "none";
   private SteeringTuningRecorder tuningRecorder;
   private int manualForwardLogical = ManualSpeedProfile.DEFAULT_FORWARD_LOGICAL;
+  private RealFollowSettings followSettings = new RealFollowSettings();
+  private final RealCartSearchController searchController = new RealCartSearchController();
+  private final YawTurnTracker yaw = new YawTurnTracker();
+  private final YawTurnTracker testYaw = new YawTurnTracker();
+  private boolean testingYaw;
+  private boolean searchEnabled;
+  private SensorManager sensorManager;
+  private Sensor gyroscope;
+  private Sensor gravity;
+  private FollowStateMachine.FrameResult presentedFrame;
+  private boolean compactAutoLayout;
+  private View[] compactViews;
+  private android.view.ViewGroup[] compactParents;
+  private android.view.ViewGroup.LayoutParams[] compactParams;
+  private int[] compactIndices;
+  private androidx.constraintlayout.widget.ConstraintLayout.LayoutParams normalScrollParams;
 
   private final Runnable commandScheduler =
       new Runnable() {
@@ -62,16 +83,21 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
               && manualTouchRouter.getActiveControl() == null) {
             latestOutput = RealCartSafetyController.stop("manual_idle");
           }
+          if (safetyController.getMode() == RealCartSafetyController.Mode.AUTO) {
+            latestOutput = safetyController.refresh(now, searchController.poll(now, yaw));
+            if (binding.startSwitch.isChecked() && !safetyController.isAutoUnlocked())
+              finishAutoSession(latestOutput.reason, true);
+          }
           sendOutput(latestOutput);
           refreshRealUi();
+          refreshFollowStatus();
           mainHandler.postDelayed(this, COMMAND_REPEAT_MS);
         }
       };
 
   @Override
   protected void onCartFollowViewCreated() {
-    // The real cart owns its missing-person timeout. Visible people keep a stationary ReID session
-    // alive, while two seconds with no person ends it in RealCartAutoDriveController.
+    // Absence parks the cart without discarding the confirmed identity; hard faults still end it.
     stateMachine.IDENTITY_UNCERTAIN_TIMEOUT_MS = Long.MAX_VALUE;
     stateMachine.SEARCH_TIMEOUT_MS = Long.MAX_VALUE;
     vehicle.useBluetoothConnection();
@@ -82,6 +108,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     tuningRecorder = new SteeringTuningRecorder(requireContext());
     installSteeringStrengthTuning();
     installManualSpeedSelector();
+    installFollowExperiments();
     binding.realModeGroup.check(R.id.real_mode_manual);
     binding.startSwitch.setChecked(false);
     binding.startSwitch.setEnabled(false);
@@ -89,7 +116,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     binding.realModeGroup.addOnButtonCheckedListener(
         (group, checkedId, isChecked) -> {
           if (!isChecked) return;
-      setMode(
+          setMode(
               checkedId == R.id.real_mode_auto
                   ? RealCartSafetyController.Mode.AUTO
                   : RealCartSafetyController.Mode.MANUAL);
@@ -131,13 +158,25 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   @Override
   public synchronized void onResume() {
     super.onResume();
+    if (binding != null && !searchEnabled) binding.realSearchEnabled.setChecked(false);
     safetyController.setForeground(true);
+    registerYawSensors();
     if (vehicle.isBleSerialReady()) vehicle.startHeartbeat();
     startScheduler();
   }
 
   @Override
   protected void onCartFollowPause() {
+    if (sensorManager != null) sensorManager.unregisterListener(this);
+    yaw.clear();
+    testYaw.clear();
+    testingYaw = false;
+    searchEnabled = false;
+    searchController.configure(
+        false,
+        followSettings.searchSpeed,
+        followSettings.searchAngle,
+        followSettings.searchTimeoutMs);
     if (binding != null
         && safetyController.getMode() == RealCartSafetyController.Mode.AUTO
         && binding.startSwitch.isChecked()) {
@@ -157,12 +196,21 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   }
 
   @Override
+  protected void onDiagnosticSessionChanged(
+      org.openbot.cartfollow.diagnostics.CartFollowDiagnosticSession session) {
+    if (vehicle != null)
+      vehicle.setControlDiagnosticObserver(session == null ? null : session::control);
+  }
+
+  @Override
   protected void onDiagnosticLoggingChanged(boolean enabled) {
     if (vehicle != null) vehicle.setBleControlDiagnosticsEnabled(enabled);
   }
 
   @Override
   protected void onFollowEnabledChanged(boolean enabled) {
+    testingYaw = false;
+    setExperimentControlsEnabled(!enabled);
     if (enabled) {
       lastSessionEndReason = "none";
       logSession("start", "enabled");
@@ -193,20 +241,85 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
 
   @Override
   protected void onFollowFrame(FollowStateMachine.FrameResult frameResult) {
-    latestOutput = safetyController.auto(frameResult, SystemClock.elapsedRealtime());
+    long now = SystemClock.elapsedRealtime();
+    latestOutput = safetyController.auto(frameResult, now, searchController.poll(now, yaw));
     logAutoDecision(frameResult);
     RealCartAutoDriveController.Result autoResult = safetyController.getAutoDriveResult();
+    if (frameResult != null) frameResult.realDriveResult = autoResult;
     updateSteeringUi(frameResult == null ? null : frameResult.steeringEvidence);
-    if (autoResult.lockout) finishAutoSession(autoResult.reason, false);
+    if (autoResult.lockout || !safetyController.isAutoUnlocked())
+      finishAutoSession(latestOutput.reason, true);
+    if (latestOutput.isStop()) sendOutput(latestOutput);
+  }
+
+  @Override
+  protected void prepareSimulatorLearningFrame(FollowStateMachine.FrameResult frame, long now) {
+    RealCartSearchController.Result search = searchController.update(frame, now, yaw);
+    frame.directedReacquireEvidence = search.evidence;
+    if (searchController.consumeEnterRequest()) stateMachine.enterDirectedReacquire();
+  }
+
+  @Override
+  protected boolean simulatorExitLearningRisk(long now) {
+    return searchController.learningRisk(now);
+  }
+
+  @Override
+  protected void onFollowGenerationChanged(long generation) {
+    safetyController.setSessionGeneration(generation);
+    searchController.reset();
+    presentedFrame = null;
+  }
+
+  @Override
+  protected void onFrameUiApplied(FollowStateMachine.FrameResult frame) {
+    boolean showConfirmation =
+        frame.state == FollowState.LOCKED_PENDING_CONFIRM
+            && (presentedFrame == null || presentedFrame.state != frame.state);
+    presentedFrame = frame;
+    refreshFollowStatus();
+    if (compactAutoLayout && showConfirmation)
+      binding.confirmPanel.post(
+          () -> {
+            if (binding != null && compactAutoLayout)
+              binding.simulatorExperimentScroll.smoothScrollTo(0, binding.confirmPanel.getTop());
+          });
   }
 
   @Override
   protected String commandForFrame(FollowStateMachine.FrameResult frameResult, String defaultText) {
-    return commandForAutoResult(safetyController.getAutoDriveResult());
+    if (frameResult != null && latestOutput.isStop()) {
+      switch (frameResult.state) {
+        case CAPTURE_TARGET:
+          return "正在采集目标 · c0,0";
+        case LOCKED_PENDING_CONFIRM:
+          return "请确认目标 · c0,0";
+        case CONFIRMED_ARMED:
+        case REACQUIRE_TARGET:
+          return "已确认，正在重识别 · c0,0";
+        case READY_TO_FOLLOW:
+          return frameResult.countdownSec + " 秒后低档启动 · c0,0";
+        default:
+          break;
+      }
+    }
+    RealCartAutoDriveController.Result actual = safetyController.getAutoDriveResult();
+    if (latestOutput.isStop() && !actual.isStop())
+      return "安全停车 · " + latestOutput.reason + " · c0,0";
+    return (frameResult != null
+                && frameResult.simulatorIdentity != null
+                && frameResult.simulatorIdentity.isContinuous()
+            ? frameResult.simulatorIdentity.isAppearanceTransition() ? "外观变化中 · 低档 · " : "连续跟踪 · "
+            : "")
+        + commandForAutoResult(actual);
   }
 
   @Override
   protected void onFollowSessionReset() {
+    searchController.reset();
+    yaw.reset(SteeringEvidence.Direction.NONE);
+    presentedFrame = null;
+    setExperimentControlsEnabled(true);
     updateSteeringUi(
         SteeringEvidence.unavailable("session_reset", REAL_CART_PREDICTION_HORIZON_MS));
   }
@@ -244,7 +357,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     binding.unlockAuto.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.realSafetyNotice.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.steeringStrengthPanel.setVisibility(auto ? View.VISIBLE : View.GONE);
+    binding.simulatorExperimentScroll.setVisibility(auto ? View.VISIBLE : View.GONE);
+    binding.simulatorExperimentPanel.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.startSwitch.setEnabled(false);
+    configureResponsiveLayout(binding.getRoot().getWidth(), binding.getRoot().getHeight());
     refreshRealUi();
   }
 
@@ -333,12 +449,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
   private RealCartSafetyController.Output manualOutput(ManualControlArbiter.Control control) {
     switch (control) {
       case FORWARD:
-        return safetyController.manual(
-            manualForwardLogical, manualForwardLogical);
+        return safetyController.manual(manualForwardLogical, manualForwardLogical);
       case BACKWARD:
         int reverseLogical = ManualSpeedProfile.reverseForForward(manualForwardLogical);
-        return safetyController.manual(
-            -reverseLogical, -reverseLogical);
+        return safetyController.manual(-reverseLogical, -reverseLogical);
       case LEFT:
         return safetyController.manual(
             -RealCartSafetyController.MANUAL_TURN, RealCartSafetyController.MANUAL_TURN);
@@ -481,6 +595,13 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     latestOutput = safetyController.resetAutoDrive(reason, revokeUnlock);
     sendOutput(latestOutput);
     if (binding.startSwitch.isChecked()) binding.startSwitch.setChecked(false);
+    searchEnabled = false;
+    binding.realSearchEnabled.setChecked(false);
+    searchController.configure(
+        false,
+        followSettings.searchSpeed,
+        followSettings.searchAngle,
+        followSettings.searchTimeoutMs);
     binding.startSwitch.setEnabled(false);
     resetFollowSession();
     refreshRealUi();
@@ -509,9 +630,21 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
 
   private void sendOutput(RealCartSafetyController.Output output) {
     if (vehicle == null || output == null) return;
+    if (!output.isStop() && safetyController.getMode() == RealCartSafetyController.Mode.AUTO) {
+      output =
+          safetyController.refresh(
+              SystemClock.elapsedRealtime(),
+              searchController.poll(SystemClock.elapsedRealtime(), yaw));
+      latestOutput = output;
+    }
+    recordControlEvent(
+        "control_submit",
+        "requested=c" + output.left + "," + output.right + ";reason=" + output.reason);
     int multiplier = Math.max(1, vehicle.getSpeedMultiplier());
     vehicle.setControl(
         new Control(output.left / (float) multiplier, output.right / (float) multiplier));
+    if (safetyController.getMode() == RealCartSafetyController.Mode.AUTO)
+      searchController.noteCommand(output.left, output.right, SystemClock.elapsedRealtime(), yaw);
   }
 
   private void sendReplacementOutput(RealCartSafetyController.Output output, long generation) {
@@ -535,26 +668,23 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
 
   private void logControl(String event, String details) {
     if (!isDiagnosticLoggingEnabled()) return;
+    recordControlEvent(event, details);
     Log.i(
         CONTROL_LOG_TAG, "ms=" + SystemClock.elapsedRealtime() + ",event=" + event + "," + details);
   }
 
   private void logSession(String event, String reason) {
+    recordControlEvent("session_" + event, reason);
     Log.i(
         SESSION_LOG_TAG,
-        "ms="
-            + SystemClock.elapsedRealtime()
-            + ",event="
-            + event
-            + ",reason="
-            + reason);
+        "ms=" + SystemClock.elapsedRealtime() + ",event=" + event + ",reason=" + reason);
   }
 
   static String commandForAutoResult(RealCartAutoDriveController.Result result) {
     if (result == null) return "自动控制未就绪";
     switch (result.phase) {
       case MOVING_STRAIGHT:
-        return "小车直行";
+        return "小车直行 · c" + result.left + "," + result.right;
       case CURVE_LEFT:
         return String.format(
             java.util.Locale.US,
@@ -572,11 +702,22 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
             result.left,
             result.right);
       case WAIT_CENTER:
-        return "目标偏差过大，停车等待";
+        return "起步稳定验证 · c0,0 · " + HumanCartSimulatorFragment.driveReasonLabel(result.reason);
       case RECOVERY_STOP:
-        return "身份确认中，停车重捕";
+        return "停车验证或学习 · c0,0 · " + HumanCartSimulatorFragment.driveReasonLabel(result.reason);
+      case SEARCH_BRAKE:
+        return "搜索前停车等待 · c0,0";
+      case PIVOT:
+        return "定向搜索 · 向"
+            + (result.left < 0 ? "左" : "右")
+            + "旋转 · c"
+            + result.left
+            + ","
+            + result.right;
+      case PARKED_WAIT:
+        return "静止等待目标返回 · 身份已保留 · c0,0";
       case WAIT_TARGET:
-        return "等待有效目标，保持停车";
+        return "保持停车 · c0,0 · " + HumanCartSimulatorFragment.driveReasonLabel(result.reason);
       case LOCKED:
       default:
         return "自动控制已锁定";
@@ -619,7 +760,21 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
             + ","
             + result.right
             + ",reason="
-            + result.reason);
+            + result.reason
+            + ",intent="
+            + result.intent
+            + ",gear="
+            + result.gear
+            + ",identity="
+            + (frame == null || frame.simulatorIdentity == null
+                ? "NONE"
+                : frame.simulatorIdentity.state)
+            + ",source_age_ms="
+            + (frame == null || frame.frameTiming == null
+                ? -1
+                : now - frame.frameTiming.receivedAtMs)
+            + ",search="
+            + searchController.poll(now, yaw).reason);
   }
 
   private static String directionName(ManualControlArbiter.Control control) {
@@ -638,32 +793,15 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
                       : vehicle.isBleSerialReady() ? "BLE 已连接 · 等待固件握手" : "BLE 未连接";
               String output =
                   latestOutput == null ? "0,0" : latestOutput.left + "," + latestOutput.right;
-              RealCartAutoDriveController.Result autoResult = safetyController.getAutoDriveResult();
               ManualControlArbiter.Control active = manualTouchRouter.getActiveControl();
               binding.realConnectionStatus.setText(
                   connection
-                      + " | output="
+                      + "\n发送 c"
                       + output
                       + " | direction="
                       + (active == null ? "STOP" : active.name())
                       + " | ble="
                       + vehicle.getBleWriteStatus()
-                      + (safetyController.getMode() == RealCartSafetyController.Mode.AUTO
-                          ? " | auto="
-                              + autoResult.phase
-                              + " h="
-                              + String.format(java.util.Locale.US, "%.2f", autoResult.heightScale)
-                              + " turn="
-                              + String.format(java.util.Locale.US, "%.2f", autoResult.filteredTurn)
-                              + " demand="
-                              + autoResult.demandPercent
-                              + " dir="
-                              + autoResult.direction
-                              + " reason="
-                              + autoResult.reason
-                              + " last_end="
-                              + lastSessionEndReason
-                          : "")
                       + " | build="
                       + BuildConfig.VERSION_NAME);
               boolean emergency = safetyController.isEmergencyLatched();
@@ -696,7 +834,8 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
                     String.format(
                         java.util.Locale.US,
                         "实际转向：直行 · 需求 %d%%\n预测提前 %d ms",
-                        safeEvidence.demandPercent, safeEvidence.predictionHorizonMs));
+                        safeEvidence.demandPercent,
+                        safeEvidence.predictionHorizonMs));
               } else {
                 binding.steeringSummary.setText(
                     String.format(
@@ -718,9 +857,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
 
   private void installSteeringStrengthTuning() {
     int saved =
-        requireContext()
-            .getSharedPreferences(TUNING_PREFS, 0)
-            .getInt(TUNING_STRENGTH_KEY, 100);
+        requireContext().getSharedPreferences(TUNING_PREFS, 0).getInt(TUNING_STRENGTH_KEY, 100);
     int strength =
         Math.max(
             RealCartAutoDriveController.MIN_STEERING_STRENGTH_PERCENT,
@@ -763,12 +900,363 @@ public class RealCartFollowFragment extends BaseCartFollowFragment {
     int minimumInner = RealCartAutoDriveController.innerSpeedForDemand(100, strength);
     binding.steeringStrengthValue.setText(
         String.format(
-            java.util.Locale.US, "转弯强度 %d%% · 最大差速 %d,14 / 14,%d", strength, minimumInner, minimumInner));
+            java.util.Locale.US,
+            "转弯强度 %d%% · 最大差速 %d,14 / 14,%d",
+            strength,
+            minimumInner,
+            minimumInner));
   }
 
   private void recordTuning(String event) {
     if (tuningRecorder == null) return;
     String note = binding == null ? "" : binding.steeringTuningNote.getText().toString().trim();
-    tuningRecorder.record(event, safetyController.getSteeringStrengthPercent(), safetyController.getAutoDriveResult(), note);
+    tuningRecorder.record(
+        event,
+        safetyController.getSteeringStrengthPercent(),
+        safetyController.getAutoDriveResult(),
+        note);
+  }
+
+  void installFollowExperiments() {
+    followSettings =
+        RealFollowSettings.load(requireContext().getSharedPreferences(RealFollowSettings.PREFS, 0));
+    searchEnabled = false;
+    compactAutoLayout = false;
+    compactViews = null;
+    compactParents = null;
+    compactParams = null;
+    compactIndices = null;
+    normalScrollParams = null;
+    binding
+        .getRoot()
+        .addOnLayoutChangeListener(
+            (v, l, t, r, b, ol, ot, or, ob) -> {
+              if (binding != null && v == binding.getRoot())
+                configureResponsiveLayout(r - l, b - t);
+            });
+    binding.realExperimentOptions.setVisibility(View.VISIBLE);
+    binding.recoveryTimeoutGroup.setVisibility(View.GONE);
+    binding.simulatorReconfirm.setVisibility(View.GONE);
+    binding.galleryModeGroup.check(
+        followSettings.dynamicGallery ? R.id.gallery_adaptive : R.id.gallery_static);
+    binding.recentGallerySwitch.setChecked(followSettings.recent);
+    binding.autoGearGroup.check(
+        followSettings.maximumGear == 21
+            ? R.id.auto_gear_21
+            : followSettings.maximumGear == 18 ? R.id.auto_gear_18 : R.id.auto_gear_14);
+    binding.realSearchEnabled.setChecked(false);
+    android.view.ViewGroup strengthParent =
+        (android.view.ViewGroup) binding.steeringStrengthPanel.getParent();
+    if (strengthParent != binding.simulatorExperimentPanel) {
+      strengthParent.removeView(binding.steeringStrengthPanel);
+      binding.simulatorExperimentPanel.addView(
+          binding.steeringStrengthPanel,
+          binding.simulatorExperimentPanel.indexOfChild(binding.simulatorStatus));
+    }
+    binding.searchSpeedSlider.setValue(followSettings.searchSpeed);
+    binding.searchAngleSlider.setValue(followSettings.searchAngle);
+    binding.searchTimeoutSlider.setValue(followSettings.searchTimeoutMs / 1000f);
+    binding.galleryModeGroup.addOnButtonCheckedListener(
+        (group, id, checked) -> {
+          if (!checked || binding.startSwitch.isChecked()) return;
+          followSettings.dynamicGallery = id == R.id.gallery_adaptive;
+          applyFollowSettings();
+        });
+    binding.recentGallerySwitch.setOnCheckedChangeListener(
+        (button, checked) -> {
+          if (binding.startSwitch.isChecked()) return;
+          followSettings.recent = checked;
+          applyFollowSettings();
+        });
+    binding.autoGearGroup.addOnButtonCheckedListener(
+        (group, id, checked) -> {
+          if (!checked || binding.startSwitch.isChecked()) return;
+          followSettings.maximumGear =
+              id == R.id.auto_gear_21 ? 21 : id == R.id.auto_gear_18 ? 18 : 14;
+          applyFollowSettings();
+        });
+    binding.realSearchEnabled.setOnCheckedChangeListener(
+        (button, checked) -> {
+          if (binding.startSwitch.isChecked()) return;
+          searchEnabled = checked;
+          applyFollowSettings();
+        });
+    binding.searchSpeedSlider.addOnChangeListener(
+        (slider, value, user) -> {
+          if (binding.startSwitch.isChecked()) return;
+          followSettings.searchSpeed = Math.round(value);
+          applyFollowSettings();
+        });
+    binding.searchAngleSlider.addOnChangeListener(
+        (slider, value, user) -> {
+          if (binding.startSwitch.isChecked()) return;
+          followSettings.searchAngle = Math.round(value);
+          applyFollowSettings();
+        });
+    binding.searchTimeoutSlider.addOnChangeListener(
+        (slider, value, user) -> {
+          if (binding.startSwitch.isChecked()) return;
+          followSettings.searchTimeoutMs = Math.round(value * 1000);
+          applyFollowSettings();
+        });
+    binding.gyroTestLeft.setOnClickListener(v -> startYawTest(SteeringEvidence.Direction.LEFT));
+    binding.gyroTestRight.setOnClickListener(v -> startYawTest(SteeringEvidence.Direction.RIGHT));
+    binding.gyroTestStop.setOnClickListener(v -> testingYaw = false);
+    binding.gyroTestReset.setOnClickListener(
+        v -> {
+          testingYaw = false;
+          testYaw.reset(SteeringEvidence.Direction.NONE);
+        });
+    sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
+    if (sensorManager != null) {
+      gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+      gravity = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+    }
+    applyFollowSettings();
+  }
+
+  /** Keep emergency/Start pinned while short landscape windows scroll the auxiliary panels. */
+  void configureResponsiveLayout(int width, int height) {
+    if (binding == null) return;
+    boolean compact =
+        width > height
+            && height > 0
+            && binding.realControlPanel.getVisibility() == View.VISIBLE
+            && binding.manualDriveControls.getVisibility() == View.GONE;
+    if (compact == compactAutoLayout) return;
+    compactAutoLayout = compact;
+    if (compact) {
+      compactViews =
+          new View[] {
+            binding.commandText,
+            binding.steeringPanel,
+            binding.countdownText,
+            binding.confirmPanel,
+            (View) binding.modelSpinner.getParent(),
+            binding.realConnectionStatus,
+            binding.realModeGroup,
+            binding.realSafetyNotice
+          };
+      compactParents = new android.view.ViewGroup[compactViews.length];
+      compactParams = new android.view.ViewGroup.LayoutParams[compactViews.length];
+      compactIndices = new int[compactViews.length];
+      for (int i = 0; i < compactViews.length; i++) {
+        compactParents[i] = (android.view.ViewGroup) compactViews[i].getParent();
+        compactParams[i] = compactViews[i].getLayoutParams();
+        compactIndices[i] = compactParents[i].indexOfChild(compactViews[i]);
+      }
+      for (int i = 0; i < compactViews.length; i++) {
+        compactParents[i].removeView(compactViews[i]);
+        binding.simulatorExperimentPanel.addView(
+            compactViews[i],
+            i,
+            new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+      }
+      normalScrollParams =
+          new androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(
+              (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
+                  binding.simulatorExperimentScroll.getLayoutParams());
+      androidx.constraintlayout.widget.ConstraintLayout.LayoutParams p =
+          new androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(normalScrollParams);
+      p.topToBottom = -1;
+      p.topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID;
+      p.topMargin = Math.round(58 * getResources().getDisplayMetrics().density);
+      p.bottomToTop = R.id.real_control_panel;
+      binding.simulatorExperimentScroll.setLayoutParams(p);
+    } else {
+      for (int i = 0; i < compactViews.length; i++) {
+        binding.simulatorExperimentPanel.removeView(compactViews[i]);
+        compactParents[i].addView(
+            compactViews[i],
+            Math.min(compactIndices[i], compactParents[i].getChildCount()),
+            compactParams[i]);
+      }
+      binding.simulatorExperimentScroll.setLayoutParams(normalScrollParams);
+    }
+  }
+
+  private void applyFollowSettings() {
+    FollowPolicy policy =
+        new FollowPolicy(
+            true,
+            followSettings.dynamicGallery
+                ? GalleryUpdateStatus.Mode.ADAPTIVE
+                : GalleryUpdateStatus.Mode.STATIC,
+            false,
+            searchEnabled);
+    configureFollowPolicy(policy);
+    configureRecentGallery(followSettings.dynamicGallery && followSettings.recent);
+    safetyController.setMaximumGear(followSettings.maximumGear);
+    searchController.configure(
+        policy.directedSearch,
+        followSettings.searchSpeed,
+        followSettings.searchAngle,
+        followSettings.searchTimeoutMs);
+    followSettings.save(requireContext().getSharedPreferences(RealFollowSettings.PREFS, 0));
+    binding.searchSpeedValue.setText(
+        "旋转档位 c"
+            + followSettings.searchSpeed
+            + " · 轮速约 "
+            + Math.max(80, ManualSpeedProfile.estimatedMmps(followSettings.searchSpeed))
+            + " mm/s");
+    binding.searchAngleValue.setText("最大搜索角度 " + followSettings.searchAngle + "°");
+    binding.searchTimeoutValue.setText(
+        "搜索总时限 " + followSettings.searchTimeoutMs / 1000f + " 秒（含制动与验证）");
+    setExperimentControlsEnabled(!binding.startSwitch.isChecked());
+  }
+
+  void setExperimentControlsEnabled(boolean enabled) {
+    if (binding == null) return;
+    for (View v :
+        new View[] {
+          binding.galleryStatic,
+          binding.galleryAdaptive,
+          binding.autoGear14,
+          binding.autoGear18,
+          binding.autoGear21,
+          binding.realSearchEnabled,
+          binding.gyroTestLeft,
+          binding.gyroTestRight,
+          binding.gyroTestStop,
+          binding.gyroTestReset
+        }) v.setEnabled(enabled);
+    binding.recentGallerySwitch.setEnabled(enabled && followSettings.dynamicGallery);
+    binding.searchSpeedSlider.setEnabled(enabled && searchEnabled);
+    binding.searchAngleSlider.setEnabled(enabled && searchEnabled);
+    binding.searchTimeoutSlider.setEnabled(enabled && searchEnabled);
+  }
+
+  private void registerYawSensors() {
+    if (sensorManager == null) return;
+    boolean g =
+        gravity != null
+            && sensorManager.registerListener(this, gravity, SensorManager.SENSOR_DELAY_GAME);
+    boolean r =
+        gyroscope != null
+            && sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
+    yaw.setSensorStatus(gyroscope != null, g && r);
+    testYaw.setSensorStatus(gyroscope != null, g && r);
+  }
+
+  private void startYawTest(SteeringEvidence.Direction direction) {
+    if (binding == null || binding.startSwitch.isChecked()) return;
+    testYaw.reset(direction);
+    testingYaw = true;
+  }
+
+  @Override
+  public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+  @Override
+  public void onSensorChanged(SensorEvent event) {
+    if (event == null || event.sensor == null || event.values == null || event.values.length < 3)
+      return;
+    if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
+      yaw.onGravity(event.timestamp, event.values[0], event.values[1], event.values[2]);
+      testYaw.onGravity(event.timestamp, event.values[0], event.values[1], event.values[2]);
+    } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+      yaw.onGyroscope(event.timestamp, event.values[0], event.values[1], event.values[2]);
+      if (testingYaw)
+        testYaw.onGyroscope(event.timestamp, event.values[0], event.values[1], event.values[2]);
+    }
+  }
+
+  private void refreshFollowStatus() {
+    if (binding == null || safetyController.getMode() != RealCartSafetyController.Mode.AUTO) return;
+    long now = SystemClock.elapsedRealtime();
+    RealCartSearchController.Result search = searchController.poll(now, yaw);
+    YawTurnTracker.Status sensor = yaw.getStatus(SystemClock.elapsedRealtimeNanos());
+    binding.gyroTestStatus.setText(
+        sensor.available
+            ? "测角就绪 · 独立测试 "
+                + Math.round(testYaw.getTurnedDegrees())
+                + "°"
+                + (testYaw.isWrongDirection() ? " · 方向错误" : "")
+            : "转角不可用 · "
+                + (!sensor.sensorExists ? "缺少陀螺仪" : !sensor.registered ? "传感器未就绪" : "数据中断"));
+    RealCartAutoDriveController.Result actual = safetyController.getAutoDriveResult();
+    FollowStateMachine.FrameResult frame = presentedFrame;
+    String text =
+        "实际输出 c"
+            + latestOutput.left
+            + ","
+            + latestOutput.right
+            + " · 档位 "
+            + actual.gear
+            + " / 上限 "
+            + followSettings.maximumGear
+            + "\n动作="
+            + actual.phase
+            + " · "
+            + latestOutput.reason
+            + "\n最近结束="
+            + lastSessionEndReason;
+    if (frame != null) {
+      if (frame.simulatorIdentity != null)
+        text +=
+            "\n身份="
+                + frame.simulatorIdentity.state
+                + " · "
+                + frame.simulatorIdentity.reason
+                + "\n恢复="
+                + frame.simulatorIdentity.recoveryType
+                + " "
+                + frame.simulatorIdentity.freshMatches
+                + "/"
+                + frame.simulatorIdentity.requiredFreshMatches
+                + "\n连续性="
+                + frame.simulatorIdentity.continuityReason;
+      if (frame.identityEvidence != null && frame.identityEvidence.reidMatch != null) {
+        ReIDMatchResult match = frame.identityEvidence.reidMatch;
+        text +=
+            String.format(
+                java.util.Locale.US,
+                "\n独立身份=%.3f Anchor=%.3f margin=%.3f",
+                match.bestScore,
+                match.anchorScore,
+                match.margin);
+      }
+      GalleryUpdateStatus g = frame.galleryUpdateStatus;
+      if (g != null)
+        text +=
+            "\nAnchor="
+                + g.anchorSize
+                + " · Adaptive="
+                + g.adaptiveSize
+                + " · Recent="
+                + (frame.recentGallery == null ? 0 : frame.recentGallery.size)
+                + " · Quarantine="
+                + g.quarantineSize
+                + "\n学习="
+                + g.event
+                + " · "
+                + g.reason;
+      text += "\n" + HumanCartSimulatorFragment.deferredGalleryText(frame);
+      if (frame.distanceDiagnosticText != null) text += "\n" + frame.distanceDiagnosticText;
+    }
+    text +=
+        "\n搜索="
+            + (searchEnabled ? search.evidence.phase : "未启用")
+            + " · "
+            + search.reason
+            + "\n"
+            + search.evidence.directionLabel()
+            + " "
+            + Math.round(yaw.getTurnedDegrees())
+            + "°/"
+            + followSettings.searchAngle
+            + "° · "
+            + search.evidence.elapsedMs / 1000f
+            + "/"
+            + followSettings.searchTimeoutMs / 1000f
+            + " 秒";
+    binding.simulatorStatus.setText(text);
+    boolean fresh =
+        frame != null && frame.frameTiming != null && now - frame.frameTiming.receivedAtMs <= 500L;
+    binding.simulatorFrameHealth.setText(
+        fresh ? "画面有效 · 完整处理 " + frame.frameTiming.pipelineMs + " ms" : "等待新鲜画面");
+    if (binding.startSwitch.isChecked()) binding.commandText.setText(commandForFrame(frame, ""));
   }
 }

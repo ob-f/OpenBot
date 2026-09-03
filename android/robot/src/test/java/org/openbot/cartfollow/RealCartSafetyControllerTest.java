@@ -37,7 +37,7 @@ public class RealCartSafetyControllerTest {
     assertEquals(14, RealCartSafetyController.MANUAL_FORWARD);
     assertEquals(12, RealCartSafetyController.MANUAL_REVERSE);
     assertEquals(5, RealCartSafetyController.MANUAL_TURN);
-    assertEquals(14, RealCartSafetyController.AUTO_MAX);
+    assertEquals(21, RealCartSafetyController.AUTO_MAX);
   }
 
   @Test
@@ -68,9 +68,9 @@ public class RealCartSafetyControllerTest {
         frame(new Control(0.6f, 0.6f), BehaviorAction.FOLLOW_SLOW);
     frame.distanceEstimate = distance(0.75f, DistanceState.TOO_FAR);
 
-    controller.auto(frame, 1000L);
-    controller.auto(frame, 1030L);
-    RealCartSafetyController.Output output = controller.auto(frame, 1060L);
+    observe(controller, frame, 1000L);
+    observe(controller, frame, 1030L);
+    RealCartSafetyController.Output output = observe(controller, frame, 1060L);
     assertEquals(14, output.left);
     assertEquals(14, output.right);
   }
@@ -82,9 +82,9 @@ public class RealCartSafetyControllerTest {
     controller.setAutoRunEnabled(true, 900L);
     FollowStateMachine.FrameResult movingFrame =
         frame(new Control(0.4f, 0.4f), BehaviorAction.FOLLOW_SLOW);
-    controller.auto(movingFrame, 1000L);
-    controller.auto(movingFrame, 1030L);
-    controller.auto(movingFrame, 1060L);
+    observe(controller, movingFrame, 1000L);
+    observe(controller, movingFrame, 1030L);
+    observe(controller, movingFrame, 1060L);
 
     RealCartSafetyController.Output output =
         controller.watchdog(1060L + RealCartSafetyController.INFERENCE_TIMEOUT_MS + 1L);
@@ -100,31 +100,31 @@ public class RealCartSafetyControllerTest {
     controller.setAutoRunEnabled(true, 900L);
     FollowStateMachine.FrameResult movingFrame =
         frame(new Control(0.4f, 0.4f), BehaviorAction.FOLLOW_SLOW);
-    controller.auto(movingFrame, 1000L);
-    controller.auto(movingFrame, 1030L);
-    controller.auto(movingFrame, 1060L);
+    observe(controller, movingFrame, 1000L);
+    observe(controller, movingFrame, 1030L);
+    observe(controller, movingFrame, 1060L);
 
     FollowStateMachine.FrameResult stoppedFrame =
         frame(new Control(0f, 0f), BehaviorAction.MOTION_STOP);
-    controller.auto(stoppedFrame, 1090L);
+    observe(controller, stoppedFrame, 1090L);
 
     assertNull(controller.watchdog(10_000L));
     assertTrue(controller.isAutoUnlocked());
   }
 
   @Test
-  public void searchNeverMovesAndRevokesAfterTwoSeconds() {
+  public void unarmedSearchNeverMovesAndParksAfterTwoSeconds() {
     RealCartSafetyController controller = readyAutoController();
     assertTrue(controller.unlockAuto());
     controller.setAutoRunEnabled(true, 900L);
     FollowStateMachine.FrameResult frame =
         frame(new Control(0f, 0f), BehaviorAction.LOCAL_SEARCH_LEFT);
-    assertTrue(controller.auto(frame, 1000L).isStop());
+    assertTrue(observe(controller, frame, 1000L).isStop());
 
     RealCartSafetyController.Output output =
-        controller.auto(frame, 1000L + RealCartAutoDriveController.RECOVERY_LIMIT_MS);
+        observe(controller, frame, 1000L + RealCartAutoDriveController.RECOVERY_LIMIT_MS);
     assertTrue(output.isStop());
-    assertFalse(controller.isAutoUnlocked());
+    assertTrue(controller.isAutoUnlocked());
   }
 
   @Test
@@ -142,8 +142,8 @@ public class RealCartSafetyControllerTest {
             null,
             0f);
 
-    assertTrue(controller.auto(frame, 1000L).isStop());
-    assertTrue(controller.auto(frame, 11_000L).isStop());
+    assertTrue(observe(controller, frame, 1000L).isStop());
+    assertTrue(observe(controller, frame, 11_000L).isStop());
     assertTrue(controller.isAutoUnlocked());
     assertNull(controller.watchdog(60_000L));
   }
@@ -165,6 +165,16 @@ public class RealCartSafetyControllerTest {
     return controller;
   }
 
+  private static long sequence;
+
+  private static RealCartSafetyController.Output observe(
+      RealCartSafetyController controller, FollowStateMachine.FrameResult frame, long now) {
+    frame.frameSequence = ++sequence;
+    frame.frameTiming = new FrameTimingEvidence(now, 0, 0, 0, 0, 0, 30, 0);
+    frame.simulatorIdentity = new SimulatorIdentityGuard.Decision(true, false, 1, 3, "verified");
+    return controller.auto(frame, now);
+  }
+
   private static FollowStateMachine.FrameResult frame(Control control, BehaviorAction action) {
     return frame(control, action, false);
   }
@@ -177,15 +187,7 @@ public class RealCartSafetyControllerTest {
     }
     FollowStateMachine.FrameResult frame =
         new FollowStateMachine.FrameResult(
-            FollowState.FOLLOW,
-            control,
-            null,
-            null,
-            persons,
-            true,
-            false,
-            null,
-            -1);
+            FollowState.FOLLOW, control, null, null, persons, true, false, null, -1);
     frame.behaviorDecision =
         new BehaviorDecisionResult(FollowState.FOLLOW, action, "test", null, 1f);
     frame.distanceEstimate = distance(0.75f, DistanceState.TOO_FAR);

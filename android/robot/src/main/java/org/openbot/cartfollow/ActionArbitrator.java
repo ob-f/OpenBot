@@ -12,6 +12,18 @@ public class ActionArbitrator {
       SystemSafetyEvidence safety,
       TargetMemory memory,
       int frameW) {
+    return decide(state, identity, distance, traversability, safety, memory, frameW, null);
+  }
+
+  public BehaviorDecisionResult decide(
+      FollowState state,
+      IdentityEvidence identity,
+      DistanceEvidence distance,
+      TraversabilityEvidence traversability,
+      SystemSafetyEvidence safety,
+      TargetMemory memory,
+      int frameW,
+      SimulatorIdentityGuard.Decision simulatorPermit) {
     if (safety != null && safety.emergencyStop) {
       return result(state, BehaviorAction.EMERGENCY_STOP, "emergency_stop", safety.reason, 0f);
     }
@@ -44,18 +56,28 @@ public class ActionArbitrator {
         || state == FollowState.IDLE) {
       return result(state, BehaviorAction.MOTION_STOP, "not_ready_to_follow", "motion_stop", 0f);
     }
-    if (state == FollowState.LOST || state == FollowState.SEARCH) {
+    if (state == FollowState.LOST
+        || state == FollowState.SEARCH
+        || state == FollowState.DIRECTED_REACQUIRE) {
       BehaviorAction searchAction = searchAction(memory, frameW);
       if (searchAction == BehaviorAction.MOTION_STOP) {
         return result(state, searchAction, "target_lost_no_last_bbox", "motion_stop", 0f);
       }
       return result(state, searchAction, "target_lost_last_side", null, 0.2f);
     }
-    if (identity != null && !identity.matched) {
+    boolean continuity =
+        simulatorPermit != null
+            && simulatorPermit.isContinuous()
+            && simulatorPermit.motionAllowed
+            && identity != null
+            && identity.trackId == simulatorPermit.trackId
+            && identity.trackId == identity.lockedTrackId;
+    if (identity != null && !identity.matched && !continuity) {
       return result(state, BehaviorAction.MOTION_STOP, "identity_unmatched", identity.reason, 0f);
     }
     if (traversability != null && traversability.centerBlocked) {
-      return result(state, BehaviorAction.BLOCKED_WAIT, "center_blocked", traversability.reason, 0f);
+      return result(
+          state, BehaviorAction.BLOCKED_WAIT, "center_blocked", traversability.reason, 0f);
     }
     if (distance != null
         && (distance.state == DistanceState.UNKNOWN || distance.state == DistanceState.TOO_CLOSE)) {
@@ -72,14 +94,16 @@ public class ActionArbitrator {
       return result(
           state,
           BehaviorAction.FOLLOW_CAUTION,
-          state == FollowState.FOLLOW_CAUTION ? "follow_caution_distance_ok" : "identity_ok_distance_ok",
+          state == FollowState.FOLLOW_CAUTION
+              ? "follow_caution_distance_ok"
+              : "identity_ok_distance_ok",
           null,
           identityConfidence(identity));
     }
     return result(
         state,
         BehaviorAction.FOLLOW_SLOW,
-        "identity_ok_follow_allowed",
+        continuity ? "continuous_tracking" : "identity_ok_follow_allowed",
         null,
         identityConfidence(identity));
   }

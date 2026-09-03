@@ -15,11 +15,13 @@ public class RealCartAutoDriveControllerTest {
   @Test
   public void stoppedCartRequiresThreeStableFarFrames() {
     RealCartAutoDriveController controller = new RealCartAutoDriveController();
-    assertTrue(controller.update(followFrame(SteeringEvidence.Direction.NONE, 0, 0.79f), 0L).isStop());
-    assertTrue(controller.update(followFrame(SteeringEvidence.Direction.NONE, 0, 0.79f), 33L).isStop());
+    assertTrue(
+        update(controller, followFrame(SteeringEvidence.Direction.NONE, 0, 0.79f), 0L).isStop());
+    assertTrue(
+        update(controller, followFrame(SteeringEvidence.Direction.NONE, 0, 0.79f), 33L).isStop());
 
     RealCartAutoDriveController.Result result =
-        controller.update(followFrame(SteeringEvidence.Direction.NONE, 0, 0.79f), 66L);
+        update(controller, followFrame(SteeringEvidence.Direction.NONE, 0, 0.79f), 66L);
     assertEquals(14, result.left);
     assertEquals(14, result.right);
     assertEquals(RealCartAutoDriveController.Phase.MOVING_STRAIGHT, result.phase);
@@ -28,16 +30,14 @@ public class RealCartAutoDriveControllerTest {
   @Test
   public void simulatorDirectionMapsToMatchingPhysicalCurve() {
     RealCartAutoDriveController.Result left =
-        movingController()
-            .update(followFrame(SteeringEvidence.Direction.LEFT, 75, 0.75f), 100L);
+        update(movingController(), followFrame(SteeringEvidence.Direction.LEFT, 75, 0.75f), 100L);
     assertEquals(11, left.left);
     assertEquals(14, left.right);
     assertEquals(RealCartAutoDriveController.Phase.CURVE_LEFT, left.phase);
     assertTrue(RealCartFollowFragment.commandForAutoResult(left).contains("向左"));
 
     RealCartAutoDriveController.Result right =
-        movingController()
-            .update(followFrame(SteeringEvidence.Direction.RIGHT, 75, 0.75f), 100L);
+        update(movingController(), followFrame(SteeringEvidence.Direction.RIGHT, 75, 0.75f), 100L);
     assertEquals(14, right.left);
     assertEquals(11, right.right);
     assertEquals(RealCartAutoDriveController.Phase.CURVE_RIGHT, right.phase);
@@ -65,7 +65,7 @@ public class RealCartAutoDriveControllerTest {
   public void missingSteeringEvidenceStopsInsteadOfGuessingControlSign() {
     RealCartAutoDriveController controller = new RealCartAutoDriveController();
     FollowStateMachine.FrameResult frame = rawFollowFrame(0.75f);
-    assertTrue(controller.update(frame, 0L).isStop());
+    assertTrue(update(controller, frame, 0L).isStop());
     assertEquals("steering_unavailable", controller.getLastResult().reason);
   }
 
@@ -73,42 +73,68 @@ public class RealCartAutoDriveControllerTest {
   public void distanceAndSearchAlwaysStop() {
     RealCartAutoDriveController controller = movingController();
     assertTrue(
-        controller
-            .update(frame(SteeringEvidence.Direction.NONE, 0, 0.90f, FollowState.FOLLOW, BehaviorAction.FOLLOW_CAUTION), 100L)
+        update(
+                controller,
+                frame(
+                    SteeringEvidence.Direction.NONE,
+                    0,
+                    0.90f,
+                    FollowState.FOLLOW,
+                    BehaviorAction.FOLLOW_CAUTION),
+                100L)
             .isStop());
     assertTrue(
-        controller
-            .update(frame(SteeringEvidence.Direction.LEFT, 80, 0.75f, FollowState.SEARCH, BehaviorAction.LOCAL_SEARCH_LEFT), 200L)
+        update(
+                controller,
+                frame(
+                    SteeringEvidence.Direction.LEFT,
+                    80,
+                    0.75f,
+                    FollowState.SEARCH,
+                    BehaviorAction.LOCAL_SEARCH_LEFT),
+                200L)
             .isStop());
   }
 
   @Test
-  public void recoveryLocksOutAfterTwoSeconds() {
+  public void recoveryParksWithoutLockoutAfterTwoSeconds() {
     RealCartAutoDriveController controller = movingController();
-    RealCartAutoDriveController.Result first =
-        controller.update(recoveryFrame(true), 1000L);
+    RealCartAutoDriveController.Result first = update(controller, recoveryFrame(true), 1000L);
     assertTrue(first.isStop());
     assertFalse(first.lockout);
 
-    controller.update(recoveryFrame(false), 1000L);
+    update(controller, recoveryFrame(false), 1000L);
     RealCartAutoDriveController.Result timedOut =
-        controller.update(recoveryFrame(false), 1000L + RealCartAutoDriveController.RECOVERY_LIMIT_MS);
+        update(
+            controller,
+            recoveryFrame(false),
+            1000L + RealCartAutoDriveController.RECOVERY_LIMIT_MS);
     assertTrue(timedOut.isStop());
-    assertTrue(timedOut.lockout);
-    assertEquals(RealCartAutoDriveController.Phase.LOCKED, timedOut.phase);
+    assertFalse(timedOut.lockout);
+    assertEquals(RealCartAutoDriveController.Phase.PARKED_WAIT, timedOut.phase);
   }
 
   private static RealCartAutoDriveController movingController() {
     RealCartAutoDriveController controller = new RealCartAutoDriveController();
-    controller.update(followFrame(SteeringEvidence.Direction.NONE, 0, 0.75f), 0L);
-    controller.update(followFrame(SteeringEvidence.Direction.NONE, 0, 0.75f), 30L);
-    controller.update(followFrame(SteeringEvidence.Direction.NONE, 0, 0.75f), 60L);
+    update(controller, followFrame(SteeringEvidence.Direction.NONE, 0, 0.75f), 0L);
+    update(controller, followFrame(SteeringEvidence.Direction.NONE, 0, 0.75f), 30L);
+    update(controller, followFrame(SteeringEvidence.Direction.NONE, 0, 0.75f), 60L);
     return controller;
   }
 
   private static FollowStateMachine.FrameResult followFrame(
       SteeringEvidence.Direction direction, int demand, float heightScale) {
     return frame(direction, demand, heightScale, FollowState.FOLLOW, BehaviorAction.FOLLOW_SLOW);
+  }
+
+  private static long sequence;
+
+  private static RealCartAutoDriveController.Result update(
+      RealCartAutoDriveController controller, FollowStateMachine.FrameResult frame, long now) {
+    frame.frameSequence = ++sequence;
+    frame.frameTiming = new FrameTimingEvidence(now, 0, 0, 0, 0, 0, 30, 0);
+    frame.simulatorIdentity = new SimulatorIdentityGuard.Decision(true, false, 1, 3, "verified");
+    return controller.update(frame, now);
   }
 
   private static FollowStateMachine.FrameResult recoveryFrame(boolean personVisible) {
@@ -154,15 +180,7 @@ public class RealCartAutoDriveControllerTest {
     }
     FollowStateMachine.FrameResult frame =
         new FollowStateMachine.FrameResult(
-            state,
-            new Control(0.6f, 0.6f),
-            null,
-            null,
-            persons,
-            true,
-            false,
-            null,
-            -1);
+            state, new Control(0.6f, 0.6f), null, null, persons, true, false, null, -1);
     DistanceState distanceState =
         Float.isNaN(heightScale)
             ? DistanceState.UNKNOWN

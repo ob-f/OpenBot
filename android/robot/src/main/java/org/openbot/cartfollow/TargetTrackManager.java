@@ -2,15 +2,24 @@ package org.openbot.cartfollow;
 
 import android.graphics.RectF;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.openbot.tflite.Detector.Recognition;
 
 public class TargetTrackManager {
-  private static final float CENTER_GATE_RATIO = 0.25f;
-  private static final float AREA_RATIO_MIN = 0.50f;
-  private static final float AREA_RATIO_MAX = 2.00f;
+  public static final class TwoStageUpdateResult {
+    public final List<Recognition> continuedLowConfidence;
+
+    TwoStageUpdateResult(List<Recognition> continuedLowConfidence) {
+      this.continuedLowConfidence = new ArrayList<>(continuedLowConfidence);
+    }
+  }
+
+  private static final float CENTER_GATE_RATIO = 0.35f;
+  private static final float AREA_RATIO_MIN = 0.25f;
+  private static final float AREA_RATIO_MAX = 4.00f;
   private static final float IOU_SOFT_GATE = 0.10f;
   private static final int MAX_MISSED_FRAMES = 16;
   private static final long LOCKED_GHOST_TTL_MS = 3000L;
@@ -32,8 +41,69 @@ public class TargetTrackManager {
   private float lockedGhostVelocityY = 0f;
   private long lockedGhostLastSeenMs = 0L;
   private String lockedGhostLostSide = "unknown";
+  private boolean globalAssociationEnabled;
+  private boolean lockedAssociationCompeting;
+  private float lockedAssociationMargin = Float.POSITIVE_INFINITY;
+  private String associationScores = "";
+
+  public float getLockedAssociationMargin() {
+    return lockedAssociationMargin;
+  }
+
+  public String getAssociationScores() {
+    return associationScores;
+  }
+
+  private void auditAssociations(List<Recognition> detections, int width, int height, long now) {
+    List<Assignment> all = new ArrayList<>();
+    StringBuilder log = new StringBuilder();
+    for (int i = 0; i < detections.size(); i++) {
+      Recognition detection = detections.get(i);
+      if (detection == null || detection.getLocation() == null) continue;
+      for (TargetTrack track : tracks) {
+        if (track.lastBbox == null) continue;
+        Match match = score(track, detection, width, height, now);
+        log.append("T")
+            .append(track.trackId)
+            .append(":D")
+            .append(i)
+            .append(":")
+            .append(match.score)
+            .append(":")
+            .append(match.accepted)
+            .append(";");
+        if (match.accepted) all.add(new Assignment(match, detection));
+      }
+    }
+    associationScores = log.toString();
+    all.sort(Comparator.comparingDouble((Assignment item) -> -item.match.score));
+    Assignment locked = null;
+    for (Assignment item : all)
+      if (item.match.track.trackId == lockedTrackId) {
+        locked = item;
+        break;
+      }
+    lockedAssociationMargin = Float.POSITIVE_INFINITY;
+    if (locked != null)
+      for (Assignment item : all) {
+        if (item == locked) continue;
+        if (item.match.track.trackId == lockedTrackId || item.detection == locked.detection)
+          lockedAssociationMargin =
+              Math.min(lockedAssociationMargin, locked.match.score - item.match.score);
+      }
+    lockedAssociationCompeting = lockedAssociationMargin < .15f;
+  }
+
+  public boolean isLockedAssociationCompeting() {
+    return lockedAssociationCompeting;
+  }
+
+  public void setGlobalAssociationEnabled(boolean enabled) {
+    globalAssociationEnabled = enabled;
+  }
 
   public void reset() {
+    lockedAssociationCompeting = false;
     tracks.clear();
     nextTrackId = 1;
     lockedTrackId = -1;
@@ -52,22 +122,44 @@ public class TargetTrackManager {
 
   public void update(List<Recognition> detections, int frameW, int frameH, long timestampMs) {
     List<Recognition> safeDetections = detections == null ? new ArrayList<>() : detections;
+    auditAssociations(safeDetections, frameW, frameH, timestampMs);
     Set<TargetTrack> matchedTracks = new HashSet<>();
     Set<Recognition> matchedDetections = new HashSet<>();
 
-    for (Recognition detection : safeDetections) {
-      if (detection == null || detection.getLocation() == null) continue;
-      Match best = null;
-      for (TargetTrack track : tracks) {
-        if (track.lastBbox == null || matchedTracks.contains(track)) continue;
-        Match match = score(track, detection, frameW, frameH);
-        if (!match.accepted) continue;
-        if (best == null || match.score > best.score) best = match;
+    if (globalAssociationEnabled) {
+      List<Assignment> assignments = new ArrayList<>();
+      for (Recognition detection : safeDetections) {
+        if (detection == null || detection.getLocation() == null) continue;
+        for (TargetTrack track : tracks) {
+          if (track.lastBbox == null) continue;
+          Match match = score(track, detection, frameW, frameH, timestampMs);
+          if (match.accepted) assignments.add(new Assignment(match, detection));
+        }
       }
-      if (best != null) {
-        best.track.update(detection, timestampMs, best.reason);
-        matchedTracks.add(best.track);
-        matchedDetections.add(detection);
+      assignments.sort(Comparator.comparingDouble((Assignment item) -> -item.match.score));
+      for (Assignment assignment : assignments) {
+        if (matchedTracks.contains(assignment.match.track)
+            || matchedDetections.contains(assignment.detection)) continue;
+        assignment.match.track.update(
+            assignment.detection, timestampMs, "global " + assignment.match.reason);
+        matchedTracks.add(assignment.match.track);
+        matchedDetections.add(assignment.detection);
+      }
+    } else {
+      for (Recognition detection : safeDetections) {
+        if (detection == null || detection.getLocation() == null) continue;
+        Match best = null;
+        for (TargetTrack track : tracks) {
+          if (track.lastBbox == null || matchedTracks.contains(track)) continue;
+          Match match = score(track, detection, frameW, frameH, timestampMs);
+          if (!match.accepted) continue;
+          if (best == null || match.score > best.score) best = match;
+        }
+        if (best != null) {
+          best.track.update(detection, timestampMs, best.reason);
+          matchedTracks.add(best.track);
+          matchedDetections.add(detection);
+        }
       }
     }
 
@@ -77,7 +169,9 @@ public class TargetTrackManager {
     }
 
     for (Recognition detection : safeDetections) {
-      if (detection == null || detection.getLocation() == null || matchedDetections.contains(detection)) {
+      if (detection == null
+          || detection.getLocation() == null
+          || matchedDetections.contains(detection)) {
         continue;
       }
       tracks.add(new TargetTrack(nextTrackId++, detection, timestampMs));
@@ -168,7 +262,9 @@ public class TargetTrackManager {
       return true;
     }
     boolean candidateStable =
-        candidate != null && candidate.isVisible() && candidate.stableFrames >= SUSPECTED_REPLACEMENT_STABLE_FRAMES;
+        candidate != null
+            && candidate.isVisible()
+            && candidate.stableFrames >= SUSPECTED_REPLACEMENT_STABLE_FRAMES;
     boolean clearlyBetter = candidateBelief >= suspectedBelief + SWITCH_BELIEF_DELTA;
     boolean currentWeak = !current.isVisible() || current.missedFrames > 0;
     boolean dwellSatisfied = suspectedDwellFrames >= SUSPECTED_MIN_DWELL_FRAMES;
@@ -250,17 +346,26 @@ public class TargetTrackManager {
     return track != null && track.trackId == lockedTrackId;
   }
 
-  private static Match score(TargetTrack track, Recognition detection, int frameW, int frameH) {
+  private static Match score(
+      TargetTrack track, Recognition detection, int frameW, int frameH, long timestampMs) {
     RectF current = detection.getLocation();
     RectF last = track.lastBbox;
     float diag = (float) Math.hypot(Math.max(1, frameW), Math.max(1, frameH));
     float centerJump = centerDistance(current, last) / Math.max(1f, diag);
     float areaRatio = area(current) / Math.max(1f, area(last));
     float iou = iou(current, last);
-    boolean accepted =
-        (centerJump <= CENTER_GATE_RATIO && areaRatio >= AREA_RATIO_MIN && areaRatio <= AREA_RATIO_MAX)
-            || iou >= IOU_SOFT_GATE;
-    float score = iou * 2.0f - centerJump - Math.abs(1f - areaRatio) * 0.25f;
+    RectF predicted = new RectF(last);
+    long dt = track.lastSeenTimestampMs - track.previousSeenTimestampMs;
+    if (track.previousBbox != null && dt > 0) {
+      float horizon = Math.max(0, timestampMs - track.lastSeenTimestampMs) / (float) dt;
+      predicted.offset(
+          (last.centerX() - track.previousBbox.centerX()) * horizon,
+          (last.centerY() - track.previousBbox.centerY()) * horizon);
+    }
+    float predictionError = centerDistance(current, predicted) / Math.max(1f, diag);
+    boolean accepted = centerJump <= CENTER_GATE_RATIO || predictionError <= .18f;
+    float sizePenalty = Math.min(1f, Math.abs((float) Math.log(Math.max(.0001f, areaRatio))));
+    float score = iou * 2f - centerJump - predictionError - sizePenalty * .25f;
     String reason =
         String.format(
             java.util.Locale.US, "iou=%.2f center=%.3f area=%.2f", iou, centerJump, areaRatio);
@@ -278,9 +383,10 @@ public class TargetTrackManager {
 
   private void updateLockedGhost(TargetTrack track, int frameW, long timestampMs) {
     if (track == null || track.lastBbox == null) return;
-    if (lockedGhostBbox != null) {
-      lockedGhostVelocityX = track.lastBbox.centerX() - lockedGhostCenterX;
-      lockedGhostVelocityY = track.lastBbox.centerY() - lockedGhostCenterY;
+    long dt = timestampMs - lockedGhostLastSeenMs;
+    if (lockedGhostBbox != null && dt > 0) {
+      lockedGhostVelocityX = (track.lastBbox.centerX() - lockedGhostCenterX) / dt;
+      lockedGhostVelocityY = (track.lastBbox.centerY() - lockedGhostCenterY) / dt;
     }
     lockedGhostBbox = new RectF(track.lastBbox);
     lockedGhostCenterX = track.lastBbox.centerX();
@@ -293,7 +399,7 @@ public class TargetTrackManager {
 
   private RectF predictedLockedGhost(long nowMs) {
     RectF ghost = new RectF(lockedGhostBbox);
-    float steps = Math.min(3f, Math.max(0f, (nowMs - lockedGhostLastSeenMs) / 250f));
+    float steps = Math.min(500f, Math.max(0f, nowMs - lockedGhostLastSeenMs));
     ghost.offset(lockedGhostVelocityX * steps, lockedGhostVelocityY * steps);
     return ghost;
   }
@@ -320,6 +426,69 @@ public class TargetTrackManager {
       this.accepted = accepted;
       this.score = score;
       this.reason = reason;
+    }
+  }
+
+  /**
+   * Associates high-confidence detections normally, then lets low-confidence detections revive only
+   * an existing locked or suspected track. Low-confidence detections never create tracks.
+   */
+  public TwoStageUpdateResult updateWithLowConfidence(
+      List<Recognition> highConfidence,
+      List<Recognition> lowConfidence,
+      int frameW,
+      int frameH,
+      long timestampMs) {
+    List<Recognition> allDetections =
+        new ArrayList<>(
+            highConfidence == null ? java.util.Collections.emptyList() : highConfidence);
+    if (lowConfidence != null) allDetections.addAll(lowConfidence);
+    auditAssociations(allDetections, frameW, frameH, timestampMs);
+    boolean competing = lockedAssociationCompeting;
+    float margin = lockedAssociationMargin;
+    String scores = associationScores;
+    update(highConfidence, frameW, frameH, timestampMs);
+    lockedAssociationCompeting = competing;
+    lockedAssociationMargin = margin;
+    associationScores = scores;
+    List<Recognition> continued = new ArrayList<>();
+    Set<TargetTrack> revivedTracks = new HashSet<>();
+    if (lowConfidence != null) {
+      for (Recognition detection : lowConfidence) {
+        if (detection == null || detection.getLocation() == null) continue;
+        Match best = null;
+        for (TargetTrack track : tracks) {
+          boolean eligible = track.trackId == lockedTrackId || track.trackId == suspectedTrackId;
+          if (!eligible
+              || track.isVisible()
+              || revivedTracks.contains(track)
+              || track.lastBbox == null) {
+            continue;
+          }
+          Match candidate = score(track, detection, frameW, frameH, timestampMs);
+          if (!candidate.accepted) continue;
+          if (best == null || candidate.score > best.score) best = candidate;
+        }
+        if (best == null) continue;
+        best.track.update(detection, timestampMs, "low_confidence " + best.reason);
+        revivedTracks.add(best.track);
+        continued.add(detection);
+      }
+    }
+    TargetTrack lockedTrack = getLockedTrack();
+    if (lockedTrack != null && lockedTrack.isVisible()) {
+      updateLockedGhost(lockedTrack, frameW, timestampMs);
+    }
+    return new TwoStageUpdateResult(continued);
+  }
+
+  private static class Assignment {
+    final Match match;
+    final Recognition detection;
+
+    Assignment(Match match, Recognition detection) {
+      this.match = match;
+      this.detection = detection;
     }
   }
 }
