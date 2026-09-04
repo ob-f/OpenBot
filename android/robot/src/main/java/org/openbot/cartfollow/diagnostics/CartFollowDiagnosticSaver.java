@@ -26,6 +26,7 @@ import org.openbot.cartfollow.TargetObservationEvidence;
 import org.openbot.cartfollow.TargetTrack;
 import org.openbot.cartfollow.TargetTrackManager;
 import org.openbot.tflite.Detector.Recognition;
+import org.openbot.vehicle.RangeTelemetrySnapshot;
 import timber.log.Timber;
 
 public class CartFollowDiagnosticSaver {
@@ -64,6 +65,9 @@ public class CartFollowDiagnosticSaver {
       String initializationDiscardReason,
       int distanceCalibrationSamples,
       long distanceCalibrationCompletedAtMs,
+      RangeTelemetrySnapshot rangeTelemetry,
+      boolean rangeFresh,
+      String rangeGateReason,
       Recognition locked,
       Recognition suspected,
       Recognition bestReid,
@@ -165,7 +169,10 @@ public class CartFollowDiagnosticSaver {
               initializationTrackId,
               initializationDiscardReason,
               distanceCalibrationSamples,
-              distanceCalibrationCompletedAtMs);
+              distanceCalibrationCompletedAtMs,
+              rangeTelemetry,
+              rangeFresh,
+              rangeGateReason);
           appendIdentityLog(
               session,
               frameNum,
@@ -286,7 +293,10 @@ public class CartFollowDiagnosticSaver {
       int initializationTrackId,
       String initializationDiscardReason,
       int distanceCalibrationSamples,
-      long distanceCalibrationCompletedAtMs) {
+      long distanceCalibrationCompletedAtMs,
+      RangeTelemetrySnapshot rangeTelemetry,
+      boolean rangeFresh,
+      String rangeGateReason) {
     SteeringEvidence snapshot =
         steering == null ? SteeringEvidence.unavailable("not_collected", 0) : steering;
     String row =
@@ -378,9 +388,23 @@ public class CartFollowDiagnosticSaver {
                 csv(initializationDiscardReason),
                 distanceCalibrationSamples,
                 distanceCalibrationCompletedAtMs)
+            + rangeColumns(rangeTelemetry, rangeFresh, rangeGateReason)
             + "\n";
     session.io.append(session.frameLogCsv, row);
     session.frameRows++;
+  }
+
+  static String rangeColumns(RangeTelemetrySnapshot telemetry, boolean fresh, String gateReason) {
+    if (telemetry == null) return ",0,-1,-1,0,,";
+    return String.format(
+        Locale.US,
+        ",%d,%d,%d,%d,%s,%s",
+        telemetry.capabilityAdvertised ? 1 : 0,
+        telemetry.minimumDistanceMm,
+        telemetry.receivedAtMs,
+        fresh ? 1 : 0,
+        csv(gateReason),
+        csv(telemetry.lastFirmwareError));
   }
 
   static String trackingColumns(org.openbot.cartfollow.TrackingDecision tracking) {

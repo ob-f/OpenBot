@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 import org.openbot.BuildConfig;
 import org.openbot.R;
 import org.openbot.vehicle.Control;
+import org.openbot.vehicle.RangeTelemetrySnapshot;
 
 /** Camera-based cart following with BLE manual control and guarded experimental autonomy. */
 public class RealCartFollowFragment extends BaseCartFollowFragment implements SensorEventListener {
@@ -25,6 +26,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   private static final long HANDSHAKE_RETRY_MS = 500L;
   private static final long AUTO_UNLOCK_HOLD_MS = 2000L;
   private static final long AUTO_LOG_INTERVAL_MS = 250L;
+  private static final long RANGE_STALE_MS = 250L;
   private static final int REAL_CART_PREDICTION_HORIZON_MS = 400;
   private static final String TUNING_PREFS = "real_cart_steering_tuning";
   private static final String TUNING_STRENGTH_KEY = "strength_percent";
@@ -39,6 +41,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   private boolean schedulerRunning;
   private long lastHandshakeRequestMs;
   private long lastAutoLogMs;
+  private String lastRangeStateKey = "";
+  private long lastFirmwareErrorAtMs = -1L;
+  private volatile org.openbot.cartfollow.diagnostics.CartFollowDiagnosticSession
+      activeDiagnosticSession;
   private RealCartAutoDriveController.Phase lastLoggedAutoPhase;
   private View activeManualButton;
   private String lastSessionEndReason = "none";
@@ -82,6 +88,8 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
           if (safetyController.getMode() == RealCartSafetyController.Mode.MANUAL
               && manualTouchRouter.getActiveControl() == null) {
             latestOutput = RealCartSafetyController.stop("manual_idle");
+          } else if (safetyController.getMode() == RealCartSafetyController.Mode.MANUAL) {
+            latestOutput = manualOutput(manualTouchRouter.getActiveControl(), now);
           }
           if (safetyController.getMode() == RealCartSafetyController.Mode.AUTO) {
             latestOutput = safetyController.refresh(now, searchController.poll(now, yaw));
@@ -89,6 +97,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
               finishAutoSession(latestOutput.reason, true);
           }
           sendOutput(latestOutput);
+          logRangeStatus(now);
           refreshRealUi();
           refreshFollowStatus();
           mainHandler.postDelayed(this, COMMAND_REPEAT_MS);
@@ -202,6 +211,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   @Override
   protected void onDiagnosticSessionChanged(
       org.openbot.cartfollow.diagnostics.CartFollowDiagnosticSession session) {
+    activeDiagnosticSession = session;
+    lastRangeStateKey = "";
+    lastFirmwareErrorAtMs = -1L;
+    if (session != null) session.setControlMode(controlModeName());
     if (vehicle != null)
       vehicle.setControlDiagnosticObserver(session == null ? null : session::control);
   }
@@ -247,6 +260,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   protected void onFollowFrame(FollowStateMachine.FrameResult frameResult) {
     long now = SystemClock.elapsedRealtime();
     latestOutput = safetyController.auto(frameResult, now, searchController.poll(now, yaw));
+    RangeTelemetrySnapshot range = vehicle.getRangeTelemetry();
+    frameResult.rangeTelemetry = range;
+    frameResult.rangeFresh = range.isFresh(now, RANGE_STALE_MS);
+    frameResult.rangeGateReason = "observation_only";
     logAutoDecision(frameResult);
     RealCartAutoDriveController.Result autoResult = safetyController.getAutoDriveResult();
     if (frameResult != null) frameResult.realDriveResult = autoResult;
@@ -368,6 +385,9 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   private void setMode(RealCartSafetyController.Mode mode) {
     invalidateManualControl("mode_change", true);
     safetyController.setMode(mode);
+    org.openbot.cartfollow.diagnostics.CartFollowDiagnosticSession session =
+        activeDiagnosticSession;
+    if (session != null) session.setControlMode(controlModeName());
     binding.startSwitch.setChecked(false);
     resetFollowSession();
     boolean auto = mode == RealCartSafetyController.Mode.AUTO;
@@ -471,18 +491,23 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   }
 
   private RealCartSafetyController.Output manualOutput(ManualControlArbiter.Control control) {
+    return manualOutput(control, SystemClock.elapsedRealtime());
+  }
+
+  private RealCartSafetyController.Output manualOutput(
+      ManualControlArbiter.Control control, long nowMs) {
     switch (control) {
       case FORWARD:
-        return safetyController.manual(manualForwardLogical, manualForwardLogical);
+        return safetyController.manual(manualForwardLogical, manualForwardLogical, nowMs);
       case BACKWARD:
         int reverseLogical = ManualSpeedProfile.reverseForForward(manualForwardLogical);
-        return safetyController.manual(-reverseLogical, -reverseLogical);
+        return safetyController.manual(-reverseLogical, -reverseLogical, nowMs);
       case LEFT:
         return safetyController.manual(
-            -RealCartSafetyController.MANUAL_TURN, RealCartSafetyController.MANUAL_TURN);
+            -RealCartSafetyController.MANUAL_TURN, RealCartSafetyController.MANUAL_TURN, nowMs);
       case RIGHT:
         return safetyController.manual(
-            RealCartSafetyController.MANUAL_TURN, -RealCartSafetyController.MANUAL_TURN);
+            RealCartSafetyController.MANUAL_TURN, -RealCartSafetyController.MANUAL_TURN, nowMs);
       default:
         return RealCartSafetyController.stop("manual_unknown");
     }
@@ -607,6 +632,45 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     }
   }
 
+  private void logRangeStatus(long now) {
+    org.openbot.cartfollow.diagnostics.CartFollowDiagnosticSession session =
+        activeDiagnosticSession;
+    if (!isDiagnosticLoggingEnabled() || session == null || vehicle == null) return;
+    RangeTelemetrySnapshot telemetry = vehicle.getRangeTelemetry();
+    boolean fresh = telemetry.isFresh(now, RANGE_STALE_MS);
+    RealCartSafetyController.Output requested = latestOutput;
+    session.range(
+        telemetry,
+        now,
+        fresh,
+        requested == null ? 0 : requested.left,
+        requested == null ? 0 : requested.right);
+    String stateKey =
+        (telemetry.capabilityAdvertised ? "1" : "0")
+            + ":"
+            + (telemetry.hasReading ? "1" : "0")
+            + ":"
+            + (fresh ? "1" : "0");
+    if (!stateKey.equals(lastRangeStateKey)) {
+      lastRangeStateKey = stateKey;
+      logControl(
+          "range_state",
+          "capability="
+              + (telemetry.capabilityAdvertised ? 1 : 0)
+              + ",minimum_mm="
+              + telemetry.minimumDistanceMm
+              + ",age_ms="
+              + (telemetry.ageMs(now) == Long.MAX_VALUE ? -1L : telemetry.ageMs(now))
+              + ",fresh="
+              + (fresh ? 1 : 0)
+              + ",android_behavior=observation_only");
+    }
+    if (telemetry.firmwareErrorAtMs >= 0L && telemetry.firmwareErrorAtMs != lastFirmwareErrorAtMs) {
+      lastFirmwareErrorAtMs = telemetry.firmwareErrorAtMs;
+      logControl("firmware_error", telemetry.lastFirmwareError);
+    }
+  }
+
   private void finishAutoSession(String reason, boolean revokeUnlock) {
     if (Looper.myLooper() != Looper.getMainLooper()) {
       mainHandler.post(() -> finishAutoSession(reason, revokeUnlock));
@@ -673,6 +737,16 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
 
   private void sendReplacementOutput(RealCartSafetyController.Output output, long generation) {
     if (vehicle == null || output == null) return;
+    recordControlEvent(
+        "control_submit",
+        "requested=c"
+            + output.left
+            + ","
+            + output.right
+            + ";reason="
+            + output.reason
+            + ";replacement_generation="
+            + generation);
     int multiplier = Math.max(1, vehicle.getSpeedMultiplier());
     vehicle.setControlReplacing(
         new Control(output.left / (float) multiplier, output.right / (float) multiplier),
@@ -702,6 +776,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     Log.i(
         SESSION_LOG_TAG,
         "ms=" + SystemClock.elapsedRealtime() + ",event=" + event + ",reason=" + reason);
+  }
+
+  private String controlModeName() {
+    return safetyController.getMode() == RealCartSafetyController.Mode.AUTO ? "auto" : "manual";
   }
 
   static String commandForAutoResult(RealCartAutoDriveController.Result result) {
@@ -828,6 +906,19 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
               String output =
                   latestOutput == null ? "0,0" : latestOutput.left + "," + latestOutput.right;
               ManualControlArbiter.Control active = manualTouchRouter.getActiveControl();
+              long now = SystemClock.elapsedRealtime();
+              RangeTelemetrySnapshot range = vehicle.getRangeTelemetry();
+              long rangeAge = range.ageMs(now);
+              String rangeText =
+                  range.capabilityAdvertised
+                      ? range.hasReading
+                          ? range.minimumDistanceMm
+                              + " mm / age="
+                              + rangeAge
+                              + " ms / "
+                              + (range.isFresh(now, RANGE_STALE_MS) ? "fresh" : "stale")
+                          : "等待首个 s<cm>"
+                      : "固件未声明 :s:";
               binding.realConnectionStatus.setText(
                   connection
                       + "\n发送 c"
@@ -837,7 +928,13 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
                       + " | ble="
                       + vehicle.getBleWriteStatus()
                       + " | build="
-                      + BuildConfig.VERSION_NAME);
+                      + BuildConfig.VERSION_NAME
+                      + "\n测距(min/source unknown)="
+                      + rangeText
+                      + " | Android=observation_only"
+                      + (range.lastFirmwareError.isEmpty()
+                          ? ""
+                          : "\nfirmware=" + range.lastFirmwareError));
               boolean emergency = safetyController.isEmergencyLatched();
               binding.emergencyStop.setEnabled(!emergency);
               binding.unlockAuto.setEnabled(!emergency && vehicle.isCartFirmwareReady());
@@ -845,9 +942,32 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
                 binding.realSafetyNotice.setVisibility(View.VISIBLE);
                 binding.realSafetyNotice.setText("急停已锁存，请重启 ESP32 后重新连接");
               } else {
-                binding.realSafetyNotice.setText("近场传感器未接入，仅限空旷实验");
+                binding.realSafetyNotice.setVisibility(View.VISIBLE);
+                if (!range.capabilityAdvertised) {
+                  binding.realSafetyNotice.setText("Android 仅记录：固件未声明测距能力；ESP32 仍可能本地拒绝运动");
+                } else if (!range.isFresh(now, RANGE_STALE_MS)) {
+                  binding.realSafetyNotice.setText("Android 仅记录：测距不可用或过期；ESP32 仍可能本地拒绝运动");
+                } else {
+                  binding.realSafetyNotice.setText(
+                      "Android 仅记录三路最小值 " + range.minimumDistanceMm + " mm；ESP32 旧固件仍可能按单路传感器拒绝运动");
+                }
               }
             });
+  }
+
+  @Override
+  protected String additionalDebugInfo() {
+    long now = SystemClock.elapsedRealtime();
+    RangeTelemetrySnapshot range = vehicle.getRangeTelemetry();
+    long age = range.ageMs(now);
+    return String.format(
+        java.util.Locale.US,
+        "rangeProtocol=V1+s capability=%s\nrangeMinMm=%d ageMs=%d fresh=%s source=three_way_min_unknown\nandroidRangeBehavior=observation_only\nfirmwareMayRejectMotion=true\nfirmwareError=%s",
+        range.capabilityAdvertised,
+        range.minimumDistanceMm,
+        age == Long.MAX_VALUE ? -1L : age,
+        range.isFresh(now, RANGE_STALE_MS),
+        range.lastFirmwareError.isEmpty() ? "-" : range.lastFirmwareError);
   }
 
   private void updateSteeringUi(SteeringEvidence evidence) {

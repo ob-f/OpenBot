@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.*;
+import org.json.JSONObject;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
@@ -98,6 +99,7 @@ public class OfflineDiagnosticTest {
                 "identity_log.csv",
                 "candidate_log.csv",
                 "control_log.csv",
+                "range_log.csv",
                 "gallery_provenance.jsonl")));
     assertEquals(
         "complete",
@@ -107,6 +109,55 @@ public class OfflineDiagnosticTest {
         "真实小车",
         DiagnosticRecordsActivity.readJson(new File(session.sessionDir, "session_info.json"))
             .getString("app_mode"));
+  }
+
+  @Test
+  public void manualOnlySessionRecordsControlModeRangeSamplesAndFirmwareErrors() throws Exception {
+    CartFollowDiagnosticSession session = new CartFollowDiagnosticSession(temp.getRoot());
+    session.mode = "真实小车";
+    session.setControlMode("manual");
+    session.writeSessionInfo(new CartFollowDiagnosticConfig(), "test", .5f, true, 0, true, 90);
+    session.control("touch_down", "direction=FORWARD");
+    session.control("control_submit", "requested=c14,14;reason=manual");
+    org.openbot.vehicle.RangeTelemetrySnapshot range =
+        org.openbot.vehicle.RangeTelemetrySnapshot.unavailable()
+            .withCapability(true)
+            .withReading(250, 1000L)
+            .withFirmwareError("!ERR,sensor_center_near", 1010L);
+    session.range(range, 1020L, true, 14, 14);
+    session.finish("manual_test");
+    assertTrue(session.io.awaitClosed(5000));
+
+    String controls =
+        new String(Files.readAllBytes(session.controlLogCsv.toPath()), StandardCharsets.UTF_8);
+    String ranges =
+        new String(Files.readAllBytes(session.rangeLogCsv.toPath()), StandardCharsets.UTF_8);
+    JSONObject summary =
+        DiagnosticRecordsActivity.readJson(new File(session.sessionDir, "summary.json"));
+    assertTrue(controls.startsWith("session_id,monotonic_ms"));
+    assertTrue(controls.contains("details,control_mode"));
+    assertTrue(controls.contains("\"touch_down\",\"direction=FORWARD\",\"manual\""));
+    assertTrue(ranges.contains("minimum_mm,age_ms,fresh,capability,has_reading,control_mode"));
+    assertTrue(ranges.contains(",250,20,1,1,1,\"manual\",14,14,\"observation_only\""));
+    assertTrue(ranges.contains("!ERR,sensor_center_near"));
+    assertEquals("manual", summary.getString("control_modes"));
+  }
+
+  @Test
+  public void sessionSummaryMarksManualAndAutoModeAsMixed() throws Exception {
+    CartFollowDiagnosticSession session = new CartFollowDiagnosticSession(temp.getRoot());
+    session.setControlMode("manual");
+    session.control("control_submit", "requested=c14,14");
+    session.setControlMode("auto");
+    session.control("control_submit", "requested=c18,18");
+    session.finish("mixed_test");
+    assertTrue(session.io.awaitClosed(5000));
+    JSONObject summary =
+        DiagnosticRecordsActivity.readJson(new File(session.sessionDir, "summary.json"));
+    String controls =
+        new String(Files.readAllBytes(session.controlLogCsv.toPath()), StandardCharsets.UTF_8);
+    assertEquals("mixed", summary.getString("control_modes"));
+    assertTrue(controls.contains("\"mode_changed\",\"from=manual,to=auto\",\"auto\""));
   }
 
   @Test

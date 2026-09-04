@@ -75,6 +75,10 @@ public class DiagnosticRecordsActivity extends AppCompatActivity {
                         ? "不完整"
                         : completion.equals("error") ? "写入异常" : completion;
             String mode = info.optString("app_mode", "未知模式");
+            String controlModes = summary.optString("control_modes", "unknown");
+            if (controlModes.equals("manual")) mode += " · 遥控";
+            else if (controlModes.equals("auto")) mode += " · 自动";
+            else if (controlModes.equals("mixed")) mode += " · 遥控/自动混合";
             rows.add(
                 dir.getName()
                     + "\n"

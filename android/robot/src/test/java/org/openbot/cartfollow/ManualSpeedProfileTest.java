@@ -7,10 +7,12 @@ import org.junit.Test;
 public class ManualSpeedProfileTest {
   @Test
   public void stagedForwardLevelsMatchVelocityFirmware() {
-    assertEquals(103, ManualSpeedProfile.estimatedMmps(9));
-    assertEquals(160, ManualSpeedProfile.estimatedMmps(14));
-    assertEquals(206, ManualSpeedProfile.estimatedMmps(18));
-    assertEquals(240, ManualSpeedProfile.estimatedMmps(21));
+    assertEquals(154, ManualSpeedProfile.estimatedMmps(9));
+    assertEquals(240, ManualSpeedProfile.estimatedMmps(14));
+    assertEquals(343, ManualSpeedProfile.estimatedMmps(16));
+    assertEquals(446, ManualSpeedProfile.estimatedMmps(18));
+    assertEquals(549, ManualSpeedProfile.estimatedMmps(20));
+    assertEquals(600, ManualSpeedProfile.estimatedMmps(21));
   }
 
   @Test

@@ -161,9 +161,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
                   }
                   break;
                 case 's':
-                  if (FormatUtils.isNumeric(body)) {
-                    vehicle.setSonarReading(Float.parseFloat(body));
-                  }
+                  vehicle.processSonarMessage(body);
                   break;
                 case 'w':
                   String[] itemList = body.split(",");
@@ -176,6 +174,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
                   break;
                 case 'b':
                   // do nothing
+                  break;
+                case '!':
+                  vehicle.recordFirmwareError(data);
                   break;
               }
 
@@ -244,9 +245,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
             commandType = Constants.CMD_DRIVE;
           } else if (event.has("server")) {
             for (int i = 0; i < serverSpinner.getAdapter().getCount(); i++) {
-              if(event.getString("server").equals("noServerFound")){
+              if (event.getString("server").equals("noServerFound")) {
                 serverSpinner.setSelection(0);
-              } else if(event.getString("server").equals(serverSpinner.getAdapter().getItem(i))){
+              } else if (event.getString("server").equals(serverSpinner.getAdapter().getItem(i))) {
                 serverSpinner.setSelection(i);
               }
             }
@@ -295,7 +296,10 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
         error -> {
           Log.d(null, "Error occurred in ControllerToBotEventBus: " + error);
         },
-        event -> event.has("command") || event.has("driveCmd") || event.has("server") // filter out everything else
+        event ->
+            event.has("command")
+                || event.has("driveCmd")
+                || event.has("server") // filter out everything else
         );
   }
 
@@ -453,7 +457,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
     if (modelAdapter != null && modelAdapter.getPosition(model) == -1) {
       modelAdapter.add(model);
       masterList.add(item);
-      FileUtils.updateModelConfig(requireActivity(), requireContext(),masterList,false);
+      FileUtils.updateModelConfig(requireActivity(), requireContext(), masterList, false);
     } else {
       if (model.equals(modelSpinner.getSelectedItem())) {
         setModel(item);

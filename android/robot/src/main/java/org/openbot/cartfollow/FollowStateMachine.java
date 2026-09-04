@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.openbot.tflite.Detector.Recognition;
 import org.openbot.vehicle.Control;
+import org.openbot.vehicle.RangeTelemetrySnapshot;
 
 public class FollowStateMachine {
 
@@ -60,6 +61,9 @@ public class FollowStateMachine {
     public String initializationDiscardReason = "";
     public int distanceCalibrationSampleCount;
     public long distanceCalibrationCompletedAtMs;
+    public RangeTelemetrySnapshot rangeTelemetry;
+    public boolean rangeFresh;
+    public String rangeGateReason = "";
 
     public FrameResult(
         FollowState state,
