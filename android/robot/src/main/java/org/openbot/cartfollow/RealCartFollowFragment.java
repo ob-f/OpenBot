@@ -158,7 +158,11 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   @Override
   public synchronized void onResume() {
     super.onResume();
-    if (binding != null && !searchEnabled) binding.realSearchEnabled.setChecked(false);
+    searchEnabled = true;
+    if (binding != null) {
+      binding.realSearchEnabled.setChecked(true);
+      applyFollowSettings();
+    }
     safetyController.setForeground(true);
     registerYawSensors();
     if (vehicle.isBleSerialReady()) vehicle.startHeartbeat();
@@ -257,6 +261,11 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     RealCartSearchController.Result search = searchController.update(frame, now, yaw);
     frame.directedReacquireEvidence = search.evidence;
     if (searchController.consumeEnterRequest()) stateMachine.enterDirectedReacquire();
+    if (search.evidence.phase == DirectedReacquireEvidence.Phase.COMPLETE) {
+      org.openbot.tflite.Detector.Recognition target =
+          frame.target != null ? frame.target : frame.candidate;
+      stateMachine.acceptDirectedContinuityRecovery(target);
+    }
   }
 
   @Override
@@ -291,9 +300,19 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     if (frameResult != null && latestOutput.isStop()) {
       switch (frameResult.state) {
         case CAPTURE_TARGET:
-          return "正在采集目标 · c0,0";
+          return (frameResult.distanceDiagnosticText == null
+                      || frameResult.distanceDiagnosticText.isEmpty()
+                  ? "正在采集目标"
+                  : frameResult.distanceDiagnosticText)
+              + " · c0,0";
         case LOCKED_PENDING_CONFIRM:
           return "请确认目标 · c0,0";
+        case DISTANCE_CALIBRATION:
+          return (frameResult.distanceDiagnosticText == null
+                      || frameResult.distanceDiagnosticText.isEmpty()
+                  ? "已确认，正在距离标定"
+                  : frameResult.distanceDiagnosticText)
+              + " · c0,0";
         case CONFIRMED_ARMED:
         case REACQUIRE_TARGET:
           return "已确认，正在重识别 · c0,0";
@@ -352,6 +371,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     binding.startSwitch.setChecked(false);
     resetFollowSession();
     boolean auto = mode == RealCartSafetyController.Mode.AUTO;
+    if (auto) searchEnabled = true;
     binding.manualDriveControls.setVisibility(auto ? View.GONE : View.VISIBLE);
     binding.manualSpeedPanel.setVisibility(auto ? View.GONE : View.VISIBLE);
     binding.unlockAuto.setVisibility(auto ? View.VISIBLE : View.GONE);
@@ -360,6 +380,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     binding.simulatorExperimentScroll.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.simulatorExperimentPanel.setVisibility(auto ? View.VISIBLE : View.GONE);
     binding.startSwitch.setEnabled(false);
+    if (auto) {
+      binding.realSearchEnabled.setChecked(true);
+      applyFollowSettings();
+    }
     configureResponsiveLayout(binding.getRoot().getWidth(), binding.getRoot().getHeight());
     refreshRealUi();
   }
@@ -595,10 +619,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     latestOutput = safetyController.resetAutoDrive(reason, revokeUnlock);
     sendOutput(latestOutput);
     if (binding.startSwitch.isChecked()) binding.startSwitch.setChecked(false);
-    searchEnabled = false;
-    binding.realSearchEnabled.setChecked(false);
+    searchEnabled = true;
+    binding.realSearchEnabled.setChecked(true);
     searchController.configure(
-        false,
+        true,
         followSettings.searchSpeed,
         followSettings.searchAngle,
         followSettings.searchTimeoutMs);
@@ -765,6 +789,16 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
             + result.intent
             + ",gear="
             + result.gear
+            + ",aim="
+            + result.aimDecision.mode
+            + ",aim_allowed="
+            + result.aimDecision.allowed
+            + ",translation_allowed="
+            + result.translationDecision.allowed
+            + ",translation_max_gear="
+            + result.translationDecision.maximumGear
+            + ",maximum_distance_multiplier="
+            + followSettings.maximumDistanceMultiplier
             + ",identity="
             + (frame == null || frame.simulatorIdentity == null
                 ? "NONE"
@@ -920,7 +954,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   void installFollowExperiments() {
     followSettings =
         RealFollowSettings.load(requireContext().getSharedPreferences(RealFollowSettings.PREFS, 0));
-    searchEnabled = false;
+    searchEnabled = true;
     compactAutoLayout = false;
     compactViews = null;
     compactParents = null;
@@ -944,7 +978,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
         followSettings.maximumGear == 21
             ? R.id.auto_gear_21
             : followSettings.maximumGear == 18 ? R.id.auto_gear_18 : R.id.auto_gear_14);
-    binding.realSearchEnabled.setChecked(false);
+    binding.realSearchEnabled.setChecked(true);
     android.view.ViewGroup strengthParent =
         (android.view.ViewGroup) binding.steeringStrengthPanel.getParent();
     if (strengthParent != binding.simulatorExperimentPanel) {
@@ -956,6 +990,8 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     binding.searchSpeedSlider.setValue(followSettings.searchSpeed);
     binding.searchAngleSlider.setValue(followSettings.searchAngle);
     binding.searchTimeoutSlider.setValue(followSettings.searchTimeoutMs / 1000f);
+    binding.maximumDistanceSlider.setValue(followSettings.maximumDistanceMultiplier);
+    updateMaximumDistanceUi();
     binding.galleryModeGroup.addOnButtonCheckedListener(
         (group, id, checked) -> {
           if (!checked || binding.startSwitch.isChecked()) return;
@@ -997,6 +1033,12 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
         (slider, value, user) -> {
           if (binding.startSwitch.isChecked()) return;
           followSettings.searchTimeoutMs = Math.round(value * 1000);
+          applyFollowSettings();
+        });
+    binding.maximumDistanceSlider.addOnChangeListener(
+        (slider, value, user) -> {
+          if (binding.startSwitch.isChecked()) return;
+          followSettings.maximumDistanceMultiplier = Math.round(value * 20f) / 20f;
           applyFollowSettings();
         });
     binding.gyroTestLeft.setOnClickListener(v -> startYawTest(SteeringEvidence.Direction.LEFT));
@@ -1089,6 +1131,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     configureFollowPolicy(policy);
     configureRecentGallery(followSettings.dynamicGallery && followSettings.recent);
     safetyController.setMaximumGear(followSettings.maximumGear);
+    stateMachine.setMaximumDistanceMultiplier(followSettings.maximumDistanceMultiplier);
     searchController.configure(
         policy.directedSearch,
         followSettings.searchSpeed,
@@ -1104,6 +1147,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     binding.searchAngleValue.setText("最大搜索角度 " + followSettings.searchAngle + "°");
     binding.searchTimeoutValue.setText(
         "搜索总时限 " + followSettings.searchTimeoutMs / 1000f + " 秒（含制动与验证）");
+    updateMaximumDistanceUi();
     setExperimentControlsEnabled(!binding.startSwitch.isChecked());
   }
 
@@ -1126,6 +1170,17 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     binding.searchSpeedSlider.setEnabled(enabled && searchEnabled);
     binding.searchAngleSlider.setEnabled(enabled && searchEnabled);
     binding.searchTimeoutSlider.setEnabled(enabled && searchEnabled);
+    binding.maximumDistanceSlider.setEnabled(enabled);
+  }
+
+  private void updateMaximumDistanceUi() {
+    if (binding == null) return;
+    float stop = Math.max(1f, followSettings.maximumDistanceMultiplier - .08f);
+    binding.maximumDistanceValue.setText(
+        getString(
+            R.string.cart_follow_maximum_distance_format,
+            followSettings.maximumDistanceMultiplier,
+            stop));
   }
 
   private void registerYawSensors() {

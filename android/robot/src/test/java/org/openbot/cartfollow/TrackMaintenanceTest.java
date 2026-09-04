@@ -163,7 +163,7 @@ public class TrackMaintenanceTest {
                 "target",
                 "person",
                 .99f,
-                new RectF(80 - h / 6, 200 - h / 2, 80 + h / 6, 200 + h / 2),
+                new RectF(200 - h / 6, 200 - h / 2, 200 + h / 6, 200 + h / 2),
                 0);
         SimulatorAutomaticRecoveryIntegrationTest.Step step = flow.step(300, r);
         assertTrue("frame " + i + ": " + step.permit.reason, step.permit.isContinuous());

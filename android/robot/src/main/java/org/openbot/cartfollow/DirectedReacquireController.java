@@ -7,9 +7,9 @@ public final class DirectedReacquireController {
   private static final long HISTORY_MS = 800L;
   private static final long STRONG_IDENTITY_MS = 1000L;
   private static final float EPSILON = 0.000001f;
-  private int speed = 18;
-  private float targetDegrees = 90f;
-  private long timeoutMs = 5000L;
+  private int speed = 5;
+  private float targetDegrees = 180f;
+  private long timeoutMs = 10000L;
   private SteeringEvidence.Direction exitDirection = SteeringEvidence.Direction.NONE;
   private long exitEvidenceMs = -1L;
   private TargetObservationEvidence previous;
@@ -35,6 +35,11 @@ public final class DirectedReacquireController {
   private int freshReidCount;
   private long lastReidId;
   private long lastFreshReidMs = -1L;
+  private int continuityRecoveryTrackId = -1;
+  private int continuityRecoveryFrames;
+  private long continuityRecoveryFirstMs = -1L;
+  private float continuityRecoveryLastCenter = Float.NaN;
+  private long candidatePauseStartedMs = -1L;
   private DirectedReacquireEvidence terminal;
   private DirectedReacquireEvidence parked;
   private long parkedAtMs = -1L;
@@ -42,7 +47,7 @@ public final class DirectedReacquireController {
   public synchronized void configure(int speed, float targetDegrees, long timeoutMs) {
     this.speed = Math.max(5, Math.min(21, speed));
     this.targetDegrees =
-        Float.isFinite(targetDegrees) ? Math.max(30f, Math.min(180f, targetDegrees)) : 90f;
+        Float.isFinite(targetDegrees) ? Math.max(30f, Math.min(180f, targetDegrees)) : 180f;
     this.timeoutMs = Math.max(1000L, Math.min(10000L, timeoutMs));
   }
 
@@ -92,6 +97,8 @@ public final class DirectedReacquireController {
     TargetObservationEvidence o = frame.targetObservation;
     int candidates = candidateCount(frame);
     boolean current = validObservation(o, nowMs);
+    if (candidates == 0) candidatePauseStartedMs = -1L;
+    else if (candidatePauseStartedMs < 0L) candidatePauseStartedMs = nowMs;
     boolean verifiedFollow =
         current
             && candidates == 1
@@ -188,11 +195,11 @@ public final class DirectedReacquireController {
           && !o.lowConfidence
           && recoveryIdentityValid(frame, o)) {
         if (recoveryTrackId != o.trackId) {
-          clearRecovery();
+          clearStrongRecovery();
           recoveryTrackId = o.trackId;
         }
         if (lastFreshReidMs >= 0L && nowMs - lastFreshReidMs > 500L) {
-          clearRecovery();
+          clearStrongRecovery();
           recoveryTrackId = o.trackId;
         }
         long id = reidId(frame);
@@ -202,10 +209,11 @@ public final class DirectedReacquireController {
           lastFreshReidMs = nowMs;
         }
       } else {
-        clearRecovery();
+        clearStrongRecovery();
       }
+      updateContinuityRecovery(frame, o, candidates, current, nowMs);
     }
-    boolean recovered =
+    boolean strongRecovered =
         current
             && candidates == 1
             && o.belief >= 0.75f
@@ -215,7 +223,31 @@ public final class DirectedReacquireController {
             && lastFreshReidMs >= 0L
             && nowMs - lastFreshReidMs <= 500L
             && (frame.state == FollowState.FOLLOW || frame.state == FollowState.FOLLOW_CAUTION);
+    boolean continuityRecovered =
+        current
+            && candidates == 1
+            && continuityRecoveryFrames >= 3
+            && continuityRecoveryFirstMs >= 0L
+            && nowMs - continuityRecoveryFirstMs >= 100L
+            && associationUnique(frame, o);
+    boolean recovered = strongRecovered || continuityRecovered;
     if (recovered) {
+      if (continuityRecovered) {
+        DirectedReacquireEvidence done =
+            evidence(
+                DirectedReacquireEvidence.Phase.COMPLETE,
+                yaw,
+                nowMs,
+                false,
+                "recovered_by_continuity");
+        active = false;
+        enterRequested = false;
+        clearExit();
+        clearRecovery();
+        missingFrames = 0;
+        missingSinceMs = -1L;
+        return done;
+      }
       if (settleStartedMs < 0L) settleStartedMs = nowMs;
       if (nowMs - settleStartedMs >= 300L) {
         DirectedReacquireEvidence done =
@@ -237,7 +269,7 @@ public final class DirectedReacquireController {
     }
     settleStartedMs = -1L;
     // Persistent rejected candidates remain stopped; they cannot cause spin/stop chatter.
-    if (candidates > 0)
+    if (candidates > 0 && (candidatePauseStartedMs < 0L || nowMs - candidatePauseStartedMs < 500L))
       return evidence(
           DirectedReacquireEvidence.Phase.VERIFYING,
           yaw,
@@ -431,10 +463,70 @@ public final class DirectedReacquireController {
   }
 
   private void clearRecovery() {
+    clearStrongRecovery();
+    clearContinuityRecovery();
+    candidatePauseStartedMs = -1L;
+  }
+
+  private void clearStrongRecovery() {
     recoveryTrackId = -1;
     freshReidCount = 0;
     lastFreshReidMs = -1L;
     settleStartedMs = -1L;
+  }
+
+  private void updateContinuityRecovery(
+      FollowStateMachine.FrameResult frame,
+      TargetObservationEvidence o,
+      int candidates,
+      boolean current,
+      long nowMs) {
+    if (!current || candidates != 1 || !associationUnique(frame, o)) {
+      clearContinuityRecovery();
+      return;
+    }
+    float center = o.screenBox.centerX();
+    boolean entersExpectedEdge =
+        exitDirection == SteeringEvidence.Direction.LEFT
+            ? o.screenBox.left <= .25f
+            : exitDirection == SteeringEvidence.Direction.RIGHT && o.screenBox.right >= .75f;
+    if (continuityRecoveryTrackId != o.trackId) {
+      clearContinuityRecovery();
+      if (!entersExpectedEdge) {
+        if (candidatePauseStartedMs < 0L) candidatePauseStartedMs = nowMs;
+        return;
+      }
+      continuityRecoveryTrackId = o.trackId;
+      continuityRecoveryFrames = 1;
+      continuityRecoveryFirstMs = nowMs;
+      continuityRecoveryLastCenter = center;
+      candidatePauseStartedMs = nowMs;
+      return;
+    }
+    boolean inward =
+        exitDirection == SteeringEvidence.Direction.LEFT
+            ? center >= continuityRecoveryLastCenter + .003f
+            : center <= continuityRecoveryLastCenter - .003f;
+    if (inward || Math.abs(center - .5f) < Math.abs(continuityRecoveryLastCenter - .5f)) {
+      continuityRecoveryFrames++;
+      continuityRecoveryLastCenter = center;
+    }
+  }
+
+  private void clearContinuityRecovery() {
+    continuityRecoveryTrackId = -1;
+    continuityRecoveryFrames = 0;
+    continuityRecoveryFirstMs = -1L;
+    continuityRecoveryLastCenter = Float.NaN;
+  }
+
+  private static boolean associationUnique(
+      FollowStateMachine.FrameResult frame, TargetObservationEvidence o) {
+    return o != null
+        && o.current
+        && (frame.trackingDecision == null
+            || (frame.trackingDecision.trackId == o.trackId
+                && frame.trackingDecision.associationUnique));
   }
 
   private static boolean recoveryIdentityValid(
@@ -464,6 +556,7 @@ public final class DirectedReacquireController {
   }
 
   private static int candidateCount(FollowStateMachine.FrameResult frame) {
+    if (frame.identityCandidates != null) return frame.identityCandidates.size();
     int count =
         (frame.persons == null ? 0 : frame.persons.size())
             + (frame.detectionTierEvidence == null

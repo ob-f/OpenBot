@@ -27,7 +27,11 @@ public final class RealCartAutoDriveController {
   public static final int MIN_STEERING_STRENGTH_PERCENT = 20;
   public static final int MAX_STEERING_STRENGTH_PERCENT = 200;
   public static final int CENTER_DEMAND_PERCENT = 10;
-  public static final float START_HEIGHT_SCALE = 0.80f;
+  public static final float AIM_PIVOT_ENTER_ERROR = 0.18f;
+  public static final float AIM_PIVOT_EXIT_ERROR = 0.08f;
+  public static final float AIM_EDGE_PIVOT_ERROR = 0.35f;
+  public static final int AIM_CENTERED_FRAMES = 3;
+  public static final int AIM_PIVOT_SPEED = 5;
   public static final int START_STABLE_FRAMES = 3;
   public static final long RECOVERY_LIMIT_MS = 2000L;
 
@@ -45,6 +49,8 @@ public final class RealCartAutoDriveController {
     public final boolean lockout;
     public final Intent intent;
     public final int gear;
+    public final AimDecision aimDecision;
+    public final TranslationDecision translationDecision;
 
     private Result(
         int left,
@@ -53,7 +59,9 @@ public final class RealCartAutoDriveController {
         String reason,
         SteeringEvidence evidence,
         float heightScale,
-        boolean lockout) {
+        boolean lockout,
+        AimDecision aimDecision,
+        TranslationDecision translationDecision) {
       this.left = phase == Phase.PIVOT ? Math.max(-21, Math.min(21, left)) : clamp(left);
       this.right = phase == Phase.PIVOT ? Math.max(-21, Math.min(21, right)) : clamp(right);
       this.intent =
@@ -70,6 +78,9 @@ public final class RealCartAutoDriveController {
       this.level = evidence == null ? SteeringEvidence.Level.CENTER : evidence.level;
       this.heightScale = heightScale;
       this.lockout = lockout;
+      this.aimDecision = aimDecision == null ? AimDecision.blocked(reason) : aimDecision;
+      this.translationDecision =
+          translationDecision == null ? TranslationDecision.block(reason) : translationDecision;
     }
 
     public boolean isStop() {
@@ -105,6 +116,9 @@ public final class RealCartAutoDriveController {
   private int maximumGear = 21;
   private long lastFrameSequence = -1L;
   private long targetMissingStartMs = -1L;
+  private boolean aimPivoting;
+  private SteeringEvidence.Direction aimPivotDirection = SteeringEvidence.Direction.NONE;
+  private int aimCenteredFrames;
   private Result lastResult = stopped(Phase.LOCKED, "auto_locked", false, null, Float.NaN);
 
   public synchronized Result update(FollowStateMachine.FrameResult frame, long nowMs) {
@@ -140,27 +154,40 @@ public final class RealCartAutoDriveController {
           identity == null ? "identity_unavailable" : identity.reason);
 
     targetMissingStartMs = -1L;
-    if ((decision.selectedAction != BehaviorAction.FOLLOW_SLOW
-            && decision.selectedAction != BehaviorAction.FOLLOW_CAUTION)
-        || (frame.state != FollowState.FOLLOW && frame.state != FollowState.FOLLOW_CAUTION)
-        || frame.distanceEstimate == null
-        || frame.distanceEstimate.state != DistanceState.TOO_FAR
-        || !isFinite(heightScale)) {
-      return stopNonRecovery(
-          Phase.WAIT_TARGET, decision.selectedAction.name().toLowerCase(), evidence, heightScale);
-    }
+    if (frame.state != FollowState.FOLLOW && frame.state != FollowState.FOLLOW_CAUTION)
+      return stopNonRecovery(Phase.WAIT_TARGET, "not_following", evidence, heightScale);
     if (evidence == null || !evidence.valid) {
       return stopNonRecovery(Phase.WAIT_TARGET, "steering_unavailable", evidence, heightScale);
     }
 
+    AimDecision aim = decideAim(evidence, frame.distanceEstimate);
+    TranslationDecision translation = decideTranslation(frame, decision, heightScale);
+    if (aim.pivots()) {
+      maintainedStart.reset();
+      moving = false;
+      centeredFrames = 0;
+      gears.reset();
+      boolean left = aim.mode == AimDecision.Mode.PIVOT_LEFT;
+      return remember(
+          new Result(
+              left ? -AIM_PIVOT_SPEED : AIM_PIVOT_SPEED,
+              left ? AIM_PIVOT_SPEED : -AIM_PIVOT_SPEED,
+              Phase.PIVOT,
+              aim.reason,
+              evidence,
+              heightScale,
+              false,
+              aim,
+              translation));
+    }
+    if (!translation.allowed) {
+      return stopForDistance(translation.reason, evidence, heightScale, aim, translation);
+    }
+
     if (!moving) {
-      if (heightScale > START_HEIGHT_SCALE) maintainedStart.reset();
-      boolean identityReady =
-          heightScale <= START_HEIGHT_SCALE && maintainedStart.ready(identity, nowMs);
-      if (heightScale <= START_HEIGHT_SCALE && frame.frameSequence > lastFrameSequence) {
+      boolean identityReady = maintainedStart.ready(identity, nowMs);
+      if (frame.frameSequence > lastFrameSequence) {
         centeredFrames++;
-      } else if (heightScale > START_HEIGHT_SCALE) {
-        centeredFrames = 0;
       }
       lastFrameSequence = Math.max(lastFrameSequence, frame.frameSequence);
       if (identity.isContinuous() || identity.tracking != null)
@@ -169,12 +196,12 @@ public final class RealCartAutoDriveController {
         return remember(
             stopped(
                 Phase.WAIT_CENTER,
-                heightScale > START_HEIGHT_SCALE
-                    ? "target_not_far_enough"
-                    : !identityReady ? "maintained_start_verification" : "target_stabilizing",
+                !identityReady ? "maintained_start_verification" : "target_stabilizing",
                 false,
                 evidence,
-                heightScale));
+                heightScale,
+                aim,
+                translation));
       }
       moving = true;
       centeredFrames = 0;
@@ -190,7 +217,7 @@ public final class RealCartAutoDriveController {
       gears.select(desired);
       lastFrameSequence = frame.frameSequence;
     }
-    return drive(evidence, heightScale);
+    return drive(evidence, heightScale, aim, translation);
   }
 
   public synchronized Result reset(String reason) {
@@ -200,6 +227,9 @@ public final class RealCartAutoDriveController {
     gears.reset();
     lastFrameSequence = -1L;
     targetMissingStartMs = -1L;
+    aimPivoting = false;
+    aimPivotDirection = SteeringEvidence.Direction.NONE;
+    aimCenteredFrames = 0;
     return remember(stopped(Phase.LOCKED, reason, false, null, Float.NaN));
   }
 
@@ -237,7 +267,22 @@ public final class RealCartAutoDriveController {
                 : search.braking ? Phase.SEARCH_BRAKE : Phase.RECOVERY_STOP;
     return remember(
         new Result(
-            search.left(), search.right(), phase, search.reason, null, Float.NaN, search.lockout));
+            search.left(),
+            search.right(),
+            phase,
+            search.reason,
+            null,
+            Float.NaN,
+            search.lockout,
+            search.pivotAllowed
+                ? AimDecision.of(
+                    search.evidence.direction == SteeringEvidence.Direction.LEFT
+                        ? AimDecision.Mode.PIVOT_LEFT
+                        : AimDecision.Mode.PIVOT_RIGHT,
+                    0f,
+                    search.reason)
+                : AimDecision.blocked(search.reason),
+            TranslationDecision.block(search.reason)));
   }
 
   private Result recoveryStop(
@@ -279,7 +324,11 @@ public final class RealCartAutoDriveController {
             heightScale));
   }
 
-  private Result drive(SteeringEvidence evidence, float heightScale) {
+  private Result drive(
+      SteeringEvidence evidence,
+      float heightScale,
+      AimDecision aim,
+      TranslationDecision translation) {
     int speed = gears.current();
     if (evidence.direction == SteeringEvidence.Direction.NONE
         || evidence.demandPercent <= CENTER_DEMAND_PERCENT) {
@@ -291,7 +340,9 @@ public final class RealCartAutoDriveController {
               "centered_follow",
               evidence,
               heightScale,
-              false));
+              false,
+              aim,
+              translation));
     }
 
     int innerSpeed = innerSpeedForDemand(speed, evidence.demandPercent, steeringStrengthPercent);
@@ -304,7 +355,84 @@ public final class RealCartAutoDriveController {
             "continuous_curve",
             evidence,
             heightScale,
-            false));
+            false,
+            aim,
+            translation));
+  }
+
+  private AimDecision decideAim(
+      SteeringEvidence evidence, ImageSetpointDistanceEstimator.DistanceEstimate distance) {
+    float error = evidence.predictedError;
+    float magnitude = Math.abs(error);
+    boolean translationFar = distance != null && distance.state == DistanceState.TOO_FAR;
+    float enter = translationFar ? AIM_EDGE_PIVOT_ERROR : AIM_PIVOT_ENTER_ERROR;
+    if (aimPivoting) {
+      if (magnitude <= AIM_PIVOT_EXIT_ERROR) aimCenteredFrames++;
+      else aimCenteredFrames = 0;
+      if (aimCenteredFrames >= AIM_CENTERED_FRAMES) {
+        aimPivoting = false;
+        aimPivotDirection = SteeringEvidence.Direction.NONE;
+        aimCenteredFrames = 0;
+        return AimDecision.of(AimDecision.Mode.HOLD, error, "aim_centered");
+      }
+      if (magnitude > AIM_PIVOT_EXIT_ERROR && evidence.direction != SteeringEvidence.Direction.NONE)
+        aimPivotDirection = evidence.direction;
+      return pivotDecision(aimPivotDirection, error, "aim_pivot_hysteresis");
+    }
+    if (magnitude >= enter || evidence.edgeUrgency > 0f) {
+      aimPivoting = true;
+      aimCenteredFrames = 0;
+      aimPivotDirection =
+          evidence.direction != SteeringEvidence.Direction.NONE
+              ? evidence.direction
+              : error < 0f ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
+      return pivotDecision(aimPivotDirection, error, "aim_target_off_center");
+    }
+    return AimDecision.of(
+        magnitude > AIM_PIVOT_EXIT_ERROR ? AimDecision.Mode.CURVE : AimDecision.Mode.HOLD,
+        error,
+        magnitude > AIM_PIVOT_EXIT_ERROR ? "aim_curve" : "aim_centered");
+  }
+
+  private static AimDecision pivotDecision(
+      SteeringEvidence.Direction direction, float error, String reason) {
+    return AimDecision.of(
+        direction == SteeringEvidence.Direction.LEFT
+            ? AimDecision.Mode.PIVOT_LEFT
+            : AimDecision.Mode.PIVOT_RIGHT,
+        error,
+        reason);
+  }
+
+  private TranslationDecision decideTranslation(
+      FollowStateMachine.FrameResult frame, BehaviorDecisionResult decision, float heightScale) {
+    if (frame.distanceEstimate == null || !isFinite(heightScale))
+      return TranslationDecision.block("distance_missing");
+    if (frame.distanceEstimate.state != DistanceState.TOO_FAR)
+      return TranslationDecision.block(
+          "distance_" + frame.distanceEstimate.state.name().toLowerCase());
+    if (decision.selectedAction != BehaviorAction.FOLLOW_SLOW
+        && decision.selectedAction != BehaviorAction.FOLLOW_CAUTION)
+      return TranslationDecision.block(decision.actionReason);
+    int cap = maximumGear;
+    if (frame.simulatorIdentity != null && frame.simulatorIdentity.tracking != null)
+      cap = Math.min(cap, frame.simulatorIdentity.tracking.maximumGear);
+    return TranslationDecision.allow(cap, "visual_too_far");
+  }
+
+  private Result stopForDistance(
+      String reason,
+      SteeringEvidence evidence,
+      float heightScale,
+      AimDecision aim,
+      TranslationDecision translation) {
+    maintainedStart.reset();
+    moving = false;
+    centeredFrames = 0;
+    gears.reset();
+    return remember(
+        new Result(
+            0, 0, Phase.WAIT_TARGET, reason, evidence, heightScale, false, aim, translation));
   }
 
   static int innerSpeedForDemand(int demandPercent) {
@@ -333,6 +461,9 @@ public final class RealCartAutoDriveController {
     moving = false;
     centeredFrames = 0;
     gears.reset();
+    aimPivoting = false;
+    aimPivotDirection = SteeringEvidence.Direction.NONE;
+    aimCenteredFrames = 0;
     return remember(stopped(phase, reason, false, evidence, heightScale));
   }
 
@@ -343,7 +474,27 @@ public final class RealCartAutoDriveController {
 
   private static Result stopped(
       Phase phase, String reason, boolean lockout, SteeringEvidence evidence, float heightScale) {
-    return new Result(0, 0, phase, reason, evidence, heightScale, lockout);
+    return new Result(
+        0,
+        0,
+        phase,
+        reason,
+        evidence,
+        heightScale,
+        lockout,
+        AimDecision.blocked(reason),
+        TranslationDecision.block(reason));
+  }
+
+  private static Result stopped(
+      Phase phase,
+      String reason,
+      boolean lockout,
+      SteeringEvidence evidence,
+      float heightScale,
+      AimDecision aim,
+      TranslationDecision translation) {
+    return new Result(0, 0, phase, reason, evidence, heightScale, lockout, aim, translation);
   }
 
   private static boolean isRecoveryDecision(

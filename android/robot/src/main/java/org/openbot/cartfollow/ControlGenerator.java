@@ -34,7 +34,16 @@ public class ControlGenerator {
   public float MIN_CONFIDENCE = 0.5f;
   public boolean FLIP_TURN = true;
 
-  public final ImageSetpointDistanceEstimator distanceEstimator = new ImageSetpointDistanceEstimator();
+  public final ImageSetpointDistanceEstimator distanceEstimator =
+      new ImageSetpointDistanceEstimator();
+
+  public void setMaximumDistanceMultiplier(float value) {
+    distanceEstimator.setMaximumDistanceMultiplier(value);
+  }
+
+  public float getMaximumDistanceMultiplier() {
+    return distanceEstimator.getMaximumDistanceMultiplier();
+  }
 
   public Result generate(List<Recognition> results, int frameW, int frameH, int sensorOrientation) {
     List<Recognition> persons = new ArrayList<>();
@@ -74,11 +83,7 @@ public class ControlGenerator {
       TargetMemory memory) {
     if (target == null || target.getLocation() == null || frameW <= 0 || frameH <= 0) {
       return new Result(
-          new Control(0f, 0f),
-          null,
-          persons == null ? new ArrayList<>() : persons,
-          false,
-          null);
+          new Control(0f, 0f), null, persons == null ? new ArrayList<>() : persons, false, null);
     }
 
     RectF loc = target.getLocation();

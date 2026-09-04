@@ -401,8 +401,8 @@ public class HumanCartSimulatorUiTest {
     fragment.onFollowFrame(nextMissing);
     assertEquals(4, fragment.preparedFrames);
     assertSame(turning, nextMissing.directedReacquireEvidence);
-    assertEquals(18, nextMissing.simulatorDriveResult.left);
-    assertEquals(-18, nextMissing.simulatorDriveResult.right);
+    assertEquals(5, nextMissing.simulatorDriveResult.left);
+    assertEquals(-5, nextMissing.simulatorDriveResult.right);
   }
 
   private static final class LearningHookFragment extends HumanCartSimulatorFragment {

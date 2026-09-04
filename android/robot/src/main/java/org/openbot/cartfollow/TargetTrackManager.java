@@ -4,6 +4,7 @@ import android.graphics.RectF;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import org.openbot.tflite.Detector.Recognition;
@@ -45,6 +46,8 @@ public class TargetTrackManager {
   private boolean lockedAssociationCompeting;
   private float lockedAssociationMargin = Float.POSITIVE_INFINITY;
   private String associationScores = "";
+  private final IdentityHashMap<Recognition, Float> candidateAssociationScores =
+      new IdentityHashMap<>();
 
   public float getLockedAssociationMargin() {
     return lockedAssociationMargin;
@@ -54,8 +57,14 @@ public class TargetTrackManager {
     return associationScores;
   }
 
+  public float getAssociationScore(Recognition recognition) {
+    Float score = candidateAssociationScores.get(recognition);
+    return score == null ? Float.NaN : score;
+  }
+
   private void auditAssociations(List<Recognition> detections, int width, int height, long now) {
     List<Assignment> all = new ArrayList<>();
+    candidateAssociationScores.clear();
     StringBuilder log = new StringBuilder();
     for (int i = 0; i < detections.size(); i++) {
       Recognition detection = detections.get(i);
@@ -63,6 +72,9 @@ public class TargetTrackManager {
       for (TargetTrack track : tracks) {
         if (track.lastBbox == null) continue;
         Match match = score(track, detection, width, height, now);
+        Float previous = candidateAssociationScores.get(detection);
+        if (previous == null || match.score > previous)
+          candidateAssociationScores.put(detection, match.score);
         log.append("T")
             .append(track.trackId)
             .append(":D")
@@ -118,6 +130,8 @@ public class TargetTrackManager {
     lockedGhostVelocityY = 0f;
     lockedGhostLastSeenMs = 0L;
     lockedGhostLostSide = "unknown";
+    associationScores = "";
+    candidateAssociationScores.clear();
   }
 
   public void update(List<Recognition> detections, int frameW, int frameH, long timestampMs) {
@@ -447,10 +461,14 @@ public class TargetTrackManager {
     boolean competing = lockedAssociationCompeting;
     float margin = lockedAssociationMargin;
     String scores = associationScores;
+    IdentityHashMap<Recognition, Float> perCandidateScores =
+        new IdentityHashMap<>(candidateAssociationScores);
     update(highConfidence, frameW, frameH, timestampMs);
     lockedAssociationCompeting = competing;
     lockedAssociationMargin = margin;
     associationScores = scores;
+    candidateAssociationScores.clear();
+    candidateAssociationScores.putAll(perCandidateScores);
     List<Recognition> continued = new ArrayList<>();
     Set<TargetTrack> revivedTracks = new HashSet<>();
     if (lowConfidence != null) {

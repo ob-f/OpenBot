@@ -70,19 +70,23 @@ public class RealCartAutoDriveControllerTest {
   }
 
   @Test
-  public void distanceAndSearchAlwaysStop() {
+  public void distanceHoldStillAimsButSearchWithoutGateStops() {
     RealCartAutoDriveController controller = movingController();
-    assertTrue(
+    RealCartAutoDriveController.Result aimed =
         update(
-                controller,
-                frame(
-                    SteeringEvidence.Direction.NONE,
-                    0,
-                    0.90f,
-                    FollowState.FOLLOW,
-                    BehaviorAction.FOLLOW_CAUTION),
-                100L)
-            .isStop());
+            controller,
+            frameWithError(
+                SteeringEvidence.Direction.LEFT,
+                80,
+                -.25f,
+                0.90f,
+                FollowState.FOLLOW,
+                BehaviorAction.FOLLOW_CAUTION),
+            100L);
+    assertEquals(RealCartAutoDriveController.Phase.PIVOT, aimed.phase);
+    assertEquals(-5, aimed.left);
+    assertEquals(5, aimed.right);
+    assertFalse(aimed.translationDecision.allowed);
     assertTrue(
         update(
                 controller,
@@ -94,6 +98,86 @@ public class RealCartAutoDriveControllerTest {
                     BehaviorAction.LOCAL_SEARCH_LEFT),
                 200L)
             .isStop());
+  }
+
+  @Test
+  public void tooCloseTargetMayPivotButCannotTranslate() {
+    RealCartAutoDriveController.Result result =
+        update(
+            new RealCartAutoDriveController(),
+            frameWithError(
+                SteeringEvidence.Direction.RIGHT,
+                50,
+                .22f,
+                1.20f,
+                FollowState.FOLLOW,
+                BehaviorAction.MOTION_STOP),
+            100L);
+    assertEquals(RealCartAutoDriveController.Phase.PIVOT, result.phase);
+    assertEquals(5, result.left);
+    assertEquals(-5, result.right);
+    assertFalse(result.translationDecision.allowed);
+  }
+
+  @Test
+  public void edgeTargetPivotsWithoutForwardEvenWhenFar() {
+    RealCartAutoDriveController.Result result =
+        update(
+            movingController(),
+            frameWithError(
+                SteeringEvidence.Direction.LEFT,
+                100,
+                -.40f,
+                .70f,
+                FollowState.FOLLOW,
+                BehaviorAction.FOLLOW_SLOW),
+            100L);
+    assertEquals(RealCartAutoDriveController.Phase.PIVOT, result.phase);
+    assertTrue(result.translationDecision.allowed);
+    assertEquals(-5, result.left);
+    assertEquals(5, result.right);
+  }
+
+  @Test
+  public void pivotStopsAfterThreeCenteredFrames() {
+    RealCartAutoDriveController controller = new RealCartAutoDriveController();
+    update(
+        controller,
+        frameWithError(
+            SteeringEvidence.Direction.RIGHT,
+            50,
+            .25f,
+            .95f,
+            FollowState.FOLLOW,
+            BehaviorAction.FOLLOW_CAUTION),
+        0L);
+    for (int i = 1; i <= 2; i++) {
+      RealCartAutoDriveController.Result result =
+          update(
+              controller,
+              frameWithError(
+                  SteeringEvidence.Direction.NONE,
+                  0,
+                  .02f,
+                  .95f,
+                  FollowState.FOLLOW,
+                  BehaviorAction.FOLLOW_CAUTION),
+              i * 33L);
+      assertEquals(RealCartAutoDriveController.Phase.PIVOT, result.phase);
+    }
+    RealCartAutoDriveController.Result centered =
+        update(
+            controller,
+            frameWithError(
+                SteeringEvidence.Direction.NONE,
+                0,
+                .02f,
+                .95f,
+                FollowState.FOLLOW,
+                BehaviorAction.FOLLOW_CAUTION),
+            99L);
+    assertTrue(centered.isStop());
+    assertEquals("distance_ok", centered.reason);
   }
 
   @Test
@@ -156,6 +240,18 @@ public class RealCartAutoDriveControllerTest {
     return frame(direction, demand, heightScale, state, action, false);
   }
 
+  private static FollowStateMachine.FrameResult frameWithError(
+      SteeringEvidence.Direction direction,
+      int demand,
+      float predictedError,
+      float heightScale,
+      FollowState state,
+      BehaviorAction action) {
+    FollowStateMachine.FrameResult frame = rawFrame(heightScale, state, action, false);
+    frame.steeringEvidence = evidence(direction, demand, predictedError);
+    return frame;
+  }
+
   private static FollowStateMachine.FrameResult frame(
       SteeringEvidence.Direction direction,
       int demand,
@@ -194,13 +290,18 @@ public class RealCartAutoDriveControllerTest {
   }
 
   private static SteeringEvidence evidence(SteeringEvidence.Direction direction, int demand) {
+    return evidence(direction, demand, 0f);
+  }
+
+  private static SteeringEvidence evidence(
+      SteeringEvidence.Direction direction, int demand, float predictedError) {
     return new SteeringEvidence(
         true,
         "test",
+        predictedError,
+        predictedError,
         0f,
-        0f,
-        0f,
-        0f,
+        predictedError,
         0f,
         demand,
         direction,

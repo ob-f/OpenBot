@@ -17,6 +17,7 @@ public class DirectedReacquireControllerTest {
 
   @Test
   public void independentOfMotionGateRequiresTwoOutwardAndTimedMissingFrames() {
+    controller.configure(18, 90, 5000);
     armRight();
     assertEquals(DirectedReacquireEvidence.Phase.IDLE, update(missing(), 1100).phase);
     assertEquals(DirectedReacquireEvidence.Phase.IDLE, update(missing(), 1199).phase);
@@ -30,6 +31,7 @@ public class DirectedReacquireControllerTest {
 
   @Test
   public void deadlineExpiresWithoutAnotherInferenceResultAndRetainsSession() {
+    controller.configure(18, 90, 5000);
     armRight();
     update(missing(), 1100);
     update(missing(), 1200);
@@ -44,6 +46,7 @@ public class DirectedReacquireControllerTest {
 
   @Test
   public void shrinkingClippedLeftBoxesAreOutward() {
+    controller.configure(18, 90, 5000);
     update(observation(900, 0f, .20f, false, 1, 0), 900);
     update(observation(1000, 0f, .10f, true, 1, 0), 1000);
     update(missing(), 1100);
@@ -159,20 +162,53 @@ public class DirectedReacquireControllerTest {
   }
 
   @Test
-  public void persistentRejectedCandidateStaysStoppedAndTimesOutIncludingVerification() {
+  public void persistentRejectedCandidatePausesThenSearchesAndTimesOut() {
     controller.configure(18, 90, 1000);
     start();
     for (long time = 1300; time < 2200; time += 100) {
       DirectedReacquireEvidence result = update(observation(time, .4f, .6f, true, 1, 0), time);
-      assertEquals(DirectedReacquireEvidence.Phase.VERIFYING, result.phase);
-      assertEquals(0, result.left());
-      assertEquals(0, result.right());
+      if (time < 1800) {
+        assertEquals(DirectedReacquireEvidence.Phase.VERIFYING, result.phase);
+        assertEquals(0, result.left());
+        assertEquals(0, result.right());
+      } else {
+        assertEquals(DirectedReacquireEvidence.Phase.TURNING, result.phase);
+        assertTrue(result.left() != 0 || result.right() != 0);
+      }
     }
     DirectedReacquireEvidence failed = update(observation(2200, .4f, .6f, true, 1, 0), 2200);
     assertEquals(DirectedReacquireEvidence.Phase.PARKED_WAIT, failed.phase);
     assertEquals("search_timeout", failed.reason);
     assertFalse(failed.lockout);
     assertSame(failed, update(missing(), 2300));
+  }
+
+  @Test
+  public void backViewMayRecoverFromSameEdgeInwardContinuityWithoutFreshReid() {
+    start();
+    assertEquals(
+        DirectedReacquireEvidence.Phase.VERIFYING,
+        update(observation(1300, .76f, .96f, true, 7, 0), 1300).phase);
+    assertEquals(
+        DirectedReacquireEvidence.Phase.VERIFYING,
+        update(observation(1400, .70f, .90f, true, 7, 0), 1400).phase);
+    DirectedReacquireEvidence recovered = update(observation(1500, .62f, .82f, true, 7, 0), 1500);
+    assertEquals(DirectedReacquireEvidence.Phase.COMPLETE, recovered.phase);
+    assertEquals("recovered_by_continuity", recovered.reason);
+  }
+
+  @Test
+  public void wrongEdgeCandidatePausesThenSearchResumes() {
+    start();
+    assertEquals(
+        DirectedReacquireEvidence.Phase.VERIFYING,
+        update(observation(1300, .04f, .24f, true, 7, 0), 1300).phase);
+    assertEquals(
+        DirectedReacquireEvidence.Phase.VERIFYING,
+        update(observation(1799, .04f, .24f, true, 7, 0), 1799).phase);
+    assertEquals(
+        DirectedReacquireEvidence.Phase.TURNING,
+        update(observation(1800, .04f, .24f, true, 7, 0), 1800).phase);
   }
 
   @Test
@@ -245,6 +281,7 @@ public class DirectedReacquireControllerTest {
 
   @Test
   public void wideBoxesTouchingBothEdgeZonesUseMotionForDirectionAndMirror() {
+    controller.configure(18, 90, 5000);
     for (boolean mirror : new boolean[] {false, true}) {
       controller.reset();
       update(mirrored(900, .04f, .90f, mirror), 900);

@@ -218,4 +218,7 @@
     <string name="person_sequence_start">Start Sequence</string>
     <string name="person_sequence_stop">Stop Sequence</string>
     <string name="person_sequence_idle">Ready to collect sequence data</string>
+    <string name="cart_follow_maximum_distance_default">视觉最远距离：确认距离的 1.10 倍</string>
+    <string name="cart_follow_maximum_distance_description">视觉最远距离倍率</string>
+    <string name="cart_follow_maximum_distance_format">视觉最远距离：确认距离的 %1$.2f 倍 · 回到 %2$.2f 倍停止前进</string>
 </resources>

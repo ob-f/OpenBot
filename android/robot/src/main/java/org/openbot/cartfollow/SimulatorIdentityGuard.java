@@ -258,6 +258,15 @@ public final class SimulatorIdentityGuard {
     }
   }
 
+  public synchronized void inspectCandidates(
+      java.util.List<ReIDMatchResult> scores,
+      IdentityCandidateSet candidates,
+      int lockedId,
+      long frame,
+      long now) {
+    inspectCandidates(scores, candidates == null ? 0 : candidates.size(), lockedId, frame, now);
+  }
+
   public synchronized void reset() {
     generation = -1L;
     continuityTrack = -1;
@@ -373,6 +382,40 @@ public final class SimulatorIdentityGuard {
    * scores (not local pose/quarantine support). A null global result never falls back to localReid.
    * following means the session has entered FOLLOW, not necessarily that it is currently in FOLLOW.
    */
+  public synchronized Decision update(
+      long session,
+      long frame,
+      long receivedAt,
+      long now,
+      int trackId,
+      int lockedId,
+      boolean highConfidence,
+      boolean local,
+      ReIDMatchResult localReid,
+      IdentityCandidateSet candidates,
+      boolean associationAmbiguous,
+      boolean targetLost,
+      ReIDMatchResult globalReid,
+      SimulatorContinuityTracker.Evidence continuity,
+      boolean following) {
+    return update(
+        session,
+        frame,
+        receivedAt,
+        now,
+        trackId,
+        lockedId,
+        highConfidence,
+        local,
+        localReid,
+        candidates == null ? 0 : candidates.size(),
+        associationAmbiguous,
+        targetLost,
+        globalReid,
+        continuity,
+        following);
+  }
+
   public synchronized Decision update(
       long session,
       long frame,

@@ -29,9 +29,11 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
   private SensorManager sensorManager;
   private Sensor gyroscope;
   private Sensor gravity;
-  private int searchSpeed = 18;
-  private float searchAngle = 90f;
-  private long searchTimeoutMs = 5000L;
+  private int searchSpeed = 5;
+  private float searchAngle = 180f;
+  private long searchTimeoutMs = 10000L;
+  private float maximumDistanceMultiplier =
+      ImageSetpointDistanceEstimator.DEFAULT_MAX_DISTANCE_MULTIPLIER;
   private boolean endingSession;
   private final YawTurnTracker testYawTracker = new YawTurnTracker();
   private final Handler sensorUiHandler = new Handler(Looper.getMainLooper());
@@ -218,7 +220,14 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
   protected void prepareSimulatorLearningFrame(FollowStateMachine.FrameResult frame, long now) {
     directedEvidence = directedController.update(frame, now, yawTurnTracker);
     if (directedController.consumeEnterRequest()) stateMachine.enterDirectedReacquire();
-    if (frame != null) frame.directedReacquireEvidence = directedEvidence;
+    if (frame != null) {
+      frame.directedReacquireEvidence = directedEvidence;
+      if (directedEvidence.phase == DirectedReacquireEvidence.Phase.COMPLETE) {
+        org.openbot.tflite.Detector.Recognition target =
+            frame.target != null ? frame.target : frame.candidate;
+        stateMachine.acceptDirectedContinuityRecovery(target);
+      }
+    }
   }
 
   @Override
@@ -400,6 +409,8 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
         return "采集中 · 等待新鲜画面 · c0,0";
       case LOCKED_PENDING_CONFIRM:
         return "请确认目标 · 等待新鲜画面 · c0,0";
+      case DISTANCE_CALIBRATION:
+        return "距离标定中 · 等待新鲜画面 · c0,0";
       case READY_TO_FOLLOW:
         return "启动倒计时 · 等待新鲜画面 · c0,0";
       case CONFIRMED_ARMED:
@@ -425,6 +436,29 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
     if (frameResult != null
         && frameResult.frameTiming != null
         && !isFrameFresh(frameResult.frameTiming)) return staleCommand(frameResult.state);
+    if (frameResult != null && result.left == 0 && result.right == 0) {
+      switch (frameResult.state) {
+        case CAPTURE_TARGET:
+          return (frameResult.distanceDiagnosticText == null
+                  ? "正在采集目标"
+                  : frameResult.distanceDiagnosticText)
+              + " · 模拟输出 c0,0";
+        case LOCKED_PENDING_CONFIRM:
+          return "请确认目标 · 模拟输出 c0,0";
+        case DISTANCE_CALIBRATION:
+          return (frameResult.distanceDiagnosticText == null
+                  ? "已确认，正在距离标定"
+                  : frameResult.distanceDiagnosticText)
+              + " · 模拟输出 c0,0";
+        case CONFIRMED_ARMED:
+        case REACQUIRE_TARGET:
+          return "已确认，正在重识别 · 模拟输出 c0,0";
+        case READY_TO_FOLLOW:
+          return frameResult.countdownSec + " 秒后低档启动 · 模拟输出 c0,0";
+        default:
+          break;
+      }
+    }
     if (result.left != 0 || result.right != 0) {
       if (search.phase == DirectedReacquireEvidence.Phase.TURNING
           && result.phase == SimulatorAutoDriveController.Phase.RECOVERY_STOP)
@@ -801,13 +835,21 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
   private void installDirectedSearchControls() {
     SharedPreferences prefs =
         requireContext().getSharedPreferences(SEARCH_PREFS, Context.MODE_PRIVATE);
-    searchSpeed = clamp(prefs.getInt("speed", 18), 5, 21);
-    searchAngle = clamp(prefs.getFloat("angle", 90f), 30f, 180f);
-    float timeoutSeconds = clamp(prefs.getFloat("timeout_seconds", 5f), 1f, 10f);
+    searchSpeed = clamp(prefs.getInt("speed", 5), 5, 21);
+    searchAngle = clamp(prefs.getFloat("angle", 180f), 30f, 180f);
+    float timeoutSeconds = clamp(prefs.getFloat("timeout_seconds", 10f), 1f, 10f);
     searchTimeoutMs = Math.round(timeoutSeconds * 1000f);
+    maximumDistanceMultiplier =
+        clamp(
+            prefs.getFloat(
+                "maximum_distance_multiplier",
+                ImageSetpointDistanceEstimator.DEFAULT_MAX_DISTANCE_MULTIPLIER),
+            ImageSetpointDistanceEstimator.MIN_MAX_DISTANCE_MULTIPLIER,
+            ImageSetpointDistanceEstimator.MAX_MAX_DISTANCE_MULTIPLIER);
     binding.searchSpeedSlider.setValue(searchSpeed);
     binding.searchAngleSlider.setValue(searchAngle);
     binding.searchTimeoutSlider.setValue(timeoutSeconds);
+    binding.maximumDistanceSlider.setValue(maximumDistanceMultiplier);
     updateDirectedControlLabels();
     binding.searchSpeedSlider.addOnChangeListener(
         (slider, value, fromUser) -> {
@@ -827,6 +869,14 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
           prefs.edit().putFloat("timeout_seconds", value).apply();
           applyDirectedConfig();
         });
+    binding.maximumDistanceSlider.addOnChangeListener(
+        (slider, value, fromUser) -> {
+          maximumDistanceMultiplier = Math.round(value * 20f) / 20f;
+          prefs.edit().putFloat("maximum_distance_multiplier", maximumDistanceMultiplier).apply();
+          stateMachine.setMaximumDistanceMultiplier(maximumDistanceMultiplier);
+          updateDirectedControlLabels();
+        });
+    stateMachine.setMaximumDistanceMultiplier(maximumDistanceMultiplier);
     applyDirectedConfig();
   }
 
@@ -842,12 +892,18 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
         String.format(java.util.Locale.US, "最大搜索角度 %.0f°", searchAngle));
     binding.searchTimeoutValue.setText(
         String.format(java.util.Locale.US, "定向搜索上限 %.1f 秒（独立于普通重捕）", searchTimeoutMs / 1000f));
+    binding.maximumDistanceValue.setText(
+        getString(
+            R.string.cart_follow_maximum_distance_format,
+            maximumDistanceMultiplier,
+            Math.max(1f, maximumDistanceMultiplier - .08f)));
   }
 
   private void setDirectedControlsEnabled(boolean enabled) {
     binding.searchSpeedSlider.setEnabled(enabled);
     binding.searchAngleSlider.setEnabled(enabled);
     binding.searchTimeoutSlider.setEnabled(enabled);
+    binding.maximumDistanceSlider.setEnabled(enabled);
     binding.gyroTestLeft.setEnabled(enabled);
     binding.gyroTestRight.setEnabled(enabled);
     binding.gyroTestStop.setEnabled(enabled);

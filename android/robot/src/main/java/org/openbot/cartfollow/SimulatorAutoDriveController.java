@@ -9,6 +9,7 @@ public final class SimulatorAutoDriveController {
     REACQUIRE,
     COUNTDOWN,
     FOLLOW,
+    PIVOT,
     RECOVERY_STOP,
     PARKED_WAIT,
     ENDED
@@ -64,6 +65,9 @@ public final class SimulatorAutoDriveController {
   private boolean lastMoving;
   private boolean holdWasMoving;
   private boolean inHold;
+  private boolean aimPivoting;
+  private int aimCenteredFrames;
+  private SteeringEvidence.Direction aimDirection = SteeringEvidence.Direction.NONE;
 
   public void setRecoveryLimitMs(long recoveryLimitMs) {
     this.recoveryLimitMs = Math.max(1000L, recoveryLimitMs);
@@ -76,6 +80,9 @@ public final class SimulatorAutoDriveController {
     gears.reset();
     hasFollowed = false;
     lastMoving = holdWasMoving = inHold = false;
+    aimPivoting = false;
+    aimCenteredFrames = 0;
+    aimDirection = SteeringEvidence.Direction.NONE;
     return stopped(Phase.IDLE, reason, false, 0L);
   }
 
@@ -154,6 +161,8 @@ public final class SimulatorAutoDriveController {
         return stopped(Phase.CAPTURE, "collecting_target", false, 0L);
       case LOCKED_PENDING_CONFIRM:
         return stopped(Phase.WAIT_CONFIRM, "waiting_confirmation", false, 0L);
+      case DISTANCE_CALIBRATION:
+        return stopped(Phase.WAIT_CONFIRM, "distance_calibration", false, 0L);
       case CONFIRMED_ARMED:
         return stopped(Phase.REACQUIRE, "stationary_reacquire", false, 0L);
       case REACQUIRE_TARGET:
@@ -186,16 +195,20 @@ public final class SimulatorAutoDriveController {
     if (action != BehaviorAction.FOLLOW_SLOW && action != BehaviorAction.FOLLOW_CAUTION) {
       return stopped(Phase.FOLLOW, frame.behaviorDecision.actionReason, false, 0L);
     }
-    if (frame.distanceEstimate == null || frame.distanceEstimate.state != DistanceState.TOO_FAR) {
+    SteeringEvidence steering = frame.steeringEvidence;
+    if (steering == null || !steering.valid) {
+      return stopped(Phase.FOLLOW, "steering_unavailable", false, 0L);
+    }
+    boolean distanceFar =
+        frame.distanceEstimate != null && frame.distanceEstimate.state == DistanceState.TOO_FAR;
+    Result aim = aimOnlyIfNeeded(steering, distanceFar);
+    if (aim != null) return aim;
+    if (!distanceFar) {
       String reason =
           frame.distanceEstimate == null
               ? "distance_missing"
               : "distance_" + frame.distanceEstimate.state.name().toLowerCase();
       return stopped(Phase.FOLLOW, reason, false, 0L);
-    }
-    SteeringEvidence steering = frame.steeringEvidence;
-    if (steering == null || !steering.valid) {
-      return stopped(Phase.FOLLOW, "steering_unavailable", false, 0L);
     }
 
     int desiredGear = distanceGear(frame.distanceEstimate.heightScale);
@@ -255,6 +268,8 @@ public final class SimulatorAutoDriveController {
         return Phase.CAPTURE;
       case LOCKED_PENDING_CONFIRM:
         return Phase.WAIT_CONFIRM;
+      case DISTANCE_CALIBRATION:
+        return Phase.WAIT_CONFIRM;
       case READY_TO_FOLLOW:
         return Phase.COUNTDOWN;
       case CONFIRMED_ARMED:
@@ -275,6 +290,51 @@ public final class SimulatorAutoDriveController {
     return gears.distanceGear(heightScale);
   }
 
+  private Result aimOnlyIfNeeded(SteeringEvidence steering, boolean distanceFar) {
+    float error = steering.predictedError;
+    float magnitude = Math.abs(error);
+    if (aimPivoting) {
+      if (magnitude <= RealCartAutoDriveController.AIM_PIVOT_EXIT_ERROR) aimCenteredFrames++;
+      else aimCenteredFrames = 0;
+      if (aimCenteredFrames >= RealCartAutoDriveController.AIM_CENTERED_FRAMES) {
+        aimPivoting = false;
+        aimCenteredFrames = 0;
+        aimDirection = SteeringEvidence.Direction.NONE;
+        return null;
+      }
+      if (magnitude > RealCartAutoDriveController.AIM_PIVOT_EXIT_ERROR
+          && steering.direction != SteeringEvidence.Direction.NONE)
+        aimDirection = steering.direction;
+      return pivotResult("aim_pivot_hysteresis");
+    }
+    float enter =
+        distanceFar
+            ? RealCartAutoDriveController.AIM_EDGE_PIVOT_ERROR
+            : RealCartAutoDriveController.AIM_PIVOT_ENTER_ERROR;
+    if (magnitude < enter && steering.edgeUrgency <= 0f) return null;
+    aimPivoting = true;
+    aimCenteredFrames = 0;
+    aimDirection =
+        steering.direction != SteeringEvidence.Direction.NONE
+            ? steering.direction
+            : error < 0f ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
+    return pivotResult("aim_target_off_center");
+  }
+
+  private Result pivotResult(String reason) {
+    boolean left = aimDirection == SteeringEvidence.Direction.LEFT;
+    int speed = RealCartAutoDriveController.AIM_PIVOT_SPEED;
+    return new Result(
+        Phase.PIVOT,
+        0,
+        left ? -speed : speed,
+        left ? speed : -speed,
+        reason,
+        false,
+        0L,
+        recoveryLimitMs);
+  }
+
   private void selectGear(int desired) {
     currentGear = gears.select(desired);
   }
@@ -285,6 +345,9 @@ public final class SimulatorAutoDriveController {
         && !"strong_identity_revalidation".equals(reason)) maintainedStart.reset();
     currentGear = GEAR_LOW;
     gears.reset();
+    aimPivoting = false;
+    aimCenteredFrames = 0;
+    aimDirection = SteeringEvidence.Direction.NONE;
     return new Result(
         phase,
         0,

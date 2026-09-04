@@ -17,6 +17,19 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
 public class SimulatorFrameProcessingTest {
+  private static final class TestClockMachine extends FollowStateMachine {
+    long now;
+
+    TestClockMachine() {
+      super(new TargetMatcher(), new ControlGenerator());
+    }
+
+    @Override
+    long nowMs() {
+      return now;
+    }
+  }
+
   @Test
   public void recentControlLocksWithStartAndRetainedIdentityHasSeparateMotionText() {
     android.content.Context context =
@@ -167,6 +180,203 @@ public class SimulatorFrameProcessingTest {
   }
 
   @Test
+  public void distanceCalibrationRequiresTemporalWindowAndUsesMedianHeight() {
+    TargetMemory memory = new TargetMemory();
+    Bitmap frame = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+    RectF ordinary = new RectF(25, 30, 75, 130);
+    for (int i = 0; i < 16; i++) {
+      RectF sample = i == 7 ? new RectF(25, 30, 75, 170) : ordinary;
+      assertFalse(memory.offerDistanceCalibrationSample(sample, 100, 200, 0, i * 33L));
+    }
+    assertTrue(memory.offerDistanceCalibrationSample(ordinary, 100, 200, 0, 528L));
+    memory.captureFromBitmap(frame, ordinary, 100, 200, 0);
+    assertEquals(.50f, memory.getDistanceSetpoint().desiredHeightRatio, .0001f);
+    frame.recycle();
+  }
+
+  @Test
+  public void clippedDistanceCalibrationRequestsNewStandingPosition() {
+    TargetMemory memory = new TargetMemory();
+    assertFalse(memory.offerDistanceCalibrationSample(new RectF(20, 20, 80, 150), 100, 200, 0, 0));
+    assertFalse(memory.offerDistanceCalibrationSample(new RectF(20, 0, 80, 150), 100, 200, 0, 0));
+    assertTrue(memory.getDistanceCalibrationStatus().contains("裁切"));
+    assertEquals(1, memory.getDistanceCalibrationSampleCount());
+  }
+
+  @Test
+  public void captureUsesTrackBoundSlidingWindowAndToleratesShortDetectionGap() {
+    TestClockMachine machine = new TestClockMachine();
+    machine.CAPTURE_FRAMES = 3;
+    Bitmap frame = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+    Recognition person = new Recognition("1", "person", .90f, new RectF(20, 0, 80, 200), 0);
+    FollowStateMachine.InitializationObservation trackOne =
+        new FollowStateMachine.InitializationObservation(person, 1, true);
+    machine.startCapture();
+    machine.now = 0;
+    machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0, null, null, trackOne);
+    machine.now = 400;
+    machine.onFrame(
+        Collections.emptyList(),
+        frame,
+        100,
+        200,
+        0,
+        null,
+        null,
+        new FollowStateMachine.InitializationObservation(null, -1, false));
+    assertEquals(1, machine.getInitializationSampleCount());
+    machine.now = 450;
+    machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0, null, null, trackOne);
+    machine.now = 500;
+    FollowStateMachine.FrameResult captured =
+        machine.onFrame(
+            Collections.singletonList(person), frame, 100, 200, 0, null, null, trackOne);
+    assertEquals(FollowState.LOCKED_PENDING_CONFIRM, captured.state);
+    assertFalse(machine.getMemory().hasDistanceSetpoint());
+    assertNotNull(captured.snapshot);
+    captured.snapshot.recycle();
+    frame.recycle();
+  }
+
+  @Test
+  public void captureTrackChangeAndLongGapRestartProgress() {
+    TestClockMachine machine = new TestClockMachine();
+    machine.CAPTURE_FRAMES = 3;
+    Bitmap frame = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+    Recognition one = new Recognition("1", "person", .9f, new RectF(20, 20, 80, 170), 0);
+    Recognition two = new Recognition("2", "person", .9f, new RectF(20, 20, 80, 170), 0);
+    machine.startCapture();
+    machine.now = 0;
+    machine.onFrame(
+        Collections.singletonList(one),
+        frame,
+        100,
+        200,
+        0,
+        null,
+        null,
+        new FollowStateMachine.InitializationObservation(one, 1, true));
+    machine.now = 100;
+    machine.onFrame(
+        Collections.singletonList(two),
+        frame,
+        100,
+        200,
+        0,
+        null,
+        null,
+        new FollowStateMachine.InitializationObservation(two, 2, true));
+    assertEquals(1, machine.getInitializationSampleCount());
+    machine.now = 700;
+    machine.onFrame(
+        Collections.emptyList(),
+        frame,
+        100,
+        200,
+        0,
+        null,
+        null,
+        new FollowStateMachine.InitializationObservation(null, -1, false));
+    assertEquals(0, machine.getInitializationSampleCount());
+    frame.recycle();
+  }
+
+  @Test
+  public void confirmedTargetStaysStoppedUntilTrackBoundDistanceCalibrationCompletes() {
+    TestClockMachine machine = new TestClockMachine();
+    machine.CAPTURE_FRAMES = 1;
+    Bitmap frame = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+    Recognition person = new Recognition("1", "person", .9f, new RectF(20, 20, 80, 170), 0);
+    FollowStateMachine.InitializationObservation locked =
+        new FollowStateMachine.InitializationObservation(person, 7, true);
+    machine.startCapture();
+    machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0, null, null, locked);
+    machine.confirm(7);
+    assertEquals(FollowState.DISTANCE_CALIBRATION, machine.getState());
+
+    machine.now = 0;
+    FollowStateMachine.FrameResult result =
+        machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0, null, null, locked);
+    assertEquals(0f, result.control.getLeft(), 0f);
+    assertEquals(1, machine.getMemory().getDistanceCalibrationSampleCount());
+    Recognition clipped = new Recognition("1", "person", .9f, new RectF(20, 0, 80, 200), 0);
+    machine.now = 100;
+    result =
+        machine.onFrame(
+            Collections.singletonList(clipped),
+            frame,
+            100,
+            200,
+            0,
+            null,
+            null,
+            new FollowStateMachine.InitializationObservation(clipped, 7, true));
+    assertEquals(FollowState.DISTANCE_CALIBRATION, result.state);
+    assertEquals(1, machine.getMemory().getDistanceCalibrationSampleCount());
+
+    for (int i = 0; i < 14; i++) {
+      machine.now = 150 + i * 50L;
+      result =
+          machine.onFrame(
+              Collections.singletonList(person), frame, 100, 200, 0, null, null, locked);
+    }
+    assertEquals(FollowState.CONFIRMED_ARMED, result.state);
+    assertTrue(machine.getMemory().hasDistanceSetpoint());
+    assertTrue(machine.getMemory().getDistanceCalibrationCompletedAtMs() > 0);
+    assertEquals(0f, result.control.getLeft(), 0f);
+    frame.recycle();
+  }
+
+  @Test
+  public void bothDriveControllersStopDuringDistanceCalibration() {
+    FollowStateMachine.FrameResult frame =
+        new FollowStateMachine.FrameResult(
+            FollowState.DISTANCE_CALIBRATION,
+            new Control(1f, 1f),
+            null,
+            null,
+            Collections.emptyList(),
+            false,
+            false,
+            null,
+            -1);
+    frame.behaviorDecision =
+        new ActionArbitrator()
+            .decide(
+                FollowState.DISTANCE_CALIBRATION,
+                null,
+                null,
+                null,
+                new SystemSafetyEvidence(false, true, true, "ok"),
+                null,
+                100);
+    frame.frameTiming = new FrameTimingEvidence(1000, 0, 1, 0, 1, 1, 30, 0);
+    SimulatorAutoDriveController.Result simulator =
+        new SimulatorAutoDriveController().update(frame, 1001);
+    RealCartAutoDriveController.Result real = new RealCartAutoDriveController().update(frame, 1001);
+    assertEquals(0, simulator.left);
+    assertEquals(0, simulator.right);
+    assertTrue(real.isStop());
+    assertEquals(BehaviorAction.MOTION_STOP, frame.behaviorDecision.selectedAction);
+  }
+
+  @Test
+  public void configuredHighConfidenceCandidateBelowPointSevenFiveCanBeCaptured() {
+    FollowStateMachine machine =
+        new FollowStateMachine(new TargetMatcher(), new ControlGenerator());
+    machine.CAPTURE_FRAMES = 1;
+    Bitmap frame = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+    Recognition person = new Recognition("1", "person", .60f, new RectF(20, 20, 80, 170), 0);
+    machine.startCapture();
+    FollowStateMachine.FrameResult result =
+        machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0);
+    assertEquals(FollowState.LOCKED_PENDING_CONFIRM, result.state);
+    assertNotNull(result.snapshot);
+    result.snapshot.recycle();
+    frame.recycle();
+  }
+
+  @Test
   public void suppliedPerFrameMatchIsNotRecomputedByStateMachine() {
     int[] calls = {0};
     TargetMatcher matcher =
@@ -185,6 +395,17 @@ public class SimulatorFrameProcessingTest {
     machine.startCapture();
     machine.onFrame(persons, frame, 64, 128, 0);
     machine.confirm();
+    for (int i = 0; i < 15; i++)
+      machine
+          .getMemory()
+          .offerDistanceCalibrationSample(new RectF(8, 8, 56, 120), 64, 128, 0, i * 50L);
+    machine.onFrame(
+        Collections.singletonList(
+            new Recognition("1", "person", .95f, new RectF(8, 8, 56, 120), 0)),
+        frame,
+        64,
+        128,
+        0);
     for (int i = 0; i < 5; i++) {
       TargetMatcher.MatchResult result =
           matcher.match(persons, frame, machine.getMemory(), 64, 128);

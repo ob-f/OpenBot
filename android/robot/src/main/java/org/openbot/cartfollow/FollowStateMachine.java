@@ -2,12 +2,26 @@ package org.openbot.cartfollow;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import org.openbot.tflite.Detector.Recognition;
 import org.openbot.vehicle.Control;
 
 public class FollowStateMachine {
+
+  public static final class InitializationObservation {
+    public final Recognition candidate;
+    public final int trackId;
+    public final boolean uniqueHighConfidence;
+
+    public InitializationObservation(
+        Recognition candidate, int trackId, boolean uniqueHighConfidence) {
+      this.candidate = candidate;
+      this.trackId = trackId;
+      this.uniqueHighConfidence = uniqueHighConfidence;
+    }
+  }
 
   public static class FrameResult {
     public final FollowState state;
@@ -28,6 +42,7 @@ public class FollowStateMachine {
     public SimulatorAutoDriveController.Result simulatorDriveResult;
     public RealCartAutoDriveController.Result realDriveResult;
     public DetectionTierEvidence detectionTierEvidence;
+    public IdentityCandidateSet identityCandidates;
     public DirectedReacquireEvidence directedReacquireEvidence;
     public TargetObservationEvidence targetObservation;
     public FrameTimingEvidence frameTiming;
@@ -40,6 +55,11 @@ public class FollowStateMachine {
     public RecentGallery.Status recentGallery;
     public String deferredGalleryStatus;
     public boolean recentMatchingSupport;
+    public int initializationSampleCount;
+    public int initializationTrackId = -1;
+    public String initializationDiscardReason = "";
+    public int distanceCalibrationSampleCount;
+    public long distanceCalibrationCompletedAtMs;
 
     public FrameResult(
         FollowState state,
@@ -77,6 +97,8 @@ public class FollowStateMachine {
   public int REACQUIRE_STRICT_FRAMES = 1;
   public int REACQUIRE_DEFAULT_FRAMES = 2;
   public int LOST_RECOVER_FRAMES = 3;
+  public long CAPTURE_WINDOW_MS = 2000L;
+  public long CAPTURE_GAP_RESET_MS = 500L;
 
   private final TargetMatcher matcher;
   private final ControlGenerator controlGenerator;
@@ -84,6 +106,11 @@ public class FollowStateMachine {
 
   private FollowState state = FollowState.IDLE;
   private int captureCount = 0;
+  private final ArrayDeque<Long> captureSampleTimesMs = new ArrayDeque<>();
+  private int captureTrackId = -1;
+  private long lastCaptureSampleMs = -1L;
+  private String initializationDiscardReason = "waiting_high_confidence";
+  private int confirmedTrackId = -1;
   private int matchCount = 0;
   private int lostCount = 0;
   private int midDefaultStreak = 0;
@@ -111,6 +138,14 @@ public class FollowStateMachine {
     return memory;
   }
 
+  public void setMaximumDistanceMultiplier(float value) {
+    controlGenerator.setMaximumDistanceMultiplier(value);
+  }
+
+  public float getMaximumDistanceMultiplier() {
+    return controlGenerator.getMaximumDistanceMultiplier();
+  }
+
   public void setSimulatorFastRecoveryEnabled(boolean enabled) {
     simulatorFastRecoveryEnabled = enabled;
   }
@@ -136,6 +171,21 @@ public class FollowStateMachine {
     resetRecoveryFreshEvidence();
   }
 
+  /** Direction/geometry continuity may restore follow without requiring the original front view. */
+  public void acceptDirectedContinuityRecovery(Recognition target) {
+    if (!simulatorFastRecoveryEnabled
+        || !hasFollowedInSession
+        || target == null
+        || state == FollowState.IDLE
+        || state == FollowState.STOP) return;
+    memory.updateDynamic(target);
+    state = FollowState.FOLLOW_CAUTION;
+    stateEnterTime = System.currentTimeMillis();
+    lostCount = 0;
+    resetEvidenceCounters();
+    resetRecoveryFreshEvidence();
+  }
+
   public void enterDirectedReacquire() {
     if (!simulatorFastRecoveryEnabled || !hasFollowedInSession) return;
     if (state == FollowState.STOP || state == FollowState.IDLE) return;
@@ -150,6 +200,8 @@ public class FollowStateMachine {
       memory.clear();
       snapshot = null;
       captureCount = 0;
+      resetCaptureWindow("capture_started");
+      confirmedTrackId = -1;
       hasFollowedInSession = false;
       resetRecoveryFreshEvidence();
       resetEvidenceCounters();
@@ -158,8 +210,14 @@ public class FollowStateMachine {
   }
 
   public void confirm() {
+    confirm(-1);
+  }
+
+  public void confirm(int lockedTrackId) {
     if (state == FollowState.LOCKED_PENDING_CONFIRM) {
-      state = FollowState.CONFIRMED_ARMED;
+      confirmedTrackId = lockedTrackId;
+      memory.resetDistanceCalibration();
+      state = FollowState.DISTANCE_CALIBRATION;
       matchCount = 0;
     }
   }
@@ -169,6 +227,8 @@ public class FollowStateMachine {
       memory.clear();
       snapshot = null;
       captureCount = 0;
+      resetCaptureWindow("retake");
+      confirmedTrackId = -1;
       state = FollowState.CAPTURE_TARGET;
     }
   }
@@ -177,6 +237,8 @@ public class FollowStateMachine {
     memory.clear();
     snapshot = null;
     captureCount = 0;
+    resetCaptureWindow("cancelled");
+    confirmedTrackId = -1;
     matchCount = 0;
     lostCount = 0;
     resetEvidenceCounters();
@@ -197,7 +259,7 @@ public class FollowStateMachine {
       int frameH,
       int sensorOrientation,
       IdentityEvidence externalIdentity) {
-    return onFrame(persons, frame, frameW, frameH, sensorOrientation, externalIdentity, null);
+    return onFrame(persons, frame, frameW, frameH, sensorOrientation, externalIdentity, null, null);
   }
 
   FrameResult observationOnly(List<Recognition> persons, IdentityEvidence identity) {
@@ -274,8 +336,21 @@ public class FollowStateMachine {
       int sensorOrientation,
       IdentityEvidence externalIdentity,
       TargetMatcher.MatchResult frameMatch) {
+    return onFrame(
+        persons, frame, frameW, frameH, sensorOrientation, externalIdentity, frameMatch, null);
+  }
+
+  public FrameResult onFrame(
+      List<Recognition> persons,
+      Bitmap frame,
+      int frameW,
+      int frameH,
+      int sensorOrientation,
+      IdentityEvidence externalIdentity,
+      TargetMatcher.MatchResult frameMatch,
+      InitializationObservation initialization) {
     List<Recognition> safePersons = persons == null ? new ArrayList<>() : persons;
-    long now = System.currentTimeMillis();
+    long now = nowMs();
 
     switch (state) {
       case IDLE:
@@ -284,25 +359,32 @@ public class FollowStateMachine {
 
       case CAPTURE_TARGET:
         {
-          Recognition cand = selectLargest(safePersons);
-          if (cand == null || cand.getLocation() == null) {
-            captureCount = 0;
-            return new FrameResult(
-                FollowState.CAPTURE_TARGET,
-                new Control(0f, 0f),
-                null,
-                null,
-                safePersons,
-                false,
-                false,
-                null,
-                -1);
+          Recognition cand =
+              initialization != null ? initialization.candidate : selectLargest(safePersons);
+          int trackId = initialization == null ? -1 : initialization.trackId;
+          if (cand == null || cand.getLocation() == null || cand.getConfidence() == null) {
+            if (lastCaptureSampleMs >= 0 && now - lastCaptureSampleMs > CAPTURE_GAP_RESET_MS)
+              resetCaptureWindow("target_missing_over_500ms");
+            else initializationDiscardReason = "waiting_high_confidence";
+            FrameResult waiting =
+                new FrameResult(
+                    FollowState.CAPTURE_TARGET,
+                    new Control(0f, 0f),
+                    null,
+                    null,
+                    safePersons,
+                    false,
+                    false,
+                    null,
+                    -1);
+            waiting.distanceDiagnosticText =
+                "目标采集中 " + captureCount + "/" + CAPTURE_FRAMES + "，等待高置信人物";
+            return waiting;
           }
-          captureCount++;
+          recordCaptureSample(trackId, now);
           if (captureCount >= CAPTURE_FRAMES) {
-            memory.captureFromBitmap(frame, cand.getLocation(), frameW, frameH, sensorOrientation);
+            memory.captureIdentityFromBitmap(frame, cand.getLocation());
             snapshot = cropSnapshot(frame, cand.getLocation(), sensorOrientation);
-            captureCount = 0;
             state = FollowState.LOCKED_PENDING_CONFIRM;
             return new FrameResult(
                 FollowState.LOCKED_PENDING_CONFIRM,
@@ -315,16 +397,19 @@ public class FollowStateMachine {
                 snapshot,
                 -1);
           }
-          return new FrameResult(
-              FollowState.CAPTURE_TARGET,
-              new Control(0f, 0f),
-              null,
-              cand,
-              safePersons,
-              false,
-              false,
-              null,
-              -1);
+          FrameResult collecting =
+              new FrameResult(
+                  FollowState.CAPTURE_TARGET,
+                  new Control(0f, 0f),
+                  null,
+                  cand,
+                  safePersons,
+                  false,
+                  false,
+                  null,
+                  -1);
+          collecting.distanceDiagnosticText = "目标采集中 " + captureCount + "/" + CAPTURE_FRAMES;
+          return collecting;
         }
 
       case LOCKED_PENDING_CONFIRM:
@@ -338,6 +423,47 @@ public class FollowStateMachine {
             false,
             snapshot,
             -1);
+
+      case DISTANCE_CALIBRATION:
+        {
+          Recognition cand =
+              initialization != null ? initialization.candidate : selectLargest(safePersons);
+          int trackId = initialization == null ? -1 : initialization.trackId;
+          boolean matchingTrack =
+              confirmedTrackId < 0 || (trackId >= 0 && trackId == confirmedTrackId);
+          boolean unique =
+              initialization == null
+                  ? safePersons.size() == 1
+                  : initialization.uniqueHighConfidence;
+          String discard = null;
+          if (cand == null || cand.getLocation() == null) discard = "waiting_locked_target";
+          else if (!matchingTrack) discard = "different_track";
+          else if (!unique) discard = "multiple_high_confidence_targets";
+          boolean ready = false;
+          if (discard == null) {
+            ready =
+                memory.offerDistanceCalibrationSample(
+                    cand.getLocation(), frameW, frameH, sensorOrientation, now);
+            if (!ready && memory.getDistanceCalibrationStatus().contains("裁切"))
+              discard = "person_clipped";
+          }
+          initializationDiscardReason = discard == null ? "distance_sample_accepted" : discard;
+          int samples = memory.getDistanceCalibrationSampleCount();
+          if (ready && memory.completeDistanceCalibration(now)) {
+            state = FollowState.CONFIRMED_ARMED;
+            initializationDiscardReason = "distance_calibration_completed";
+          }
+          FrameResult result =
+              new FrameResult(
+                  state, new Control(0f, 0f), cand, cand, safePersons, false, false, snapshot, -1);
+          result.distanceDiagnosticText =
+              state == FollowState.CONFIRMED_ARMED
+                  ? "距离标定完成"
+                  : discard == null
+                      ? "距离标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES
+                      : calibrationPrompt(discard, samples);
+          return result;
+        }
 
       case CONFIRMED_ARMED:
         if (!safePersons.isEmpty()) {
@@ -659,6 +785,52 @@ public class FollowStateMachine {
         return new FrameResult(
             FollowState.STOP, new Control(0f, 0f), null, null, safePersons, false, false, null, -1);
     }
+  }
+
+  private void recordCaptureSample(int trackId, long now) {
+    if (captureTrackId != -1 && trackId != -1 && captureTrackId != trackId)
+      resetCaptureWindow("capture_track_changed");
+    if (lastCaptureSampleMs >= 0 && now - lastCaptureSampleMs > CAPTURE_GAP_RESET_MS)
+      resetCaptureWindow("capture_gap_over_500ms");
+    captureTrackId = trackId;
+    lastCaptureSampleMs = now;
+    captureSampleTimesMs.addLast(now);
+    while (!captureSampleTimesMs.isEmpty()
+        && now - captureSampleTimesMs.peekFirst() > CAPTURE_WINDOW_MS)
+      captureSampleTimesMs.removeFirst();
+    captureCount = captureSampleTimesMs.size();
+    initializationDiscardReason = "capture_sample_accepted";
+  }
+
+  long nowMs() {
+    return System.currentTimeMillis();
+  }
+
+  private void resetCaptureWindow(String reason) {
+    captureSampleTimesMs.clear();
+    captureCount = 0;
+    captureTrackId = -1;
+    lastCaptureSampleMs = -1L;
+    initializationDiscardReason = reason;
+  }
+
+  private static String calibrationPrompt(String reason, int samples) {
+    if ("person_clipped".equals(reason))
+      return "距离标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES + "，请后退并保持完整人物入镜";
+    if ("multiple_high_confidence_targets".equals(reason)) return "距离标定暂停，请保持画面内只有已确认目标";
+    return "距离标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES + "，等待已确认目标";
+  }
+
+  public int getInitializationSampleCount() {
+    return captureCount;
+  }
+
+  public int getInitializationTrackId() {
+    return captureTrackId;
+  }
+
+  public String getInitializationDiscardReason() {
+    return initializationDiscardReason;
   }
 
   private void fillIdentity(FrameResult fr, IdentityEvidence id) {

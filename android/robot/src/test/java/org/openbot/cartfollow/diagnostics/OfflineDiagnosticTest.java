@@ -3,6 +3,7 @@ package org.openbot.cartfollow.diagnostics;
 import static org.junit.Assert.*;
 
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,6 +14,10 @@ import java.util.zip.*;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.openbot.cartfollow.DetectionTierEvidence;
+import org.openbot.cartfollow.IdentityCandidateSet;
+import org.openbot.cartfollow.TargetTrackManager;
+import org.openbot.tflite.Detector;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -20,6 +25,40 @@ import org.robolectric.annotation.Config;
 @Config(sdk = 28)
 public class OfflineDiagnosticTest {
   @Rule public TemporaryFolder temp = new TemporaryFolder();
+
+  @Test
+  public void candidateLogSeparatesRawLowProposalFromTrackBoundIdentityCandidate()
+      throws Exception {
+    CartFollowDiagnosticSession session = new CartFollowDiagnosticSession(temp.getRoot());
+    Detector.Recognition high =
+        new Detector.Recognition("high", "person", .9f, new RectF(10, 20, 80, 180), 0);
+    Detector.Recognition rawLow =
+        new Detector.Recognition("low", "person", .3f, new RectF(200, 40, 230, 100), 0);
+    TargetTrackManager tracks = new TargetTrackManager();
+    tracks.update(Collections.singletonList(high), 320, 240, 100);
+    IdentityCandidateSet candidates =
+        IdentityCandidateSet.from(Collections.singletonList(high), Collections.emptyList(), tracks);
+    DetectionTierEvidence tiers =
+        new DetectionTierEvidence(
+            .5f, .25f, Collections.singletonList(rawLow), Collections.emptyList(), false);
+    new CartFollowDiagnosticSaver()
+        .saveCandidatesAsync(
+            session, 7, Collections.singletonList(high), tiers, candidates, tracks);
+    session.finish("candidate_test");
+    assertTrue(session.io.awaitClosed(5000));
+    String log =
+        new String(Files.readAllBytes(session.candidateLogCsv.toPath()), StandardCharsets.UTF_8);
+    String frameHeader =
+        new String(Files.readAllBytes(session.frameLogCsv.toPath()), StandardCharsets.UTF_8);
+    assertTrue(frameHeader.contains("initialization_samples,initialization_track_id"));
+    assertTrue(
+        frameHeader.contains(
+            "initialization_discard_reason,distance_calibration_samples,distance_calibration_completed_ms"));
+    assertTrue(log.contains(",\"high\",0.9000,"));
+    assertTrue(log.contains(",\"raw_low\",0.3000,"));
+    assertTrue(log.contains(",1,1,,0,,\"new_track\""));
+    assertTrue(log.contains(",-1,0,,0,,\"unbound\""));
+  }
 
   @Test
   public void closeDrainsAcceptedEventsRejectsLateWritesAndExportsCompleteZip() throws Exception {
@@ -57,6 +96,7 @@ public class OfflineDiagnosticTest {
                 "status.json",
                 "frame_log.csv",
                 "identity_log.csv",
+                "candidate_log.csv",
                 "control_log.csv",
                 "gallery_provenance.jsonl")));
     assertEquals(

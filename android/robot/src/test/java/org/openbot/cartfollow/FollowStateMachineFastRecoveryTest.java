@@ -55,6 +55,13 @@ public class FollowStateMachineFastRecoveryTest {
         FollowState.LOCKED_PENDING_CONFIRM,
         machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0).state);
     machine.confirm();
+    for (int i = 0; i < 15; i++)
+      machine
+          .getMemory()
+          .offerDistanceCalibrationSample(person.getLocation(), 100, 200, 0, i * 50L);
+    assertEquals(
+        FollowState.CONFIRMED_ARMED,
+        machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0).state);
     machine.onFrame(Collections.singletonList(person), frame, 100, 200, 0, strong(person, 1));
     assertEquals(
         FollowState.READY_TO_FOLLOW,

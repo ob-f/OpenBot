@@ -25,6 +25,8 @@ public class FollowSessionGuardTest {
         BaseCartFollowFragment.shouldShowConfirmation(false, FollowState.LOCKED_PENDING_CONFIRM));
     assertFalse(BaseCartFollowFragment.shouldShowConfirmation(true, FollowState.IDLE));
     assertFalse(BaseCartFollowFragment.shouldShowConfirmation(true, FollowState.CONFIRMED_ARMED));
+    assertFalse(
+        BaseCartFollowFragment.shouldShowConfirmation(true, FollowState.DISTANCE_CALIBRATION));
   }
 
   @Test

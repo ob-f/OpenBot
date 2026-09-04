@@ -58,8 +58,8 @@ public class CartFollowDiagnosticSession {
   public final File eventsCsv;
   public final long startedAtMs;
 
-  public volatile int frameRows, identityRows, eventRows, cropCount, galleryCount;
-  public final File controlLogCsv, provenanceFile;
+  public volatile int frameRows, identityRows, candidateRows, eventRows, cropCount, galleryCount;
+  public final File controlLogCsv, candidateLogCsv, provenanceFile;
   public final long startedMonotonicMs = android.os.SystemClock.elapsedRealtime();
   public final DiagnosticIo io;
   public volatile long latestFrame, latestSourceMs, latestGeneration;
@@ -99,6 +99,7 @@ public class CartFollowDiagnosticSession {
     identityLogCsv = new File(sessionDir, "identity_log.csv");
     eventsCsv = new File(sessionDir, "events.csv");
     controlLogCsv = new File(sessionDir, "control_log.csv");
+    candidateLogCsv = new File(sessionDir, "candidate_log.csv");
     provenanceFile = new File(sessionDir, "gallery_provenance.jsonl");
     io = new DiagnosticIo(this::initialize);
     ACTIVE.put(sessionDir.getAbsolutePath(), this);
@@ -112,11 +113,17 @@ public class CartFollowDiagnosticSession {
       writeHeader(
           frameLogCsv,
           FRAME_LOG_HEADER
-              + ",tracking_session,tracking_frame,tracking_ms,tracking_tier,tracking_stable,tracking_max_gear,tracking_reason");
+              + ",tracking_session,tracking_frame,tracking_ms,tracking_tier,tracking_stable,tracking_max_gear,tracking_reason"
+              + ",raw_low_candidate_count,tracked_low_candidate_count,identity_candidate_count,multi_check_state,primary_limit_reason"
+              + ",aim_allowed,aim_mode,aim_error,aim_reason,translation_allowed,translation_max_gear,translation_reason"
+              + ",initialization_samples,initialization_track_id,initialization_discard_reason,distance_calibration_samples,distance_calibration_completed_ms");
       writeHeader(identityLogCsv, IDENTITY_LOG_HEADER);
       writeHeader(eventsCsv, EVENTS_HEADER);
       writeHeader(
           controlLogCsv, "session_id,monotonic_ms,source_frame,source_ms,generation,event,details");
+      writeHeader(
+          candidateLogCsv,
+          "session_id,frame_id,timestamp_ms,candidate_index,tier,confidence,left,top,right,bottom,track_id,identity_eligible,association_score,association_competing,locked_association_margin,match_reason");
       writeHeader(provenanceFile, null);
       writeJson(
           new File(sessionDir, "status.json"),
@@ -145,10 +152,10 @@ public class CartFollowDiagnosticSession {
                 .put("created_at_ms", startedAtMs)
                 .put("started_monotonic_ms", startedMonotonicMs)
                 .put("app_mode", mode)
-                .put("log_version", 2)
+                .put("log_version", 5)
                 .put("build", org.openbot.BuildConfig.VERSION_NAME)
                 .put("build_stamp", org.openbot.BuildConfig.CART_BUILD_STAMP)
-                .put("strategy", "continuity-v2")
+                .put("strategy", "continuity-aim-init-v4")
                 .put("device_model", Build.MODEL)
                 .put("sdk_int", Build.VERSION.SDK_INT)
                 .put("detector", detector)
@@ -168,6 +175,14 @@ public class CartFollowDiagnosticSession {
                 .put("association_margin", .15)
                 .put("short_return_ms", 500)
                 .put("stable_frames", 3)
+                .put("aim_pivot_enter_error", .18)
+                .put("aim_pivot_exit_error", .08)
+                .put("aim_edge_pivot_error", .35)
+                .put("aim_centered_frames", 3)
+                .put("aim_pivot_speed", 5)
+                .put("distance_calibration_samples", 15)
+                .put("distance_calibration_span_ms", 500)
+                .put("default_maximum_distance_multiplier", 1.10)
                 .put("reid_interval_ms", 200)
                 .put("multi_check_ms", 500)
                 .put("multi_timeout_ms", 1000)
@@ -288,6 +303,7 @@ public class CartFollowDiagnosticSession {
                     .put("error", io.error)
                     .put("frames", frameRows)
                     .put("identities", identityRows)
+                    .put("candidates", candidateRows)
                     .put("events", eventRows)
                     .put("crops", cropCount)
                     .put("gallery_images", galleryCount)

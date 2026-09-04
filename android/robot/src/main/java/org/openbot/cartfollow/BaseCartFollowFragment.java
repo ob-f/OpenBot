@@ -248,9 +248,14 @@ public class BaseCartFollowFragment extends CameraFragment {
             resetFollowSession();
             return;
           }
-          if (reidCoordinator != null) reidCoordinator.confirmGallery();
           int lockedTrackId =
               targetTrackManager.lockClosest(stateMachine.getMemory().getLastBbox());
+          if (lockedTrackId < 0) {
+            recordControlEvent("target_confirm_failed", "locked_track_unavailable");
+            updateCommandText("目标轨迹已失效，请重拍");
+            return;
+          }
+          if (reidCoordinator != null) reidCoordinator.confirmGallery();
           beliefAccumulator.lockTrack(lockedTrackId);
           activateDiagnosticSession();
           if (diagnosticActive && diagnosticSession != null && latestConfirmSnapshot != null) {
@@ -258,7 +263,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                 latestConfirmSnapshot, diagnosticSession, "confirmed_snapshot");
           }
           recordControlEvent("target_confirmed", "locked_track=" + lockedTrackId);
-          stateMachine.confirm();
+          stateMachine.confirm(lockedTrackId);
           invalidatePendingUiSnapshots();
           if (enhancedRecoveryEnabled) rememberDistractors(lockedTrackId, lastPresentedPersons);
           binding.confirmPanel.setVisibility(View.GONE);
@@ -752,8 +757,9 @@ public class BaseCartFollowFragment extends CameraFragment {
                   tierUpdate == null
                       ? java.util.Collections.emptyList()
                       : tierUpdate.continuedLowConfidence;
-              List<Detector.Recognition> identityCandidates = new ArrayList<>(mappedRecognitions);
-              identityCandidates.addAll(continuedLowConfidence);
+              IdentityCandidateSet identityCandidates =
+                  IdentityCandidateSet.from(
+                      mappedRecognitions, continuedLowConfidence, targetTrackManager);
               FollowState currentState = stateMachine.getState();
               Detector.Recognition largestPerson = selectLargest(mappedRecognitions);
               long initializationStartedMs = SystemClock.elapsedRealtime();
@@ -784,7 +790,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                   reidCoordinator == null
                       ? null
                       : reidCoordinator.evaluate(
-                          identityCandidates,
+                          identityCandidates.candidates,
                           workingFrame,
                           stateMachine.getMemory(),
                           currentState,
@@ -831,6 +837,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                   currentState != FollowState.IDLE
                       && currentState != FollowState.CAPTURE_TARGET
                       && currentState != FollowState.LOCKED_PENDING_CONFIRM
+                      && currentState != FollowState.DISTANCE_CALIBRATION
                       && currentState != FollowState.STOP;
               boolean stale =
                   enhancedRecoveryEnabled && SystemClock.elapsedRealtime() - receivedAtMs > 500L;
@@ -913,7 +920,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                 if (reidCoordinator != null)
                   simulatorIdentityGuard.inspectCandidates(
                       reidCoordinator.getGlobalScores(),
-                      mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                      identityCandidates,
                       targetTrackManager.getLockedTrackId(),
                       acceptedSequence,
                       receivedAtMs);
@@ -928,7 +935,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                         high,
                         local,
                         identity == null ? null : identity.reidMatch,
-                        mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                        identityCandidates,
                         targetTrackManager.isLockedAssociationCompeting(),
                         candidateTrack == null || candidateTrack.missedFrames > 0,
                         identity == null || reidCoordinator == null
@@ -969,6 +976,23 @@ public class BaseCartFollowFragment extends CameraFragment {
                   stateMachine.acceptSimulatorRecovery(authorization, identity.bestCandidate);
               }
               boolean holdIdentity = authorization != null && !authorization.authorized;
+              Detector.Recognition initializationCandidate = largestPerson;
+              if (currentState == FollowState.DISTANCE_CALIBRATION) {
+                TargetTrack lockedInitializationTrack = targetTrackManager.getLockedTrack();
+                initializationCandidate =
+                    lockedInitializationTrack != null
+                            && lockedInitializationTrack.isVisible()
+                            && mappedRecognitions.contains(lockedInitializationTrack.recognition)
+                        ? lockedInitializationTrack.recognition
+                        : null;
+              }
+              TargetTrack initializationTrack =
+                  targetTrackManager.getTrackForRecognition(initializationCandidate);
+              FollowStateMachine.InitializationObservation initializationObservation =
+                  new FollowStateMachine.InitializationObservation(
+                      initializationCandidate,
+                      initializationTrack == null ? -1 : initializationTrack.trackId,
+                      mappedRecognitions.size() == 1);
               FollowStateMachine.FrameResult fr =
                   !stale && holdIdentity && authorization.retainTarget
                       ? stateMachine.continuityFrame(
@@ -987,7 +1011,8 @@ public class BaseCartFollowFragment extends CameraFragment {
                               frameH,
                               activeSensorOrientation,
                               identity,
-                              enhancedRecoveryEnabled ? legacyMatch : null);
+                              enhancedRecoveryEnabled ? legacyMatch : null,
+                              initializationObservation);
               fr.simulatorIdentity = authorization;
               fr.trackingDecision = authorization == null ? null : authorization.tracking;
               fr.frameSequence = acceptedSequence;
@@ -995,12 +1020,24 @@ public class BaseCartFollowFragment extends CameraFragment {
               fr.targetObservation =
                   targetObservation(
                       continuedLowConfidence,
-                      mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                      identityCandidates.size(),
                       frameW,
                       frameH,
                       activeSensorOrientation,
                       receivedAtMs);
-              fr.distanceDiagnosticText = distanceDiagnostic(fr.targetObservation);
+              if ((fr.state != FollowState.CAPTURE_TARGET
+                      && fr.state != FollowState.DISTANCE_CALIBRATION
+                      && currentState != FollowState.DISTANCE_CALIBRATION)
+                  || fr.distanceDiagnosticText == null
+                  || fr.distanceDiagnosticText.isEmpty())
+                fr.distanceDiagnosticText = distanceDiagnostic(fr.targetObservation);
+              fr.initializationSampleCount = stateMachine.getInitializationSampleCount();
+              fr.initializationTrackId = stateMachine.getInitializationTrackId();
+              fr.initializationDiscardReason = stateMachine.getInitializationDiscardReason();
+              fr.distanceCalibrationSampleCount =
+                  stateMachine.getMemory().getReportedDistanceCalibrationSampleCount();
+              fr.distanceCalibrationCompletedAtMs =
+                  stateMachine.getMemory().getDistanceCalibrationCompletedAtMs();
               selectedLowConfidence =
                   identity != null && continuedLowConfidence.contains(identity.bestCandidate);
               fr.detectionTierEvidence =
@@ -1012,6 +1049,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                           continuedLowConfidence,
                           selectedLowConfidence)
                       : DetectionTierEvidence.disabled(minConfidence);
+              fr.identityCandidates = identityCandidates;
               fr.behaviorDecision = decideBehavior(fr, frameW, frameH);
               if (!enhancedRecoveryEnabled) maybeRelockAfterRecovery(fr);
               if (enhancedRecoveryEnabled) {
@@ -1043,7 +1081,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                                   fr.state,
                                   fr.behaviorDecision,
                                   galleryIdentity,
-                                  mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                                  identityCandidates.size(),
                                   frameW,
                                   frameH,
                                   activeSensorOrientation,
@@ -1059,7 +1097,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                                   fr.state,
                                   fr.behaviorDecision,
                                   galleryIdentity,
-                                  mappedRecognitions.size() + lowConfidenceRecognitions.size(),
+                                  identityCandidates.size(),
                                   frameW,
                                   frameH,
                                   activeSensorOrientation,
@@ -1407,6 +1445,10 @@ public class BaseCartFollowFragment extends CameraFragment {
     List<DrawBox> boxes = new ArrayList<>();
     Detector.Recognition pendingCandidate =
         fr.state == FollowState.LOCKED_PENDING_CONFIRM ? selectLargest(fr.persons) : null;
+    Detector.Recognition captureCandidate =
+        fr.state == FollowState.CAPTURE_TARGET ? selectLargest(fr.persons) : null;
+    Detector.Recognition calibrationCandidate =
+        fr.state == FollowState.DISTANCE_CALIBRATION ? fr.target : null;
     for (Detector.Recognition r : fr.persons) {
       if (r == null || r.getLocation() == null) continue;
       int colorType = COLOR_NORMAL;
@@ -1416,7 +1458,11 @@ public class BaseCartFollowFragment extends CameraFragment {
           fr.state == FollowState.IDENTITY_UNCERTAIN
               || fr.state == FollowState.REACQUIRE_TARGET
               || fr.state == FollowState.DIRECTED_REACQUIRE;
-      if (pendingConfirmation && r == pendingCandidate) {
+      if (r == captureCandidate) {
+        colorType = COLOR_CANDIDATE;
+      } else if (r == calibrationCandidate) {
+        colorType = COLOR_TARGET;
+      } else if (pendingConfirmation && r == pendingCandidate) {
         colorType = COLOR_CANDIDATE;
       } else if (track != null
           && targetTrackManager.isLockedTrack(track)
@@ -1440,7 +1486,15 @@ public class BaseCartFollowFragment extends CameraFragment {
                   && (track.trackId == fr.simulatorIdentity.trackId
                       || targetTrackManager.isLockedTrack(track))))) colorType = COLOR_CANDIDATE;
       String label = null;
-      if (pendingConfirmation && r == pendingCandidate) {
+      if (r == captureCandidate) {
+        label = "目标采集中 " + fr.initializationSampleCount + "/" + stateMachine.CAPTURE_FRAMES;
+      } else if (r == calibrationCandidate) {
+        label =
+            "已确认 · 距离标定 "
+                + fr.distanceCalibrationSampleCount
+                + "/"
+                + TargetMemory.DISTANCE_CALIBRATION_SAMPLES;
+      } else if (pendingConfirmation && r == pendingCandidate) {
         label = "待确认";
       } else if (recovering && r == fr.target) {
         label = "重捕确认中";
@@ -1561,9 +1615,15 @@ public class BaseCartFollowFragment extends CameraFragment {
       case IDLE:
         return "待命，打开 Start 开始采集目标";
       case CAPTURE_TARGET:
-        return "采集中，请保持站立";
+        return fr.distanceDiagnosticText == null || fr.distanceDiagnosticText.isEmpty()
+            ? "采集中，请保持站立"
+            : fr.distanceDiagnosticText;
       case LOCKED_PENDING_CONFIRM:
         return "请确认是否跟随此人";
+      case DISTANCE_CALIBRATION:
+        return fr.distanceDiagnosticText == null || fr.distanceDiagnosticText.isEmpty()
+            ? "已确认，正在距离标定 · c0,0"
+            : fr.distanceDiagnosticText + " · c0,0";
       case CONFIRMED_ARMED:
         return "已确认，请回到车前";
       case REACQUIRE_TARGET:
@@ -1872,6 +1932,14 @@ public class BaseCartFollowFragment extends CameraFragment {
     Detector.Recognition suspected = recognitionForTrack(suspectedTrack);
     Detector.Recognition bestReid =
         reidCoordinator == null ? null : reidCoordinator.getLastBestCandidate();
+    if (shouldLog)
+      diagnosticSaver.saveCandidatesAsync(
+          diagnosticSession,
+          fr.frameSequence,
+          fr.persons,
+          fr.detectionTierEvidence,
+          fr.identityCandidates,
+          targetTrackManager);
     diagnosticSaver.saveFrameAsync(
         workingFrame,
         diagnosticSession,
@@ -1891,6 +1959,7 @@ public class BaseCartFollowFragment extends CameraFragment {
         fr.galleryGeometry,
         fr.simulatorDriveResult,
         fr.detectionTierEvidence,
+        fr.identityCandidates,
         fr.directedReacquireEvidence,
         fr.frameTiming,
         fr.targetObservation,
@@ -1900,6 +1969,11 @@ public class BaseCartFollowFragment extends CameraFragment {
         fr.deferredGalleryStatus,
         fr.recentMatchingSupport,
         fr.realDriveResult,
+        fr.initializationSampleCount,
+        fr.initializationTrackId,
+        fr.initializationDiscardReason,
+        fr.distanceCalibrationSampleCount,
+        fr.distanceCalibrationCompletedAtMs,
         locked,
         suspected,
         bestReid,

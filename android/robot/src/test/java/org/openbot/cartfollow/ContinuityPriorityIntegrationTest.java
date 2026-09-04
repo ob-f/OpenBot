@@ -18,7 +18,7 @@ public class ContinuityPriorityIntegrationTest {
         "target",
         "person",
         confidence,
-        new RectF(80 - width / 2, 200 - height / 2, 80 + width / 2, 200 + height / 2),
+        new RectF(200 - width / 2, 200 - height / 2, 200 + width / 2, 200 + height / 2),
         0);
   }
 
@@ -35,9 +35,6 @@ public class ContinuityPriorityIntegrationTest {
       for (int n = 0; n < 360; n++) {
         float height = 180 - n * .17f;
         Recognition measured = target(.95f, height / 3 * (n % 90 < 45 ? 1.3f : .7f), height);
-        RectF centered = measured.getLocation();
-        centered.offset(120, 0);
-        measured.setLocation(centered);
         SimulatorAutomaticRecoveryIntegrationTest.Step step = flow.step(33, measured);
         assertTrue("frame " + n + ": " + step.permit.reason, step.permit.motionAllowed);
         assertTrue(
@@ -149,7 +146,7 @@ public class ContinuityPriorityIntegrationTest {
         assertTrue(step.globalScore.adaptiveScore > .99f);
         assertEquals(n == 5, step.permit.authorized);
         assertEquals(n < 5, real.auto(step.frame, SystemClock.elapsedRealtime()).isStop());
-        if (n == 5) assertTrue(step.drive.left > 0 && step.drive.right > 0);
+        if (n == 5) assertTrue(step.drive.left != 0 || step.drive.right != 0);
       }
     }
   }

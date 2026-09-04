@@ -169,6 +169,44 @@ public class SimulatorAutoDriveControllerTest {
     assertEquals("distance_ok", result.reason);
   }
 
+  @Test
+  public void nonFarTargetStillPivotsUntilCenteredForThreeFrames() {
+    SimulatorAutoDriveController controller = new SimulatorAutoDriveController();
+    FollowStateMachine.FrameResult frame = frame(0.90f, 40, SteeringEvidence.Direction.LEFT);
+    frame.distanceEstimate =
+        new ImageSetpointDistanceEstimator.DistanceEstimate(
+            0.90f, 0.90f, 0f, DistanceState.OK, 1f, null);
+    frame.steeringEvidence = steering(-.22f, SteeringEvidence.Direction.LEFT);
+    SimulatorAutoDriveController.Result pivot = controller.update(frame, 0);
+    assertEquals(SimulatorAutoDriveController.Phase.PIVOT, pivot.phase);
+    assertEquals(-5, pivot.left);
+    assertEquals(5, pivot.right);
+    frame.steeringEvidence = steering(0.04f, SteeringEvidence.Direction.NONE);
+    assertEquals(SimulatorAutoDriveController.Phase.PIVOT, controller.update(frame, 33).phase);
+    assertEquals(SimulatorAutoDriveController.Phase.PIVOT, controller.update(frame, 66).phase);
+    SimulatorAutoDriveController.Result centered = controller.update(frame, 99);
+    assertEquals(0, centered.left);
+    assertEquals("distance_ok", centered.reason);
+  }
+
+  private static SteeringEvidence steering(
+      float predictedError, SteeringEvidence.Direction direction) {
+    return new SteeringEvidence(
+        true,
+        "test",
+        predictedError,
+        predictedError,
+        0f,
+        predictedError,
+        0f,
+        Math.round(Math.abs(predictedError) * 100f),
+        direction,
+        direction == SteeringEvidence.Direction.NONE
+            ? SteeringEvidence.Level.CENTER
+            : SteeringEvidence.Level.MEDIUM,
+        400);
+  }
+
   private static FollowStateMachine.FrameResult frame(
       float heightScale, int demand, SteeringEvidence.Direction direction) {
     FollowStateMachine.FrameResult frame =

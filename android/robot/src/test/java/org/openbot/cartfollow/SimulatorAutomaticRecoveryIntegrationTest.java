@@ -51,12 +51,12 @@ public class SimulatorAutomaticRecoveryIntegrationTest {
           assertEquals(step.identity.trackId, flow.tracks.getLockedTrackId());
           assertEquals(FollowState.FOLLOW_CAUTION, step.frame.state);
           assertSame(returned, step.frame.target);
-          assertMoving(step);
+          assertPivoting(step);
         }
       }
       assertTrue(SystemClock.elapsedRealtime() - started < 3000L);
       Step next = flow.step(300, remote("returned"));
-      assertMoving(next);
+      assertPivoting(next);
       assertEquals(SimulatorIdentityGuard.RecoveryType.LOCAL, next.permit.recoveryType);
       assertEquals(3000L, flow.machine.COUNTDOWN_MS);
     }
@@ -190,16 +190,24 @@ public class SimulatorAutomaticRecoveryIntegrationTest {
     assertFalse(step.drive.lockout);
   }
 
+  private static void assertPivoting(Step step) {
+    assertTrue(step.permit.motionAllowed);
+    assertEquals(SimulatorAutoDriveController.Phase.PIVOT, step.drive.phase);
+    assertTrue(step.drive.left != 0 || step.drive.right != 0);
+    assertEquals(-step.drive.left, step.drive.right);
+    assertFalse(step.drive.lockout);
+  }
+
   private static Recognition initialTarget() {
-    return person("target", new RectF(40, 80, 120, 320));
+    return person("target", new RectF(160, 80, 240, 320));
   }
 
   static Recognition movingTarget() {
-    return person("target", new RectF(48, 104, 112, 296));
+    return person("target", new RectF(168, 104, 232, 296));
   }
 
   static Recognition remote(String id) {
-    return person(id, new RectF(280, 140, 336, 308));
+    return person(id, new RectF(340, 320, 396, 388));
   }
 
   private static Recognition person(String id, RectF box) {
@@ -299,11 +307,16 @@ public class SimulatorAutomaticRecoveryIntegrationTest {
       confirmedSnapshot = captured.snapshot;
       assertNotSame(image, confirmedSnapshot);
       snapshotPixels = pixels(confirmedSnapshot);
-      baseline = machine.getMemory().getDistanceSetpoint();
       confirmedArea = machine.getMemory().getConfirmedArea();
       upperHist = machine.getMemory().getUpperColorHist().clone();
       lowerHist = machine.getMemory().getLowerColorHist().clone();
       machine.confirm();
+      for (int i = 0; i < 15; i++)
+        machine.getMemory().offerDistanceCalibrationSample(target.getLocation(), W, H, 0, i * 50L);
+      assertEquals(
+          FollowState.CONFIRMED_ARMED,
+          machine.onFrame(Collections.singletonList(target), image, W, H, 0).state);
+      baseline = machine.getMemory().getDistanceSetpoint();
     }
 
     void startFollowing() {

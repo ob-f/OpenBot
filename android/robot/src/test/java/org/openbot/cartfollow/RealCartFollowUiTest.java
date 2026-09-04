@@ -44,12 +44,12 @@ public class RealCartFollowUiTest {
   }
 
   @Test
-  public void firstEntryUsesHighCapButSearchIsOff() {
+  public void firstEntryUsesHighCapAndDirectedSearchDefaultsOn() {
     Screen f = screen();
     assertEquals(R.id.auto_gear_21, f.binding.autoGearGroup.getCheckedButtonId());
-    assertFalse(f.binding.realSearchEnabled.isChecked());
+    assertTrue(f.binding.realSearchEnabled.isChecked());
     assertEquals(5, f.binding.searchSpeedSlider.getValue(), 0);
-    assertFalse(f.binding.searchSpeedSlider.isEnabled());
+    assertTrue(f.binding.searchSpeedSlider.isEnabled());
     assertTrue(f.binding.recentGallerySwitch.isChecked());
     assertEquals(View.GONE, f.binding.recoveryTimeoutGroup.getVisibility());
     assertSame(f.binding.simulatorExperimentPanel, f.binding.steeringStrengthPanel.getParent());
@@ -74,7 +74,7 @@ public class RealCartFollowUiTest {
   }
 
   @Test
-  public void settingsPersistButRotationPermissionDoesNot() {
+  public void settingsPersistAndNewPageDefaultsRotationPermissionOn() {
     Screen f = screen();
     f.binding.autoGearGroup.check(R.id.auto_gear_18);
     f.binding.realSearchEnabled.setChecked(true);
@@ -85,7 +85,7 @@ public class RealCartFollowUiTest {
     assertEquals(R.id.auto_gear_18, next.binding.autoGearGroup.getCheckedButtonId());
     assertEquals(9, next.binding.searchSpeedSlider.getValue(), 0);
     assertEquals(120, next.binding.searchAngleSlider.getValue(), 0);
-    assertFalse(next.binding.realSearchEnabled.isChecked());
+    assertTrue(next.binding.realSearchEnabled.isChecked());
   }
 
   @Test

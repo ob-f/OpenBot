@@ -3,6 +3,9 @@ package org.openbot.cartfollow;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.RectF;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.openbot.tflite.Detector.Recognition;
 
 public class TargetMemory {
@@ -30,6 +33,15 @@ public class TargetMemory {
   private float desiredHeightRatio;
   private float desiredAreaRatio;
   private float desiredBottomRatio;
+  private final List<float[]> distanceCalibrationSamples = new ArrayList<>();
+  private final List<Long> distanceCalibrationTimesMs = new ArrayList<>();
+  private String distanceCalibrationStatus = "等待完整人物框";
+  private long distanceCalibrationCompletedAtMs;
+  private int completedDistanceCalibrationSampleCount;
+
+  public static final int DISTANCE_CALIBRATION_SAMPLES = 15;
+  public static final long DISTANCE_CALIBRATION_SPAN_MS = 500L;
+  private static final int DISTANCE_CALIBRATION_MAX_SAMPLES = 60;
 
   private RectF lastBbox;
   private RectF previousBbox;
@@ -44,6 +56,27 @@ public class TargetMemory {
 
   public void captureFromBitmap(
       Bitmap bitmap, RectF bbox, int frameW, int frameH, int sensorOrientation) {
+    captureAppearanceFromBitmap(bitmap, bbox);
+    if (distanceCalibrationSamples.size() >= DISTANCE_CALIBRATION_SAMPLES) {
+      applyDistanceCalibration(System.currentTimeMillis());
+    } else {
+      computeDistanceSetpoint(bbox, frameW, frameH, sensorOrientation);
+      resetDistanceCalibrationSamples("等待完整人物框");
+    }
+  }
+
+  /** Captures the confirmed identity without making a one-frame distance setpoint authoritative. */
+  public void captureIdentityFromBitmap(Bitmap bitmap, RectF bbox) {
+    captureAppearanceFromBitmap(bitmap, bbox);
+    desiredHeightRatio = 0f;
+    desiredAreaRatio = 0f;
+    desiredBottomRatio = 0f;
+    distanceCalibrationCompletedAtMs = 0L;
+    completedDistanceCalibrationSampleCount = 0;
+    resetDistanceCalibrationSamples("等待确认后距离标定");
+  }
+
+  private void captureAppearanceFromBitmap(Bitmap bitmap, RectF bbox) {
     confirmedBbox = new RectF(bbox);
     confirmedArea = bbox.width() * bbox.height();
     confirmedAspectRatio = bbox.width() / Math.max(1f, bbox.height());
@@ -55,31 +88,128 @@ public class TargetMemory {
     lastCenterY = bbox.centerY();
     lastArea = confirmedArea;
     lastSeenTimeMs = System.currentTimeMillis();
-    computeDistanceSetpoint(bbox, frameW, frameH, sensorOrientation);
+  }
+
+  public boolean offerDistanceCalibrationSample(
+      RectF bbox, int frameW, int frameH, int sensorOrientation, long observedAtMs) {
+    float[] geometry = normalizedGeometry(bbox, frameW, frameH, sensorOrientation);
+    if (geometry == null || geometry[3] < 0.01f || geometry[2] > 0.99f) {
+      distanceCalibrationStatus = "人物顶部或底部被裁切，请重新站位";
+      return false;
+    }
+    distanceCalibrationSamples.add(new float[] {geometry[0], geometry[1], geometry[2]});
+    distanceCalibrationTimesMs.add(observedAtMs);
+    if (distanceCalibrationSamples.size() > DISTANCE_CALIBRATION_MAX_SAMPLES) {
+      distanceCalibrationSamples.remove(0);
+      distanceCalibrationTimesMs.remove(0);
+    }
+    long span = observedAtMs - distanceCalibrationTimesMs.get(0);
+    boolean ready =
+        distanceCalibrationSamples.size() >= DISTANCE_CALIBRATION_SAMPLES
+            && span >= DISTANCE_CALIBRATION_SPAN_MS;
+    distanceCalibrationStatus =
+        ready
+            ? "距离标定完成"
+            : "距离标定 "
+                + distanceCalibrationSamples.size()
+                + "/"
+                + DISTANCE_CALIBRATION_SAMPLES
+                + "，已覆盖 "
+                + span
+                + " ms";
+    return ready;
+  }
+
+  public boolean completeDistanceCalibration(long completedAtMs) {
+    if (distanceCalibrationSamples.size() < DISTANCE_CALIBRATION_SAMPLES
+        || distanceCalibrationTimesMs.isEmpty()
+        || distanceCalibrationTimesMs.get(distanceCalibrationTimesMs.size() - 1)
+                - distanceCalibrationTimesMs.get(0)
+            < DISTANCE_CALIBRATION_SPAN_MS) return false;
+    applyDistanceCalibration(completedAtMs);
+    return true;
+  }
+
+  private void applyDistanceCalibration(long completedAtMs) {
+    completedDistanceCalibrationSampleCount = distanceCalibrationSamples.size();
+    desiredHeightRatio = median(0);
+    desiredAreaRatio = median(1);
+    desiredBottomRatio = median(2);
+    distanceCalibrationCompletedAtMs = completedAtMs;
+    resetDistanceCalibrationSamples("距离标定完成");
+  }
+
+  public void resetDistanceCalibration() {
+    resetDistanceCalibrationSamples("等待完整人物框");
+    distanceCalibrationCompletedAtMs = 0L;
+    completedDistanceCalibrationSampleCount = 0;
+  }
+
+  private void resetDistanceCalibrationSamples(String status) {
+    distanceCalibrationSamples.clear();
+    distanceCalibrationTimesMs.clear();
+    distanceCalibrationStatus = status;
+  }
+
+  public int getDistanceCalibrationSampleCount() {
+    return distanceCalibrationSamples.size();
+  }
+
+  public String getDistanceCalibrationStatus() {
+    return distanceCalibrationStatus;
+  }
+
+  public long getDistanceCalibrationCompletedAtMs() {
+    return distanceCalibrationCompletedAtMs;
+  }
+
+  public int getReportedDistanceCalibrationSampleCount() {
+    return distanceCalibrationSamples.isEmpty()
+        ? completedDistanceCalibrationSampleCount
+        : distanceCalibrationSamples.size();
   }
 
   private void computeDistanceSetpoint(RectF bbox, int frameW, int frameH, int sensorOrientation) {
-    if (frameW <= 0 || frameH <= 0 || bbox == null) {
+    float[] geometry = normalizedGeometry(bbox, frameW, frameH, sensorOrientation);
+    if (geometry == null) {
       desiredHeightRatio = 0f;
       desiredAreaRatio = 0f;
       desiredBottomRatio = 0f;
       return;
     }
+    desiredHeightRatio = geometry[0];
+    desiredAreaRatio = geometry[1];
+    desiredBottomRatio = geometry[2];
+  }
+
+  private static float[] normalizedGeometry(
+      RectF bbox, int frameW, int frameH, int sensorOrientation) {
+    if (frameW <= 0 || frameH <= 0 || bbox == null) return null;
     boolean rotated = sensorOrientation % 180 == 90;
     float imgWidth = rotated ? frameH : frameW;
     float imgHeight = rotated ? frameW : frameH;
-    if (imgWidth <= 0 || imgHeight <= 0) {
-      desiredHeightRatio = 0f;
-      desiredAreaRatio = 0f;
-      desiredBottomRatio = 0f;
-      return;
-    }
+    if (imgWidth <= 0 || imgHeight <= 0) return null;
     float boxHeight = rotated ? bbox.width() : bbox.height();
     float boxWidth = rotated ? bbox.height() : bbox.width();
+    float boxTop = rotated ? bbox.left : bbox.top;
     float boxBottom = rotated ? bbox.right : bbox.bottom;
-    desiredHeightRatio = boxHeight / imgHeight;
-    desiredAreaRatio = (boxWidth * boxHeight) / (imgWidth * imgHeight);
-    desiredBottomRatio = boxBottom / imgHeight;
+    if (boxHeight <= 0f || boxWidth <= 0f) return null;
+    return new float[] {
+      boxHeight / imgHeight,
+      (boxWidth * boxHeight) / (imgWidth * imgHeight),
+      boxBottom / imgHeight,
+      boxTop / imgHeight
+    };
+  }
+
+  private float median(int index) {
+    List<Float> values = new ArrayList<>();
+    for (float[] sample : distanceCalibrationSamples) values.add(sample[index]);
+    Collections.sort(values);
+    int middle = values.size() / 2;
+    return values.size() % 2 == 0
+        ? (values.get(middle - 1) + values.get(middle)) / 2f
+        : values.get(middle);
   }
 
   public boolean hasDistanceSetpoint() {
@@ -112,6 +242,7 @@ public class TargetMemory {
     desiredHeightRatio = 0f;
     desiredAreaRatio = 0f;
     desiredBottomRatio = 0f;
+    resetDistanceCalibration();
     lastBbox = null;
     previousBbox = null;
     lastCenterX = 0f;

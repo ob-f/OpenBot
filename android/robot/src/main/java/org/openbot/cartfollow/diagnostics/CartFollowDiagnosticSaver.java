@@ -14,6 +14,7 @@ import org.openbot.cartfollow.DirectedReacquireEvidence;
 import org.openbot.cartfollow.FrameTimingEvidence;
 import org.openbot.cartfollow.GalleryCropGeometry;
 import org.openbot.cartfollow.GalleryUpdateStatus;
+import org.openbot.cartfollow.IdentityCandidateSet;
 import org.openbot.cartfollow.IdentityEvidence;
 import org.openbot.cartfollow.ReIDMatchResult;
 import org.openbot.cartfollow.RealCartAutoDriveController;
@@ -22,6 +23,8 @@ import org.openbot.cartfollow.SimulatorAutoDriveController;
 import org.openbot.cartfollow.SimulatorIdentityGuard;
 import org.openbot.cartfollow.SteeringEvidence;
 import org.openbot.cartfollow.TargetObservationEvidence;
+import org.openbot.cartfollow.TargetTrack;
+import org.openbot.cartfollow.TargetTrackManager;
 import org.openbot.tflite.Detector.Recognition;
 import timber.log.Timber;
 
@@ -46,6 +49,7 @@ public class CartFollowDiagnosticSaver {
       GalleryCropGeometry geometry,
       SimulatorAutoDriveController.Result simulatorDrive,
       DetectionTierEvidence detectionTier,
+      IdentityCandidateSet identityCandidates,
       DirectedReacquireEvidence directed,
       FrameTimingEvidence timing,
       TargetObservationEvidence observation,
@@ -55,6 +59,11 @@ public class CartFollowDiagnosticSaver {
       String deferredReview,
       boolean recentMatchingSupport,
       RealCartAutoDriveController.Result realDrive,
+      int initializationSamples,
+      int initializationTrackId,
+      String initializationDiscardReason,
+      int distanceCalibrationSamples,
+      long distanceCalibrationCompletedAtMs,
       Recognition locked,
       Recognition suspected,
       Recognition bestReid,
@@ -141,6 +150,7 @@ public class CartFollowDiagnosticSaver {
               steering,
               simulatorDrive,
               detectionTier,
+              identityCandidates,
               directed,
               timing,
               observation,
@@ -150,7 +160,12 @@ public class CartFollowDiagnosticSaver {
               gallery,
               deferredReview,
               recentMatchingSupport,
-              realDrive);
+              realDrive,
+              initializationSamples,
+              initializationTrackId,
+              initializationDiscardReason,
+              distanceCalibrationSamples,
+              distanceCalibrationCompletedAtMs);
           appendIdentityLog(
               session,
               frameNum,
@@ -256,6 +271,7 @@ public class CartFollowDiagnosticSaver {
       SteeringEvidence steering,
       SimulatorAutoDriveController.Result simulatorDrive,
       DetectionTierEvidence detectionTier,
+      IdentityCandidateSet identityCandidates,
       DirectedReacquireEvidence directed,
       FrameTimingEvidence timing,
       TargetObservationEvidence observation,
@@ -265,7 +281,12 @@ public class CartFollowDiagnosticSaver {
       GalleryUpdateStatus gallery,
       String deferredReview,
       boolean recentMatchingSupport,
-      RealCartAutoDriveController.Result realDrive) {
+      RealCartAutoDriveController.Result realDrive,
+      int initializationSamples,
+      int initializationTrackId,
+      String initializationDiscardReason,
+      int distanceCalibrationSamples,
+      long distanceCalibrationCompletedAtMs) {
     SteeringEvidence snapshot =
         steering == null ? SteeringEvidence.unavailable("not_collected", 0) : steering;
     String row =
@@ -346,6 +367,17 @@ public class CartFollowDiagnosticSaver {
                 identityPermit == null ? -1L : identityPermit.identityEvidenceTimeMs,
                 identityPermit == null ? -1L : identityPermit.identityObservationId)
             + trackingColumns(identityPermit == null ? null : identityPermit.tracking)
+            + candidateColumns(
+                detectionTier, identityCandidates, identityPermit, actionReason, safetyBlock)
+            + aimAndTranslationColumns(realDrive)
+            + String.format(
+                Locale.US,
+                ",%d,%d,%s,%d,%d",
+                initializationSamples,
+                initializationTrackId,
+                csv(initializationDiscardReason),
+                distanceCalibrationSamples,
+                distanceCalibrationCompletedAtMs)
             + "\n";
     session.io.append(session.frameLogCsv, row);
     session.frameRows++;
@@ -364,6 +396,130 @@ public class CartFollowDiagnosticSaver {
             tracking.stableFrames,
             tracking.maximumGear,
             csv(tracking.reason));
+  }
+
+  static String candidateColumns(
+      DetectionTierEvidence tiers,
+      IdentityCandidateSet candidates,
+      SimulatorIdentityGuard.Decision permit,
+      String actionReason,
+      String safetyBlock) {
+    int rawLow = tiers == null ? 0 : tiers.lowConfidencePersons.size();
+    int continued = tiers == null ? 0 : tiers.continuedLowConfidencePersons.size();
+    int count = candidates == null ? 0 : candidates.size();
+    String multiState =
+        candidates == null
+            ? "unavailable"
+            : candidates.exceedsBudget()
+                ? "over_budget"
+                : candidates.isMultiPerson() ? "multi" : "single";
+    String limit =
+        safetyBlock != null && !safetyBlock.isEmpty()
+            ? safetyBlock
+            : permit != null && !permit.motionAllowed
+                ? permit.reason
+                : actionReason == null ? "" : actionReason;
+    return String.format(
+        Locale.US, ",%d,%d,%d,%s,%s", rawLow, continued, count, csv(multiState), csv(limit));
+  }
+
+  static String aimAndTranslationColumns(RealCartAutoDriveController.Result drive) {
+    org.openbot.cartfollow.AimDecision aim = drive == null ? null : drive.aimDecision;
+    org.openbot.cartfollow.TranslationDecision translation =
+        drive == null ? null : drive.translationDecision;
+    return String.format(
+        Locale.US,
+        ",%d,%s,%.4f,%s,%d,%d,%s",
+        aim != null && aim.allowed ? 1 : 0,
+        csv(aim == null ? "" : aim.mode.name()),
+        aim == null ? 0f : aim.predictedError,
+        csv(aim == null ? "" : aim.reason),
+        translation != null && translation.allowed ? 1 : 0,
+        translation == null ? 0 : translation.maximumGear,
+        csv(translation == null ? "" : translation.reason));
+  }
+
+  public void saveCandidatesAsync(
+      CartFollowDiagnosticSession session,
+      long frameNum,
+      java.util.List<Recognition> highConfidence,
+      DetectionTierEvidence tiers,
+      IdentityCandidateSet identityCandidates,
+      TargetTrackManager tracks) {
+    if (session == null) return;
+    final long timestampMs = System.currentTimeMillis();
+    java.util.List<String> rows = new java.util.ArrayList<>();
+    int index = 0;
+    if (highConfidence != null)
+      for (Recognition recognition : highConfidence)
+        rows.add(
+            candidateRow(
+                session,
+                frameNum,
+                timestampMs,
+                index++,
+                "high",
+                recognition,
+                identityCandidates,
+                tracks));
+    if (tiers != null)
+      for (Recognition recognition : tiers.lowConfidencePersons)
+        rows.add(
+            candidateRow(
+                session,
+                frameNum,
+                timestampMs,
+                index++,
+                tiers.continuedLowConfidencePersons.contains(recognition)
+                    ? "continued_low"
+                    : "raw_low",
+                recognition,
+                identityCandidates,
+                tracks));
+    if (rows.isEmpty()) return;
+    session.io.submit(
+        () -> {
+          for (String row : rows) session.io.append(session.candidateLogCsv, row);
+          session.candidateRows += rows.size();
+        });
+  }
+
+  private static String candidateRow(
+      CartFollowDiagnosticSession session,
+      long frameNum,
+      long timestampMs,
+      int index,
+      String tier,
+      Recognition recognition,
+      IdentityCandidateSet identityCandidates,
+      TargetTrackManager tracks) {
+    RectF box = recognition == null ? null : recognition.getLocation();
+    TargetTrack track = tracks == null ? null : tracks.getTrackForRecognition(recognition);
+    boolean eligible = identityCandidates != null && identityCandidates.contains(recognition);
+    float score = tracks == null ? Float.NaN : tracks.getAssociationScore(recognition);
+    return String.format(
+        Locale.US,
+        "%s,%d,%d,%d,%s,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%s,%s,%s,%s,%s\n",
+        csv(session.sessionId),
+        frameNum,
+        timestampMs,
+        index,
+        csv(tier),
+        recognition == null || recognition.getConfidence() == null
+            ? 0f
+            : recognition.getConfidence(),
+        box == null ? 0f : box.left,
+        box == null ? 0f : box.top,
+        box == null ? 0f : box.right,
+        box == null ? 0f : box.bottom,
+        track == null ? -1 : track.trackId,
+        eligible ? "1" : "0",
+        Float.isNaN(score) ? "" : String.format(Locale.US, "%.4f", score),
+        tracks != null && tracks.isLockedAssociationCompeting() ? "1" : "0",
+        tracks == null || Float.isInfinite(tracks.getLockedAssociationMargin())
+            ? ""
+            : String.format(Locale.US, "%.4f", tracks.getLockedAssociationMargin()),
+        csv(track == null ? "unbound" : track.matchReason));
   }
 
   static String continuityColumns(

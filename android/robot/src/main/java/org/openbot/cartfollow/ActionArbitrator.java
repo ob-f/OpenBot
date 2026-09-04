@@ -50,6 +50,7 @@ public class ActionArbitrator {
       return result(state, BehaviorAction.MOTION_STOP, "identity_uncertain", "motion_stop", conf);
     }
     if (state == FollowState.LOCKED_PENDING_CONFIRM
+        || state == FollowState.DISTANCE_CALIBRATION
         || state == FollowState.CONFIRMED_ARMED
         || state == FollowState.READY_TO_FOLLOW
         || state == FollowState.CAPTURE_TARGET
