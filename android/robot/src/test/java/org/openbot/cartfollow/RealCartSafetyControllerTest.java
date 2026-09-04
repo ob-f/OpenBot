@@ -157,6 +157,43 @@ public class RealCartSafetyControllerTest {
     assertTrue(controller.manual(28, 28).isStop());
   }
 
+  @Test
+  public void manualMotionIsIndependentOfRangeObservationTiming() {
+    RealCartSafetyController controller = new RealCartSafetyController();
+    controller.setForeground(true);
+    controller.setConnection(true, true);
+    assertEquals(14, controller.manual(14, 14, 1000L).left);
+    assertEquals(-12, controller.manual(-12, -12, 5000L).left);
+    assertEquals(-5, controller.manual(-5, 5, 60_000L).left);
+    assertEquals(-5, controller.manual(5, -5, 60_000L).right);
+  }
+
+  @Test
+  public void automaticForwardIgnoresObservationOnlyRangeFields() {
+    RealCartSafetyController controller = readyAutoController();
+    assertTrue(controller.unlockAuto());
+    controller.setAutoRunEnabled(true, 900L);
+    FollowStateMachine.FrameResult frame =
+        frame(new Control(0.6f, 0.6f), BehaviorAction.FOLLOW_SLOW);
+    frame.rangeTelemetry =
+        org.openbot.vehicle.RangeTelemetrySnapshot.unavailable()
+            .withCapability(true)
+            .withReading(150, 1000L);
+    frame.rangeFresh = false;
+    frame.rangeGateReason = "observation_only";
+    observe(controller, frame, 1000L);
+    observe(controller, frame, 1030L);
+    RealCartSafetyController.Output output = observe(controller, frame, 1060L);
+    assertFalse(output.isStop());
+    frame.rangeTelemetry = org.openbot.vehicle.RangeTelemetrySnapshot.unavailable();
+    assertFalse(observe(controller, frame, 1090L).isStop());
+    frame.rangeTelemetry = frame.rangeTelemetry.withCapability(true).withReading(250, 1120L);
+    assertFalse(observe(controller, frame, 1120L).isStop());
+    frame.rangeTelemetry = frame.rangeTelemetry.withCapability(true).withReading(500, 1150L);
+    assertFalse(observe(controller, frame, 1150L).isStop());
+    assertTrue(controller.isAutoUnlocked());
+  }
+
   private static RealCartSafetyController readyAutoController() {
     RealCartSafetyController controller = new RealCartSafetyController();
     controller.setForeground(true);

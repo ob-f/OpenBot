@@ -1782,9 +1782,9 @@ public class BaseCartFollowFragment extends CameraFragment {
     diagnosticSession.initCsvFiles();
     diagnosticActive = true;
     loggedGalleryRevision = -1;
+    onDiagnosticSessionChanged(diagnosticSession);
     activateDiagnosticSession();
     recordControlEvent("recording_start", "enabled");
-    onDiagnosticSessionChanged(diagnosticSession);
     targetEventAwaitingReturn = false;
     latestConfirmSnapshot = null;
     lastDiagnosticFrameLogMs = 0L;
@@ -1974,6 +1974,9 @@ public class BaseCartFollowFragment extends CameraFragment {
         fr.initializationDiscardReason,
         fr.distanceCalibrationSampleCount,
         fr.distanceCalibrationCompletedAtMs,
+        fr.rangeTelemetry,
+        fr.rangeFresh,
+        fr.rangeGateReason,
         locked,
         suspected,
         bestReid,
@@ -2123,6 +2126,8 @@ public class BaseCartFollowFragment extends CameraFragment {
             behaviorLine,
             identityLine,
             steeringLine);
+    String modeDebug = additionalDebugInfo();
+    if (modeDebug != null && !modeDebug.isEmpty()) fullInfo += "\n" + modeDebug;
     String compactInfo =
         String.format(
             Locale.US,
@@ -2143,6 +2148,11 @@ public class BaseCartFollowFragment extends CameraFragment {
                 : identityEvidence.reidMatch.margin);
     String info = showFullDebug ? fullInfo : compactInfo;
     postCurrentFrameUi(() -> binding.debugInfo.setText(info));
+  }
+
+  /** Lets hardware-backed modes append transport or sensor diagnostics to the full panel. */
+  protected String additionalDebugInfo() {
+    return "";
   }
 
   private String buildIdentityDebugLine(IdentityEvidence identity) {

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openbot.vehicle.RangeTelemetrySnapshot;
 
 public class CartFollowDiagnosticSession {
   private static final String TAG = "CartFollowDiagnostic";
@@ -58,12 +59,23 @@ public class CartFollowDiagnosticSession {
   public final File eventsCsv;
   public final long startedAtMs;
 
-  public volatile int frameRows, identityRows, candidateRows, eventRows, cropCount, galleryCount;
-  public final File controlLogCsv, candidateLogCsv, provenanceFile;
+  public volatile int frameRows,
+      identityRows,
+      candidateRows,
+      eventRows,
+      rangeRows,
+      cropCount,
+      galleryCount;
+  public final File controlLogCsv, candidateLogCsv, rangeLogCsv, provenanceFile;
   public final long startedMonotonicMs = android.os.SystemClock.elapsedRealtime();
   public final DiagnosticIo io;
   public volatile long latestFrame, latestSourceMs, latestGeneration;
   public volatile String mode = "HumanCartSimulator";
+  private volatile String controlMode = "unknown";
+  private volatile boolean sawManualMode;
+  private volatile boolean sawAutoMode;
+  private long lastRangeSequence = Long.MIN_VALUE;
+  private String lastRangeState = "";
   private volatile boolean finished;
   private long lastGalleryImageMs = -1, lastSceneMs = -1;
   private String lastSceneKey = "";
@@ -100,6 +112,7 @@ public class CartFollowDiagnosticSession {
     eventsCsv = new File(sessionDir, "events.csv");
     controlLogCsv = new File(sessionDir, "control_log.csv");
     candidateLogCsv = new File(sessionDir, "candidate_log.csv");
+    rangeLogCsv = new File(sessionDir, "range_log.csv");
     provenanceFile = new File(sessionDir, "gallery_provenance.jsonl");
     io = new DiagnosticIo(this::initialize);
     ACTIVE.put(sessionDir.getAbsolutePath(), this);
@@ -116,14 +129,19 @@ public class CartFollowDiagnosticSession {
               + ",tracking_session,tracking_frame,tracking_ms,tracking_tier,tracking_stable,tracking_max_gear,tracking_reason"
               + ",raw_low_candidate_count,tracked_low_candidate_count,identity_candidate_count,multi_check_state,primary_limit_reason"
               + ",aim_allowed,aim_mode,aim_error,aim_reason,translation_allowed,translation_max_gear,translation_reason"
-              + ",initialization_samples,initialization_track_id,initialization_discard_reason,distance_calibration_samples,distance_calibration_completed_ms");
+              + ",initialization_samples,initialization_track_id,initialization_discard_reason,distance_calibration_samples,distance_calibration_completed_ms"
+              + ",range_capability,range_minimum_mm,range_received_ms,range_fresh,range_gate_reason,range_firmware_error");
       writeHeader(identityLogCsv, IDENTITY_LOG_HEADER);
       writeHeader(eventsCsv, EVENTS_HEADER);
       writeHeader(
-          controlLogCsv, "session_id,monotonic_ms,source_frame,source_ms,generation,event,details");
+          controlLogCsv,
+          "session_id,monotonic_ms,source_frame,source_ms,generation,event,details,control_mode");
       writeHeader(
           candidateLogCsv,
           "session_id,frame_id,timestamp_ms,candidate_index,tier,confidence,left,top,right,bottom,track_id,identity_eligible,association_score,association_competing,locked_association_margin,match_reason");
+      writeHeader(
+          rangeLogCsv,
+          "session_id,monotonic_ms,received_ms,sequence,minimum_mm,age_ms,fresh,capability,has_reading,control_mode,requested_left,requested_right,observation_state,firmware_error");
       writeHeader(provenanceFile, null);
       writeJson(
           new File(sessionDir, "status.json"),
@@ -144,6 +162,7 @@ public class CartFollowDiagnosticSession {
       int gallerySize,
       boolean upright,
       int orientation) {
+    final String initialControlMode = controlMode;
     io.submit(
         () -> {
           try {
@@ -152,7 +171,8 @@ public class CartFollowDiagnosticSession {
                 .put("created_at_ms", startedAtMs)
                 .put("started_monotonic_ms", startedMonotonicMs)
                 .put("app_mode", mode)
-                .put("log_version", 5)
+                .put("initial_control_mode", initialControlMode)
+                .put("log_version", 7)
                 .put("build", org.openbot.BuildConfig.VERSION_NAME)
                 .put("build_stamp", org.openbot.BuildConfig.CART_BUILD_STAMP)
                 .put("strategy", "continuity-aim-init-v4")
@@ -198,6 +218,14 @@ public class CartFollowDiagnosticSession {
                 .put("weak_max_gear", 18)
                 .put("max_gear", 21)
                 .put("real_frame_max_age_ms", 400);
+            json.put("range_protocol", "CART_AT8236_V1_s")
+                .put("range_telemetry_period_ms", 100)
+                .put("range_stale_ms", 250)
+                .put("range_source", "minimum_of_three_source_unknown")
+                .put("range_android_behavior", "observation_only")
+                .put("range_firmware_may_reject_motion", true)
+                .put("firmware_c14_mmps", 240)
+                .put("firmware_c21_mmps", 600);
             writeJson(new File(sessionDir, "session_info.json"), json);
           } catch (IOException | JSONException e) {
             io.fail(e);
@@ -247,6 +275,7 @@ public class CartFollowDiagnosticSession {
       inFlightSource = new long[] {-1, -1, -1};
     }
     final long frame = context[0], source = context[1], generation = context[2];
+    final String rowControlMode = controlMode;
     io.submit(
         () ->
             io.append(
@@ -264,7 +293,77 @@ public class CartFollowDiagnosticSession {
                     + quote(event)
                     + ","
                     + quote(details)
+                    + ","
+                    + quote(rowControlMode)
                     + "\n"));
+  }
+
+  public synchronized void setControlMode(String nextMode) {
+    String normalized = nextMode == null ? "unknown" : nextMode.trim().toLowerCase(Locale.US);
+    if (!normalized.equals("manual") && !normalized.equals("auto")) normalized = "unknown";
+    if (normalized.equals(controlMode)) return;
+    String previous = controlMode;
+    controlMode = normalized;
+    if (normalized.equals("manual")) sawManualMode = true;
+    if (normalized.equals("auto")) sawAutoMode = true;
+    control("mode_changed", "from=" + previous + ",to=" + normalized);
+  }
+
+  /** Records each new V1 range sample and capability/freshness/error state transition. */
+  public synchronized void range(
+      RangeTelemetrySnapshot telemetry,
+      long nowMs,
+      boolean fresh,
+      int requestedLeft,
+      int requestedRight) {
+    RangeTelemetrySnapshot safe =
+        telemetry == null ? RangeTelemetrySnapshot.unavailable() : telemetry;
+    String state =
+        (safe.capabilityAdvertised ? "1" : "0")
+            + ":"
+            + (safe.hasReading ? "1" : "0")
+            + ":"
+            + (fresh ? "1" : "0")
+            + ":"
+            + safe.firmwareErrorAtMs;
+    if (safe.sequence == lastRangeSequence && state.equals(lastRangeState)) return;
+    lastRangeSequence = safe.sequence;
+    lastRangeState = state;
+    String rowControlMode = controlMode;
+    io.submit(
+        () -> {
+          rangeRows++;
+          io.append(
+              rangeLogCsv,
+              quote(sessionId)
+                  + ","
+                  + nowMs
+                  + ","
+                  + safe.receivedAtMs
+                  + ","
+                  + safe.sequence
+                  + ","
+                  + safe.minimumDistanceMm
+                  + ","
+                  + (safe.ageMs(nowMs) == Long.MAX_VALUE ? -1L : safe.ageMs(nowMs))
+                  + ","
+                  + (fresh ? 1 : 0)
+                  + ","
+                  + (safe.capabilityAdvertised ? 1 : 0)
+                  + ","
+                  + (safe.hasReading ? 1 : 0)
+                  + ","
+                  + quote(rowControlMode)
+                  + ","
+                  + requestedLeft
+                  + ","
+                  + requestedRight
+                  + ","
+                  + quote("observation_only")
+                  + ","
+                  + quote(safe.lastFirmwareError)
+                  + "\n");
+        });
   }
 
   public void provenance(String json) {
@@ -293,10 +392,15 @@ public class CartFollowDiagnosticSession {
     io.finish(
         () -> {
           try {
+            String recordedControlModes =
+                sawManualMode && sawAutoMode
+                    ? "mixed"
+                    : sawManualMode ? "manual" : sawAutoMode ? "auto" : "unknown";
             JSONObject summary =
                 new JSONObject()
                     .put("status", io.error.isEmpty() ? "complete" : "error")
                     .put("mode", mode)
+                    .put("control_modes", recordedControlModes)
                     .put("duration_ms", Math.max(0, ended - startedMonotonicMs))
                     .put("ended_at_ms", System.currentTimeMillis())
                     .put("reason", reason)
@@ -305,6 +409,7 @@ public class CartFollowDiagnosticSession {
                     .put("identities", identityRows)
                     .put("candidates", candidateRows)
                     .put("events", eventRows)
+                    .put("ranges", rangeRows)
                     .put("crops", cropCount)
                     .put("gallery_images", galleryCount)
                     .put("dropped_images", io.droppedImages.get())

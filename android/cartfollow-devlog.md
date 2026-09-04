@@ -178,7 +178,7 @@ ReID margin 可作为身份置信证据，但不能单独恢复 FOLLOW。
 
 | 功能 | 优先级 | 说明 |
 |------|--------|------|
-| **近场传感器安全门** | 高 | 超声波 / ToF 尚未接入，真实自动模式只能在空旷受控场地测试 |
+| **近场传感器日志与固件标定** | 高 | Android 已取消来源不明最小值的运动门控；ESP32 仍需按“仅日志模式”说明修改、烧录并悬空验收 |
 | **真实车急转弯与拐角恢复** | 中 | 首版只允许两轮同向缓弯，偏差过大时停车，不执行原地旋转搜索 |
 | **参数持久化** | 低 | 当前调参仅内存生效，重启恢复默认 |
 | **参数 UI 面板** | 低 | K_TURN / MAX_FORWARD / 阈值等参数需通过代码修改，没有 UI 界面 |
@@ -2132,3 +2132,54 @@ Debug APK 为 `android/robot/build/outputs/apk/debug/robot-debug.apk`，42,531,3
 `9808BCDECF2015F46897DAC273532162108D6E282D1867ABF737FBEC6FC86F0C`。构建结束时
 `adb devices` 没有列出设备，因此未覆盖安装、未启动跟随、未发送车辆控制指令。手机确认交互、
 实际标定耗时和实车起步仍待连接设备后复测；拐角转弯、绕后自转和 V2 传感器协议不在本轮范围。
+
+## 41. 传感器版 V1 协议适配与 Android 二次门控（2026-09-04）
+
+同步主仓库后确认，当前 ESP32 并未实施 V2 `m/d/g/a`，而是通过
+`fCART_AT8236:s:`、`s100` 和 `s<cm>` 接入左／中／右三路测距。本轮按实装协议开发，取消
+侧移。BLE 与 USB 接收增加换行分包／粘包重组，连接清理时丢弃残留半包；Vehicle 保存能力、
+三路有效最小距离、单调接收时间、序号和最近 `!ERR`，不再把旧 `SensorReading.age` 当当前年龄。
+
+真实车手动、自动和定向搜索共用 `RangeSafetyGate`：前进 300/400 mm、转向 200/300 mm，
+解除均要求 3 个新样本；超过 250 ms 未更新、未声明能力或未收到首帧时禁止前进和转向。停车、
+急停始终有效，后退保持可用并标注没有后侧覆盖。由于 V1 只给最小值，Android 无法按来源做
+方向判断；ESP32 的单路状态、方向门控和制动仍是最终依据。
+
+实车状态区与完整调试面板新增协议、最小距离、age、fresh、门控锁存、限制原因和固件错误。
+日志版本升至 6，`frame_log.csv` 末尾追加相同字段，`control_log.csv` 记录节流后的
+`range_state`。固件分段速度映射同步为 `c14=240`、`c16=343`、`c18=446`、`c20=549`、
+`c21=600 mm/s`；按用户确认保留自动默认 `c21`，但 600 mm/s 实车跟随仍待逐档验收。
+
+### 41.1 桌面验证与交付物
+
+- JDK 17 Debug／Release 各 **325/325**，46 个测试类，0 失败、0 错误、0 跳过。
+- `:robot:check`、`:robot:assembleDebug`、固件静态契约 7 项、google-java-format 1.7 dry-run
+  与主／子仓库 `git diff --check` 通过。项目没有 `:robot:spotlessCheck` 任务，格式检查继续使用
+  仓库自带 google-java-format。
+- Lint 保留 **11 Error、673 Warning、6 Information**：MissingClass 2、RecyclerView 1、
+  RestrictedApi 4、UseAppTint 3、Timber/AGP `LintError` 1；`abortOnError=false`。另保留 Java 17／
+  Kotlin 1.8 target 不一致和旧 Gradle API 警告。
+- Debug APK：`android/robot/build/outputs/apk/debug/robot-debug.apk`，42,491,963 字节，SHA256
+  `2CC2351AB80EC228E73F0E78EF57722F63F0B2312529E2C999468347EE7FF2D1`。
+
+本轮尚未安装 APK，也没有向车辆发送控制指令。BLE `s100` 周期、实际最小值显示、传感器断线、
+阈值停车和 600 mm/s 分档仍需按联调指南完成手机、车轮悬空与空旷落地测试。
+
+## 42. Android 测距仅记录与遥控日志完善（2026-09-04）
+
+实车遥控复查确认，V1 `s<cm>` 只提供三路有效读数的最小值，Android 无法知道该值来自左前、中央还是右前。上一节的 `RangeSafetyGate` 因而会把侧方近物错误解释为中央障碍，导致前进和转向被改成 `c0,0`；ESP32 仍会再按单路传感器状态拒绝相应方向。
+
+本轮删除 Android 测距运动门控。手动、自动跟随和定向搜索不再因未声明能力、没有首帧、数据过期或最小距离过近而改变输出；断连、急停、前后台、身份、旧帧和自动授权安全链保持不变。V1 握手、`s100`、`s<cm>` 解析、接收时间、新鲜度和最近 `!ERR` 继续用于显示与诊断，兼容字段统一写为 `observation_only`。
+
+离线日志版本升至 7。遥控模式可直接打开“记录日志”，不依赖 Start 或视觉推理；`control_log.csv` 末尾追加 `control_mode`，方向替换补写 `control_submit`，模式切换、请求输出、队列和 GATT 结果继续区分记录。新增 `range_log.csv`，按新测距序列或能力／新鲜度／固件错误状态变化记录最小值、age、模式、最近 Android 请求轮速和 `!ERR`。记录列表标明遥控、自动或混合会话，ZIP 自动包含新文件。
+
+ESP32 本轮没有修改。当前已烧录固件仍可能返回 `!ERR,sensor_*` 并拒绝运动，因此 Android 恢复请求输出不等于车轮必然执行。已新增 [ESP32 传感器仅日志模式修改说明](../../../design/ESP32传感器仅日志模式修改说明.md)：下位机不能只把 `REQUIRE_RANGE_SENSORS_FOR_MOTION` 设为 false，还必须统一旁路三个风险锁存对命令接收和运动中制动的影响。
+
+### 42.1 桌面验证与交付物
+
+- 使用 JDK 17.0.14 完成 Debug／Release 全量测试，各 **322/322**、45 个测试类，0 失败、0 错误、0 跳过；扩展后的测距仅记录、遥控日志和混合会话回归均包含在全量结果中。
+- `:robot:check`、`:robot:assembleDebug`、固件既有静态契约 7 项、google-java-format 1.7 dry-run 和主／子仓库 `git diff --check` 通过。
+- Lint 为 **11 Error、675 Warning、6 Information**；Error 仍为既有 MissingClass、RecyclerView、RestrictedApi、UseAppTint 和 Timber/AGP `LintError`，项目 `abortOnError=false`。保留 Java 17／Kotlin 1.8 target 与旧 Gradle API 警告。
+- Debug APK：`android/robot/build/outputs/apk/debug/robot-debug.apk`，42,490,097 字节，SHA256 `C731728E2C3448488780B6D2FC7CECF9454824BDEB21D2689FE0EB4DCEBEC164`。
+
+`adb devices` 未列出设备，因此本轮未覆盖安装、未启动跟随、未发送车辆指令。新版首次实车测试仍须先悬空；在下位机同步“仅日志模式”前，必须从日志中的 Android 请求、GATT 写入和 ESP32 `!ERR` 三层判断未执行原因。

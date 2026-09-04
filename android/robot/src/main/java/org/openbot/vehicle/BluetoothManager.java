@@ -66,6 +66,7 @@ public class BluetoothManager {
   public ScanDeviceAdapter adapter;
   private int indexValue;
   public String readValue;
+  private final SerialLineAccumulator serialLineAccumulator = new SerialLineAccumulator();
   private final LocalBroadcastManager localBroadcastManager;
   private final ConnectionListener connectionListener;
   private final BleSerialWriteQueue writeQueue;
@@ -591,6 +592,7 @@ public class BluetoothManager {
 
   private void clearTransportState() {
     writeQueue.clear();
+    serialLineAccumulator.clear();
     clearSerialCharacteristics();
     motionGeneration = 0L;
     readValue = null;
@@ -678,11 +680,12 @@ public class BluetoothManager {
   }
 
   private void onSerialDataReceived(String data) {
-    // Add whatever you want here
     Logger.i("Serial data received from BLE: " + data);
-    localBroadcastManager.sendBroadcast(
-        new Intent(Constants.DEVICE_ACTION_DATA_RECEIVED)
-            .putExtra("from", "ble")
-            .putExtra("data", data));
+    for (String line : serialLineAccumulator.accept(data)) {
+      localBroadcastManager.sendBroadcast(
+          new Intent(Constants.DEVICE_ACTION_DATA_RECEIVED)
+              .putExtra("from", "ble")
+              .putExtra("data", line));
+    }
   }
 }

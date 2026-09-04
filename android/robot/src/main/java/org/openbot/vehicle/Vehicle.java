@@ -2,6 +2,7 @@ package org.openbot.vehicle;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 import com.ficat.easyble.BleDevice;
@@ -28,6 +29,7 @@ public class Vehicle {
   private final SensorReading leftWheelRpm = new SensorReading();
   private final SensorReading rightWheelRpm = new SensorReading();
   private final SensorReading sonarReading = new SensorReading();
+  private volatile RangeTelemetrySnapshot rangeTelemetry = RangeTelemetrySnapshot.unavailable();
 
   private float minMotorVoltage = 2.5f;
   private float lowBatteryVoltage = 9.0f;
@@ -180,6 +182,8 @@ public class Vehicle {
   public void processVehicleConfig(String message) {
     setVehicleType(message.split(":")[0]);
     cartFirmwareReady = "CART_AT8236".equals(getVehicleType());
+    setHasSonar(false);
+    rangeTelemetry = rangeTelemetry.withCapability(message.contains(":s:"));
 
     if (message.contains(":v:")) {
       setHasVoltageDivider(true);
@@ -281,6 +285,35 @@ public class Vehicle {
 
   public void setSonarReading(float sonarReading) {
     this.sonarReading.setReading(sonarReading);
+    if (!Float.isFinite(sonarReading) || sonarReading <= 0f) return;
+    int millimeters = Math.round(sonarReading * 10f);
+    rangeTelemetry = rangeTelemetry.withReading(millimeters, SystemClock.elapsedRealtime());
+  }
+
+  public boolean processSonarMessage(String body) {
+    if (body == null || !body.matches("[0-9]{1,5}")) return false;
+    try {
+      float centimeters = Float.parseFloat(body);
+      if (centimeters <= 0f) return false;
+      setSonarReading(centimeters);
+      return true;
+    } catch (NumberFormatException ignored) {
+      return false;
+    }
+  }
+
+  public RangeTelemetrySnapshot getRangeTelemetry() {
+    return rangeTelemetry;
+  }
+
+  public void recordFirmwareError(String error) {
+    if (error == null || error.trim().isEmpty()) return;
+    rangeTelemetry = rangeTelemetry.withFirmwareError(error.trim(), SystemClock.elapsedRealtime());
+  }
+
+  private void resetRangeTelemetry() {
+    setHasSonar(false);
+    rangeTelemetry = RangeTelemetrySnapshot.unavailable();
   }
 
   public Control getControl() {
@@ -541,6 +574,7 @@ public class Vehicle {
             new BluetoothManager.ConnectionListener() {
               @Override
               public void onBleSerialReady() {
+                resetRangeTelemetry();
                 bleSerialReady = true;
                 setReady(false);
                 cartFirmwareReady = false;
@@ -551,6 +585,7 @@ public class Vehicle {
               @Override
               public void onBleDisconnected() {
                 control = new Control(0, 0);
+                resetRangeTelemetry();
                 bleSerialReady = false;
                 cartFirmwareReady = false;
                 setReady(false);
@@ -560,6 +595,7 @@ public class Vehicle {
               @Override
               public void onBleCriticalWriteFailure() {
                 control = new Control(0, 0);
+                resetRangeTelemetry();
                 bleSerialReady = false;
                 cartFirmwareReady = false;
                 setReady(false);

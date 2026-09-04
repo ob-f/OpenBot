@@ -124,6 +124,11 @@ public final class RealCartSafetyController {
     return new Output(left, right, "manual");
   }
 
+  /** Kept for callers that provide a monotonic timestamp; range telemetry is observation-only. */
+  public synchronized Output manual(int left, int right, long nowMs) {
+    return manual(left, right);
+  }
+
   public synchronized Output auto(FollowStateMachine.FrameResult frame, long nowMs) {
     return auto(frame, nowMs, null);
   }
