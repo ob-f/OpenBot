@@ -462,9 +462,9 @@ public class FollowStateMachine {
                   state, new Control(0f, 0f), cand, cand, safePersons, false, false, snapshot, -1);
           result.distanceDiagnosticText =
               state == FollowState.CONFIRMED_ARMED
-                  ? "距离标定完成"
+                  ? "视觉参考标定完成"
                   : discard == null
-                      ? "距离标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES
+                      ? "视觉参考标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES
                       : calibrationPrompt(discard, samples);
           return result;
         }
@@ -820,9 +820,9 @@ public class FollowStateMachine {
 
   private static String calibrationPrompt(String reason, int samples) {
     if ("person_clipped".equals(reason))
-      return "距离标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES + "，请后退并保持完整人物入镜";
-    if ("multiple_high_confidence_targets".equals(reason)) return "距离标定暂停，请保持画面内只有已确认目标";
-    return "距离标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES + "，等待已确认目标";
+      return "视觉参考标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES + "，请后退并保持完整人物入镜";
+    if ("multiple_high_confidence_targets".equals(reason)) return "视觉参考标定暂停，请保持画面内只有已确认目标";
+    return "视觉参考标定 " + samples + "/" + TargetMemory.DISTANCE_CALIBRATION_SAMPLES + "，等待已确认目标";
   }
 
   public int getInitializationSampleCount() {

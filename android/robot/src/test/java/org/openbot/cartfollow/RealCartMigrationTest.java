@@ -14,6 +14,54 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
 public class RealCartMigrationTest {
+  private static SteeringEvidence curve(float raw, int demand) {
+    return new SteeringEvidence(true, "replay", raw, raw, 0, raw, 0, demand,
+        raw < 0 ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT,
+        SteeringEvidence.Level.MEDIUM, 0);
+  }
+
+  @Test public void returnBrakeReleasesDifferentialAndNextObservationChoosesNewSide() {
+    for (int sign : new int[] {-1, 1}) {
+      RealCartSafetyController safety = movingHigh();
+      FollowStateMachine.FrameResult f = frame(7, 350, .5f);
+      f.steeringEvidence = new SteeringEvidence(true, "return", sign * .10f, sign * .10f,
+          -sign * .8f, -sign * .1f, 0, 0,
+          sign < 0 ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT,
+          SteeringEvidence.Level.CENTER, 0);
+      RealCartSafetyController.Output out = safety.auto(f, 350);
+      assertEquals(21, out.left);
+      assertEquals(21, out.right);
+      assertEquals("curve_return_brake", safety.getAutoDriveResult().reason);
+      f = frame(8, 450, .5f);
+      f.steeringEvidence = curve(-sign * .15f, 15);
+      out = safety.auto(f, 450);
+      assertEquals(sign > 0 ? 20 : 21, out.left);
+      assertEquals(sign > 0 ? 21 : 20, out.right);
+    }
+  }
+
+  @Test public void replayRightForwardCurveDoesNotStopBeforePointEightFive() {
+    RealCartSafetyController safety = movingHigh();
+    float[] errors = {.15f, .6261f, .70f, .8231f, .8411f};
+    for (int i = 0; i < errors.length; i++) {
+      long time = 350 + i * 100;
+      FollowStateMachine.FrameResult f = frame(7 + i, time, .5f);
+      f.steeringEvidence = curve(errors[i], 5); // Legacy low demand cannot override raw steering.
+      RealCartSafetyController.Output out = safety.auto(f, time);
+      assertTrue(out.left > out.right && out.right > 0);
+    }
+  }
+
+  @Test public void loggedGentleCurveKeepsDistanceGearAndBoundedPositiveDifferential() {
+    RealCartSafetyController safety = movingHigh();
+    FollowStateMachine.FrameResult f = frame(7, 350, .35f);
+    f.steeringEvidence = curve(.2505f, 19);
+    RealCartSafetyController.Output out = safety.auto(f, 350);
+    assertEquals(21, out.left);
+    assertEquals(20, out.right);
+    assertTrue(out.left > 14 && out.right > 0);
+  }
+
   @Test
   public void threeDistinctFramesStartLowAndThreeMoreUpshift() {
     RealCartSafetyController s = ready();
@@ -30,15 +78,15 @@ public class RealCartMigrationTest {
   public void distanceAndTurnImmediatelyDownshiftWithoutZero() {
     RealCartSafetyController s = movingHigh();
     FollowStateMachine.FrameResult f = frame(7, 350, .5f);
-    f.steeringEvidence = steering(SteeringEvidence.Direction.LEFT, 50);
+    f.steeringEvidence = curve(-.4f, 50);
     RealCartSafetyController.Output mid = s.auto(f, 350);
     assertEquals(18, mid.right);
-    assertEquals(15, mid.left);
+    assertEquals(16, mid.left);
     f = frame(8, 400, .5f);
-    f.steeringEvidence = steering(SteeringEvidence.Direction.RIGHT, 90);
+    f.steeringEvidence = curve(.56f, 90);
     RealCartSafetyController.Output low = s.auto(f, 400);
     assertEquals(14, low.left);
-    assertEquals(10, low.right);
+    assertEquals(11, low.right);
   }
 
   @Test
@@ -138,9 +186,9 @@ public class RealCartMigrationTest {
         assertTrue(inner >= 6);
         assertTrue(inner <= gear);
       }
-    assertEquals(6, RealCartAutoDriveController.innerSpeedForDemand(14, 100, 200));
-    assertEquals(8, RealCartAutoDriveController.innerSpeedForDemand(18, 100, 200));
-    assertEquals(9, RealCartAutoDriveController.innerSpeedForDemand(21, 100, 200));
+    assertEquals(10, RealCartAutoDriveController.innerSpeedForDemand(14, 100, 200));
+    assertEquals(14, RealCartAutoDriveController.innerSpeedForDemand(18, 100, 200));
+    assertEquals(17, RealCartAutoDriveController.innerSpeedForDemand(21, 100, 200));
   }
 
   @Test

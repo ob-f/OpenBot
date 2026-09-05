@@ -395,7 +395,7 @@ public class CartFollowDiagnosticSaver {
   }
 
   static String rangeColumns(RangeTelemetrySnapshot telemetry, boolean fresh, String gateReason) {
-    if (telemetry == null) return ",0,-1,-1,0,,";
+    if (telemetry == null) return ",0,-1,-1,0,,,-1";
     return String.format(
         Locale.US,
         ",%d,%d,%d,%d,%s,%s",
@@ -404,7 +404,7 @@ public class CartFollowDiagnosticSaver {
         telemetry.receivedAtMs,
         fresh ? 1 : 0,
         csv(gateReason),
-        csv(telemetry.lastFirmwareError));
+        csv(telemetry.lastFirmwareError)) + "," + telemetry.firmwareErrorAtMs;
   }
 
   static String trackingColumns(org.openbot.cartfollow.TrackingDecision tracking) {

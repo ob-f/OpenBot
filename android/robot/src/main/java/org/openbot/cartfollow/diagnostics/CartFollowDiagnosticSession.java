@@ -130,7 +130,7 @@ public class CartFollowDiagnosticSession {
               + ",raw_low_candidate_count,tracked_low_candidate_count,identity_candidate_count,multi_check_state,primary_limit_reason"
               + ",aim_allowed,aim_mode,aim_error,aim_reason,translation_allowed,translation_max_gear,translation_reason"
               + ",initialization_samples,initialization_track_id,initialization_discard_reason,distance_calibration_samples,distance_calibration_completed_ms"
-              + ",range_capability,range_minimum_mm,range_received_ms,range_fresh,range_gate_reason,range_firmware_error");
+              + ",range_capability,range_minimum_mm,range_received_ms,range_fresh,range_gate_reason,range_firmware_error,range_firmware_error_received_ms");
       writeHeader(identityLogCsv, IDENTITY_LOG_HEADER);
       writeHeader(eventsCsv, EVENTS_HEADER);
       writeHeader(
@@ -172,10 +172,15 @@ public class CartFollowDiagnosticSession {
                 .put("started_monotonic_ms", startedMonotonicMs)
                 .put("app_mode", mode)
                 .put("initial_control_mode", initialControlMode)
-                .put("log_version", 7)
+                .put("log_version", 8)
                 .put("build", org.openbot.BuildConfig.VERSION_NAME)
                 .put("build_stamp", org.openbot.BuildConfig.CART_BUILD_STAMP)
-                .put("strategy", "observed-aim-pulse-v5")
+                .put("strategy", org.openbot.cartfollow.FollowTuning.VERSION)
+                .put("curve_enter_error", org.openbot.cartfollow.FollowTuning.CURVE_ENTER)
+                .put("curve_exit_error", org.openbot.cartfollow.FollowTuning.CURVE_EXIT)
+                .put("curve_gain", "linear((damped_abs_error-0.03)/0.82)")
+                .put("curve_brake_seconds", org.openbot.cartfollow.FollowTuning.CURVE_BRAKE_SECONDS)
+                .put("curve_effective_strength_max_percent", 100)
                 .put("device_model", Build.MODEL)
                 .put("sdk_int", Build.VERSION.SDK_INT)
                 .put("detector", detector)
@@ -195,17 +200,22 @@ public class CartFollowDiagnosticSession {
                 .put("association_margin", .15)
                 .put("short_return_ms", 500)
                 .put("stable_frames", 3)
-                .put("aim_pivot_enter_error", .18)
-                .put("aim_pivot_exit_error", .08)
+                .put("aim_pivot_enter_error", org.openbot.cartfollow.FollowTuning.NEAR_PIVOT_ENTER)
+                .put("aim_pivot_exit_error", org.openbot.cartfollow.FollowTuning.NEAR_PIVOT_EXIT)
                 .put(
                     "aim_edge_pivot_error",
                     org.openbot.cartfollow.TargetAimController.FAR_ENTER_ERROR)
                 .put("aim_pulse_ms", org.openbot.cartfollow.TargetAimController.PULSE_MS)
                 .put("aim_settle_ms", org.openbot.cartfollow.TargetAimController.SETTLE_MS)
+                .put("aim_same_direction_settle_ms", org.openbot.cartfollow.FollowTuning.SAME_DIRECTION_SETTLE_MS)
+                .put("short_recovery_context_ms", org.openbot.cartfollow.FollowTuning.RECOVERY_CONTEXT_MS)
+                .put("curve_max_reduction_14", org.openbot.cartfollow.FollowTuning.maximumReduction(14))
+                .put("curve_max_reduction_18", org.openbot.cartfollow.FollowTuning.maximumReduction(18))
+                .put("curve_max_reduction_21", org.openbot.cartfollow.FollowTuning.maximumReduction(21))
                 .put(
                     "aim_far_exit_error", org.openbot.cartfollow.TargetAimController.FAR_EXIT_ERROR)
                 .put("real_prediction_horizon_ms", 0)
-                .put("aim_pivot_speed", 5)
+                .put("aim_pivot_speed_bands", "abs_error<0.35:5;0.35<=abs_error<0.65:8;abs_error>=0.65:10")
                 .put("distance_calibration_samples", 15)
                 .put("distance_calibration_span_ms", 500)
                 .put("default_maximum_distance_multiplier", 1.10)

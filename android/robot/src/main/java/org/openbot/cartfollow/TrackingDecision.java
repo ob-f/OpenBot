@@ -40,7 +40,7 @@ public final class TrackingDecision {
     stableFrames = stable;
     motionAllowed = move;
     learningAllowed = learn;
-    maximumGear = high ? 21 : 18;
+    maximumGear = reason.startsWith("short_recovery_") ? 14 : high ? 21 : 18;
     this.reason = reason;
   }
 
@@ -65,6 +65,7 @@ public final class TrackingDecision {
 
   public String label() {
     if (!motionAllowed) return "重捕验证";
+    if (reason.startsWith("short_recovery_")) return "短时恢复 · 限速";
     if (detectionLevel == DetectionLevel.LOW) return "检测偏弱";
     return "multi_person_check".equals(reason) ? "多人核验" : "连续跟踪";
   }

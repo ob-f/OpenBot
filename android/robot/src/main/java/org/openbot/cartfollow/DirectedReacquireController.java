@@ -18,6 +18,7 @@ public final class DirectedReacquireController {
   private int outwardObservations;
   private long firstOutwardMs = -1L;
   private long trustedAtMs = -1L;
+  private long trustedLifetimeMs = STRONG_IDENTITY_MS;
   private int trustedTrackId = -1;
   private long missingSinceMs = -1L;
   private long lastFrameSequence = -1L;
@@ -105,8 +106,8 @@ public final class DirectedReacquireController {
             && isFollowing(frame)
             && !o.lowConfidence
             && o.belief >= .75f
-            && recoveryIdentityValid(frame, o)
-            && recentBoundReid(frame, o, nowMs);
+            && ((recoveryIdentityValid(frame, o) && recentBoundReid(frame, o, nowMs))
+                || continuousIdentityTime(frame, o, nowMs) >= 0L);
     if (parked != null) {
       // A frame captured before parking cannot re-arm a consumed exit episode.
       if (!newFrame || !verifiedFollow || o.observedAtMs <= parkedAtMs) return parked;
@@ -131,13 +132,15 @@ public final class DirectedReacquireController {
         if (candidates == 1 && o.personCount == 1) {
           if (o.trackId != trustedTrackId) clearExit();
           long strongAt = strongIdentityTime(frame, o, nowMs);
-          if (strongAt >= 0L) {
-            trustedAtMs = Math.max(trustedAtMs, strongAt);
+          long continuousAt = continuousIdentityTime(frame, o, nowMs);
+          if (strongAt >= 0L || continuousAt >= 0L) {
+            trustedAtMs = Math.max(strongAt, continuousAt);
+            trustedLifetimeMs = strongAt >= 0L ? STRONG_IDENTITY_MS : FollowTuning.SEARCH_CONTINUITY_MS;
             trustedTrackId = o.trackId;
           }
           if (trustedTrackId == o.trackId
               && trustedAtMs >= 0L
-              && nowMs - trustedAtMs <= STRONG_IDENTITY_MS
+              && nowMs - trustedAtMs <= trustedLifetimeMs
               && continuityPermits(frame, o)) rememberExit(o);
           else {
             clearExit();
@@ -161,7 +164,7 @@ public final class DirectedReacquireController {
       }
       if (!history.isEmpty()) evaluateTrajectory(nowMs);
       if ((exitEvidenceMs >= 0L && nowMs - firstOutwardMs > HISTORY_MS)
-          || (trustedAtMs >= 0L && nowMs - trustedAtMs > STRONG_IDENTITY_MS)) {
+          || (trustedAtMs >= 0L && nowMs - trustedAtMs > trustedLifetimeMs)) {
         clearExit();
         exitReason = "exit_evidence_expired";
       }
@@ -171,7 +174,7 @@ public final class DirectedReacquireController {
           || exitEvidenceMs < 0L
           || nowMs - firstOutwardMs > HISTORY_MS
           || trustedAtMs < 0L
-          || nowMs - trustedAtMs > STRONG_IDENTITY_MS
+          || nowMs - trustedAtMs > trustedLifetimeMs
           || nowMs - exitEvidenceMs > HISTORY_MS) {
         return DirectedReacquireEvidence.idle(
             outwardObservations >= 2 ? "target_missing_debounce" : exitReason);
@@ -295,7 +298,7 @@ public final class DirectedReacquireController {
     return outwardObservations >= 2
         && trustedAtMs >= 0L
         && nowMs >= trustedAtMs
-        && nowMs - trustedAtMs <= STRONG_IDENTITY_MS
+        && nowMs - trustedAtMs <= trustedLifetimeMs
         && exitEvidenceMs >= 0L
         && nowMs >= exitEvidenceMs
         && nowMs - exitEvidenceMs <= HISTORY_MS;
@@ -429,6 +432,18 @@ public final class DirectedReacquireController {
     return frame.state == FollowState.FOLLOW || frame.state == FollowState.FOLLOW_CAUTION;
   }
 
+  private static long continuousIdentityTime(
+      FollowStateMachine.FrameResult frame, TargetObservationEvidence o, long nowMs) {
+    SimulatorIdentityGuard.Decision identity = frame.simulatorIdentity;
+    if (identity == null || identity.needsConfirmation || identity.trackId != o.trackId
+        || identity.tracking == null || !identity.tracking.matchesFrame(frame)
+        || identity.tracking.trackId != o.trackId || identity.tracking.stableFrames < 3
+        || o.lowConfidence || !identity.allowsForward(nowMs)
+        || nowMs < o.observedAtMs || nowMs - o.observedAtMs > FollowTuning.SEARCH_CONTINUITY_MS)
+      return -1L;
+    return o.observedAtMs;
+  }
+
   private static long strongIdentityTime(
       FollowStateMachine.FrameResult frame, TargetObservationEvidence o, long nowMs) {
     if (o.lowConfidence || o.belief < .75f || !recoveryIdentityValid(frame, o)) return -1L;
@@ -456,6 +471,7 @@ public final class DirectedReacquireController {
     return identity.trackId == o.trackId
         && !identity.needsConfirmation
         && (identity.authorized
+            || continuousIdentityTime(frame, o, o.observedAtMs) >= 0L
             || (identity.retainTarget
                 && (identity.isMaintained()
                     || identity.state == SimulatorIdentityGuard.State.CONTINUITY_HOLD

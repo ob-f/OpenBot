@@ -133,7 +133,7 @@
         android:id="@+id/voiceCartSimulatorFragment"
         android:name="org.openbot.cartfollow.voice.VoiceCartSimulatorFragment"
         android:label="@string/voice_cart_title"
-        tools:layout="@layout/fragment_voice_cart_simulator" />
+        tools:layout="@layout/fragment_human_cart_simulator" />
 
     <fragment
         android:id="@+id/realCartFollowFragment"

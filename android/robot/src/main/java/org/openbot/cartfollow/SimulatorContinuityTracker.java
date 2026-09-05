@@ -69,7 +69,7 @@ public final class SimulatorContinuityTracker {
     imageWidth = width;
     imageHeight = height;
     BboxContinuityEvidence geometry =
-        previous != null && track == id && receivedAt > time && receivedAt - time <= 500
+        previous != null && track == id && receivedAt > time && receivedAt - time <= FollowTuning.RECOVERY_CONTEXT_MS
             ? BboxContinuityEvidence.from(box, previous, null, width, height)
             : null;
     Evidence result = update(id, box, frame, receivedAt, now, highCurrent, true, competing);
@@ -104,11 +104,11 @@ public final class SimulatorContinuityTracker {
         || receivedAt > now
         || now - receivedAt > 500) {
       stable = 0;
-      if (competing || !local || (time >= 0 && receivedAt - time > 500)) reset();
+      if (competing || !local || (time >= 0 && receivedAt - time > FollowTuning.RECOVERY_CONTEXT_MS)) reset();
       return new Evidence(false, competing ? "association_competing" : "current_target_missing", 0);
     }
     boolean adjacent =
-        previous != null && track == id && receivedAt > time && receivedAt - time <= 500;
+        previous != null && track == id && receivedAt > time && receivedAt - time <= FollowTuning.RECOVERY_CONTEXT_MS;
     boolean smooth = false;
     if (adjacent) {
       float elapsed = receivedAt - time;
@@ -122,13 +122,15 @@ public final class SimulatorContinuityTracker {
                       box.centerX() - previous.centerX() - velocityX * elapsed,
                       box.centerY() - previous.centerY() - velocityY * elapsed)
               / diagonal;
-      smooth = shift <= .35f || prediction <= .18f;
+      smooth = elapsed > 500L
+          ? BboxContinuityEvidence.from(box, previous, null, imageWidth, imageHeight).bboxDefaultOk
+          : shift <= .35f || prediction <= .18f;
       if (smooth) {
         velocityX = (box.centerX() - previous.centerX()) / elapsed;
         velocityY = (box.centerY() - previous.centerY()) / elapsed;
       }
     }
-    stable = smooth ? Math.min(3, stable + 1) : 1;
+    stable = smooth && receivedAt - time <= 500L ? Math.min(3, stable + 1) : 1;
     previous = new RectF(box);
     track = id;
     time = receivedAt;

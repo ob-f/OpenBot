@@ -410,7 +410,7 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
       case LOCKED_PENDING_CONFIRM:
         return "请确认目标 · 等待新鲜画面 · c0,0";
       case DISTANCE_CALIBRATION:
-        return "距离标定中 · 等待新鲜画面 · c0,0";
+        return "视觉参考标定中 · 等待新鲜画面 · c0,0";
       case READY_TO_FOLLOW:
         return "启动倒计时 · 等待新鲜画面 · c0,0";
       case CONFIRMED_ARMED:
@@ -447,7 +447,7 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
           return "请确认目标 · 模拟输出 c0,0";
         case DISTANCE_CALIBRATION:
           return (frameResult.distanceDiagnosticText == null
-                  ? "已确认，正在距离标定"
+                  ? "已确认，正在视觉参考标定"
                   : frameResult.distanceDiagnosticText)
               + " · 模拟输出 c0,0";
         case CONFIRMED_ARMED:

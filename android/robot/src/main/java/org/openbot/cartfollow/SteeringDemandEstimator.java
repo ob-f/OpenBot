@@ -51,6 +51,7 @@ public final class SteeringDemandEstimator {
             || nowMs <= lastTimestampMs
             || nowMs - lastTimestampMs > RESET_GAP_MS;
     if (resetRequired) {
+      direction = SteeringEvidence.Direction.NONE;
       initialized = true;
       activeTrackId = trackId;
       filteredError = rawError;
@@ -69,15 +70,19 @@ public final class SteeringDemandEstimator {
             ? rawError
             : clamp(filteredError + lateralRatePerSec * horizonMs / 1000f, -1f, 1f);
     float edgeUrgency = edgeUrgency(displayed, predictedError);
-    float centerDemand =
-        Math.max(0f, (Math.abs(predictedError) - CENTER_DEAD_ZONE) / (1f - CENTER_DEAD_ZONE));
-    int demandPercent = Math.round(100f * Math.max(centerDemand, edgeUrgency));
-    updateDirection(predictedError);
+    SteeringEvidence.Direction previousDirection = direction;
+    updateDirection(rawError);
+    float dampedError = FollowTuning.dampedError(rawError, lateralRatePerSec);
+    int demandPercent = direction == SteeringEvidence.Direction.NONE
+        || dampedError <= FollowTuning.CURVE_EXIT ? 0
+        : Math.max(1, Math.round(100f * FollowTuning.curveDemand(dampedError)));
     updateLevel(demandPercent);
 
     return new SteeringEvidence(
         true,
-        resetRequired ? "filter_reset" : "ok",
+        direction == SteeringEvidence.Direction.NONE ? "curve_centered"
+            : dampedError <= FollowTuning.CURVE_EXIT ? "curve_return_brake"
+            : previousDirection == direction ? "curve_active" : "curve_enter_or_change",
         rawError,
         filteredError,
         lateralRatePerSec,
@@ -106,17 +111,18 @@ public final class SteeringDemandEstimator {
     return clamp((edgeZone - edgeDistance) / edgeZone, 0f, 1f);
   }
 
-  private void updateDirection(float predictedError) {
-    if (Math.abs(predictedError) <= 0.05f) {
+  private void updateDirection(float rawError) {
+    float magnitude = Math.abs(rawError);
+    if (magnitude <= FollowTuning.CURVE_EXIT) {
       direction = SteeringEvidence.Direction.NONE;
       return;
     }
-    SteeringEvidence.Direction candidate =
-        predictedError < 0f ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
-    if (direction != SteeringEvidence.Direction.NONE
-        && direction != candidate
-        && Math.abs(predictedError) < 0.10f) return;
-    direction = candidate;
+    SteeringEvidence.Direction candidate = rawError < 0f
+        ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
+    if (direction != candidate) {
+      // Never preserve the old sign after a center crossing.
+      direction = magnitude > FollowTuning.CURVE_ENTER ? candidate : SteeringEvidence.Direction.NONE;
+    }
   }
 
   private void updateLevel(int demandPercent) {

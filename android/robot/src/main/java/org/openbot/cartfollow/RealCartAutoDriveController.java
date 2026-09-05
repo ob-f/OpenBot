@@ -23,12 +23,12 @@ public final class RealCartAutoDriveController {
 
   public static final int STRAIGHT_SPEED = 14;
   public static final int MIN_INNER_SPEED = 6;
-  public static final int BASE_MAX_INNER_REDUCTION = 4;
+  public static final int BASE_MAX_INNER_REDUCTION = FollowTuning.maximumReduction(14);
   public static final int MIN_STEERING_STRENGTH_PERCENT = 20;
   public static final int MAX_STEERING_STRENGTH_PERCENT = 200;
   public static final int CENTER_DEMAND_PERCENT = 10;
-  public static final float AIM_PIVOT_ENTER_ERROR = 0.18f;
-  public static final float AIM_PIVOT_EXIT_ERROR = 0.08f;
+  public static final float AIM_PIVOT_ENTER_ERROR = FollowTuning.NEAR_PIVOT_ENTER;
+  public static final float AIM_PIVOT_EXIT_ERROR = FollowTuning.NEAR_PIVOT_EXIT;
   public static final float AIM_EDGE_PIVOT_ERROR = TargetAimController.FAR_ENTER_ERROR;
   public static final int AIM_PIVOT_SPEED = 5;
   public static final int START_STABLE_FRAMES = 3;
@@ -41,6 +41,7 @@ public final class RealCartAutoDriveController {
     public final String reason;
     public final float rawTurn;
     public final float filteredTurn;
+    public final float dampedTurnMagnitude;
     public final int demandPercent;
     public final SteeringEvidence.Direction direction;
     public final SteeringEvidence.Level level;
@@ -72,6 +73,8 @@ public final class RealCartAutoDriveController {
       this.reason = reason;
       this.rawTurn = evidence == null ? 0f : evidence.rawError;
       this.filteredTurn = evidence == null ? 0f : evidence.filteredError;
+      this.dampedTurnMagnitude = evidence == null ? 0f
+          : FollowTuning.dampedError(evidence.rawError, evidence.lateralRatePerSec);
       this.demandPercent = evidence == null ? 0 : evidence.demandPercent;
       this.direction = evidence == null ? SteeringEvidence.Direction.NONE : evidence.direction;
       this.level = evidence == null ? SteeringEvidence.Level.CENTER : evidence.level;
@@ -180,8 +183,8 @@ public final class RealCartAutoDriveController {
       boolean left = aim.mode == AimDecision.Mode.PIVOT_LEFT;
       return remember(
           new Result(
-              left ? -AIM_PIVOT_SPEED : AIM_PIVOT_SPEED,
-              left ? AIM_PIVOT_SPEED : -AIM_PIVOT_SPEED,
+              left ? -aim.speed : aim.speed,
+              left ? aim.speed : -aim.speed,
               Phase.PIVOT,
               aim.reason,
               evidence,
@@ -219,12 +222,9 @@ public final class RealCartAutoDriveController {
     } else if (frame.frameSequence > lastFrameSequence) {
       int desired = Math.min(maximumGear, gears.distanceGear(heightScale));
       if (identity.isAppearanceTransition()
-          || Math.abs(evidence.rawError) > 0.18f
-          || evidence.demandPercent > 60
           || frame.state == FollowState.FOLLOW_CAUTION
           || decision.selectedAction == BehaviorAction.FOLLOW_CAUTION) desired = 14;
-      else if (Math.abs(evidence.rawError) > 0.10f || evidence.demandPercent > 30)
-        desired = Math.min(18, desired);
+      desired = FollowTuning.curveGear(desired, evidence.rawError);
       if (identity.tracking != null) desired = Math.min(desired, identity.tracking.maximumGear);
       gears.select(desired);
       lastFrameSequence = frame.frameSequence;
@@ -342,8 +342,7 @@ public final class RealCartAutoDriveController {
       AimDecision aim,
       TranslationDecision translation) {
     int speed = gears.current();
-    if (evidence.direction == SteeringEvidence.Direction.NONE
-        || evidence.demandPercent <= CENTER_DEMAND_PERCENT) {
+    if (evidence.direction == SteeringEvidence.Direction.NONE) {
       return remember(
           new Result(
               speed,
@@ -357,14 +356,14 @@ public final class RealCartAutoDriveController {
               translation));
     }
 
-    int innerSpeed = innerSpeedForDemand(speed, evidence.demandPercent, steeringStrengthPercent);
+    int innerSpeed = innerSpeedForError(speed, evidence.rawError, evidence.lateralRatePerSec, steeringStrengthPercent);
     boolean turnLeft = evidence.direction == SteeringEvidence.Direction.LEFT;
     return remember(
         new Result(
             turnLeft ? innerSpeed : speed,
             turnLeft ? speed : innerSpeed,
-            turnLeft ? Phase.CURVE_LEFT : Phase.CURVE_RIGHT,
-            "continuous_curve",
+            innerSpeed == speed ? Phase.MOVING_STRAIGHT : turnLeft ? Phase.CURVE_LEFT : Phase.CURVE_RIGHT,
+            innerSpeed == speed ? "curve_return_brake" : "continuous_curve",
             evidence,
             heightScale,
             false,
@@ -414,6 +413,19 @@ public final class RealCartAutoDriveController {
             0, 0, Phase.WAIT_TARGET, reason, evidence, heightScale, false, aim, translation));
   }
 
+  static int innerSpeedForError(int gear, float error, int strengthPercent) {
+    return innerSpeedForError(gear, error, 0f, strengthPercent);
+  }
+
+  static int innerSpeedForError(int gear, float error, float lateralRate, int strengthPercent) {
+    float damped = FollowTuning.dampedError(error, lateralRate);
+    if (damped <= FollowTuning.CURVE_EXIT) return gear;
+    float strength = FollowTuning.effectiveStrength(strengthPercent) / 100f;
+    int reduction = Math.max(1, Math.round(FollowTuning.maximumReduction(gear)
+        * FollowTuning.curveDemand(damped) * strength));
+    return Math.max(MIN_INNER_SPEED, gear - reduction);
+  }
+
   static int innerSpeedForDemand(int demandPercent) {
     return innerSpeedForDemand(demandPercent, 100);
   }
@@ -424,10 +436,7 @@ public final class RealCartAutoDriveController {
 
   static int innerSpeedForDemand(int gear, int demandPercent, int steeringStrengthPercent) {
     int clampedDemand = Math.max(0, Math.min(100, demandPercent));
-    int clampedStrength =
-        Math.max(
-            MIN_STEERING_STRENGTH_PERCENT,
-            Math.min(MAX_STEERING_STRENGTH_PERCENT, steeringStrengthPercent));
+    int clampedStrength = FollowTuning.effectiveStrength(steeringStrengthPercent);
     int reduction =
         Math.round(
             AutoGearSelector.maximumReduction(gear) * clampedDemand * clampedStrength / 10000f);

@@ -14,8 +14,14 @@ public final class AimDecision {
   public final boolean allowed;
   public final float predictedError;
   public final String reason;
+  public final int speed;
 
   private AimDecision(Mode mode, boolean allowed, float predictedError, String reason) {
+    this(mode, allowed, predictedError, reason, 0);
+  }
+
+  private AimDecision(Mode mode, boolean allowed, float predictedError, String reason, int speed) {
+    this.speed = speed;
     this.mode = mode;
     this.allowed = allowed;
     this.predictedError = predictedError;
@@ -28,6 +34,10 @@ public final class AimDecision {
 
   public static AimDecision blocked(String reason) {
     return new AimDecision(Mode.BLOCKED, false, 0f, reason);
+  }
+
+  public static AimDecision pivot(boolean left, float error, int speed, String reason) {
+    return new AimDecision(left ? Mode.PIVOT_LEFT : Mode.PIVOT_RIGHT, true, error, reason, speed);
   }
 
   public boolean pivots() {

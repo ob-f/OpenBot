@@ -43,6 +43,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   private long lastAutoLogMs;
   private String lastRangeStateKey = "";
   private long lastFirmwareErrorAtMs = -1L;
+  private long autoObservationAtMs = -1L;
   private volatile org.openbot.cartfollow.diagnostics.CartFollowDiagnosticSession
       activeDiagnosticSession;
   private RealCartAutoDriveController.Phase lastLoggedAutoPhase;
@@ -259,6 +260,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   @Override
   protected void onFollowFrame(FollowStateMachine.FrameResult frameResult) {
     long now = SystemClock.elapsedRealtime();
+    autoObservationAtMs = frameResult.frameTiming == null ? -1L : frameResult.frameTiming.receivedAtMs;
     latestOutput = safetyController.auto(frameResult, now, searchController.poll(now, yaw));
     RangeTelemetrySnapshot range = vehicle.getRangeTelemetry();
     frameResult.rangeTelemetry = range;
@@ -327,7 +329,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
         case DISTANCE_CALIBRATION:
           return (frameResult.distanceDiagnosticText == null
                       || frameResult.distanceDiagnosticText.isEmpty()
-                  ? "已确认，正在距离标定"
+                  ? "已确认，正在视觉参考标定"
                   : frameResult.distanceDiagnosticText)
               + " · c0,0";
         case CONFIRMED_ARMED:
@@ -667,7 +669,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     }
     if (telemetry.firmwareErrorAtMs >= 0L && telemetry.firmwareErrorAtMs != lastFirmwareErrorAtMs) {
       lastFirmwareErrorAtMs = telemetry.firmwareErrorAtMs;
-      logControl("firmware_error", telemetry.lastFirmwareError);
+      logControl("firmware_error", telemetry.lastFirmwareError + ";received_ms=" + telemetry.firmwareErrorAtMs);
     }
   }
 
@@ -727,7 +729,19 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
     }
     recordControlEvent(
         "control_submit",
-        "requested=c" + output.left + "," + output.right + ";reason=" + output.reason);
+        "requested=c" + output.left + "," + output.right + ";reason=" + output.reason
+            + ";observation_received_ms=" + autoObservationAtMs
+            + ";observation_to_submit_ms=" + (safetyController.getMode() == RealCartSafetyController.Mode.AUTO && autoObservationAtMs >= 0
+                ? SystemClock.elapsedRealtime() - autoObservationAtMs : -1)
+            + ";actual_raw_error=" + safetyController.getAutoDriveResult().rawTurn
+            + ";wheel_difference=" + (Math.abs(output.left) - Math.abs(output.right))
+            + ";strength_saved_percent=" + safetyController.getSteeringStrengthPercent()
+            + ";strength_effective_percent=" + FollowTuning.effectiveStrength(safetyController.getSteeringStrengthPercent())
+            + ";damped_error_magnitude=" + safetyController.getAutoDriveResult().dampedTurnMagnitude
+            + ";actual_reduction=" + Math.abs(Math.abs(output.left) - Math.abs(output.right))
+            + ";target_left_mmps=" + LegacyWheelSpeedMapping.targetMmps(output.left, output.right)
+            + ";target_right_mmps=" + LegacyWheelSpeedMapping.targetMmps(output.right, output.left)
+            + ";wheel_speed_source=protocol_target_not_measured;submission_only=true");
     int multiplier = Math.max(1, vehicle.getSpeedMultiplier());
     vehicle.setControl(
         new Control(output.left / (float) multiplier, output.right / (float) multiplier));
@@ -935,7 +949,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
                       + " | Android=observation_only"
                       + (range.lastFirmwareError.isEmpty()
                           ? ""
-                          : "\nfirmware=" + range.lastFirmwareError));
+                          : "\n最近固件错误（非当前帧回执）=" + range.lastFirmwareError + " @" + range.firmwareErrorAtMs));
               boolean emergency = safetyController.isEmergencyLatched();
               binding.emergencyStop.setEnabled(!emergency);
               binding.unlockAuto.setEnabled(!emergency && vehicle.isCartFirmwareReady());
@@ -1052,12 +1066,13 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
 
   private void updateSteeringStrengthUi(int strength) {
     if (binding == null) return;
-    int minimumInner = RealCartAutoDriveController.innerSpeedForDemand(100, strength);
+    int minimumInner = RealCartAutoDriveController.innerSpeedForError(14, .85f, strength);
     binding.steeringStrengthValue.setText(
         String.format(
             java.util.Locale.US,
-            "转弯强度 %d%% · 最大差速 %d,14 / 14,%d",
+            "转弯强度设置 %d%% · 实际生效 %d%% · 最大差速 %d,14 / 14,%d",
             strength,
+            FollowTuning.effectiveStrength(strength),
             minimumInner,
             minimumInner));
   }
@@ -1370,6 +1385,10 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
             + "\n最近结束="
             + lastSessionEndReason;
     if (frame != null) {
+      text += "\n目标锁定=" + (frame.targetObservation != null && frame.targetObservation.current
+          ? "当前可见" : "等待重捕") + " · 运动判定=" + actual.reason;
+      if (frame.behaviorDecision != null)
+        text += " · " + frame.behaviorDecision.safetyBlockReason;
       if (frame.simulatorIdentity != null)
         text +=
             "\n身份="

@@ -1050,7 +1050,7 @@ public class BaseCartFollowFragment extends CameraFragment {
                           selectedLowConfidence)
                       : DetectionTierEvidence.disabled(minConfidence);
               fr.identityCandidates = identityCandidates;
-              fr.behaviorDecision = decideBehavior(fr, frameW, frameH);
+              fr.behaviorDecision = decideBehavior(fr, frameW, frameH, activeSensorOrientation);
               if (!enhancedRecoveryEnabled) maybeRelockAfterRecovery(fr);
               if (enhancedRecoveryEnabled) {
                 fr.frameTiming =
@@ -1490,7 +1490,7 @@ public class BaseCartFollowFragment extends CameraFragment {
         label = "目标采集中 " + fr.initializationSampleCount + "/" + stateMachine.CAPTURE_FRAMES;
       } else if (r == calibrationCandidate) {
         label =
-            "已确认 · 距离标定 "
+            "已确认 · 视觉参考标定 "
                 + fr.distanceCalibrationSampleCount
                 + "/"
                 + TargetMemory.DISTANCE_CALIBRATION_SAMPLES;
@@ -1622,7 +1622,7 @@ public class BaseCartFollowFragment extends CameraFragment {
         return "请确认是否跟随此人";
       case DISTANCE_CALIBRATION:
         return fr.distanceDiagnosticText == null || fr.distanceDiagnosticText.isEmpty()
-            ? "已确认，正在距离标定 · c0,0"
+            ? "已确认，正在视觉参考标定 · c0,0"
             : fr.distanceDiagnosticText + " · c0,0";
       case CONFIRMED_ARMED:
         return "已确认，请回到车前";
@@ -2222,7 +2222,7 @@ public class BaseCartFollowFragment extends CameraFragment {
   }
 
   private BehaviorDecisionResult decideBehavior(
-      FollowStateMachine.FrameResult fr, int frameW, int frameH) {
+      FollowStateMachine.FrameResult fr, int frameW, int frameH, int orientation) {
     IdentityEvidence identity =
         fr.identityEvidence != null
             ? fr.identityEvidence
@@ -2241,7 +2241,7 @@ public class BaseCartFollowFragment extends CameraFragment {
     } else {
       distance = new DistanceEvidence(DistanceState.UNKNOWN, 0f, "distance_not_available");
     }
-    TraversabilityEvidence traversability = estimateTraversability(fr, frameW, frameH);
+    TraversabilityEvidence traversability = VisualTraversabilityEstimator.estimate(fr, frameW, frameH, orientation);
     SystemSafetyEvidence safety = createSystemSafetyEvidence();
     BehaviorDecisionResult decision =
         actionArbitrator.decide(
@@ -2261,33 +2261,6 @@ public class BaseCartFollowFragment extends CameraFragment {
         decision.confidence,
         distance,
         traversability);
-  }
-
-  private TraversabilityEvidence estimateTraversability(
-      FollowStateMachine.FrameResult fr, int frameW, int frameH) {
-    if (fr == null || fr.persons == null || frameW <= 0 || frameH <= 0) {
-      return new TraversabilityEvidence(1f, 1f, 1f, false, "default_clear");
-    }
-    boolean centerBlocked = false;
-    float centerFreeScore = 1f;
-    for (Detector.Recognition person : fr.persons) {
-      if (person == null || person == fr.target || person.getLocation() == null) continue;
-      RectF b = person.getLocation();
-      float cxRatio = b.centerX() / frameW;
-      boolean inCenter = cxRatio >= 0.33f && cxRatio <= 0.67f;
-      boolean lowerBodyRisk = b.bottom >= frameH * 0.55f;
-      boolean largeEnough = b.width() * b.height() >= frameW * frameH * 0.03f;
-      if (inCenter && lowerBodyRisk && largeEnough) {
-        centerBlocked = true;
-        centerFreeScore = Math.min(centerFreeScore, 0.2f);
-      }
-    }
-    return new TraversabilityEvidence(
-        1f,
-        centerFreeScore,
-        1f,
-        centerBlocked,
-        centerBlocked ? "non_target_in_center_corridor" : "default_clear");
   }
 
   protected Model getModel() {

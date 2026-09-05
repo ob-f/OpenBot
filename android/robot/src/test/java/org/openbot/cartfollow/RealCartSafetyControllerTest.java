@@ -24,20 +24,21 @@ public class RealCartSafetyControllerTest {
         new SteeringEvidence(
             true,
             "test",
-            .7f,
-            .7f,
+            .9f,
+            .9f,
             0f,
-            .7f,
+            .9f,
             0f,
             80,
             SteeringEvidence.Direction.RIGHT,
             SteeringEvidence.Level.LARGE,
             0);
     assertFalse(observe(controller, frame, 1000L).isStop());
-    assertTrue(controller.refresh(1300L, null).isStop());
-    assertEquals("aim_settling", controller.getAutoDriveResult().reason);
-    assertTrue(controller.isAutoUnlocked());
-    assertTrue(controller.refresh(1350L, null).isStop());
+    assertFalse(controller.refresh(1399L, null).isStop());
+    assertTrue(controller.refresh(1401L, null).isStop());
+
+    assertFalse(controller.isAutoUnlocked());
+    assertTrue(controller.refresh(1450L, null).isStop());
   }
 
   @Test

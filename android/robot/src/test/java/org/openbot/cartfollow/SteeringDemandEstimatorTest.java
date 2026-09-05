@@ -13,6 +13,18 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
 public class SteeringDemandEstimatorTest {
+  @Test public void smallOffsetActivatesWithoutWaitingForPredictionAndHasHysteresis() {
+    SteeringDemandEstimator estimator = new SteeringDemandEstimator();
+    assertEquals(SteeringEvidence.Direction.NONE, estimator.update(box(525),1000,600,0,1,0,400).direction);
+    SteeringEvidence active = estimator.update(box(575),1000,600,0,1,100,400);
+    assertEquals(SteeringEvidence.Direction.RIGHT, active.direction);
+    assertTrue(active.demandPercent > 10);
+    assertEquals(SteeringEvidence.Direction.RIGHT, estimator.update(box(525),1000,600,0,1,200,400).direction);
+    assertEquals(SteeringEvidence.Direction.NONE, estimator.update(box(510),1000,600,0,1,300,400).direction);
+    assertEquals(SteeringEvidence.Direction.NONE, estimator.update(box(480),1000,600,0,1,400,400).direction);
+    assertEquals(SteeringEvidence.Direction.LEFT, estimator.update(box(450),1000,600,0,1,500,400).direction);
+  }
+
   @Test
   public void zeroHorizonUsesObservedPositionEvenAfterFastCrossing() {
     SteeringDemandEstimator estimator = new SteeringDemandEstimator();
@@ -70,7 +82,7 @@ public class SteeringDemandEstimatorTest {
         estimator.update(new RectF(820f, 100f, 1005f, 500f), 1000, 600, 0, 3, 0, 0);
 
     assertEquals(1f, evidence.edgeUrgency, 0.001f);
-    assertEquals(100, evidence.demandPercent);
+    assertEquals(97, evidence.demandPercent);
     assertEquals(SteeringEvidence.Level.EDGE, evidence.level);
   }
 
@@ -81,11 +93,11 @@ public class SteeringDemandEstimatorTest {
     estimator.update(box(700f), 1000, 600, 0, 4, 100, 400);
 
     SteeringEvidence trackChanged = estimator.update(box(700f), 1000, 600, 0, 5, 200, 400);
-    assertEquals("filter_reset", trackChanged.reason);
+    assertEquals("curve_enter_or_change", trackChanged.reason);
     assertEquals(0f, trackChanged.lateralRatePerSec, 0.001f);
 
     SteeringEvidence gapReset = estimator.update(box(700f), 1000, 600, 0, 5, 800, 400);
-    assertEquals("filter_reset", gapReset.reason);
+    assertEquals("curve_enter_or_change", gapReset.reason);
     assertEquals(0f, gapReset.lateralRatePerSec, 0.001f);
   }
 
@@ -107,8 +119,8 @@ public class SteeringDemandEstimatorTest {
   @Test
   public void levelUsesHysteresisNearTheMediumThreshold() {
     SteeringDemandEstimator estimator = new SteeringDemandEstimator();
-    SteeringEvidence medium = estimator.update(box(700f), 1000, 600, 0, 8, 0, 0);
-    SteeringEvidence stillMedium = estimator.update(box(690f), 1000, 600, 0, 8, 100, 0);
+    SteeringEvidence medium = estimator.update(box(665f), 1000, 600, 0, 8, 0, 0);
+    SteeringEvidence stillMedium = estimator.update(box(655f), 1000, 600, 0, 8, 100, 0);
 
     assertEquals(SteeringEvidence.Level.MEDIUM, medium.level);
     assertTrue(stillMedium.demandPercent < 35);

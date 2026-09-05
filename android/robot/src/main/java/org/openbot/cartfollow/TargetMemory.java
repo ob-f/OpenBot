@@ -30,6 +30,16 @@ public class TargetMemory {
   private float[] upperColorHist;
   private float[] lowerColorHist;
 
+  // Visual reference geometry and a future sensor-measured setpoint are different quantities.
+  private Integer desiredFollowingDistanceMm;
+
+  public Integer getDesiredFollowingDistanceMm() { return desiredFollowingDistanceMm; }
+
+  public void setDesiredFollowingDistanceMm(Integer millimeters) {
+    if (millimeters != null && millimeters <= 0) throw new IllegalArgumentException("distance must be positive");
+    desiredFollowingDistanceMm = millimeters;
+  }
+
   private float desiredHeightRatio;
   private float desiredAreaRatio;
   private float desiredBottomRatio;
@@ -68,12 +78,13 @@ public class TargetMemory {
   /** Captures the confirmed identity without making a one-frame distance setpoint authoritative. */
   public void captureIdentityFromBitmap(Bitmap bitmap, RectF bbox) {
     captureAppearanceFromBitmap(bitmap, bbox);
+    desiredFollowingDistanceMm = null;
     desiredHeightRatio = 0f;
     desiredAreaRatio = 0f;
     desiredBottomRatio = 0f;
     distanceCalibrationCompletedAtMs = 0L;
     completedDistanceCalibrationSampleCount = 0;
-    resetDistanceCalibrationSamples("等待确认后距离标定");
+    resetDistanceCalibrationSamples("等待确认后视觉参考标定");
   }
 
   private void captureAppearanceFromBitmap(Bitmap bitmap, RectF bbox) {
@@ -109,8 +120,8 @@ public class TargetMemory {
             && span >= DISTANCE_CALIBRATION_SPAN_MS;
     distanceCalibrationStatus =
         ready
-            ? "距离标定完成"
-            : "距离标定 "
+            ? "视觉参考标定完成"
+            : "视觉参考标定 "
                 + distanceCalibrationSamples.size()
                 + "/"
                 + DISTANCE_CALIBRATION_SAMPLES
@@ -136,7 +147,7 @@ public class TargetMemory {
     desiredAreaRatio = median(1);
     desiredBottomRatio = median(2);
     distanceCalibrationCompletedAtMs = completedAtMs;
-    resetDistanceCalibrationSamples("距离标定完成");
+    resetDistanceCalibrationSamples("视觉参考标定完成");
   }
 
   public void resetDistanceCalibration() {
@@ -239,6 +250,7 @@ public class TargetMemory {
     confirmedAspectRatio = 0f;
     upperColorHist = null;
     lowerColorHist = null;
+    desiredFollowingDistanceMm = null;
     desiredHeightRatio = 0f;
     desiredAreaRatio = 0f;
     desiredBottomRatio = 0f;

@@ -2,17 +2,24 @@ package org.openbot.cartfollow;
 
 /** Observed-position aiming: short turns separated by a stationary, fresh observation. */
 public final class TargetAimController {
-  public static final float FAR_ENTER_ERROR = 0.60f;
-  public static final float FAR_EXIT_ERROR = 0.35f;
-  public static final long PULSE_MS = 300L;
-  public static final long SETTLE_MS = 650L;
+  public static final float FAR_ENTER_ERROR = FollowTuning.FAR_PIVOT_ENTER;
+  public static final float FAR_EXIT_ERROR = FollowTuning.FAR_PIVOT_EXIT;
+  public static final long PULSE_MS = FollowTuning.VISIBLE_PIVOT_MS;
+  public static final long SETTLE_MS = FollowTuning.REVERSAL_SETTLE_MS;
   private long pulseUntil = -1L;
   private long settleUntil = -1L;
   private int direction;
+  private int pulseSpeed;
+  private boolean aiming;
+  private int brakedDirection;
+  private long brakedAt = -1L;
 
   public void reset() {
     pulseUntil = settleUntil = -1L;
     direction = 0;
+    brakedDirection = 0;
+    brakedAt = -1L;
+    aiming = false;
   }
 
   /** Called by the command scheduler too, so a stalled camera cannot extend a turn pulse. */
@@ -23,8 +30,10 @@ public final class TargetAimController {
   }
 
   private void brake(long nowMs) {
+    brakedDirection = direction;
+    brakedAt = nowMs;
     pulseUntil = -1L;
-    settleUntil = nowMs + SETTLE_MS;
+    settleUntil = nowMs + (direction == 0 ? SETTLE_MS : FollowTuning.SAME_DIRECTION_SETTLE_MS);
     direction = 0;
   }
 
@@ -40,7 +49,10 @@ public final class TargetAimController {
     }
     expire(nowMs);
     if (settleUntil >= 0L) {
-      if (nowMs < settleUntil || observedAtMs < settleUntil)
+      // Only another pulse in the same direction earns the shorter stationary observation.
+      long deadline = brakedDirection != 0 && brakedDirection * error >= 0f
+          ? settleUntil : brakedAt + SETTLE_MS;
+      if (nowMs < deadline || observedAtMs < deadline)
         return AimDecision.blocked("aim_settling");
       settleUntil = -1L;
     }
@@ -51,17 +63,24 @@ public final class TargetAimController {
     if (pulseUntil >= 0L) {
       if (direction * error <= exit || direction * approaching <= exit) {
         brake(nowMs);
+        aiming = false;
         return AimDecision.blocked("aim_brake_observe");
       }
       return pivot(error);
     }
     float enter = far ? FAR_ENTER_ERROR : RealCartAutoDriveController.AIM_PIVOT_ENTER_ERROR;
-    if (magnitude >= enter) {
+    if (magnitude <= exit) aiming = false;
+    if (magnitude >= enter || aiming) {
+      if (brakedDirection * error < 0f
+          && (nowMs < brakedAt + SETTLE_MS || observedAtMs < brakedAt + SETTLE_MS))
+        return AimDecision.blocked("aim_reversal_settling");
       if (moving) {
         brake(nowMs);
-        return AimDecision.blocked("aim_brake_before_pivot");
+        return AimDecision.blocked(far ? "aim_edge_brake_before_pivot" : "aim_brake_before_pivot");
       }
+      aiming = true;
       direction = error < 0f ? -1 : 1;
+      pulseSpeed = FollowTuning.pivotSpeed(error);
       pulseUntil = nowMs + PULSE_MS;
       return pivot(error);
     }
@@ -74,9 +93,7 @@ public final class TargetAimController {
   }
 
   private AimDecision pivot(float error) {
-    return AimDecision.of(
-        direction < 0 ? AimDecision.Mode.PIVOT_LEFT : AimDecision.Mode.PIVOT_RIGHT,
-        error,
-        "aim_pulse");
+    pulseSpeed = Math.min(pulseSpeed, FollowTuning.pivotSpeed(error));
+    return AimDecision.pivot(direction < 0, error, pulseSpeed, "aim_visible_bounded");
   }
 }

@@ -32,7 +32,8 @@ public class RealCartAutoDriveControllerTest {
       assertTrue(result.translationDecision.allowed);
       assertTrue(result.left > 0 && result.right > 0);
       assertNotPivot(result);
-      if (Math.abs(error) > .18f) assertTrue(result.gear <= 14);
+      if (Math.abs(error) > .55f) assertTrue(result.gear <= 14);
+      else if (Math.abs(error) > .35f) assertTrue(result.gear <= 18);
     }
   }
 
@@ -85,7 +86,7 @@ public class RealCartAutoDriveControllerTest {
   public void steeringStrengthScalesCurveWithoutReversingAWheel() {
     assertEquals(13, RealCartAutoDriveController.innerSpeedForDemand(100, 20));
     assertEquals(10, RealCartAutoDriveController.innerSpeedForDemand(100, 100));
-    assertEquals(6, RealCartAutoDriveController.innerSpeedForDemand(100, 200));
+    assertEquals(10, RealCartAutoDriveController.innerSpeedForDemand(100, 200));
     assertEquals(14, RealCartAutoDriveController.innerSpeedForDemand(0, 200));
   }
 
@@ -155,15 +156,15 @@ public class RealCartAutoDriveControllerTest {
             frameWithError(
                 SteeringEvidence.Direction.LEFT,
                 100,
-                -.70f,
+                -.90f,
                 .70f,
                 FollowState.FOLLOW,
                 BehaviorAction.FOLLOW_SLOW),
             100L);
     assertEquals(RealCartAutoDriveController.Phase.PIVOT, result.phase);
     assertTrue(result.translationDecision.allowed);
-    assertEquals(-5, result.left);
-    assertEquals(5, result.right);
+    assertEquals(-10, result.left);
+    assertEquals(10, result.right);
   }
 
   @Test
@@ -318,7 +319,8 @@ public class RealCartAutoDriveControllerTest {
   }
 
   private static SteeringEvidence evidence(SteeringEvidence.Direction direction, int demand) {
-    return evidence(direction, demand, 0f);
+    return evidence(direction, demand, direction == SteeringEvidence.Direction.NONE ? 0f
+        : (direction == SteeringEvidence.Direction.LEFT ? -1f : 1f) * (.03f + .82f * demand / 100f));
   }
 
   private static SteeringEvidence evidence(

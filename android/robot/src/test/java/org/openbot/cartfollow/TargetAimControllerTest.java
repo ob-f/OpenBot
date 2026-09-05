@@ -1,82 +1,71 @@
 package org.openbot.cartfollow;
-
 import static org.junit.Assert.*;
-
 import org.junit.Test;
-
 public class TargetAimControllerTest {
-  private static SteeringEvidence evidence(float raw, float rate, float prediction) {
-    return new SteeringEvidence(
-        true,
-        "replay",
-        raw,
-        raw,
-        rate,
-        prediction,
-        1f,
-        80,
-        prediction < 0 ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT,
-        SteeringEvidence.Level.LARGE,
-        400);
+  private static SteeringEvidence e(float raw, float rate) {
+    return new SteeringEvidence(true, "test", raw, raw, rate, -raw, 0, 80,
+        raw < 0 ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT,
+        SteeringEvidence.Level.LARGE, 400);
   }
-
-  @Test
-  public void recordedPredictionSwingsCannotTriggerFarPivot() {
-    TargetAimController aim = new TargetAimController();
-    float[] raw = {.3113f, .128f, -.2127f, .0273f, -.0107f, .005f, -.0826f};
-    float[] predicted = {.4346f, -.0809f, -.5894f, .2443f, -.3386f, .1962f, .1184f};
-    for (int i = 0; i < raw.length; i++) {
-      AimDecision result =
-          aim.update(evidence(raw[i], 0f, predicted[i]), true, true, i * 200L, i * 200L);
-      assertTrue(result.allowed);
-      assertFalse(result.pivots());
+  @Test public void recordedRightForwardExitRemainsArcUntilEdge() {
+    TargetAimController c = new TargetAimController();
+    for (float raw : new float[] {.15f, .6261f, .70f, .8231f, .8411f}) {
+      AimDecision d = c.update(e(raw, 0), true, true, 100, 100);
+      assertTrue(d.allowed); assertFalse(d.pivots());
     }
+    assertFalse(c.update(e(.85f, 0), true, true, 200, 200).allowed);
   }
-
-  @Test
-  public void movingCartBrakesBeforeEdgePivotAndRequiresPostSettleObservation() {
-    TargetAimController aim = new TargetAimController();
-    SteeringEvidence edge = evidence(.7f, 0f, .8f);
-    assertFalse(aim.update(edge, true, true, 0, 0).allowed);
-    assertFalse(aim.update(edge, true, false, 600, 650).allowed);
-    assertTrue(aim.update(edge, true, false, 650, 650).pivots());
+  @Test public void movingRequiresFullBrakeAndPostDeadlineFrame() {
+    TargetAimController c = new TargetAimController();
+    assertFalse(c.update(e(.9f, 0), true, true, 0, 0).allowed);
+    assertFalse(c.update(e(.9f, 0), true, false, 649, 650).allowed);
+    assertEquals(10, c.update(e(.9f, 0), true, false, 650, 650).speed);
   }
-
-  @Test
-  public void centerCrossingBrakesRatherThanImmediatelyReversing() {
-    TargetAimController aim = new TargetAimController();
-    assertTrue(aim.update(evidence(.25f, 0f, .3f), false, false, 0, 0).pivots());
-    assertFalse(aim.update(evidence(-.25f, -1f, -.6f), false, false, 100, 100).allowed);
-    assertFalse(aim.update(evidence(-.25f, 0f, -.3f), false, false, 700, 700).allowed);
-    assertEquals(
-        AimDecision.Mode.PIVOT_LEFT,
-        aim.update(evidence(-.25f, 0f, -.3f), false, false, 750, 750).mode);
+  @Test public void nearTargetStartsAtPointOneAndStopsAtPointZeroFour() {
+    TargetAimController c = new TargetAimController();
+    assertFalse(c.update(e(.09f, 0), false, false, 0, 0).pivots());
+    assertEquals(5, c.update(e(.10f, 0), false, false, 100, 100).speed);
+    assertFalse(c.update(e(.04f, 0), false, false, 200, 200).allowed);
   }
-
-  @Test
-  public void approachingCenterBrakesEarlyWithoutCommandingOppositeTurn() {
-    TargetAimController aim = new TargetAimController();
-    aim.update(evidence(.25f, 0f, .3f), false, false, 0, 0);
-    assertFalse(aim.update(evidence(.128f, -.6665f, -.0809f), false, false, 100, 100).allowed);
+  @Test public void speedDropsButNeverRisesWithinOneTurn() {
+    TargetAimController c = new TargetAimController();
+    assertEquals(10, c.update(e(.7f, 0), false, false, 0, 0).speed);
+    assertEquals(8, c.update(e(.5f, 0), false, false, 100, 100).speed);
+    assertEquals(8, c.update(e(.7f, 0), false, false, 200, 200).speed);
+    assertEquals(5, c.update(e(.3f, 0), false, false, 300, 300).speed);
   }
-
-  @Test
-  public void schedulerExpiresPulseWithoutAnotherCameraFrame() {
-    TargetAimController aim = new TargetAimController();
-    aim.update(evidence(.7f, 0f, .7f), true, false, 0, 0);
-    assertFalse(aim.expire(299));
-    assertTrue(aim.expire(300));
-    assertFalse(aim.expire(400));
-    assertFalse(aim.update(evidence(.7f, 0f, .7f), true, false, 949, 949).allowed);
-    assertTrue(aim.update(evidence(.7f, 0f, .7f), true, false, 950, 950).pivots());
+  @Test public void schedulerBoundsTurnAndRequiresFreshPostPauseObservation() {
+    TargetAimController c = new TargetAimController();
+    c.update(e(.9f, 0), true, false, 0, 0);
+    assertFalse(c.expire(599)); assertTrue(c.expire(600)); assertFalse(c.expire(650));
+    assertFalse(c.update(e(.9f, 0), true, false, 749, 800).allowed);
+    assertTrue(c.update(e(.9f, 0), true, false, 800, 800).pivots());
   }
-
-  @Test
-  public void farTargetReturnsToCurveBeforeBecomingPerfectlyCentered() {
-    TargetAimController aim = new TargetAimController();
-    aim.update(evidence(.7f, 0f, .7f), true, false, 0, 0);
-    assertFalse(aim.update(evidence(.3f, 0f, .4f), true, false, 100, 100).allowed);
-    assertEquals(
-        AimDecision.Mode.CURVE, aim.update(evidence(.3f, 0f, .4f), true, false, 750, 750).mode);
+  @Test public void centerCrossingCannotReverseBeforeSixHundredFiftyMs() {
+    TargetAimController c = new TargetAimController();
+    c.update(e(.3f, 0), false, false, 0, 0);
+    assertFalse(c.update(e(-.3f, 0), false, false, 100, 100).allowed);
+    assertFalse(c.update(e(-.3f, 0), false, false, 749, 749).allowed);
+    assertEquals(AimDecision.Mode.PIVOT_LEFT, c.update(e(-.3f, 0), false, false, 750, 750).mode);
+  }
+  @Test public void pauseRetainsFarExitHysteresis() {
+    TargetAimController c = new TargetAimController();
+    c.update(e(.9f, 0), true, false, 0, 0); c.expire(600);
+    assertTrue(c.update(e(.7f, 0), true, false, 750, 750).pivots());
+    assertFalse(c.update(e(.55f, 0), true, false, 850, 850).allowed);
+    assertEquals(AimDecision.Mode.CURVE,c.update(e(.5f, 0),true,false,1000,1000).mode);
+  }
+  @Test public void predictionOnlyBrakesNeverChoosesDirection() {
+    TargetAimController c = new TargetAimController();
+    assertEquals(AimDecision.Mode.PIVOT_RIGHT,c.update(e(.25f, 0),false,false,0,0).mode);
+    assertFalse(c.update(e(.1f, -1f),false,false,100,100).allowed);
+  }
+  @Test public void shortPauseExitCannotBypassLaterReversalDeadline() {
+    TargetAimController c = new TargetAimController();
+    c.update(e(.25f, 0),false,false,0,0);
+    c.update(e(.03f, 0),false,false,100,100);
+    assertTrue(c.update(e(.03f, 0),false,false,250,250).allowed);
+    assertFalse(c.update(e(-.25f, 0),false,false,300,300).allowed);
+    assertTrue(c.update(e(-.25f, 0),false,false,750,750).pivots());
   }
 }

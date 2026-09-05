@@ -222,8 +222,11 @@ public final class SimulatorAutoDriveController {
     if (inHold
         || frame.simulatorIdentity != null && frame.simulatorIdentity.isAppearanceTransition())
       desiredGear = GEAR_LOW;
-    if (steering.demandPercent > 60) desiredGear = GEAR_LOW;
-    else if (steering.demandPercent > 30) desiredGear = Math.min(desiredGear, GEAR_MID);
+    if (frame.state == FollowState.FOLLOW_CAUTION
+        || frame.behaviorDecision != null
+            && frame.behaviorDecision.selectedAction == BehaviorAction.FOLLOW_CAUTION)
+      desiredGear = GEAR_LOW;
+    desiredGear = FollowTuning.curveGear(desiredGear, steering.rawError);
     if (frame.simulatorIdentity != null && frame.simulatorIdentity.tracking != null)
       desiredGear = Math.min(desiredGear, frame.simulatorIdentity.tracking.maximumGear);
     if (!lastMoving) {
@@ -231,10 +234,7 @@ public final class SimulatorAutoDriveController {
       currentGear = GEAR_LOW;
     } else selectGear(desiredGear);
 
-    int reductionMax = currentGear == GEAR_HIGH ? 6 : currentGear == GEAR_MID ? 5 : 4;
-    int reduction =
-        Math.round(reductionMax * Math.max(0, Math.min(100, steering.demandPercent)) / 100f);
-    int inner = Math.max(1, currentGear - reduction);
+    int inner = RealCartAutoDriveController.innerSpeedForError(currentGear, steering.rawError, steering.lateralRatePerSec, 100);
     int left = currentGear;
     int right = currentGear;
     if (steering.direction == SteeringEvidence.Direction.LEFT) left = inner;
@@ -244,7 +244,8 @@ public final class SimulatorAutoDriveController {
         currentGear,
         left,
         right,
-        steering.direction == SteeringEvidence.Direction.NONE ? "follow_straight" : "follow_curve",
+        steering.direction == SteeringEvidence.Direction.NONE ? "follow_straight"
+            : inner == currentGear ? "curve_return_brake" : "follow_curve",
         false,
         0L,
         recoveryLimitMs);
@@ -301,7 +302,7 @@ public final class SimulatorAutoDriveController {
     }
     if (!aim.pivots()) return null;
     boolean left = aim.mode == AimDecision.Mode.PIVOT_LEFT;
-    int speed = RealCartAutoDriveController.AIM_PIVOT_SPEED;
+    int speed = aim.speed;
     return new Result(
         Phase.PIVOT,
         0,

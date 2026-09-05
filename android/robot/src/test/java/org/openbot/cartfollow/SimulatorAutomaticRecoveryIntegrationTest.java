@@ -51,13 +51,12 @@ public class SimulatorAutomaticRecoveryIntegrationTest {
           assertEquals(step.identity.trackId, flow.tracks.getLockedTrackId());
           assertEquals(FollowState.FOLLOW_CAUTION, step.frame.state);
           assertSame(returned, step.frame.target);
-          assertPivoting(step);
+          assertMoving(step);
         }
       }
       assertTrue(SystemClock.elapsedRealtime() - started < 3000L);
       Step next = flow.step(300, remote("returned"));
-      assertStopped(next);
-      assertEquals("aim_settling", next.drive.reason);
+      assertMoving(next);
       assertEquals(SimulatorIdentityGuard.RecoveryType.LOCAL, next.permit.recoveryType);
       assertEquals(3000L, flow.machine.COUNTDOWN_MS);
     }

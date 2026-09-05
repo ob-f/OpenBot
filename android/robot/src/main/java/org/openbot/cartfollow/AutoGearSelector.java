@@ -45,6 +45,6 @@ public final class AutoGearSelector {
   }
 
   public static int maximumReduction(int gear) {
-    return gear == 21 ? 6 : gear == 18 ? 5 : 4;
+    return FollowTuning.maximumReduction(gear);
   }
 }

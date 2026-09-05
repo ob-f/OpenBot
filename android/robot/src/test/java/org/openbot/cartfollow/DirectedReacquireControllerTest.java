@@ -15,6 +15,41 @@ public class DirectedReacquireControllerTest {
   private final DirectedReacquireController controller = new DirectedReacquireController();
   private final YawTurnTracker yaw = new YawTurnTracker();
 
+  private void armWithContinuousTracking() {
+    SimulatorIdentityGuard guard = new SimulatorIdentityGuard();
+    guard.begin(1);
+    for (int i = 1; i <= 3; i++) SimulatorIdentityGuardTest.continuous(guard, i, i * 300, .99f);
+    for (int i = 4; i <= 6; i++) {
+      long now = 1200 + (i - 4) * 100;
+      float left = .65f + (i - 4) * .08f;
+      FollowStateMachine.FrameResult f = observation(now, left, Math.min(1f, left + .2f), false, 1, 0);
+      f.sessionGeneration = 1;
+      f.frameSequence = i;
+      f.frameTiming = new FrameTimingEvidence(now, 0, 0, 0, 0, 0, 5, 0);
+      f.simulatorIdentity = SimulatorIdentityGuardTest.continuous(guard, i, now, .65f);
+      f.identityEvidence = null;
+      update(f, now);
+    }
+  }
+  private FollowStateMachine.FrameResult missingAt(long sequence) {
+    FollowStateMachine.FrameResult f = missing();
+    f.sessionGeneration = 1;
+    f.frameSequence = sequence;
+    return f;
+  }
+  @Test public void reliablePermittedContinuityArmsStationarySearchWithoutFreshReid() {
+    armWithContinuousTracking();
+    update(missingAt(7), 1500);
+    DirectedReacquireEvidence result = update(missingAt(8), 1600);
+    assertEquals(DirectedReacquireEvidence.Phase.TURNING, result.phase);
+    assertEquals(0, result.left() + result.right());
+  }
+  @Test public void continuousExitEvidenceExpiresAfterFiveHundredMilliseconds() {
+    armWithContinuousTracking();
+    update(missingAt(7), 1901);
+    assertEquals(DirectedReacquireEvidence.Phase.IDLE, update(missingAt(8), 2001).phase);
+  }
+
   @Test
   public void independentOfMotionGateRequiresTwoOutwardAndTimedMissingFrames() {
     controller.configure(18, 90, 5000);

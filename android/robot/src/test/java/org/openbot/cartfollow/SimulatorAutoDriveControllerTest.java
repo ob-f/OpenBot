@@ -227,14 +227,16 @@ public class SimulatorAutoDriveControllerTest {
     frame.behaviorDecision =
         new BehaviorDecisionResult(
             FollowState.FOLLOW, BehaviorAction.FOLLOW_SLOW, "test", null, 1f);
+    float raw = direction == SteeringEvidence.Direction.NONE ? 0f
+        : (direction == SteeringEvidence.Direction.LEFT ? -1f : 1f) * (.03f + .82f * demand * demand / 10000f);
     frame.steeringEvidence =
         new SteeringEvidence(
             true,
             "test",
+            raw,
+            raw,
             0,
-            0,
-            0,
-            0,
+            raw,
             0,
             demand,
             direction,

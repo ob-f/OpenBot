@@ -200,6 +200,9 @@ public final class SimulatorIdentityGuard {
   private int continuityTrack = -1;
   private long weakSince = -1;
   private long lastObservedAt = -1L;
+  private long recoveryDeadline = -1L;
+  private int recoveryObservations;
+  private boolean restrictedRecovery;
   private long maintainedAt = -1L;
   private long maintainedObservation = -1L;
   private int maintainedMatches;
@@ -276,6 +279,9 @@ public final class SimulatorIdentityGuard {
     lastFrame = lastObservation = -1L;
     lastTrustedAt = -1L;
     lastObservedAt = -1L;
+    recoveryDeadline = -1L;
+    recoveryObservations = 0;
+    restrictedRecovery = false;
     lastIdentityObservation = -1L;
     appearanceSupportMisses = 0;
     multiSince = multiCheckAt = lastMultiObservation = -1;
@@ -472,7 +478,7 @@ public final class SimulatorIdentityGuard {
                               : "association_competing")
                           : "bbox_jump");
     }
-    // Missing observations stop immediately, but retain the original association for 500 ms.
+    // Missing observations never permit motion; keep a bounded original-target recovery context.
     boolean current =
         trackId >= 0
             && candidateCount > 0
@@ -483,8 +489,32 @@ public final class SimulatorIdentityGuard {
         following
             && continuityTrack == lockedId
             && lastObservedAt >= 0
-            && receivedAt - lastObservedAt <= 500;
+            && receivedAt - lastObservedAt <= FollowTuning.RECOVERY_CONTEXT_MS;
+    if (originalContext && !hardContinuityBreak && recoveryDeadline < 0L
+        && (!current || receivedAt - lastObservedAt > 500L)) {
+      recoveryDeadline = lastObservedAt + FollowTuning.RECOVERY_CONTEXT_MS;
+      recoveryObservations = 0;
+    }
+    if (recoveryDeadline >= 0L) {
+      if (receivedAt > recoveryDeadline || candidateCount > 1 || hardContinuityBreak
+          || current && (trackId != lockedId || !local || !highConfidence
+              || continuity.observedGeometry == null
+              || !continuity.observedGeometry.bboxDefaultOk))
+      {
+        recoveryDeadline = -1L;
+        recoveryObservations = 0;
+        restrictedRecovery = false;
+        originalContext = false;
+        local = false;
+        recoveryType = RecoveryType.GLOBAL;
+      } else if (!current) {
+        recoveryObservations = 0;
+        return new Decision(false, false, trackId, 0, "current_target_missing");
+      }
+    }
     if (originalContext && current && trackId == lockedId && !hardContinuityBreak) {
+      boolean recovering = recoveryDeadline >= 0L;
+      if (recovering && receivedAt > lastObservedAt) recoveryObservations++;
       lastObservedAt = receivedAt;
       if (localReid != null
           && localReid.fresh
@@ -497,10 +527,15 @@ public final class SimulatorIdentityGuard {
           && localReid.anchorScore >= .70f) {
         lastTrustedAt = localReid.observationTimeMs;
         lastIdentityObservation = localReid.observationId;
+        if (!recovering) restrictedRecovery = false;
       }
-      boolean stable = continuity.reliable;
+      boolean stable = continuity.reliable && (!recovering || recoveryObservations >= 3);
+      if (recovering) restrictedRecovery = true;
+      if (recovering && stable) recoveryDeadline = -1L;
       String reason =
-          !stable
+          restrictedRecovery
+              ? (stable ? "short_recovery_follow" : "short_recovery_verifying")
+              : !stable
               ? "tracking_stabilizing"
               : !highConfidence
                   ? "low_detection_continuity"
@@ -516,7 +551,7 @@ public final class SimulatorIdentityGuard {
               true,
               continuity.stableFrames,
               stable,
-              stable && highConfidence && candidateCount == 1,
+              stable && highConfidence && candidateCount == 1 && !restrictedRecovery,
               reason);
       Decision result =
           new Decision(
@@ -721,6 +756,9 @@ public final class SimulatorIdentityGuard {
   }
 
   private Decision reject(int trackId, boolean confirmation, String reason) {
+    recoveryDeadline = -1L;
+    recoveryObservations = 0;
+    restrictedRecovery = false;
     RecoveryType rejectedType = recoveryType;
     continuityTrack = -1;
     resetMaintainedEvidence();
