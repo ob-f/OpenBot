@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="voice_cart_title">Voice Cart Simulator</string>
+    <string name="voice_cart_description">系统中文语音试听</string>
+    <string name="voice_cart_phrase">你好，欢迎使用购物车语音测试。请走到镜头前，我会引导你完成初始化。</string>
+    <string name="voice_cart_hint">这是语音试听页面，尚未启用相机或跟随。\n\n请调高媒体音量，并检查声音是否输出到蓝牙耳机。听到声音后，可关闭 Wi-Fi 和移动数据，再点重新播放，验证离线可用性。</string>
+    <string name="voice_cart_replay">重新播放 / 重试</string>
+    <string name="voice_cart_initializing">正在初始化系统语音引擎…</string>
+    <string name="voice_cart_init_timeout">语音引擎响应超时，请重试，或检查手机设置中的文字转语音引擎。</string>
+    <string name="voice_cart_init_failed">系统语音引擎初始化失败。请在手机设置中检查文字转语音引擎，再返回重试。</string>
+    <string name="voice_cart_missing_data">缺少中文语音数据。请在手机的文字转语音设置中下载中文语音，再返回重试。</string>
+    <string name="voice_cart_unsupported">当前引擎不支持中文，请在手机的文字转语音设置中选择支持中文的引擎，再返回重试。</string>
+    <string name="voice_cart_queued">已提交播放，等待语音引擎…</string>
+    <string name="voice_cart_speaking">正在播放…</string>
+    <string name="voice_cart_done">引擎报告播放完成。请以实际听到中文声音为准。</string>
+    <string name="voice_cart_error">语音播放失败（错误码 %1$d），请检查语音数据、网络和媒体音量后重试。</string>
+    <string name="voice_cart_details">系统默认引擎：%1$s\n当前音色：%2$s\n网络要求：%3$s</string>
+    <string name="voice_cart_unknown">未知</string>
+    <string name="voice_cart_network_required">需要联网</string>
+    <string name="voice_cart_local_voice">引擎声明无需联网，仍需断网试听确认</string>
+</resources>

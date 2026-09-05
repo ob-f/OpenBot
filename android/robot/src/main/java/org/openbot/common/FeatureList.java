@@ -37,6 +37,7 @@ public class FeatureList {
   public static final String PERSON_FOLLOWING = "Person Following";
   public static final String OBJECT_NAV = "Object Tracking";
   public static final String CART_SIMULATOR = "Cart Simulator";
+  public static final String VOICE_CART_SIMULATOR = "Voice Cart Simulator";
   public static final String REAL_CART_FOLLOW = "Real Cart Follow";
   public static final String PERSON_CROP_COLLECTOR = "Person Crop Collector";
   public static final String PERSON_SEQUENCE_COLLECTOR = "Person Sequence Collector";
@@ -87,6 +88,8 @@ public class FeatureList {
     subCategories.add(new SubCategory(AUTOPILOT, R.drawable.ic_autopilot, "#44525F"));
     subCategories.add(new SubCategory(OBJECT_NAV, R.drawable.ic_person_search, "#E7CE88"));
     subCategories.add(new SubCategory(CART_SIMULATOR, R.drawable.ic_person_search, "#6BBF8A"));
+    subCategories.add(
+        new SubCategory(VOICE_CART_SIMULATOR, R.drawable.ic_person_search, "#5C9ED6"));
     subCategories.add(new SubCategory(REAL_CART_FOLLOW, R.drawable.ic_electric_car, "#D05A47"));
     subCategories.add(
         new SubCategory(PERSON_CROP_COLLECTOR, R.drawable.ic_person_search, "#8BBF6B"));
