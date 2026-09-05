@@ -97,6 +97,10 @@ public class MainFragment extends Fragment implements OnItemClickListener<SubCat
             .navigate(R.id.action_mainFragment_to_realCartFollowFragment);
         break;
 
+      case FeatureList.VOICE_CART_SIMULATOR:
+        Navigation.findNavController(requireView()).navigate(R.id.voiceCartSimulatorFragment);
+        break;
+
       case FeatureList.PERSON_CROP_COLLECTOR:
         Navigation.findNavController(requireView())
             .navigate(R.id.action_mainFragment_to_personCropCollectorFragment);

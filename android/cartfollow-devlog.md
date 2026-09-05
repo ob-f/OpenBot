@@ -2225,3 +2225,30 @@ session_info 的 strategy 更新为 observed-aim-pulse-v5，记录脉冲、观�
   本次未出现。abortOnError=false，因此 check 通过不表示 Lint 为零。
 - APK：`android/robot/build/outputs/apk/debug/robot-debug.apk`，42,642,003 字节，
   SHA256 `77D17FF8D211223B5BED8172B6A77A35A0C687B3B341ED341DE2DF092EFC905A`。本轮仅构建交付，尚未安装或进行新版实车验证。
+
+## Voice Cart Simulator：系统中文 TTS 最小试听实验（2026-09-05）
+
+新增首页 AI 分类中的 `Voice Cart Simulator` 入口，进入独立 Fragment 后初始化 Android
+系统默认 TTS，使用 `Locale.SIMPLIFIED_CHINESE` 自动播报一句中文。页面提供重新播放／重试、
+当前状态、默认引擎、音色及网络要求。初始化超时、中文数据缺失、不支持中文和播放错误均有
+提示；离开页面停止并释放 TTS，旧会话和旧播报回调不能覆盖新状态。
+
+本阶段只验证系统语音可用性，尚未复制模拟器、开启相机、采集身份、标定距离或发送车辆
+指令。原 Cart Simulator、公共跟随基类、状态机和既有 AudioPlayer 不变；新增 Manifest
+TTS_SERVICE queries 声明以支持 Android 11 及以上的引擎发现，无新增 SDK 或权限。
+
+手机验收：
+1. 首页打开 Voice Cart Simulator，确认自动听到中文、字幕一致。
+2. 连续点重新播放，确认只播最新一句；返回首页，确认声音停止。
+3. 再进入页面，以及切后台后返回，确认能重新初始化和试听。
+4. 关闭 Wi-Fi 和移动数据后重播，确认是否可离线使用。音色声明不等于离线实测结果。
+5. 如无声，检查媒体音量、蓝牙音频输出和系统中文语音数据；记录页面状态和引擎信息。
+
+引擎报告播放完成仅表示收到完成回调，不能代替用户实际听到声音。当前 adb 未列出设备，
+未安装 APK，也未验证手机中文音色、离线播放或生命周期实机表现。
+
+本轮验证：JDK 17 下 `:robot:assembleDebug :robot:check --offline` 成功，Debug／Release 各
+337 项现有测试通过，0 失败、0 错误、0 跳过；修改 Java 文件的 google-java-format 1.7
+检查及 `git diff --check` 通过。Lint 报告仍含 10 Error、675 Warning、6 Information，
+未报告新增 voice Java／布局／字符串文件问题；Gradle check 成功不表示 Lint 零问题。
+APK：`android/robot/build/outputs/apk/debug/robot-debug.apk`（42,366,607 字节）。
