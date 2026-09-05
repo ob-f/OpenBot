@@ -27,7 +27,7 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
   private static final long AUTO_UNLOCK_HOLD_MS = 2000L;
   private static final long AUTO_LOG_INTERVAL_MS = 250L;
   private static final long RANGE_STALE_MS = 250L;
-  private static final int REAL_CART_PREDICTION_HORIZON_MS = 400;
+  private static final int REAL_CART_PREDICTION_HORIZON_MS = 0;
   private static final String TUNING_PREFS = "real_cart_steering_tuning";
   private static final String TUNING_STRENGTH_KEY = "strength_percent";
   private static final String MANUAL_SPEED_KEY = "manual_forward_logical";
@@ -804,13 +804,14 @@ public class RealCartFollowFragment extends BaseCartFollowFragment implements Se
             result.left,
             result.right);
       case WAIT_CENTER:
-        return "起步稳定验证 · c0,0 · " + HumanCartSimulatorFragment.driveReasonLabel(result.reason);
+        return (result.reason.startsWith("aim_") ? "对准停车观察 · c0,0 · " : "起步稳定验证 · c0,0 · ")
+            + HumanCartSimulatorFragment.driveReasonLabel(result.reason);
       case RECOVERY_STOP:
         return "停车验证或学习 · c0,0 · " + HumanCartSimulatorFragment.driveReasonLabel(result.reason);
       case SEARCH_BRAKE:
         return "搜索前停车等待 · c0,0";
       case PIVOT:
-        return "定向搜索 · 向"
+        return (result.reason.startsWith("aim_") ? "目标对准 · 向" : "定向搜索 · 向")
             + (result.left < 0 ? "左" : "右")
             + "旋转 · c"
             + result.left

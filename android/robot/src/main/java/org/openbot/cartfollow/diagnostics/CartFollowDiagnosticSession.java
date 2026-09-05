@@ -175,7 +175,7 @@ public class CartFollowDiagnosticSession {
                 .put("log_version", 7)
                 .put("build", org.openbot.BuildConfig.VERSION_NAME)
                 .put("build_stamp", org.openbot.BuildConfig.CART_BUILD_STAMP)
-                .put("strategy", "continuity-aim-init-v4")
+                .put("strategy", "observed-aim-pulse-v5")
                 .put("device_model", Build.MODEL)
                 .put("sdk_int", Build.VERSION.SDK_INT)
                 .put("detector", detector)
@@ -197,8 +197,14 @@ public class CartFollowDiagnosticSession {
                 .put("stable_frames", 3)
                 .put("aim_pivot_enter_error", .18)
                 .put("aim_pivot_exit_error", .08)
-                .put("aim_edge_pivot_error", .35)
-                .put("aim_centered_frames", 3)
+                .put(
+                    "aim_edge_pivot_error",
+                    org.openbot.cartfollow.TargetAimController.FAR_ENTER_ERROR)
+                .put("aim_pulse_ms", org.openbot.cartfollow.TargetAimController.PULSE_MS)
+                .put("aim_settle_ms", org.openbot.cartfollow.TargetAimController.SETTLE_MS)
+                .put(
+                    "aim_far_exit_error", org.openbot.cartfollow.TargetAimController.FAR_EXIT_ERROR)
+                .put("real_prediction_horizon_ms", 0)
                 .put("aim_pivot_speed", 5)
                 .put("distance_calibration_samples", 15)
                 .put("distance_calibration_span_ms", 500)

@@ -936,6 +936,13 @@ public class HumanCartSimulatorFragment extends BaseCartFollowFragment
   private static String galleryReasonLabel(String reason) {
     if (reason == null) return "-";
     switch (reason) {
+      case "aim_settling":
+      case "aim_brake_observe":
+        return "停止旋转，等待新画面";
+      case "aim_brake_before_pivot":
+        return "先停车，再短时对准目标";
+      case "aim_pulse":
+        return "短时对准目标";
       case "anchor_confirmed":
         return "初始身份已确认";
       case "static_mode":

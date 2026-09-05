@@ -15,6 +15,32 @@ import org.openbot.vehicle.Control;
 
 public class RealCartSafetyControllerTest {
   @Test
+  public void schedulerStopsAimPulseEvenWithoutNewInference() {
+    RealCartSafetyController controller = readyAutoController();
+    assertTrue(controller.unlockAuto());
+    controller.setAutoRunEnabled(true, 900L);
+    FollowStateMachine.FrameResult frame = frame(new Control(0, 0), BehaviorAction.FOLLOW_SLOW);
+    frame.steeringEvidence =
+        new SteeringEvidence(
+            true,
+            "test",
+            .7f,
+            .7f,
+            0f,
+            .7f,
+            0f,
+            80,
+            SteeringEvidence.Direction.RIGHT,
+            SteeringEvidence.Level.LARGE,
+            0);
+    assertFalse(observe(controller, frame, 1000L).isStop());
+    assertTrue(controller.refresh(1300L, null).isStop());
+    assertEquals("aim_settling", controller.getAutoDriveResult().reason);
+    assertTrue(controller.isAutoUnlocked());
+    assertTrue(controller.refresh(1350L, null).isStop());
+  }
+
+  @Test
   public void manualRequiresForegroundConnectionAndHandshake() {
     RealCartSafetyController controller = new RealCartSafetyController();
     assertTrue(

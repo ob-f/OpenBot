@@ -65,9 +65,7 @@ public final class SimulatorAutoDriveController {
   private boolean lastMoving;
   private boolean holdWasMoving;
   private boolean inHold;
-  private boolean aimPivoting;
-  private int aimCenteredFrames;
-  private SteeringEvidence.Direction aimDirection = SteeringEvidence.Direction.NONE;
+  private final TargetAimController aimController = new TargetAimController();
 
   public void setRecoveryLimitMs(long recoveryLimitMs) {
     this.recoveryLimitMs = Math.max(1000L, recoveryLimitMs);
@@ -80,9 +78,7 @@ public final class SimulatorAutoDriveController {
     gears.reset();
     hasFollowed = false;
     lastMoving = holdWasMoving = inHold = false;
-    aimPivoting = false;
-    aimCenteredFrames = 0;
-    aimDirection = SteeringEvidence.Direction.NONE;
+    aimController.reset();
     return stopped(Phase.IDLE, reason, false, 0L);
   }
 
@@ -201,7 +197,12 @@ public final class SimulatorAutoDriveController {
     }
     boolean distanceFar =
         frame.distanceEstimate != null && frame.distanceEstimate.state == DistanceState.TOO_FAR;
-    Result aim = aimOnlyIfNeeded(steering, distanceFar);
+    Result aim =
+        aimOnlyIfNeeded(
+            steering,
+            distanceFar,
+            frame.frameTiming == null ? nowMs : frame.frameTiming.receivedAtMs,
+            nowMs);
     if (aim != null) return aim;
     if (!distanceFar) {
       String reason =
@@ -290,46 +291,23 @@ public final class SimulatorAutoDriveController {
     return gears.distanceGear(heightScale);
   }
 
-  private Result aimOnlyIfNeeded(SteeringEvidence steering, boolean distanceFar) {
-    float error = steering.predictedError;
-    float magnitude = Math.abs(error);
-    if (aimPivoting) {
-      if (magnitude <= RealCartAutoDriveController.AIM_PIVOT_EXIT_ERROR) aimCenteredFrames++;
-      else aimCenteredFrames = 0;
-      if (aimCenteredFrames >= RealCartAutoDriveController.AIM_CENTERED_FRAMES) {
-        aimPivoting = false;
-        aimCenteredFrames = 0;
-        aimDirection = SteeringEvidence.Direction.NONE;
-        return null;
-      }
-      if (magnitude > RealCartAutoDriveController.AIM_PIVOT_EXIT_ERROR
-          && steering.direction != SteeringEvidence.Direction.NONE)
-        aimDirection = steering.direction;
-      return pivotResult("aim_pivot_hysteresis");
+  private Result aimOnlyIfNeeded(
+      SteeringEvidence steering, boolean distanceFar, long observedAtMs, long nowMs) {
+    AimDecision aim = aimController.update(steering, distanceFar, lastMoving, observedAtMs, nowMs);
+    if (!aim.allowed) {
+      gears.reset();
+      currentGear = GEAR_LOW;
+      return new Result(Phase.FOLLOW, 0, 0, 0, aim.reason, false, 0L, recoveryLimitMs);
     }
-    float enter =
-        distanceFar
-            ? RealCartAutoDriveController.AIM_EDGE_PIVOT_ERROR
-            : RealCartAutoDriveController.AIM_PIVOT_ENTER_ERROR;
-    if (magnitude < enter && steering.edgeUrgency <= 0f) return null;
-    aimPivoting = true;
-    aimCenteredFrames = 0;
-    aimDirection =
-        steering.direction != SteeringEvidence.Direction.NONE
-            ? steering.direction
-            : error < 0f ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
-    return pivotResult("aim_target_off_center");
-  }
-
-  private Result pivotResult(String reason) {
-    boolean left = aimDirection == SteeringEvidence.Direction.LEFT;
+    if (!aim.pivots()) return null;
+    boolean left = aim.mode == AimDecision.Mode.PIVOT_LEFT;
     int speed = RealCartAutoDriveController.AIM_PIVOT_SPEED;
     return new Result(
         Phase.PIVOT,
         0,
         left ? -speed : speed,
         left ? speed : -speed,
-        reason,
+        aim.reason,
         false,
         0L,
         recoveryLimitMs);
@@ -345,9 +323,7 @@ public final class SimulatorAutoDriveController {
         && !"strong_identity_revalidation".equals(reason)) maintainedStart.reset();
     currentGear = GEAR_LOW;
     gears.reset();
-    aimPivoting = false;
-    aimCenteredFrames = 0;
-    aimDirection = SteeringEvidence.Direction.NONE;
+    aimController.reset();
     return new Result(
         phase,
         0,

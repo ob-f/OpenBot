@@ -34,6 +34,7 @@ public class BluetoothManager {
     ENABLING_NOTIFY,
     SERIAL_READY,
     RETRYING,
+    RESCANNING,
     DISCONNECTING,
     FAILED
   }
@@ -80,6 +81,7 @@ public class BluetoothManager {
   private BleDevice retryDevice;
   private int retryIndex;
   private boolean retryAfterDisconnect;
+  private BleDevice recoveryScanMatch;
   private volatile boolean controlDiagnosticsEnabled;
   private boolean notifyEnabled;
   UUID[] uuidArray = new UUID[] {UUID.fromString(SERVICE_UUID)};
@@ -125,11 +127,18 @@ public class BluetoothManager {
             .init(this.context);
   }
 
-  public void startScan() {
+  public synchronized void startScan() {
+    if (connectionState == ConnectionState.CONNECTING
+        || connectionState == ConnectionState.ENABLING_NOTIFY
+        || connectionState == ConnectionState.RETRYING
+        || connectionState == ConnectionState.RESCANNING
+        || connectionState == ConnectionState.DISCONNECTING) return;
+    final long scanGeneration = connectionGeneration;
     manager.startScan(
         new BleScanCallback() {
           @Override
           public void onLeScan(BleDevice device, int rssi, byte[] scanRecord) {
+            if (scanGeneration != connectionGeneration) return;
             for (BleDevice d : deviceList) {
               if (device.address.equals(d.address)) {
                 return;
@@ -141,6 +150,7 @@ public class BluetoothManager {
 
           @Override
           public void onStart(boolean startScanSuccess, String info) {
+            if (scanGeneration != connectionGeneration) return;
             if (bleDevice != null && bleDevice.connecting) {
             } else {
               deviceList.clear();
@@ -157,8 +167,9 @@ public class BluetoothManager {
         });
   }
 
-  public void stopScan() {
-    manager.stopScan();
+  public synchronized void stopScan() {
+    // UI clicks/lifecycle may stop a list scan, but must not truncate automatic recovery.
+    if (connectionState != ConnectionState.RESCANNING) manager.stopScan();
   }
 
   public synchronized void toggleConnection(int position, BleDevice device) {
@@ -166,6 +177,7 @@ public class BluetoothManager {
     if (connectionState == ConnectionState.CONNECTING
         || connectionState == ConnectionState.ENABLING_NOTIFY
         || connectionState == ConnectionState.RETRYING
+        || connectionState == ConnectionState.RESCANNING
         || connectionState == ConnectionState.DISCONNECTING) return;
 
     if (isBleConnected() && device.address.equals(activeAddress)) {
@@ -191,6 +203,8 @@ public class BluetoothManager {
     retryDevice = null;
     connectionGeneration++;
     long generation = connectionGeneration;
+    manager.stopScan();
+    recoveryScanMatch = null;
     connectionState = retryCount > 0 ? ConnectionState.RETRYING : ConnectionState.CONNECTING;
     lastConnectionError = "";
     device.connecting = true;
@@ -512,8 +526,7 @@ public class BluetoothManager {
     if (!isActiveAttempt(generation, device.address) || connectionState != ConnectionState.RETRYING)
       return;
     logConnection("disconnect_timeout", generation, device, "hard_reset_before_retry");
-    hardResetBleStack();
-    scheduleRetry(connectionGeneration);
+    scheduleRetry(generation);
   }
 
   private synchronized void forceUserDisconnectTimeout(long generation, BleDevice device) {
@@ -531,17 +544,69 @@ public class BluetoothManager {
     notifyAdapter();
   }
 
-  private void scheduleRetry(long generation) {
-    mainHandler.postDelayed(
-        () -> {
-          synchronized (BluetoothManager.this) {
-            if (connectionState != ConnectionState.RETRYING
-                || connectionGeneration != generation
-                || retryDevice == null) return;
-            beginConnection(retryIndex, retryDevice, autoRetryCount);
+  private synchronized void scheduleRetry(long generation) {
+    if (connectionGeneration != generation || retryDevice == null) return;
+    // Invalidate callbacks and dispose the failed GATT before obtaining fresh scan metadata.
+    hardResetBleStack();
+    connectionState = ConnectionState.RESCANNING;
+    recoveryScanMatch = null;
+    final long scanGeneration = connectionGeneration;
+    notifyAdapter();
+    mainHandler.postDelayed(() -> startRecoveryScan(scanGeneration), RETRY_DELAY_MS);
+  }
+
+  private synchronized boolean isRecoveryScan(long generation) {
+    return connectionGeneration == generation && connectionState == ConnectionState.RESCANNING;
+  }
+
+  private synchronized void startRecoveryScan(long generation) {
+    if (!isRecoveryScan(generation)) return;
+    logConnection("retry_scan_start", generation, retryDevice, "fresh_advertisement_required");
+    // Independent watchdog also covers missing EasyBLE scan completion callbacks.
+    mainHandler.postDelayed(() -> finishRecoveryScan(generation, "scan_timeout"), 5000L);
+    manager.startScan(
+        new BleScanCallback() {
+          @Override
+          public void onStart(boolean success, String info) {
+            if (!success)
+              mainHandler.post(() -> finishRecoveryScan(generation, "scan_start_failed: " + info));
           }
-        },
-        RETRY_DELAY_MS);
+
+          @Override
+          public void onLeScan(BleDevice device, int rssi, byte[] scanRecord) {
+            mainHandler.post(
+                () -> {
+                  synchronized (BluetoothManager.this) {
+                    if (!isRecoveryScan(generation)
+                        || device == null
+                        || !device.address.equals(activeAddress)) return;
+                    recoveryScanMatch = device;
+                    logConnection("retry_scan_found", generation, device, "rssi=" + rssi);
+                  }
+                });
+          }
+
+          @Override
+          public void onFinish() {
+            mainHandler.post(() -> finishRecoveryScan(generation, "device_not_rediscovered"));
+          }
+        });
+  }
+
+  private synchronized void finishRecoveryScan(long generation, String failure) {
+    if (!isRecoveryScan(generation)) return;
+    BleDevice freshDevice = recoveryScanMatch;
+    recoveryScanMatch = null;
+    // Change state before stopScan: some implementations synchronously call onFinish.
+    connectionState = ConnectionState.RETRYING;
+    cancelConnectionTimers();
+    manager.stopScan();
+    if (freshDevice == null) {
+      lastConnectionError = failure;
+      failAfterRetries(retryDevice, failure);
+      return;
+    }
+    beginConnection(retryIndex, freshDevice, autoRetryCount);
   }
 
   private synchronized void failAfterRetries(BleDevice device, String reason) {
@@ -556,7 +621,7 @@ public class BluetoothManager {
     retryAfterDisconnect = false;
     replaceDeviceAtIndex(safeDeviceIndex(indexValue, device), device);
     notifyAdapter();
-    Toast.makeText(context, "BLE 连接失败，请再次点击设备重试", Toast.LENGTH_LONG).show();
+    Toast.makeText(context, "BLE 连接失败，请刷新扫描后重试", Toast.LENGTH_LONG).show();
     Logger.e("BLE connection failed after retry: " + reason);
   }
 
@@ -634,6 +699,8 @@ public class BluetoothManager {
         return "断开";
       case RETRYING:
         return "自动重试";
+      case RESCANNING:
+        return "重新扫描小车";
       case DISCONNECTING:
         return "断开中";
       case FAILED:
