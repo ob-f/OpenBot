@@ -14,9 +14,22 @@ import org.robolectric.annotation.Config;
 @Config(sdk = 28)
 public class SteeringDemandEstimatorTest {
   @Test
+  public void zeroHorizonUsesObservedPositionEvenAfterFastCrossing() {
+    SteeringDemandEstimator estimator = new SteeringDemandEstimator();
+    estimator.update(box(280f), 1000, 600, 0, 2, 0, 0);
+    estimator.update(box(390f), 1000, 600, 0, 2, 100, 0);
+    SteeringEvidence centered = estimator.update(box(514f), 1000, 600, 0, 2, 200, 0);
+    assertEquals(centered.rawError, centered.predictedError, 0.0001f);
+    assertEquals(SteeringEvidence.Direction.NONE, centered.direction);
+    assertEquals(0, centered.demandPercent);
+  }
+
+  @Test
   public void leftAndRightAreSymmetricInImageCoordinates() {
-    SteeringEvidence left = new SteeringDemandEstimator().update(box(100f), 1000, 600, 0, 1, 0, 400);
-    SteeringEvidence right = new SteeringDemandEstimator().update(box(900f), 1000, 600, 0, 1, 0, 400);
+    SteeringEvidence left =
+        new SteeringDemandEstimator().update(box(100f), 1000, 600, 0, 1, 0, 400);
+    SteeringEvidence right =
+        new SteeringDemandEstimator().update(box(900f), 1000, 600, 0, 1, 0, 400);
 
     assertEquals(SteeringEvidence.Direction.LEFT, left.direction);
     assertEquals(SteeringEvidence.Direction.RIGHT, right.direction);
@@ -45,8 +58,9 @@ public class SteeringDemandEstimatorTest {
       settled = estimator.update(box(700f), 1000, 600, 0, 2, i * 100L, 400);
     }
 
-    assertTrue(Math.abs(settled.predictedError - settled.filteredError)
-        < Math.abs(moving.predictedError - moving.filteredError));
+    assertTrue(
+        Math.abs(settled.predictedError - settled.filteredError)
+            < Math.abs(moving.predictedError - moving.filteredError));
   }
 
   @Test
@@ -84,7 +98,7 @@ public class SteeringDemandEstimatorTest {
     longEstimator.update(box(500f), 1000, 600, 0, 6, 0, 800);
     SteeringEvidence longHorizon = longEstimator.update(box(700f), 1000, 600, 0, 6, 100, 800);
 
-    assertEquals(zero.filteredError, zero.predictedError, 0.001f);
+    assertEquals(zero.rawError, zero.predictedError, 0.001f);
     assertTrue(longHorizon.predictedError > longHorizon.filteredError);
     assertEquals(0, zero.predictionHorizonMs);
     assertEquals(800, longHorizon.predictionHorizonMs);
@@ -94,8 +108,7 @@ public class SteeringDemandEstimatorTest {
   public void levelUsesHysteresisNearTheMediumThreshold() {
     SteeringDemandEstimator estimator = new SteeringDemandEstimator();
     SteeringEvidence medium = estimator.update(box(700f), 1000, 600, 0, 8, 0, 0);
-    SteeringEvidence stillMedium =
-        estimator.update(box(690f), 1000, 600, 0, 8, 100, 0);
+    SteeringEvidence stillMedium = estimator.update(box(690f), 1000, 600, 0, 8, 100, 0);
 
     assertEquals(SteeringEvidence.Level.MEDIUM, medium.level);
     assertTrue(stillMedium.demandPercent < 35);

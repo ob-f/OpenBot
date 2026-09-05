@@ -29,8 +29,7 @@ public final class RealCartAutoDriveController {
   public static final int CENTER_DEMAND_PERCENT = 10;
   public static final float AIM_PIVOT_ENTER_ERROR = 0.18f;
   public static final float AIM_PIVOT_EXIT_ERROR = 0.08f;
-  public static final float AIM_EDGE_PIVOT_ERROR = 0.35f;
-  public static final int AIM_CENTERED_FRAMES = 3;
+  public static final float AIM_EDGE_PIVOT_ERROR = TargetAimController.FAR_ENTER_ERROR;
   public static final int AIM_PIVOT_SPEED = 5;
   public static final int START_STABLE_FRAMES = 3;
   public static final long RECOVERY_LIMIT_MS = 2000L;
@@ -116,9 +115,7 @@ public final class RealCartAutoDriveController {
   private int maximumGear = 21;
   private long lastFrameSequence = -1L;
   private long targetMissingStartMs = -1L;
-  private boolean aimPivoting;
-  private SteeringEvidence.Direction aimPivotDirection = SteeringEvidence.Direction.NONE;
-  private int aimCenteredFrames;
+  private final TargetAimController aimController = new TargetAimController();
   private Result lastResult = stopped(Phase.LOCKED, "auto_locked", false, null, Float.NaN);
 
   public synchronized Result update(FollowStateMachine.FrameResult frame, long nowMs) {
@@ -160,8 +157,21 @@ public final class RealCartAutoDriveController {
       return stopNonRecovery(Phase.WAIT_TARGET, "steering_unavailable", evidence, heightScale);
     }
 
-    AimDecision aim = decideAim(evidence, frame.distanceEstimate);
+    AimDecision aim =
+        aimController.update(
+            evidence,
+            frame.distanceEstimate != null && frame.distanceEstimate.state == DistanceState.TOO_FAR,
+            moving,
+            frame.frameTiming.receivedAtMs,
+            nowMs);
     TranslationDecision translation = decideTranslation(frame, decision, heightScale);
+    if (!aim.allowed) {
+      moving = false;
+      centeredFrames = 0;
+      gears.reset();
+      return remember(
+          stopped(Phase.WAIT_CENTER, aim.reason, false, evidence, heightScale, aim, translation));
+    }
     if (aim.pivots()) {
       maintainedStart.reset();
       moving = false;
@@ -209,10 +219,12 @@ public final class RealCartAutoDriveController {
     } else if (frame.frameSequence > lastFrameSequence) {
       int desired = Math.min(maximumGear, gears.distanceGear(heightScale));
       if (identity.isAppearanceTransition()
+          || Math.abs(evidence.rawError) > 0.18f
           || evidence.demandPercent > 60
           || frame.state == FollowState.FOLLOW_CAUTION
           || decision.selectedAction == BehaviorAction.FOLLOW_CAUTION) desired = 14;
-      else if (evidence.demandPercent > 30) desired = Math.min(18, desired);
+      else if (Math.abs(evidence.rawError) > 0.10f || evidence.demandPercent > 30)
+        desired = Math.min(18, desired);
       if (identity.tracking != null) desired = Math.min(desired, identity.tracking.maximumGear);
       gears.select(desired);
       lastFrameSequence = frame.frameSequence;
@@ -227,9 +239,7 @@ public final class RealCartAutoDriveController {
     gears.reset();
     lastFrameSequence = -1L;
     targetMissingStartMs = -1L;
-    aimPivoting = false;
-    aimPivotDirection = SteeringEvidence.Direction.NONE;
-    aimCenteredFrames = 0;
+    aimController.reset();
     return remember(stopped(Phase.LOCKED, reason, false, null, Float.NaN));
   }
 
@@ -255,6 +265,7 @@ public final class RealCartAutoDriveController {
   }
 
   public synchronized Result search(RealCartSearchController.Result search) {
+    aimController.reset();
     maintainedStart.reset();
     moving = false;
     centeredFrames = 0;
@@ -291,6 +302,7 @@ public final class RealCartAutoDriveController {
       SteeringEvidence evidence,
       float heightScale,
       String reason) {
+    aimController.reset();
     if (!MaintainedStartGate.canObserve(frame, nowMs, 400L)) maintainedStart.reset();
     moving = false;
     centeredFrames = 0;
@@ -360,48 +372,15 @@ public final class RealCartAutoDriveController {
             translation));
   }
 
-  private AimDecision decideAim(
-      SteeringEvidence evidence, ImageSetpointDistanceEstimator.DistanceEstimate distance) {
-    float error = evidence.predictedError;
-    float magnitude = Math.abs(error);
-    boolean translationFar = distance != null && distance.state == DistanceState.TOO_FAR;
-    float enter = translationFar ? AIM_EDGE_PIVOT_ERROR : AIM_PIVOT_ENTER_ERROR;
-    if (aimPivoting) {
-      if (magnitude <= AIM_PIVOT_EXIT_ERROR) aimCenteredFrames++;
-      else aimCenteredFrames = 0;
-      if (aimCenteredFrames >= AIM_CENTERED_FRAMES) {
-        aimPivoting = false;
-        aimPivotDirection = SteeringEvidence.Direction.NONE;
-        aimCenteredFrames = 0;
-        return AimDecision.of(AimDecision.Mode.HOLD, error, "aim_centered");
-      }
-      if (magnitude > AIM_PIVOT_EXIT_ERROR && evidence.direction != SteeringEvidence.Direction.NONE)
-        aimPivotDirection = evidence.direction;
-      return pivotDecision(aimPivotDirection, error, "aim_pivot_hysteresis");
+  public synchronized Result pollAim(long nowMs) {
+    if (aimController.expire(nowMs)) {
+      moving = false;
+      centeredFrames = 0;
+      gears.reset();
+      return remember(
+          stopped(Phase.WAIT_CENTER, "aim_settling", false, null, lastResult.heightScale));
     }
-    if (magnitude >= enter || evidence.edgeUrgency > 0f) {
-      aimPivoting = true;
-      aimCenteredFrames = 0;
-      aimPivotDirection =
-          evidence.direction != SteeringEvidence.Direction.NONE
-              ? evidence.direction
-              : error < 0f ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
-      return pivotDecision(aimPivotDirection, error, "aim_target_off_center");
-    }
-    return AimDecision.of(
-        magnitude > AIM_PIVOT_EXIT_ERROR ? AimDecision.Mode.CURVE : AimDecision.Mode.HOLD,
-        error,
-        magnitude > AIM_PIVOT_EXIT_ERROR ? "aim_curve" : "aim_centered");
-  }
-
-  private static AimDecision pivotDecision(
-      SteeringEvidence.Direction direction, float error, String reason) {
-    return AimDecision.of(
-        direction == SteeringEvidence.Direction.LEFT
-            ? AimDecision.Mode.PIVOT_LEFT
-            : AimDecision.Mode.PIVOT_RIGHT,
-        error,
-        reason);
+    return lastResult;
   }
 
   private TranslationDecision decideTranslation(
@@ -461,9 +440,7 @@ public final class RealCartAutoDriveController {
     moving = false;
     centeredFrames = 0;
     gears.reset();
-    aimPivoting = false;
-    aimPivotDirection = SteeringEvidence.Direction.NONE;
-    aimCenteredFrames = 0;
+    aimController.reset();
     return remember(stopped(phase, reason, false, evidence, heightScale));
   }
 

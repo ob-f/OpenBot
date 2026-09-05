@@ -2183,3 +2183,45 @@ ESP32 本轮没有修改。当前已烧录固件仍可能返回 `!ERR,sensor_*` 
 - Debug APK：`android/robot/build/outputs/apk/debug/robot-debug.apk`，42,490,097 字节，SHA256 `C731728E2C3448488780B6D2FC7CECF9454824BDEB21D2689FE0EB4DCEBEC164`。
 
 `adb devices` 未列出设备，因此本轮未覆盖安装、未启动跟随、未发送车辆指令。新版首次实车测试仍须先悬空；在下位机同步“仅日志模式”前，必须从日志中的 Android 请求、GATT 写入和 ESP32 `!ERR` 三层判断未执行原因。
+
+
+## 43. 实测转向振荡修复与 BLE 自动重扫（2026-09-05）
+
+手机日志 cart_diag_20260905_155401_612_a7742f5c（65 秒，log_version=7）复现：47.56 秒后的
+84 个记录点全部 translation_allowed=1，82 个却为 PIVOT，左右切换 8 次。51.72 秒实测误差
+0.0273 而预测为 0.2443；后段 pipeline 平均约 46 ms、result age 最大 94 ms，未显示推理超时
+是这段振荡的主因。control_log 记录 57 次 !ERR,settling。仅保留文字证据，不提交 crop 或照片。
+
+实车预测时域改为 0 ms，零时域直接使用当前 bbox 中心误差，保留滤波与变化率作为诊断及提前
+停转依据。距离允许时在一般偏移下持续差速前进，误差超过 0.18 限至 c14、超过 0.10 限至 c18。
+原地对准改为共享 TargetAimController：远距离进入误差 0.60、退出 0.35；距离合适或太近时
+保持进入 0.18、退出 0.08。仅使用实测位置选择方向，变化率只能提前结束旋转。行驶转入原地
+对准前先停车；c5 脉冲最长 300 ms，每次停转观察 650 ms 且等待新画面；越中心立即停，不直接
+反向。发指令前的 safety refresh 同时检查脉冲截止。模拟器共用对准逻辑，实车界面区分“目标
+对准”和“定向搜索”。急停、断连、身份、旧帧和自动授权规则保留，未更改 ESP32 或 V1 协议。
+
+现场 BLE 首次及重试在建连阶段返回 status=133，小车断电重启后仍失败；手动刷新扫描后
+约 0.56 秒 serial_ready，握手／写入正常。Android 失败恢复现先销毁失败连接并使旧回调失效，
+等待 750 ms 后扫描 4 秒，只有重新发现同地址才用新设备对象重试。5 秒扫描看门狗覆盖回调缺失，
+扫描失败／未发现目标直接结束，最多一次自动重试；重扫期间 UI 连续点击不能截断内部扫描。
+新增 retry_scan_start／retry_scan_found 日志与“重新扫描小车”状态。这是针对现场恢复路径的
+修复，不能把一次成功解释成所有 status=133 的唯一根因。
+
+session_info 的 strategy 更新为 observed-aim-pulse-v5，记录脉冲、观察窗口、远距离退出阈值
+和实车零时域。新增回归覆盖记录中的预测摆动、斜向前进、第一帧居中停止、过零不反打、脉冲
+定时停车、新画面要求，以及 BLE 新对象重连、异地址、旧回调、扫描失败／超时、重试上限与重复点击。
+
+新版 APK 尚未安装；未启动跟随或发送车辆控制。650 ms 只代表上位机观察窗口，并非固件制动
+完成确认。实车需按主仓库联调指南从低档复测，尤其确认边缘对准效果、固件 settling 和 BLE
+多次断连恢复。默认最高 c21 保留，但不代表已完成 600 mm/s 实车验收。
+
+### 43.1 最终桌面验证
+
+- JDK 17 Debug／Release 各 **337/337**，47 个测试类，0 失败、0 错误、0 跳过。
+- `:robot:testDebugUnitTest :robot:testReleaseUnitTest :robot:check :robot:assembleDebug --offline`
+  通过；改动 Java 文件通过 google-java-format 1.7 dry-run，主／子仓库 diff 检查通过。
+- Lint 保留 **10 Error、675 Warning、6 Information**；Error 为既有
+  MissingClass、RecyclerView、RestrictedApi、UseAppTint；此前间歇出现的 Timber/AGP LintError
+  本次未出现。abortOnError=false，因此 check 通过不表示 Lint 为零。
+- APK：`android/robot/build/outputs/apk/debug/robot-debug.apk`，42,642,003 字节，
+  SHA256 `77D17FF8D211223B5BED8172B6A77A35A0C687B3B341ED341DE2DF092EFC905A`。本轮仅构建交付，尚未安装或进行新版实车验证。

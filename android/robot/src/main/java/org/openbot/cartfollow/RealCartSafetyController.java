@@ -218,6 +218,11 @@ public final class RealCartSafetyController {
       autoDriveController.reset("identity_unverified");
       return currentAuto = stop("identity_unverified");
     }
+    RealCartAutoDriveController.Result timed = autoDriveController.pollAim(nowMs);
+    if (timed.isStop() && !currentAuto.isStop()) {
+      autoMotionActive = false;
+      return currentAuto = stop(timed.reason);
+    }
     return currentAuto;
   }
 

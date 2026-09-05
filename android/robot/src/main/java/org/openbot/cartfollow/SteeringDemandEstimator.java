@@ -35,7 +35,8 @@ public final class SteeringDemandEstimator {
       return SteeringEvidence.unavailable("target_unavailable", horizonMs);
     }
 
-    DisplayHorizontalBounds displayed = displayedHorizontalBounds(bbox, frameW, frameH, sensorOrientation);
+    DisplayHorizontalBounds displayed =
+        displayedHorizontalBounds(bbox, frameW, frameH, sensorOrientation);
     if (displayed.width <= 0f
         || Float.isNaN(displayed.center)
         || Float.isInfinite(displayed.center)) {
@@ -59,13 +60,14 @@ public final class SteeringDemandEstimator {
       float predictedAtNow = filteredError + lateralRatePerSec * dtSec;
       float residual = rawError - predictedAtNow;
       filteredError = clamp(predictedAtNow + ALPHA * residual, -1f, 1f);
-      lateralRatePerSec =
-          clamp(lateralRatePerSec + BETA * residual / dtSec, -4f, 4f);
+      lateralRatePerSec = clamp(lateralRatePerSec + BETA * residual / dtSec, -4f, 4f);
     }
     lastTimestampMs = nowMs;
 
     float predictedError =
-        clamp(filteredError + lateralRatePerSec * horizonMs / 1000f, -1f, 1f);
+        horizonMs == 0
+            ? rawError
+            : clamp(filteredError + lateralRatePerSec * horizonMs / 1000f, -1f, 1f);
     float edgeUrgency = edgeUrgency(displayed, predictedError);
     float centerDemand =
         Math.max(0f, (Math.abs(predictedError) - CENTER_DEAD_ZONE) / (1f - CENTER_DEAD_ZONE));

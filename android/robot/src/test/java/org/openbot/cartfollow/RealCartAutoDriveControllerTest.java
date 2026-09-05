@@ -13,6 +13,34 @@ import org.openbot.vehicle.Control;
 
 public class RealCartAutoDriveControllerTest {
   @Test
+  public void recordedModerateOffsetsKeepForwardMotionDuringTurns() {
+    RealCartAutoDriveController controller = movingController();
+    float[] errors = {.3113f, .4428f, .5204f, .128f, -.2127f, -.4346f, .0273f, -.0107f};
+    for (int i = 0; i < errors.length; i++) {
+      float error = errors[i];
+      SteeringEvidence.Direction direction =
+          Math.abs(error) <= .08f
+              ? SteeringEvidence.Direction.NONE
+              : error < 0 ? SteeringEvidence.Direction.LEFT : SteeringEvidence.Direction.RIGHT;
+      int demand = Math.round(Math.max(0f, Math.abs(error) - .08f) / .92f * 100f);
+      RealCartAutoDriveController.Result result =
+          update(
+              controller,
+              frameWithError(
+                  direction, demand, error, .55f, FollowState.FOLLOW, BehaviorAction.FOLLOW_SLOW),
+              100L + i * 200L);
+      assertTrue(result.translationDecision.allowed);
+      assertTrue(result.left > 0 && result.right > 0);
+      assertNotPivot(result);
+      if (Math.abs(error) > .18f) assertTrue(result.gear <= 14);
+    }
+  }
+
+  private static void assertNotPivot(RealCartAutoDriveController.Result result) {
+    assertFalse(result.phase == RealCartAutoDriveController.Phase.PIVOT);
+  }
+
+  @Test
   public void stoppedCartRequiresThreeStableFarFrames() {
     RealCartAutoDriveController controller = new RealCartAutoDriveController();
     assertTrue(
@@ -71,7 +99,7 @@ public class RealCartAutoDriveControllerTest {
 
   @Test
   public void distanceHoldStillAimsButSearchWithoutGateStops() {
-    RealCartAutoDriveController controller = movingController();
+    RealCartAutoDriveController controller = new RealCartAutoDriveController();
     RealCartAutoDriveController.Result aimed =
         update(
             controller,
@@ -123,11 +151,11 @@ public class RealCartAutoDriveControllerTest {
   public void edgeTargetPivotsWithoutForwardEvenWhenFar() {
     RealCartAutoDriveController.Result result =
         update(
-            movingController(),
+            new RealCartAutoDriveController(),
             frameWithError(
                 SteeringEvidence.Direction.LEFT,
                 100,
-                -.40f,
+                -.70f,
                 .70f,
                 FollowState.FOLLOW,
                 BehaviorAction.FOLLOW_SLOW),
@@ -139,7 +167,7 @@ public class RealCartAutoDriveControllerTest {
   }
 
   @Test
-  public void pivotStopsAfterThreeCenteredFrames() {
+  public void pivotStopsOnFirstCenteredFrameAndObservesWhileStopped() {
     RealCartAutoDriveController controller = new RealCartAutoDriveController();
     update(
         controller,
@@ -163,7 +191,7 @@ public class RealCartAutoDriveControllerTest {
                   FollowState.FOLLOW,
                   BehaviorAction.FOLLOW_CAUTION),
               i * 33L);
-      assertEquals(RealCartAutoDriveController.Phase.PIVOT, result.phase);
+      assertTrue(result.isStop());
     }
     RealCartAutoDriveController.Result centered =
         update(
@@ -177,7 +205,7 @@ public class RealCartAutoDriveControllerTest {
                 BehaviorAction.FOLLOW_CAUTION),
             99L);
     assertTrue(centered.isStop());
-    assertEquals("distance_ok", centered.reason);
+    assertEquals("aim_settling", centered.reason);
   }
 
   @Test

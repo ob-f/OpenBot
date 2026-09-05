@@ -170,7 +170,7 @@ public class SimulatorAutoDriveControllerTest {
   }
 
   @Test
-  public void nonFarTargetStillPivotsUntilCenteredForThreeFrames() {
+  public void nonFarTargetStopsTurningOnFirstCenteredFrame() {
     SimulatorAutoDriveController controller = new SimulatorAutoDriveController();
     FollowStateMachine.FrameResult frame = frame(0.90f, 40, SteeringEvidence.Direction.LEFT);
     frame.distanceEstimate =
@@ -182,11 +182,11 @@ public class SimulatorAutoDriveControllerTest {
     assertEquals(-5, pivot.left);
     assertEquals(5, pivot.right);
     frame.steeringEvidence = steering(0.04f, SteeringEvidence.Direction.NONE);
-    assertEquals(SimulatorAutoDriveController.Phase.PIVOT, controller.update(frame, 33).phase);
-    assertEquals(SimulatorAutoDriveController.Phase.PIVOT, controller.update(frame, 66).phase);
+    assertEquals(0, controller.update(frame, 33).left);
+    assertEquals(0, controller.update(frame, 66).left);
     SimulatorAutoDriveController.Result centered = controller.update(frame, 99);
     assertEquals(0, centered.left);
-    assertEquals("distance_ok", centered.reason);
+    assertEquals("aim_settling", centered.reason);
   }
 
   private static SteeringEvidence steering(

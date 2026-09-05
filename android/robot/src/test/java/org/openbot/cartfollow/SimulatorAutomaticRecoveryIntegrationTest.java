@@ -56,7 +56,8 @@ public class SimulatorAutomaticRecoveryIntegrationTest {
       }
       assertTrue(SystemClock.elapsedRealtime() - started < 3000L);
       Step next = flow.step(300, remote("returned"));
-      assertPivoting(next);
+      assertStopped(next);
+      assertEquals("aim_settling", next.drive.reason);
       assertEquals(SimulatorIdentityGuard.RecoveryType.LOCAL, next.permit.recoveryType);
       assertEquals(3000L, flow.machine.COUNTDOWN_MS);
     }
