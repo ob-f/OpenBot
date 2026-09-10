@@ -93,7 +93,10 @@ dependencies {
     implementation project(':comlib')
 
     // Include AAR files from comlib/lib
-    implementation fileTree(dir: comlibDir, include: ['*.aar'])
+    implementation fileTree(dir: comlibDir, include: ['*.aar'], exclude: ['google-webrtc*.aar'])
+
+    // 16 KB page-size aligned WebRTC (replaces the legacy google-webrtc 1.0.32006 AAR)
+    implementation "io.github.webrtc-sdk:android:$webrtc_version"
 
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

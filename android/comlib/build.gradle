@@ -1,4 +1,4 @@
-//Abemart wroup and google webRtc are both deprecated on maven and other similar repositories
+//Abemart wroup and usbserial are not available on maven and other similar repositories
 //Hence created a local implementation of those libraries using pre-compiled .aar files in a shared modules called comlib
 plugins {
     id 'java-library'
@@ -14,7 +14,6 @@ java {
 project.ext.LIB_DIR = "${projectDir}/libs"
 apply from: 'download.gradle'
 
-def googleWebrtcFile = file("${project.ext.LIB_DIR}/google-webrtc-1.0.32006.aar")
 def wroupFile = file("${project.ext.LIB_DIR}/Wroup-master-release.aar")
 def usbserialFile = file("${project.ext.LIB_DIR}/usbserial-6.1.0-release.aar")
 
@@ -23,17 +22,13 @@ task checkAars {
     dependsOn downloadAars // Ensure this matches the actual download task name
 
     doLast {
-        if (!googleWebrtcFile.exists() || !wroupFile.exists() || !usbserialFile.exists()) {
+        if (!wroupFile.exists() || !usbserialFile.exists()) {
             throw new GradleException("Required AAR files are missing. Please run the download task.")
         }
     }
 }
 
 dependencies {
-    if (googleWebrtcFile.exists()) {
-        api files(googleWebrtcFile)
-    }
-    
     if (wroupFile.exists()) {
         api files(wroupFile)
     }

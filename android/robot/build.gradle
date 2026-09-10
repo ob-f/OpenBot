@@ -98,13 +98,16 @@ dependencies {
     implementation project(':comlib')
 
     // Include AAR files from comlib/lib
-    implementation fileTree(dir: comlibDir, include: ['*.aar'])
+    implementation fileTree(dir: comlibDir, include: ['*.aar'], exclude: ['google-webrtc*.aar'])
+
+    // 16 KB page-size aligned WebRTC (replaces the legacy google-webrtc 1.0.32006 AAR)
+    implementation "io.github.webrtc-sdk:android:$webrtc_version"
 
     implementation 'com.google.android.material:material:1.4.0'
 
-    // Build off of stable TensorFlow Lite
-    implementation 'org.tensorflow:tensorflow-lite:2.4.0'
-    implementation 'org.tensorflow:tensorflow-lite-gpu:2.4.0'
+    // LiteRT (TensorFlow Lite successor); keeps org.tensorflow.lite package names
+    implementation 'com.google.ai.edge.litert:litert:1.4.2'
+    implementation 'com.google.ai.edge.litert:litert-gpu:1.4.2'
 
     implementation "com.google.android.gms:play-services-location:$location_version"
     implementation "com.google.android.gms:play-services-nearby:$nearby_version"
@@ -194,14 +197,14 @@ dependencies {
     implementation 'com.nononsenseapps:filepicker:4.2.1'
 
     // arcore
-    implementation 'com.google.ar:core:1.29.0'
+    implementation 'com.google.ar:core:1.48.0'
     implementation 'de.javagl:obj:0.2.1'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
     implementation 'com.koushikdutta.ion:ion:3.1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
 
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.25'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.29'
 
     // BLE
     implementation 'com.github.Ficat:EasyBle:v2.0.2'
