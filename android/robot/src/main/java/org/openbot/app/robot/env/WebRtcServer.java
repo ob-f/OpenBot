@@ -12,6 +12,8 @@ import android.view.TextureView;
 import androidx.core.content.ContextCompat;
 import com.pedro.rtplibrary.view.OpenGlView;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.app.robot.utils.AndGate;
@@ -34,6 +36,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RtpReceiver;
+import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.SessionDescription;
 import org.webrtc.SurfaceTextureHelper;
@@ -81,6 +84,8 @@ public class WebRtcServer implements IVideoServer {
   SurfaceTextureHelper surfaceTextureHelper;
   private PeerConnection peerConnection;
   MediaStream mediaStream;
+  private RtpSender videoSender;
+  private RtpSender audioSender;
 
   private AndGate andGate;
   private Context context;
@@ -242,7 +247,7 @@ public class WebRtcServer implements IVideoServer {
   private void resumeLocalCamera() {
     emitLocalCameraCommand(Constants.CMD_RESUME_LOCAL_CAMERA);
   }
-  
+
   private void emitLocalCameraCommand(String command) {
     try {
       ControllerToBotEventBus.emitEvent(new JSONObject().put("command", command).toString());
@@ -274,15 +279,42 @@ public class WebRtcServer implements IVideoServer {
         new MediaConstraints());
   }
 
+  // Logs whether the negotiated SDP actually contains a video m-line, so a
+  // logcat pull tells us immediately whether the break is in track
+  // negotiation (this log) vs. transport/rendering (later logs).
+  private void logSdp(String label, SessionDescription sdp) {
+    boolean hasVideo = sdp.description.contains("m=video");
+    boolean hasAudio = sdp.description.contains("m=audio");
+    Log.d(TAG, "SDP [" + label + "]: m=video present=" + hasVideo + " m=audio present=" + hasAudio);
+  }
+
   private void startStreamingVideo() {
     mediaStream = factory.createLocalMediaStream("ARDAMS");
     mediaStream.addTrack(videoTrackFromCamera);
     mediaStream.addTrack(localAudioTrack);
-    peerConnection.addStream(mediaStream);
+    // peerConnection.addStream() is a Plan-B-only API and is a no-op under the
+    // Unified Plan SDP semantics that the current WebRTC build defaults to, so
+    // tracks must be attached with addTrack() instead.
+    List<String> streamIds = Collections.singletonList(mediaStream.getId());
+    videoSender = peerConnection.addTrack(videoTrackFromCamera, streamIds);
+    audioSender = peerConnection.addTrack(localAudioTrack, streamIds);
+    Log.d(
+        TAG,
+        "startStreamingVideo: videoSender="
+            + (videoSender != null)
+            + " audioSender="
+            + (audioSender != null)
+            + " videoTrack.state="
+            + videoTrackFromCamera.state());
   }
 
   private void stopStreamingVideo() {
-    peerConnection.removeStream(mediaStream);
+    if (videoSender != null) {
+      peerConnection.removeTrack(videoSender);
+    }
+    if (audioSender != null) {
+      peerConnection.removeTrack(audioSender);
+    }
   }
 
   private void stopServer() {
@@ -335,6 +367,7 @@ public class WebRtcServer implements IVideoServer {
     iceServers.add(stunServer);
 
     PeerConnection.RTCConfiguration rtcConfig = new PeerConnection.RTCConfiguration(iceServers);
+    rtcConfig.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN;
     MediaConstraints pcConstraints = new MediaConstraints();
 
     PeerConnection.Observer pcObserver =
@@ -433,6 +466,10 @@ public class WebRtcServer implements IVideoServer {
   private void createVideoTrackFromCameraAndShowIt() {
     audioConstraints = new MediaConstraints();
     videoCapturer = createVideoCapturer();
+    if (videoCapturer == null) {
+      Log.e(TAG, "createVideoTrackFromCameraAndShowIt: no back-facing camera capturer found");
+      return;
+    }
     VideoSource videoSource = factory.createVideoSource(videoCapturer.isScreencast());
 
     surfaceTextureHelper =
@@ -454,14 +491,17 @@ public class WebRtcServer implements IVideoServer {
   }
 
   private void initializePeerConnectionFactory() {
+    // PeerConnectionFactory.initialize() loads the native WebRTC library; it must
+    // run before any class that calls into native code (e.g. DefaultVideoEncoderFactory's
+    // SoftwareVideoEncoderFactory) is constructed, or it fails with UnsatisfiedLinkError.
+    PeerConnectionFactory.InitializationOptions initializationOptions =
+            PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions();
+    PeerConnectionFactory.initialize(initializationOptions);
+
     VideoEncoderFactory encoderFactory =
         new DefaultVideoEncoderFactory(rootEglBase.getEglBaseContext(), true, true);
     VideoDecoderFactory decoderFactory =
         new DefaultVideoDecoderFactory(rootEglBase.getEglBaseContext());
-
-    PeerConnectionFactory.InitializationOptions initializationOptions =
-        PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions();
-    PeerConnectionFactory.initialize(initializationOptions);
 
     PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
     options.networkIgnoreMask = 16;
@@ -495,12 +535,45 @@ public class WebRtcServer implements IVideoServer {
     return Camera2Enumerator.isSupported(context);
   }
 
+  private final CameraVideoCapturer.CameraEventsHandler cameraEventsHandler =
+      new CameraVideoCapturer.CameraEventsHandler() {
+        @Override
+        public void onCameraError(String errorDescription) {
+          Log.e(TAG, "Camera onCameraError: " + errorDescription);
+        }
+
+        @Override
+        public void onCameraDisconnected() {
+          Log.e(TAG, "Camera onCameraDisconnected");
+        }
+
+        @Override
+        public void onCameraFreezed(String errorDescription) {
+          Log.e(TAG, "Camera onCameraFreezed: " + errorDescription);
+        }
+
+        @Override
+        public void onCameraOpening(String cameraName) {
+          Log.d(TAG, "Camera onCameraOpening: " + cameraName);
+        }
+
+        @Override
+        public void onFirstFrameAvailable() {
+          Log.d(TAG, "Camera onFirstFrameAvailable");
+        }
+
+        @Override
+        public void onCameraClosed() {
+          Log.d(TAG, "Camera onCameraClosed");
+        }
+      };
+
   private VideoCapturer createCameraCapturer(CameraEnumerator enumerator) {
     final String[] deviceNames = enumerator.getDeviceNames();
 
     for (String deviceName : deviceNames) {
       if (enumerator.isBackFacing(deviceName)) {
-        VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
+        VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, cameraEventsHandler);
         if (videoCapturer != null) {
           return videoCapturer;
         }
