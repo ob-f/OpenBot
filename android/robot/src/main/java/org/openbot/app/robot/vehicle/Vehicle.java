@@ -508,6 +508,7 @@ public class Vehicle {
   }
 
   public void initBle() {
+    if (bluetoothManager != null) return;
     bluetoothManager = new BluetoothManager(context);
   }
 

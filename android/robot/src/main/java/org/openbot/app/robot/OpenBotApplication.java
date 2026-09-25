@@ -28,7 +28,6 @@ public class OpenBotApplication extends Application {
     vehicle = new Vehicle(this, baudRate);
     vehicle.initBle();
     vehicle.connectUsb();
-    vehicle.initBle();
     if (BuildConfig.DEBUG) {
       Timber.plant(
           new Timber.DebugTree() {
