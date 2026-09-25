@@ -123,6 +123,17 @@ class ControllerState extends State<Controller> {
       });
     };
 
+    // Fallback path in case the legacy onAddStream compatibility shim doesn't
+    // fire for this WebRTC build: onTrack is the canonical Unified Plan event.
+    pc.onTrack = (RTCTrackEvent event) {
+      if (event.track.kind == 'video' && event.streams.isNotEmpty) {
+        _remoteVideoRenderer.srcObject = event.streams[0];
+        setState(() {
+          _remoteVideoRenderer;
+        });
+      }
+    };
+
     return pc;
   }
 
