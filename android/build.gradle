@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.8.0'
-    ext.webrtc_version = '1.0.32006'
+    ext.webrtc_version = '150.7871.01'
     ext.location_version = '19.0.1'
     ext.nearby_version = '18.0.2'
 

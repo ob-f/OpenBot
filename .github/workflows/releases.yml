@@ -22,15 +22,30 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
-      - name: Assemble Debug Apk
-        id: assemble_debug_apk
+      - name: Add google-services.json
         run: |
-          ./gradlew assembleDebug
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > robot/google-services.json
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > robot/src/main/assets/google-services.json
+      - name: Decode Release Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+      - name: Assemble Release Apk
+        id: assemble_release_apk
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=$PWD/release.keystore \
+            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       - name: Specify Release Asset Paths
         id: asset_paths
         run:  |
-          echo "::set-output name=openbot_apk_path::$(pwd)/robot/build/outputs/apk/debug/robot-debug.apk"
-          echo "::set-output name=controller_apk_path::$(pwd)/controller/build/outputs/apk/debug/controller-debug.apk"
+          echo "::set-output name=openbot_apk_path::$(pwd)/robot/build/outputs/apk/release/robot-release.apk"
+          echo "::set-output name=controller_apk_path::$(pwd)/controller/build/outputs/apk/release/controller-release.apk"
       - name: Specify Release Asset Names using Tag [${{github.event.release.tag_name}}]
         id: asset_names
         run:  |
