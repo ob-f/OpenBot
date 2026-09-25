@@ -108,17 +108,17 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       ImageFrame rgb,
       CameraIntrinsics cameraIntrinsics,
       long timestamp) {
-    if (isRunning && vehicle != null) {
-      float goalDistance =
-          computeDistance(navigationPoses.getTargetPose(), navigationPoses.getCurrentPose());
+    Pose targetPose = navigationPoses.getTargetPose();
+    Pose currentPose = navigationPoses.getCurrentPose();
+    if (isRunning && vehicle != null && targetPose != null && currentPose != null) {
+      float goalDistance = computeDistance(targetPose, currentPose);
 
       if (goalDistance < 0.15f) {
         stop();
         audioPlayer.playFromStringID(R.string.goal_reached);
         showInfoDialog(getString(R.string.goal_reached));
       } else {
-        float deltaYaw =
-            computeDeltaYaw(navigationPoses.getCurrentPose(), navigationPoses.getTargetPose());
+        float deltaYaw = computeDeltaYaw(currentPose, targetPose);
 
         Bitmap bitmap = convertRGBFrameToScaledBitmap(rgb, 160.f / 480.f);
         bitmap = Bitmap.createBitmap(bitmap, 0, 30, 160, 90);
