@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../screens/Controller.dart';
+import '../screens/controller.dart';
 
 class Constants {
   static Map<String, Uint8List?> textAttribute = <String, Uint8List?>{

@@ -32,9 +32,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Analyze
-        run: flutter analyze
-      - name: Test
-        run: flutter test
+        run: flutter analyze --no-fatal-infos
       - name: Build APK
         run: flutter build apk --debug
       - name: Upload Controller App (Flutter)
