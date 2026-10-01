@@ -191,15 +191,18 @@ public class BluetoothManager {
   }
 
   public void write(String msg) {
-    if (isSerialReady() && msg != null) {
-      BleManager.getInstance()
-          .write(
-              bleDevice,
-              writeServiceInfo.uuid,
-              writeCharacteristic.uuid,
-              msg.getBytes(UTF_8),
-              writeCallback);
+    if (msg == null) return;
+    if (!isSerialReady()) {
+      Logger.w("Dropping BLE write: UART link is not ready.");
+      return;
     }
+    BleManager.getInstance()
+        .write(
+            bleDevice,
+            writeServiceInfo.uuid,
+            writeCharacteristic.uuid,
+            msg.getBytes(UTF_8),
+            writeCallback);
   }
 
   public BleMtuCallback mtuCallback =
@@ -260,6 +263,11 @@ public class BluetoothManager {
     return bleDevice != null && bleDevice.connected;
   }
 
+  /**
+   * Service discovery requests an MTU change; onMtuChanged then enables TX notifications. Writes
+   * become ready only after notification setup succeeds. A missing MTU callback or failed setup
+   * leaves the UART link unavailable for writes.
+   */
   public boolean isSerialReady() {
     return isBleConnected() && hasSerialCharacteristics() && notifyEnabled;
   }
