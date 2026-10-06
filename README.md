@@ -98,4 +98,4 @@ Please cite our [paper](https://arxiv.org/abs/2008.10631) if you use OpenBot.
 
 <a href="https://www.openbot.org//" target="_blank">
   <img align="center" alt="Footer" width="100%" src="docs/images/footer.gif" />
-</a>
+</a>run boots 
