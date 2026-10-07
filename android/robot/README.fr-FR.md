@@ -21,13 +21,29 @@
 L'application démarre avec un écran de menu qui affiche tous les écrans disponibles. L'écran des paramètres peut être ouvert en cliquant sur l'icône en haut à droite. En cliquant sur les autres icônes, l'utilisateur peut accéder à divers écrans dont les fonctionnalités sont expliquées ci-dessous.
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/screen_main.png" alt="Menu Principal" width="24.5%"/>
-<img src="../../docs/images/screen_settings.png" alt="Menu Paramètres" width="24.5%"/>
-<img src="../../docs/images/dialog_stream_mode.png" alt="Menu Paramètres" width="24.5%"/>
-<img src="../../docs/images/dialog_connectivity_mode.png" alt="Menu Paramètres" width="24.5%"/>
+<img style="padding-right: 2%;" src="../../docs/images/screen_main.jpg" alt="Menu Principal" height="300"/>
+<img src="../../docs/images/screen_settings.jpg" alt="Menu Paramètres" height="300"/>
+<img src="../../docs/images/dialog_stream_mode.jpg" alt="Menu Paramètres" height="300"/>
+<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="Menu Paramètres" height="300"/>
 </p>
 
 ### Menu Paramètres
+
+#### Prise en charge multilingue
+
+Appuyez sur `Langue` dans la catégorie Général pour choisir la langue d'affichage de l'application. Sélectionnez `Par défaut du système` pour suivre la langue de votre téléphone, ou choisissez l'une des langues prises en charge : English, Deutsch, Español, Français, 中文, 한국어 ou हिन्दी. L'application applique la nouvelle langue immédiatement.
+
+<p align="left">
+<img src="../../docs/images/screen_language.jpg" alt="Sélection de la langue" height="300"/>
+</p>
+
+#### Serveur de signalisation web
+
+Appuyez sur `Serveur de signalisation web` dans la catégorie Contrôleur web pour saisir l'adresse WebSocket du serveur de signalisation, par exemple `ws://<ip-du-serveur>:8080/ws`. Elle est utilisée lorsque le mode de contrôle est réglé sur serveur web ; le téléphone et le serveur doivent donc être sur le même réseau Wi-Fi. Consultez le [serveur web](../../controller/web-server/README.md) pour sa configuration.
+
+<p align="left">
+<img src="../../docs/images/dialog_web_signaling_server.jpg" alt="Serveur de signalisation web" height="300"/>
+</p>
 
 #### Connexion USB
 

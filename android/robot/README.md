@@ -21,13 +21,29 @@
 The app starts with a menu screen that shows all available screens. The settings screen can be opened with a click on the icon at the top right corner. By clicking on the other icons the user can access various screens whose functionalities are explained in the following.
 
 <p align="left">
-<img src="../../docs/images/screen_main.jpg" alt="Main Menu" width="21.6%"/>
-<img src="../../docs/images/screen_settings.jpg" alt="Settings Menu" width="20%"/>
-<img src="../../docs/images/dialog_stream_mode.jpg" alt="Settings Menu" width="20%"/>
-<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="Settings Menu" width="20%"/>
+<img src="../../docs/images/screen_main.jpg" alt="Main Menu" height="300"/>
+<img src="../../docs/images/screen_settings.jpg" alt="Settings Menu" height="300"/>
+<img src="../../docs/images/dialog_stream_mode.jpg" alt="Settings Menu" height="300"/>
+<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="Settings Menu" height="300"/>
 </p>
 
 ### Settings Menu
+
+#### Multi-Language Support
+
+Tap `Language` in the General category to choose the display language of the app. Select `System Default` to follow the language of your phone, or pick one of the supported languages: English, Deutsch, Español, Français, 中文, 한국어 or हिन्दी. The app applies the new language right away.
+
+<p align="left">
+<img src="../../docs/images/screen_language.jpg" alt="Language Selection" height="300"/>
+</p>
+
+#### Web Signaling Server
+
+Tap `Web Signaling Server` in the Web Controller category to enter the WebSocket address of the signaling server, for example `ws://<server-ip>:8080/ws`. It is used when the control mode is set to web server, so your phone and the server need to be on the same Wi-Fi network. See the [web server](../../controller/web-server/README.md) for how to set it up.
+
+<p align="left">
+<img src="../../docs/images/dialog_web_signaling_server.jpg" alt="Web Signaling Server" height="300"/>
+</p>
 
 #### USB Connection
 

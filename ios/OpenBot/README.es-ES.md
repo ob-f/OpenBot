@@ -21,9 +21,9 @@
 La aplicación comienza con una pantalla de menú que muestra todas las pantallas disponibles. La pantalla de conexión Bluetooth se puede abrir haciendo clic en el ícono de Bluetooth en la parte superior derecha. La pantalla de configuración se puede abrir con un clic en el ícono de configuración justo al lado. Al hacer clic en los otros íconos, el usuario puede acceder a varias pantallas cuyas funcionalidades se explican en las secciones siguientes.
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/ios_main_screen.jpg" alt="Menú Principal" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_bluetooth_screen.jpg" alt="Bluetooth" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_settings_screen.jpg" alt="Configuración" width="25%"/>
+<img src="../../docs/images/ios_main_screen.jpg" alt="Menú Principal" height="400"/>
+<img src="../../docs/images/ios_settings_screen.jpg" alt="Configuración" height="400"/>
+<img src="../../docs/images/ios_bluetooth_screen.jpg" alt="Bluetooth" height="400"/>
 </p>
 
 #### Conexión Bluetooth
@@ -31,7 +31,23 @@ La aplicación comienza con una pantalla de menú que muestra todas las pantalla
 A diferencia de la aplicación de Android, que permite conectar el smartphone a la placa de control de bajo nivel de un OpenBot a través de un cable USB, la aplicación de iOS se basa únicamente en una conexión inalámbrica Bluetooth de baja energía (BLE). Al abrir la pantalla de conexión Bluetooth en la aplicación de iOS (haciendo clic en el logotipo de Bluetooth desde la pantalla principal o desde cualquier fragmento), se muestra una lista de todos los dispositivos compatibles. La compatibilidad se asegura aquí utilizando una serie de UUID específicos asignados a un vehículo OpenBot tanto a nivel de [aplicación](https://github.com/3dwesupport/OpenBot/blob/090dcb28206195a7ee45a13b8ded968a8d365abe/ios/OpenBot/OpenBot/Utils/Constants.swift#L57) como de [firmware](https://github.com/3dwesupport/OpenBot/blob/090dcb28206195a7ee45a13b8ded968a8d365abe/firmware/openbot_nano/openbot_nano.ino#L115). Debes asegurarte de que estos UUID coincidan. Emparejar un dispositivo iOS con un vehículo OpenBot simplemente requiere seleccionar ese vehículo de la lista y presionar el botón "Conectar". La tasa de baudios predeterminada para la conexión está configurada en 115200 y se puede cambiar a nivel de aplicación y firmware.
 
 <p align="left">
-<img src="../../docs/images/ios_ble.gif" alt="Conexión BLE" width="25%" />
+<img src="../../docs/images/ios_ble.gif" alt="Conexión BLE" height="400" />
+</p>
+
+#### Soporte multilingüe
+
+Abre la pantalla de ajustes con el ícono de engranaje de la parte superior derecha y toca `Idioma` en la sección General para elegir el idioma de la app. Selecciona `Predeterminado del sistema` para usar el idioma de tu iPhone, o elige uno de los idiomas disponibles: English, Deutsch, Español, Français, 中文, 한국어 o हिन्दी. La app aplica el nuevo idioma al instante.
+
+<p align="left">
+<img src="../../docs/images/ios_language_screen.jpg" alt="Selección de idioma" height="400"/>
+</p>
+
+#### Servidor de señalización web
+
+En la pantalla de ajustes, introduce la dirección WebSocket del servidor de señalización en el campo `Servidor de señalización web`, por ejemplo `ws://<ip-del-servidor>:8080/ws`. Se usa cuando el modo de control es servidor web, por lo que el iPhone y el servidor deben estar en la misma red Wi-Fi. Consulta el [servidor web](../../controller/web-server/README.md) para ver cómo configurarlo.
+
+<p align="left">
+<img src="../../docs/images/ios_web_signaling_screen.jpg" alt="Servidor de señalización web" height="400"/>
 </p>
 
 ### Modo Libre

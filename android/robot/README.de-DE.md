@@ -21,13 +21,29 @@
 Die App startet mit einem Menübildschirm, der alle verfügbaren Bildschirme anzeigt. Der Einstellungsbildschirm kann durch Klicken auf das Symbol in der oberen rechten Ecke geöffnet werden. Durch Klicken auf die anderen Symbole kann der Benutzer auf verschiedene Bildschirme zugreifen, deren Funktionen im Folgenden erklärt werden.
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/screen_main.png" alt="Hauptmenü" width="24.5%"/>
-<img src="../../docs/images/screen_settings.png" alt="Einstellungsmenü" width="24.5%"/>
-<img src="../../docs/images/dialog_stream_mode.png" alt="Einstellungsmenü" width="24.5%"/>
-<img src="../../docs/images/dialog_connectivity_mode.png" alt="Einstellungsmenü" width="24.5%"/>
+<img style="padding-right: 2%;" src="../../docs/images/screen_main.jpg" alt="Hauptmenü" height="300"/>
+<img src="../../docs/images/screen_settings.jpg" alt="Einstellungsmenü" height="300"/>
+<img src="../../docs/images/dialog_stream_mode.jpg" alt="Einstellungsmenü" height="300"/>
+<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="Einstellungsmenü" height="300"/>
 </p>
 
 ### Einstellungsmenü
+
+#### Mehrsprachige Unterstützung
+
+Tippen Sie in der Kategorie „Allgemein“ auf `Sprache`, um die Anzeigesprache der App zu wählen. Wählen Sie `Systemstandard`, um die Sprache Ihres Telefons zu verwenden, oder eine der unterstützten Sprachen: English, Deutsch, Español, Français, 中文, 한국어 oder हिन्दी. Die App wendet die neue Sprache sofort an.
+
+<p align="left">
+<img src="../../docs/images/screen_language.jpg" alt="Sprachauswahl" height="300"/>
+</p>
+
+#### Web-Signalisierungsserver
+
+Tippen Sie in der Kategorie „Web-Controller“ auf `Web-Signalisierungsserver`, um die WebSocket-Adresse des Signalisierungsservers einzugeben, zum Beispiel `ws://<server-ip>:8080/ws`. Sie wird verwendet, wenn der Steuerungsmodus auf Webserver eingestellt ist. Telefon und Server müssen sich dafür im selben WLAN befinden. Die Einrichtung ist im [Webserver](../../controller/web-server/README.md) beschrieben.
+
+<p align="left">
+<img src="../../docs/images/dialog_web_signaling_server.jpg" alt="Web-Signalisierungsserver" height="300"/>
+</p>
 
 #### USB-Verbindung
 

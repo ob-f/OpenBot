@@ -26,9 +26,9 @@
 앱 하단에는 `홈, 프로젝트, 프로필` 탭이 있는 탭 바가 표시돼요. 기본적으로 홈 탭이 표시돼요. 사용자가 로그인한 상태라면, Google Drive의 "openbot-opencode" 폴더에 저장된 모든 프로젝트가 프로젝트 탭에 나열돼요. 프로필 탭에서는 사용자 프로필 확인과 로그아웃을 할 수 있는 버튼이 있어요.
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/ios_main_screen.jpg" alt="메인 메뉴" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_bluetooth_screen.jpg" alt="Bluetooth" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_settings_screen.jpg" alt="설정" width="25%"/>
+<img src="../../docs/images/ios_main_screen.jpg" alt="메인 메뉴" height="400"/>
+<img src="../../docs/images/ios_settings_screen.jpg" alt="설정" height="400"/>
+<img src="../../docs/images/ios_bluetooth_screen.jpg" alt="Bluetooth" height="400"/>
 </p>
 
 #### 블루투스 연결
@@ -38,7 +38,23 @@
 iOS 기기를 OpenBot 차량과 연결하려면, 목록에서 차량을 선택하고 "Connect" 버튼을 누르기만 하면 돼요. 기본 전송 속도(baud rate)는 115200으로 설정되어 있지만, 앱과 펌웨어에서 변경할 수 있어요.
 
 <p align="left">
-<img src="../../docs/images/ios_ble.gif" alt="BLE connection" width="25%" />
+<img src="../../docs/images/ios_ble.gif" alt="BLE connection" height="400" />
+</p>
+
+#### 다국어 지원
+
+오른쪽 위의 톱니바퀴 아이콘으로 설정 화면을 열고, 일반 섹션에서 `언어`를 탭하면 앱 표시 언어를 선택할 수 있어요. `시스템 기본값`을 선택하면 iPhone 언어를 따르고, 지원하는 언어(English, Deutsch, Español, Français, 中文, 한국어, हिन्दी) 중에서 직접 고를 수도 있어요. 선택한 언어는 바로 적용돼요.
+
+<p align="left">
+<img src="../../docs/images/ios_language_screen.jpg" alt="Language Selection" height="400"/>
+</p>
+
+#### 웹 시그널링 서버
+
+설정 화면의 `웹 시그널링 서버` 입력란에 시그널링 서버의 WebSocket 주소를 입력하세요. 예: `ws://<서버-IP>:8080/ws`. 제어 모드를 웹 서버로 설정했을 때 사용하며, iPhone과 서버가 같은 Wi-Fi 네트워크에 있어야 해요. 설정 방법은 [웹 서버](../../controller/web-server/README.md)를 참고하세요.
+
+<p align="left">
+<img src="../../docs/images/ios_web_signaling_screen.jpg" alt="Web Signaling Server" height="400"/>
 </p>
 
 ### 자유 주행
