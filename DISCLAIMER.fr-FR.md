@@ -1,4 +1,4 @@
-## AVERTISSEMENT
+.## AVERTISSEMENT
 
 <p align="center">
   <a href="DISCLAIMER.md">English</a> |
