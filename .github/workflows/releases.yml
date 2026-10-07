@@ -5,23 +5,35 @@ on:
 
 name: Upload Android Apk to Release
 
+permissions:
+  contents: write
+
 jobs:
   upload-apk-to-release:
-    name: Add Android Debug Apk to Release Assets
+    name: Add Android Release Apk to Release Assets
     runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
     defaults:
       run:
         working-directory: android
     steps:
-      - uses: actions/checkout@v2
-      - name: Print Release Url
-        run: echo "${{ github.event.release.html_url }}"
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
+      - uses: actions/checkout@v4
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+      - name: Verify release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+          cache: 'gradle'
+          cache-dependency-path: |
+            android/**/*.gradle*
+            android/gradle/wrapper/gradle-wrapper.properties
       - name: Add google-services.json
         run: |
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > robot/google-services.json
@@ -41,33 +53,12 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      - name: Specify Release Asset Paths
-        id: asset_paths
-        run:  |
-          echo "::set-output name=openbot_apk_path::$(pwd)/robot/build/outputs/apk/release/robot-release.apk"
-          echo "::set-output name=controller_apk_path::$(pwd)/controller/build/outputs/apk/release/controller-release.apk"
-      - name: Specify Release Asset Names using Tag [${{github.event.release.tag_name}}]
-        id: asset_names
-        run:  |
-          echo "::set-output name=openbot_name::OpenBot-$(echo ${{github.event.release.tag_name}}| sed 's/[^-a-zA-Z0-9.]/_/g'| sed 's/^v//').apk"
-          echo "::set-output name=controller_name::Controller-$(echo ${{github.event.release.tag_name}}| sed 's/[^-a-zA-Z0-9.]/_/g'| sed 's/^v//').apk"
-      - name: Upload OpenBot Asset
-        id: upload-openbot-asset
-        uses: actions/upload-release-asset@v1
+      - name: Upload release APKs
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ steps.asset_paths.outputs.openbot_apk_path }}
-          asset_name: ${{ steps.asset_names.outputs.openbot_name }}
-          asset_content_type: application/vnd.android.package-archive
-      - name: Upload Controller Asset
-        id: upload-controller-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ steps.asset_paths.outputs.controller_apk_path }}
-          asset_name: ${{ steps.asset_names.outputs.controller_name }}
-          asset_content_type: application/vnd.android.package-archive
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(printf '%s' "$RELEASE_TAG" | sed 's/[^-a-zA-Z0-9.]/_/g; s/^v//')
+          cp robot/build/outputs/apk/release/robot-release.apk "OpenBot-${version}.apk"
+          cp controller/build/outputs/apk/release/controller-release.apk "Controller-${version}.apk"
+          gh release upload "$RELEASE_TAG" "OpenBot-${version}.apk" "Controller-${version}.apk" \
+            --repo "$GITHUB_REPOSITORY"
