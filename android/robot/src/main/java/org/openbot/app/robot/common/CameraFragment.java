@@ -161,20 +161,7 @@ public abstract class CameraFragment extends ControlsFragment {
           new ImageAnalysis.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build();
     else
       imageAnalysis = new ImageAnalysis.Builder().setTargetResolution(analyserResolution).build();
-    // insert your code here.
-    imageAnalysis.setAnalyzer(
-        cameraExecutor,
-        image -> {
-          if (bitmapBuffer == null)
-            bitmapBuffer =
-                Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
-
-          rotationDegrees = image.getImageInfo().getRotationDegrees();
-          converter.yuvToRgb(image.getImage(), bitmapBuffer);
-          image.close();
-
-          processFrame(bitmapBuffer, image);
-        });
+    imageAnalysis.setAnalyzer(cameraExecutor, this::analyzeFrame);
     try {
       if (cameraProvider != null) {
         cameraProvider.unbindAll();
@@ -182,6 +169,21 @@ public abstract class CameraFragment extends ControlsFragment {
       }
     } catch (Exception e) {
       Timber.e("Use case binding failed: %s", e.toString());
+    }
+  }
+
+  @SuppressLint({"UnsafeExperimentalUsageError", "UnsafeOptInUsageError"})
+  private void analyzeFrame(ImageProxy image) {
+    try {
+      if (bitmapBuffer == null)
+        bitmapBuffer =
+            Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
+
+      rotationDegrees = image.getImageInfo().getRotationDegrees();
+      converter.yuvToRgb(image.getImage(), bitmapBuffer);
+      processFrame(bitmapBuffer, image);
+    } finally {
+      image.close();
     }
   }
 
@@ -238,5 +240,10 @@ public abstract class CameraFragment extends ControlsFragment {
     bindCameraUseCases();
   }
 
+  /**
+   * Processes a converted frame while its ImageProxy is still open. This base class closes the
+   * proxy when the synchronous callback returns or throws. Subclasses must not close it or retain
+   * it for asynchronous work; copy any needed metadata before returning.
+   */
   protected abstract void processFrame(Bitmap image, ImageProxy imageProxy);
 }

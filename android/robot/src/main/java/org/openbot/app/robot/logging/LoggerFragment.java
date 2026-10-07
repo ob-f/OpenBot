@@ -659,12 +659,15 @@ public class LoggerFragment extends CameraFragment {
   protected void processFrame(Bitmap bitmap, ImageProxy image) {
     ++frameNum;
     if (binding != null) {
-      if (isAdded())
+      if (isAdded()) {
+        final int frameWidth = image.getWidth();
+        final int frameHeight = image.getHeight();
         requireActivity()
             .runOnUiThread(
                 () ->
                     binding.frameInfo.setText(
-                        String.format(Locale.US, "%d x %d", image.getWidth(), image.getHeight())));
+                        String.format(Locale.US, "%d x %d", frameWidth, frameHeight)));
+      }
 
       if (!binding.loggerSwitch.isChecked()) return;
 
