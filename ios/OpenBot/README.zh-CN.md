@@ -21,9 +21,9 @@
 应用程序启动时会显示一个菜单屏幕，展示所有可用的屏幕。点击右上角的蓝牙图标可以打开蓝牙连接屏幕。点击旁边的设置图标可以打开设置屏幕。点击其他图标，用户可以访问各种屏幕，其功能将在后续部分中解释。
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/ios_main_screen.jpg" alt="主菜单" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_bluetooth_screen.jpg" alt="蓝牙" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_settings_screen.jpg" alt="设置" width="25%"/>
+<img src="../../docs/images/ios_main_screen.jpg" alt="主菜单" height="400"/>
+<img src="../../docs/images/ios_settings_screen.jpg" alt="设置" height="400"/>
+<img src="../../docs/images/ios_bluetooth_screen.jpg" alt="蓝牙" height="400"/>
 </p>
 
 #### 蓝牙连接
@@ -31,7 +31,23 @@
 与允许通过USB电缆将智能手机连接到OpenBot低级控制板的Android应用程序不同，iOS应用程序仅依赖于蓝牙低功耗（BLE）无线连接。在iOS应用程序中打开蓝牙连接屏幕时（通过点击主屏幕或任何片段中的蓝牙标志），会显示所有兼容设备的列表。兼容性通过在[应用程序](https://github.com/3dwesupport/OpenBot/blob/090dcb28206195a7ee45a13b8ded968a8d365abe/ios/OpenBot/OpenBot/Utils/Constants.swift#L57)和[固件](https://github.com/3dwesupport/OpenBot/blob/090dcb28206195a7ee45a13b8ded968a8d365abe/firmware/openbot_nano/openbot_nano.ino#L115)级别分配给OpenBot车辆的一系列特定UUID来强制执行。您必须确保这些UUID匹配。将iOS设备与OpenBot车辆配对只需从列表中选择该车辆并按下“连接”按钮。连接的默认波特率设置为115200，可以在应用程序和固件级别更改。
 
 <p align="left">
-<img src="../../docs/images/ios_ble.gif" alt="BLE连接" width="25%" />
+<img src="../../docs/images/ios_ble.gif" alt="BLE连接" height="400" />
+</p>
+
+#### 多语言支持
+
+点击右上角的齿轮图标打开设置界面，在“常规”部分点击`语言`，即可选择应用的显示语言。选择`系统默认`会跟随iPhone的语言，也可以从支持的语言中选择：English、Deutsch、Español、Français、中文、한국어、हिन्दी。新语言会立即生效。
+
+<p align="left">
+<img src="../../docs/images/ios_language_screen.jpg" alt="语言选择" height="400"/>
+</p>
+
+#### Web信令服务器
+
+在设置界面的`Web信令服务器`输入框中输入信令服务器的WebSocket地址，例如 `ws://<服务器IP>:8080/ws`。当控制模式设置为Web服务器时会用到它，iPhone和服务器需要连接到同一个Wi-Fi网络。设置方法请参见[Web服务器](../../controller/web-server/README.md)。
+
+<p align="left">
+<img src="../../docs/images/ios_web_signaling_screen.jpg" alt="Web 信令服务器" height="400"/>
 </p>
 
 ### 自由漫游

@@ -21,13 +21,29 @@
 앱은 모든 사용 가능한 화면을 보여주는 메뉴 화면으로 시작돼요. 설정 화면은 오른쪽 상단 모서리에 있는 아이콘을 클릭하면 열 수 있어요. 다른 아이콘을 클릭하면 여러 가지 화면에 접근할 수 있고, 각 화면의 기능은 아래에서 설명할게요.
 
 <p align="left">
-<img src="../../docs/images/screen_main.jpg" alt="Main Menu" width="21.6%"/>
-<img src="../../docs/images/screen_settings.jpg" alt="Settings Menu" width="20%"/>
-<img src="../../docs/images/dialog_stream_mode.jpg" alt="Settings Menu" width="20%"/>
-<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="Settings Menu" width="20%"/>
+<img src="../../docs/images/screen_main.jpg" alt="Main Menu" height="300"/>
+<img src="../../docs/images/screen_settings.jpg" alt="Settings Menu" height="300"/>
+<img src="../../docs/images/dialog_stream_mode.jpg" alt="Settings Menu" height="300"/>
+<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="Settings Menu" height="300"/>
 </p>
 
 ### 설정 메뉴
+
+#### 다국어 지원
+
+일반 카테고리에서 `언어`를 탭하면 앱 표시 언어를 선택할 수 있어요. `시스템 기본값`을 선택하면 휴대폰 언어를 따르고, 지원하는 언어(English, Deutsch, Español, Français, 中文, 한국어, हिन्दी) 중에서 직접 고를 수도 있어요. 선택한 언어는 바로 적용돼요.
+
+<p align="left">
+<img src="../../docs/images/screen_language.jpg" alt="Language Selection" height="300"/>
+</p>
+
+#### 웹 시그널링 서버
+
+웹 컨트롤러 카테고리에서 `웹 시그널링 서버`를 탭하고 시그널링 서버의 WebSocket 주소를 입력하세요. 예: `ws://<서버-IP>:8080/ws`. 제어 모드를 웹 서버로 설정했을 때 사용하며, 휴대폰과 서버가 같은 Wi-Fi 네트워크에 있어야 해요. 설정 방법은 [웹 서버](../../controller/web-server/README.md)를 참고하세요.
+
+<p align="left">
+<img src="../../docs/images/dialog_web_signaling_server.jpg" alt="Web Signaling Server" height="300"/>
+</p>
 
 #### USB 연결
 

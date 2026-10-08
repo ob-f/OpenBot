@@ -14,12 +14,13 @@
 				<string>com.openbot.tflite</string>
 			</array>
 		</dict>
-		<dict/>
 	</array>
 	<key>CFBundleIcons</key>
 	<dict/>
 	<key>CFBundleIcons~ipad</key>
 	<dict/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
@@ -40,7 +41,6 @@
 				<string>com.googleusercontent.apps.000000000000-0000000000000000000000000000</string>
 			</array>
 		</dict>
-		<dict/>
 	</array>
 	<key>GCSupportedGameControllers</key>
 	<array>

@@ -21,13 +21,29 @@
 La aplicación comienza con una pantalla de menú que muestra todas las pantallas disponibles. La pantalla de configuración se puede abrir con un clic en el ícono en la esquina superior derecha. Al hacer clic en los otros íconos, el usuario puede acceder a varias pantallas cuyas funcionalidades se explican a continuación.
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/screen_main.png" alt="Menú Principal" width="24.5%"/>
-<img src="../../docs/images/screen_settings.png" alt="Menú de Configuración" width="24.5%"/>
-<img src="../../docs/images/dialog_stream_mode.png" alt="Menú de Configuración" width="24.5%"/>
-<img src="../../docs/images/dialog_connectivity_mode.png" alt="Menú de Configuración" width="24.5%"/>
+<img style="padding-right: 2%;" src="../../docs/images/screen_main.jpg" alt="Menú Principal" height="300"/>
+<img src="../../docs/images/screen_settings.jpg" alt="Menú de Configuración" height="300"/>
+<img src="../../docs/images/dialog_stream_mode.jpg" alt="Menú de Configuración" height="300"/>
+<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="Menú de Configuración" height="300"/>
 </p>
 
 ### Menú de Configuración
+
+#### Soporte multilingüe
+
+Toca `Idioma` en la categoría General para elegir el idioma de la app. Selecciona `Predeterminado del sistema` para usar el idioma de tu teléfono, o elige uno de los idiomas disponibles: English, Deutsch, Español, Français, 中文, 한국어 o हिन्दी. La app aplica el nuevo idioma al instante.
+
+<p align="left">
+<img src="../../docs/images/screen_language.jpg" alt="Selección de idioma" height="300"/>
+</p>
+
+#### Servidor de señalización web
+
+Toca `Servidor de señalización web` en la categoría Controlador web para introducir la dirección WebSocket del servidor de señalización, por ejemplo `ws://<ip-del-servidor>:8080/ws`. Se usa cuando el modo de control es servidor web, por lo que el teléfono y el servidor deben estar en la misma red Wi-Fi. Consulta el [servidor web](../../controller/web-server/README.md) para ver cómo configurarlo.
+
+<p align="left">
+<img src="../../docs/images/dialog_web_signaling_server.jpg" alt="Servidor de señalización web" height="300"/>
+</p>
 
 #### Conexión USB
 

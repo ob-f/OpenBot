@@ -1,0 +1,43 @@
+# This workflow builds and checks the Flutter controller app
+# For more information see: https://docs.github.com/actions/guides/building-and-testing-flutter-applications
+
+name: Flutter CI for Controller App
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - 'controller/flutter/**'
+    - '.github/workflows/flutter.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+    - 'controller/flutter/**'
+    - '.github/workflows/flutter.yml'
+
+jobs:
+  build:
+    name: Flutter Checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: controller/flutter
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.1'
+          channel: 'stable'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+      - name: Build APK
+        run: flutter build apk --debug
+      - name: Upload Controller App (Flutter)
+        uses: actions/upload-artifact@v4
+        with:
+          name: controller-flutter-debug.apk
+          path: controller/flutter/build/app/outputs/flutter-apk/app-debug.apk

@@ -108,7 +108,9 @@ public class PhoneController {
   }
 
   public void connect(Context context) {
-    setWebVideoEnabled(false);
+    // Phone mode streams video over the same local connection as web mode does
+    // over the signaling websocket, so it needs the video server enabled too.
+    setWebVideoEnabled(true);
     ILocalConnection connection = connectionSelector.getConnection();
 
     if (!connection.isConnected()) {

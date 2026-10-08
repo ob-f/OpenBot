@@ -47,6 +47,34 @@ Begin by installing [Flutter](https://flutter.dev/) on your system. Choose the a
     <img src="../../docs/images/run_editor.jpg" width="50%" />
   </p>
 
+## Building a Signed Release (Android)
+Release builds (`flutter build apk --release` / `flutter build appbundle --release`) are signed using a keystore referenced from `android/key.properties`. This file is **gitignored** and never committed — each developer must create their own local copy. Debug builds (`flutter build apk --debug`, `flutter run`) don't need any of this.
+
+### 1. Generate a keystore (once)
+```bash
+keytool -genkey -v -keystore ~/release.keystore -alias upload -keyalg RSA -keysize 2048 -validity 10000
+```
+Keep the resulting `.keystore`/`.jks` file and its passwords somewhere safe outside the repo — losing it means you can no longer publish updates under the same app signature.
+
+### 2. Create `android/key.properties`
+`android/app/build.gradle` reads this file at `controller/flutter/android/key.properties`, so create it there with:
+```properties
+storePassword=<your keystore password>
+keyPassword=<your key password>
+keyAlias=upload
+storeFile=/absolute/path/to/release.keystore
+```
+`storeFile` must be an absolute path (or a path resolvable from `controller/flutter/android/`) to the keystore you generated in step 1.
+
+### 3. Build
+```bash
+cd controller/flutter
+flutter build appbundle --release   # for Play Store upload (.aab)
+# or
+flutter build apk --release         # for a signed installable APK
+```
+`app/build.gradle` loads `key.properties` automatically if present and wires it into the `release` signing config; if the file is missing, the release build config falls back to null signing values and the build will fail signing (debug builds are unaffected).
+
 ## Connection
 
 When the controller app is started, it immediately tries to connect to the robot and shows the following screen:

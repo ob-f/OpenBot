@@ -27,9 +27,9 @@ The app starts with a menu screen that shows all available screens. The Bluetoot
 The bottom of the app displays a tab bar with tabs for `Home, Projects, and Profile`. By default, the Home tab is displayed. If a user is logged in, all their saved projects in the "openbot-opencode" folder on Google Drive will be listed in Projects tab. The Profile tab includes buttons for accessing the user's profile and signing out.
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/ios_main_screen.jpg" alt="Main Menu" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_bluetooth_screen.jpg" alt="Bluetooth" width="25%"/>
-<img style="padding-right: 2%;" src="../../docs/images/ios_settings_screen.jpg" alt="Settings" width="25%"/>
+<img src="../../docs/images/ios_main_screen.jpg" alt="Main Menu" height="400"/>
+<img src="../../docs/images/ios_settings_screen.jpg" alt="Settings" height="400"/>
+<img src="../../docs/images/ios_bluetooth_screen.jpg" alt="Bluetooth" height="400"/>
 </p>
 
 #### Bluetooth Connection
@@ -37,7 +37,23 @@ The bottom of the app displays a tab bar with tabs for `Home, Projects, and Prof
 Unlike the Android app, which allows connecting the smartphone to the low-level control board of an OpenBot via a USB cable, the iOS app relies `solely` on a Bluetooth Low-Energy (BLE) wireless connection. When opening the Bluetooth connection screen in the iOS application (by clicking on the bluetooth logo from the main screen or from any fragment), a list of all compatible devices is displayed. Compatibility is here enforced by using a range of specific UUIDs assigned to an OpenBot vehicle at both the [app](https://github.com/ob-f/OpenBot/blob/090dcb28206195a7ee45a13b8ded968a8d365abe/ios/OpenBot/OpenBot/Utils/Constants.swift#L57) and [firmware](https://github.com/ob-f/OpenBot/blob/090dcb28206195a7ee45a13b8ded968a8d365abe/firmware/openbot_nano/openbot_nano.ino#L115) levels. You must ensure that these UUIDs match. Pairing an iOS device to an OpenBot vehicle then simply requires to select that vehicle from the list and press the "Connect" button. The default baud rate for the connection is set to 115200 and can be changed at the app and firmware level.
 
 <p align="left">
-<img src="../../docs/images/ios_ble.gif" alt="BLE connection" width="25%" />
+<img src="../../docs/images/ios_ble.gif" alt="BLE connection" height="400" />
+</p>
+
+#### Multi-Language Support
+
+Open the settings screen with the gear icon at the top right and tap `Language` in the General section to choose the display language of the app. Select `System Default` to follow the language of your iPhone, or pick one of the supported languages: English, Deutsch, Español, Français, 中文, 한국어 or हिन्दी. The app applies the new language right away.
+
+<p align="left">
+<img src="../../docs/images/ios_language_screen.jpg" alt="Language Selection" height="400"/>
+</p>
+
+#### Web Signaling Server
+
+In the settings screen, enter the WebSocket address of the signaling server in the `Web Signaling Server` field, for example `ws://<server-ip>:8080/ws`. It is used when the control mode is set to web server, so your iPhone and the server need to be on the same Wi-Fi network. See the [web server](../../controller/web-server/README.md) for how to set it up.
+
+<p align="left">
+<img src="../../docs/images/ios_web_signaling_screen.jpg" alt="Web Signaling Server" height="400"/>
 </p>
 
 ### Free Roam

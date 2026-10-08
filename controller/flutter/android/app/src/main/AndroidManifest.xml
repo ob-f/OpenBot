@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.openbot.flutter_controller">
+    package="org.openbot.app.controller">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
    <application
         android:label="OpenBot Controller"
         android:name="${applicationName}"

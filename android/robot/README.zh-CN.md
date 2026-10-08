@@ -21,13 +21,29 @@
 应用程序启动时会显示一个菜单屏幕，列出所有可用的屏幕。可以通过点击右上角的图标打开设置屏幕。点击其他图标，用户可以访问各种屏幕，其功能在下文中解释。
 
 <p align="left">
-<img style="padding-right: 2%;" src="../../docs/images/screen_main.png" alt="主菜单" width="24.5%"/>
-<img src="../../docs/images/screen_settings.png" alt="设置菜单" width="24.5%"/>
-<img src="../../docs/images/dialog_stream_mode.png" alt="设置菜单" width="24.5%"/>
-<img src="../../docs/images/dialog_connectivity_mode.png" alt="设置菜单" width="24.5%"/>
+<img style="padding-right: 2%;" src="../../docs/images/screen_main.jpg" alt="主菜单" height="300"/>
+<img src="../../docs/images/screen_settings.jpg" alt="设置菜单" height="300"/>
+<img src="../../docs/images/dialog_stream_mode.jpg" alt="设置菜单" height="300"/>
+<img src="../../docs/images/dialog_connectivity_mode.jpg" alt="设置菜单" height="300"/>
 </p>
 
 ### 设置菜单
+
+#### 多语言支持
+
+在“常规”类别中点击`语言`，即可选择应用的显示语言。选择`系统默认`会跟随手机的语言，也可以从支持的语言中选择：English、Deutsch、Español、Français、中文、한국어、हिन्दी。新语言会立即生效。
+
+<p align="left">
+<img src="../../docs/images/screen_language.jpg" alt="语言选择" height="300"/>
+</p>
+
+#### Web信令服务器
+
+在“Web控制器”类别中点击`Web信令服务器`，输入信令服务器的WebSocket地址，例如 `ws://<服务器IP>:8080/ws`。当控制模式设置为Web服务器时会用到它，手机和服务器需要连接到同一个Wi-Fi网络。设置方法请参见[Web服务器](../../controller/web-server/README.md)。
+
+<p align="left">
+<img src="../../docs/images/dialog_web_signaling_server.jpg" alt="Web 信令服务器" height="300"/>
+</p>
 
 #### USB连接
 
