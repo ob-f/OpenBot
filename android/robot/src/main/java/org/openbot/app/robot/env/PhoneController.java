@@ -118,6 +118,8 @@ public class PhoneController {
       connection.connect(context);
     } else {
       connection.start();
+      // The socket stayed open, so no new CONNECTED event will come: restart video here.
+      videoServer.setConnected(true);
     }
   }
 
