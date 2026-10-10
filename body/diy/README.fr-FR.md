@@ -25,6 +25,7 @@ Il existe plusieurs options pour le corps du robot en fonction de vos besoins et
 - [Corps mince](cad/slim_body/README.md) : Comme beaucoup d'imprimantes 3D courantes ont un volume de construction plus petit, nous avons également conçu une version plus petite sans pare-chocs qui tient sur une plaque de construction de 220mmx220mm à 45 degrés.
 - [Corps collable](cad/glue_body/README.md) : Pour l'impression sur des imprimantes 3D avec des volumes de construction encore plus petits, il existe également un corps modulaire conçu par @sloretz avec plusieurs pièces à coller ensemble ; il tient sur une plaque de construction de 150mmx140mm.
 - [Corps bloc](cad/block_body/README.md) : Ce corps conçu par @Christos-Ps propose plusieurs variantes avec des options pour plus d'espace à l'intérieur de la coque et un dessus compatible avec les Lego tout en conservant une petite empreinte nécessitant seulement 221mmx150mm pour l'impression.
+- [Corps ESP32](cad/esp32_body/README.fr-FR.md) : Un corps compact pour l'ESP32 DevKit V1 avec un pilote de moteurs L298N (firmware `DIY_ESP32`). Il possède un couvercle compatible avec les Lego, des supports électroniques vissés, des encodeurs de roue et trois options de batterie ; toutes les pièces tiennent sur un plateau de 180mmx180mm (par ex. Bambu Lab A1 mini).
 
 #### Support de téléphone
 
