@@ -25,6 +25,7 @@
 - [纤细主体](cad/slim_body/README.md)：由于许多常见的3D打印机有较小的打印体积，我们还设计了一个没有保险杠的较小版本，可以在45度角的220mmx220mm打印板上打印。
 - [可粘合主体](cad/glue_body/README.md)：对于打印体积更小的3D打印机，还有一个由@sloretz设计的模块化主体，需要将几个部分粘合在一起；适合150mmx140mm的打印板。
 - [块状主体](cad/block_body/README.md)：由@Christos-Ps设计的这个主体提供了多个变体，具有外壳内额外空间和兼容乐高的顶部，同时保持了仅需221mmx150mm的打印面积。
+- [ESP32主体](cad/esp32_body/README.zh-CN.md)：适用于ESP32 DevKit V1和L298N电机驱动器（`DIY_ESP32`固件）的紧凑型主体。它带有兼容乐高的顶盖、螺丝固定的电子元件支架、车轮编码器和三种电池方案，所有零件均可在180mmx180mm的打印平台上打印（例如Bambu Lab A1 mini）。
 
 #### 手机支架
 
