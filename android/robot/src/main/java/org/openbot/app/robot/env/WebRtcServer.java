@@ -2,6 +2,7 @@ package org.openbot.app.robot.env;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
 import android.media.ToneGenerator;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,8 +10,11 @@ import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceView;
 import android.view.TextureView;
+import androidx.camera.core.ImageProxy;
 import androidx.core.content.ContextCompat;
 import com.pedro.rtplibrary.view.OpenGlView;
+import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,11 +30,13 @@ import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraEnumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.CandidatePairChangeEvent;
+import org.webrtc.CapturerObserver;
 import org.webrtc.DataChannel;
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
+import org.webrtc.JavaI420Buffer;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
@@ -44,6 +50,7 @@ import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoDecoderFactory;
 import org.webrtc.VideoEncoderFactory;
+import org.webrtc.VideoFrame;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 import timber.log.Timber;
@@ -93,12 +100,24 @@ public class WebRtcServer implements IVideoServer {
 
   private final SignalingHandler signalingHandler = new SignalingHandler();
 
+  // The robot preview (CameraFragment) and WebRTC cannot both open the camera. While a preview
+  // is on screen, WebRTC streams the preview's frames instead of opening the camera itself.
+  private static final Object frameLock = new Object();
+  private static WeakReference<WebRtcServer> activeServer = new WeakReference<>(null);
+  private static Object localPreviewOwner;
+  private static CapturerObserver sharedFrameObserver;
+
+  private VideoSource videoSource;
+  private boolean cameraCapturing = false;
+  private boolean streaming = false;
+
   public WebRtcServer() {}
 
   // IVideoServer Interface
   @Override
   public void init(Context context) {
     this.context = context;
+    activeServer = new WeakReference<>(this);
 
     andGate = new AndGate(() -> startServer(), () -> stopServer());
     andGate.addCondition("connected");
@@ -113,6 +132,13 @@ public class WebRtcServer implements IVideoServer {
     rootEglBase = EglBase.create();
 
     signalingHandler.handleControllerWebRtcEvents();
+
+    // The controller socket really closed: end the call so the next controller gets a fresh one.
+    ControllerToBotEventBus.subscribe(
+        "WebRtcServer.disconnect",
+        event -> mainHandler.post(this::closeCall),
+        error -> Log.d(TAG, "Error occurred in disconnect monitor: " + error),
+        event -> event.has("command") && "DISCONNECTED".equals(event.getString("command")));
   }
 
   @Override
@@ -174,18 +200,140 @@ public class WebRtcServer implements IVideoServer {
   }
   // end Interface
 
+  // Shared camera frames from CameraFragment
+
+  /** Called on the main thread when a CameraFragment binds or releases the camera preview. */
+  public static void setLocalPreviewActive(Object owner, boolean active) {
+    if (active) {
+      localPreviewOwner = owner;
+    } else if (localPreviewOwner == owner) {
+      localPreviewOwner = null;
+    } else {
+      return; // a newer preview already owns the camera
+    }
+    WebRtcServer server = activeServer.get();
+    if (server != null) {
+      server.applyVideoSource();
+    }
+  }
+
+  /** Called on the camera analysis thread for every preview frame. */
+  public static void onLocalPreviewFrame(ImageProxy image) {
+    if (image.getFormat() != ImageFormat.YUV_420_888) {
+      return;
+    }
+    synchronized (frameLock) {
+      if (sharedFrameObserver == null) {
+        return;
+      }
+      VideoFrame frame =
+          new VideoFrame(
+              toI420Buffer(image), image.getImageInfo().getRotationDegrees(), System.nanoTime());
+      sharedFrameObserver.onFrameCaptured(frame);
+      frame.release();
+    }
+  }
+
+  private static JavaI420Buffer toI420Buffer(ImageProxy image) {
+    int width = image.getWidth();
+    int height = image.getHeight();
+    int chromaWidth = (width + 1) / 2;
+    int chromaHeight = (height + 1) / 2;
+    JavaI420Buffer buffer = JavaI420Buffer.allocate(width, height);
+    ImageProxy.PlaneProxy[] planes = image.getPlanes();
+    copyPlane(planes[0], width, height, buffer.getDataY(), buffer.getStrideY());
+    copyPlane(planes[1], chromaWidth, chromaHeight, buffer.getDataU(), buffer.getStrideU());
+    copyPlane(planes[2], chromaWidth, chromaHeight, buffer.getDataV(), buffer.getStrideV());
+    return buffer;
+  }
+
+  private static void copyPlane(
+      ImageProxy.PlaneProxy plane, int width, int height, ByteBuffer dst, int dstStride) {
+    ByteBuffer src = plane.getBuffer().duplicate();
+    int rowStride = plane.getRowStride();
+    int pixelStride = plane.getPixelStride();
+    int srcLimit = src.limit();
+    for (int y = 0; y < height; y++) {
+      int srcRow = y * rowStride;
+      int dstRow = y * dstStride;
+      if (pixelStride == 1) {
+        src.limit(srcRow + width).position(srcRow);
+        dst.position(dstRow);
+        dst.put(src);
+        src.limit(srcLimit);
+      } else {
+        for (int x = 0; x < width; x++) {
+          dst.put(dstRow + x, src.get(srcRow + x * pixelStride));
+        }
+      }
+    }
+    dst.rewind();
+  }
+
+  // Chooses where streamed frames come from: nothing (paused), the preview's frames, or WebRTC's
+  // own camera capturer. The camera is always released before the preview needs it.
+  private void applyVideoSource() {
+    if (videoSource == null) {
+      return;
+    }
+    boolean usePreviewFrames = streaming && localPreviewOwner != null;
+    if (usePreviewFrames || !streaming) {
+      stopCameraCapture();
+    }
+    synchronized (frameLock) {
+      sharedFrameObserver = usePreviewFrames ? videoSource.getCapturerObserver() : null;
+    }
+    if (usePreviewFrames) {
+      videoSource.getCapturerObserver().onCapturerStarted(true);
+    } else if (streaming) {
+      startCameraCapture();
+    }
+  }
+
+  private void startCameraCapture() {
+    if (videoCapturer != null && !cameraCapturing) {
+      videoCapturer.startCapture(VIDEO_RESOLUTION_WIDTH, VIDEO_RESOLUTION_HEIGHT, FPS);
+      cameraCapturing = true;
+    }
+  }
+
+  private void stopCameraCapture() {
+    if (videoCapturer != null && cameraCapturing) {
+      try {
+        videoCapturer.stopCapture();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      cameraCapturing = false;
+    }
+  }
+
   // local methods
   private void startServer() {
+    streaming = true;
+    if (peerConnection != null) {
+      // The Flutter controller keeps one peer connection per session and cannot accept a new
+      // offer on it, so reuse the existing call and just resume the video.
+      applyVideoSource();
+      startClient();
+      return;
+    }
 
     initializeSurfaceViews();
     initializePeerConnectionFactory();
     createVideoTrackFromCameraAndShowIt();
+    if (videoTrackFromCamera == null) {
+      Log.e(TAG, "startServer: no camera available, video not started");
+      closeCall();
+      return;
+    }
     initializePeerConnections();
 
     startStreamingVideo();
     doCall();
     startClient();
     monitorCameraControlEvents();
+    applyVideoSource();
   }
 
   // Delay to let the local camera actually finish releasing before we switch.
@@ -199,6 +347,11 @@ public class WebRtcServer implements IVideoServer {
           switch (event.getString("command")) {
             case "SWITCH_CAMERA":
               Log.d(TAG, "Received SWITCH_CAMERA command");
+              if (localPreviewOwner != null) {
+                // The robot preview owns the camera; WebRTC is only forwarding its frames.
+                emitSwitchCameraStatus("ERROR:LOCAL_PREVIEW_ACTIVE");
+                break;
+              }
               if (!(videoCapturer instanceof CameraVideoCapturer)) {
                 Log.e(TAG, "Cannot switch camera: capturer is not ready");
                 emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
@@ -317,20 +470,50 @@ public class WebRtcServer implements IVideoServer {
     }
   }
 
+  // Pause only: release the camera and stop sending frames, but keep the call alive.
   private void stopServer() {
-    if (videoCapturer != null) {
-      try {
-        videoCapturer.stopCapture();
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      }
+    streaming = false;
+    applyVideoSource();
+    stopClient();
+  }
+
+  // Ends the call and frees all WebRTC resources. Only used when the controller disconnects.
+  private void closeCall() {
+    if (factory == null) {
+      return; // nothing was started
     }
+    streaming = false;
+    applyVideoSource();
     if (peerConnection != null) {
-      peerConnection.close();
+      peerConnection.dispose();
       peerConnection = null;
     }
+    mediaStream = null;
+    videoSender = null;
+    audioSender = null;
+    videoTrackFromCamera = null;
+    localAudioTrack = null;
+    if (videoCapturer != null) {
+      videoCapturer.dispose();
+      videoCapturer = null;
+    }
+    if (videoSource != null) {
+      videoSource.dispose();
+      videoSource = null;
+    }
+    if (audioSource != null) {
+      audioSource.dispose();
+      audioSource = null;
+    }
+    if (surfaceTextureHelper != null) {
+      surfaceTextureHelper.dispose();
+      surfaceTextureHelper = null;
+    }
+    if (factory != null) {
+      factory.dispose();
+      factory = null;
+    }
     view.release();
-    stopClient();
   }
 
   private void stopClient() {
@@ -479,7 +662,8 @@ public class WebRtcServer implements IVideoServer {
       Log.e(TAG, "createVideoTrackFromCameraAndShowIt: no back-facing camera capturer found");
       return;
     }
-    VideoSource videoSource = factory.createVideoSource(videoCapturer.isScreencast());
+    videoSource = factory.createVideoSource(videoCapturer.isScreencast());
+    videoSource.adaptOutputFormat(VIDEO_RESOLUTION_WIDTH, VIDEO_RESOLUTION_HEIGHT, FPS);
 
     surfaceTextureHelper =
         SurfaceTextureHelper.create("CaptureThread", rootEglBase.getEglBaseContext());
@@ -488,7 +672,7 @@ public class WebRtcServer implements IVideoServer {
         context /*getApplicationContext()*/,
         videoSource.getCapturerObserver());
 
-    videoCapturer.startCapture(VIDEO_RESOLUTION_WIDTH, VIDEO_RESOLUTION_HEIGHT, FPS);
+    // Capture (or using the preview's frames) is started in applyVideoSource().
 
     videoTrackFromCamera = factory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
     videoTrackFromCamera.setEnabled(true);
@@ -603,8 +787,18 @@ public class WebRtcServer implements IVideoServer {
       ControllerToBotEventBus.subscribe(
           "WEB_RTC_COMMANDS",
           event -> {
+            if (peerConnection == null) {
+              // Late message after the call closed. Throwing here would end this subscription.
+              Log.d(TAG, "Ignoring WebRTC event: no active call");
+              return;
+            }
             String commandType = "";
-            JSONObject webRtcEvent = event.getJSONObject("webrtc_event");
+            // The controller sometimes sends webrtc_event as a JSON string instead of an object.
+            Object rawEvent = event.get("webrtc_event");
+            JSONObject webRtcEvent =
+                rawEvent instanceof JSONObject
+                    ? (JSONObject) rawEvent
+                    : new JSONObject(rawEvent.toString());
             String type = webRtcEvent.getString("type");
             switch (type) {
               case "offer":
