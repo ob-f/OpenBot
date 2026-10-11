@@ -34,6 +34,8 @@ Zusätzlich müssen Sie eine Handyhalterung drucken, die am Roboterkörper befes
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+Um das Handy um bis zu 30° nach oben zu neigen, drucken Sie statt `phone_mount_bottom` die neigbare Version aus [body/phone_mount](../phone_mount/README.de-DE.md).
+
 #### Reinigung
 
 Bevor Sie mit dem Bau fortfahren, müssen Sie möglicherweise den 3D-Druck reinigen.

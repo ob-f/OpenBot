@@ -9,7 +9,7 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-OpenBot Compact est un corps [OpenBot](../../README.fr-FR.md) compact à quatre roues pour une motorisation **ESP32 DevKit V1 + L298N**. Il possède un couvercle à tenons compatible LEGO, un capot vissé, un support de téléphone en deux pièces, des supports électroniques amovibles fixés par vis et trois options de batterie. Chaque pièce imprimée tient sur une **Bambu Lab A1 mini** (plus grande pièce 104 × 168 mm).
+OpenBot Compact est un corps [OpenBot](../../README.fr-FR.md) compact à quatre roues pour une motorisation **ESP32 DevKit V1 + L298N**. Il possède un couvercle à tenons compatible LEGO, un capot vissé, un support de téléphone inclinable, des supports électroniques amovibles fixés par vis et trois options de batterie. Chaque pièce imprimée tient sur une **Bambu Lab A1 mini** (plus grande pièce 104 × 168 mm).
 
 <p align="center">
   <img src="../../docs/images/compact/teaser_front.jpg" alt="Vue avant" width="45%" />
@@ -21,8 +21,8 @@ OpenBot Compact est un corps [OpenBot](../../README.fr-FR.md) compact à quatre 
 | **Contrôleur** | ESP32 DevKit V1 (30 broches), firmware OpenBot `DIY_ESP32` ; liaison avec le téléphone par Bluetooth ou câble USB |
 | **Capteurs** | Ultrason HC-SR04 (avant), 4 × encodeurs de roue optiques LM393, tension de la batterie |
 | **Alimentation** | Au choix : boîtier 18650 2S ou 3S sur le couvercle, ou petite batterie LiPo à l'intérieur (voir [Options de batterie](#options-de-batterie)) |
-| **Visserie** | Uniquement des vis à tête cylindrique bombée M3 × 10 et M3 × 25, des écrous M3 et 16 inserts filetés (le support de téléphone inclinable optionnel ajoute deux M3 × 30) |
-| **Impression** | PLA, deux plateaux A1 mini, ≈ 11 h et ≈ 300 g, plus les pièces de l'option de batterie choisie |
+| **Visserie** | Uniquement des vis à tête cylindrique bombée M3 × 10 et M3 × 25, des écrous M3 et 20 inserts filetés |
+| **Impression** | PLA, deux plateaux A1 mini, ≈ 12 h et ≈ 305 g, plus les pièces de l'option de batterie choisie |
 
 > **Gauche et droite** désignent toujours dans ce guide la gauche et la droite **du robot** : placez-vous derrière le robot (côté interrupteur) et regardez vers l'avant, par-dessus le couvercle, en direction du capteur à ultrasons. Le firmware utilise la même convention pour les moteurs et encodeurs « gauche » et « droit ».
 
@@ -55,33 +55,37 @@ OpenBot Compact est un corps [OpenBot](../../README.fr-FR.md) compact à quatre 
 | [power_board_stand](cad/stl/power_board_stand.stl) ([STEP](cad/step/power_board_stand.step)) | 1 | Porte le convertisseur 5 V et la plaque à trous du diviseur derrière le dissipateur. Base vers le bas. |
 | [pcb_spacer](cad/stl/pcb_spacer.stl) ([STEP](cad/step/pcb_spacer.step)) | 4 | Entretoises isolantes de 2,4 mm sous le L298N |
 | [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | Rondelles isolantes de 0,8 mm : 4 pour le L298N, 4 pour les capteurs de vitesse |
-| [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | Base du support de téléphone ; debout sur son pied, sans supports |
-| [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | Pince coulissante du téléphone ; debout, sans supports |
-| [phone_mount_tilt_base](cad/stl/phone_mount_tilt_base.stl) ([STEP](cad/step/phone_mount_tilt_base.step)) | 1 *(optionnel)* | Support de téléphone inclinable : pied avec deux joues de charnière ; remplace `phone_mount_bottom`. Debout sur son pied, sans supports |
-| [phone_mount_tilt_column](cad/stl/phone_mount_tilt_column.stl) ([STEP](cad/step/phone_mount_tilt_column.step)) | 1 *(optionnel)* | Support de téléphone inclinable : colonne pour la pince standard `phone_mount_top`. Debout, sans supports |
-| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Adaptateurs pour les voyants encastrés : 2 à l'avant, 2 à l'arrière |
+| [phone_mount_tilt_base](../phone_mount/phone_mount_tilt_base.stl) ([STEP](../phone_mount/phone_mount_tilt_base.step)) | 1 | Pied du support de téléphone avec deux joues de charnière ; debout sur son pied, sans supports |
+| [phone_mount_tilt_column](../phone_mount/phone_mount_tilt_column.stl) ([STEP](../phone_mount/phone_mount_tilt_column.step)) | 1 | Colonne du support de téléphone, s'incline de 0 à 30° vers l'arrière ; debout, supports uniquement sous le téton de l'élastique |
+| [phone_mount_top](../phone_mount/phone_mount_top.stl) ([STEP](../phone_mount/phone_mount_top.step)) | 1 | Pince coulissante du téléphone ; debout, supports uniquement sous le téton de l'élastique |
+| [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) ([STEP](../phone_mount/phone_mount_bottom.step)) | 1 *(optionnel)* | Base fixe du support de téléphone à la place du pied et de la colonne inclinables ; debout sur son pied, supports uniquement sous le téton de l'élastique |
+| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Adaptateurs pour voyants encastrés de 12 mm : 2 à l'avant, 2 à l'arrière |
+| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(optionnel)* | Identique pour des voyants de 10 mm, à la place de `led_adapter` ; 6 mm de long pour que les filetages courts atteignent l'écrou |
+| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(optionnel)* | Identique pour des voyants de 8 mm, à la place de `led_adapter` ; 6 mm de long pour que les filetages courts atteignent l'écrou |
+| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(optionnel)* | Identique pour des voyants de 6 mm, à la place de `led_adapter` ; 6 mm de long pour que les filetages courts atteignent l'écrou |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optionnel ; imprimez en filament **opaque** ou utilisez des disques achetés compatibles. S'imprime à plat. |
 
 Les quatre pattes de l'ESP32 sont identiques, tout comme les quatre supports de capteur ; chaque pièce va donc à n'importe quelle position. Les clips à ultrasons forment une paire gauche/droite symétrique. Imprimez-les couchés sur leur large face arrière. Les pièces de votre batterie sont listées dans [Options de batterie](#options-de-batterie).
 
 ## Impression
 
-Les fichiers STL et STEP de toutes les pièces se trouvent dans [cad/stl](cad/stl) et [cad/step](cad/step), déjà orientés pour l'impression et en millimètres ; imprimez à l'échelle 100 %.
+Les fichiers STL et STEP de toutes les pièces se trouvent dans [cad/stl](cad/stl) et [cad/step](cad/step), déjà orientés pour l'impression et en millimètres ; imprimez à l'échelle 100 %. Les pièces du support de téléphone sont communes à toutes les carrosseries et se trouvent dans [body/phone_mount](../phone_mount).
 
-Ouvrez **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** dans Bambu Studio. Les plateaux 1 et 2 contiennent toutes les pièces standard dans la quantité nécessaire. Les plateaux 3 à 5 contiennent chacun une option de batterie ; n'imprimez que celle que vous avez choisie. Le plateau 6 contient le support de téléphone inclinable optionnel avec sa propre pince.
+Ouvrez **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** dans Bambu Studio. Les plateaux 1 et 2 contiennent toutes les pièces standard dans la quantité nécessaire. Les plateaux 3 à 5 contiennent chacun une option de batterie ; n'imprimez que celle que vous avez choisie. Le plateau 6 contient le support de téléphone fixe optionnel, le plateau 7 les adaptateurs LED optionnels pour voyants de 10, 8 et 6 mm.
 
 | Plateau | Contenu | Durée* | Filament* |
 |---|---|---:|---:|
-| 1 – Châssis et accessoires | châssis, support de téléphone (les deux pièces), 4 supports de capteur, 4 adaptateurs LED, 2 disques d'encodeur, 2 pattes ESP32, clip à ultrasons droit, 2 entretoises, 6 rondelles | ≈ 7 h 50 min | ≈ 215 g |
-| 2 – Couvercle et accessoires | couvercle à tenons, support ESP32, support des cartes d'alimentation, 2 bouchons de couvercle, 2 disques d'encodeur, 2 pattes ESP32, clip à ultrasons gauche, 2 entretoises, 2 rondelles | ≈ 3 h 20 min | ≈ 80 g |
+| 1 – Châssis et accessoires | châssis, support des cartes d'alimentation, support ESP32, 4 supports de capteur, 4 adaptateurs LED, les deux clips à ultrasons, 4 pattes ESP32, 4 entretoises, 8 rondelles | ≈ 7 h 50 min | ≈ 215 g |
+| 2 – Couvercle et support de téléphone | couvercle à tenons, support de téléphone inclinable (pied, colonne, pince), 4 disques d'encodeur, 2 bouchons de couvercle | ≈ 3 h 50 min | ≈ 90 g |
 | 3 – Batterie A (boîtier 2S) | boîtier de batterie 2S, son couvercle, passe-câble du couvercle | ≈ 1 h 40 min | ≈ 42 g |
 | 4 – Batterie B (boîtier 3S) | boîtier de batterie 3S, son couvercle, passe-câble du couvercle | ≈ 2 h 20 min | ≈ 58 g |
 | 5 – Batterie C (plateau LiPo) | plateau LiPo | ≈ 15 min | ≈ 5 g |
-| 6 – Support de téléphone inclinable (optionnel) | pied inclinable, colonne inclinable, pince | ≈ 2 h 20 min | ≈ 57 g |
+| 6 – Support de téléphone fixe (optionnel) | base fixe du support de téléphone | ≈ 1 h | ≈ 23 g |
+| 7 – Adaptateurs LED (optionnel) | 4 de chaque pour voyants de 10, 8 et 6 mm ; imprimez seulement votre taille | ≈ 25 min | ≈ 10 g |
 
-\*Estimations avec Generic PLA ; plateaux 3 à 6 extrapolés à partir du volume des pièces. Vos durées seront différentes. Cliquez sur **Slice plate** pour chaque plateau avant d'imprimer.
+\*Estimations avec Generic PLA ; plateaux 2 à 7 extrapolés à partir du volume des pièces. Vos durées seront différentes. Cliquez sur **Slice plate** pour chaque plateau avant d'imprimer.
 
-Profil : buse de 0,4 mm, couches de 0,20 mm, 4 parois, 5 couches supérieures et 5 inférieures, remplissage gyroïde 30 %, plateau PEI texturé. **Aucune pièce n'a besoin de supports.** Les trous des parois du châssis sont ronds et mesurent au plus 20 mm, et ses logements d'écrou forment des ponts d'environ 8 mm. Les deux pièces du support de téléphone s'impriment debout. Les supports sont désactivés dans le projet ; si vous ajoutez une pièce du dossier STL, laissez-les aussi désactivés. Avant d'imprimer, sélectionnez le PLA réellement chargé et vérifiez l'aperçu des couches.
+Profil : buse de 0,4 mm, couches de 0,20 mm, 4 parois, 5 couches supérieures et 5 inférieures, remplissage gyroïde 30 %, plateau PEI texturé. **Seules les pièces du support de téléphone ont besoin de supports, et uniquement sous le petit téton de l'élastique.** Les trous des parois du châssis sont ronds et mesurent au plus 20 mm, et ses logements d'écrou forment des ponts d'environ 8 mm. Les pièces du support de téléphone s'impriment debout, et le projet active les supports pour elles seules : un petit arbre sous le rebord du téton, dans la glissière. Retirez-le à la pince par l'arrière ouvert de la glissière. Les supports sont désactivés pour toutes les autres pièces ; si vous ajoutez une pièce du dossier STL, laissez-les désactivés, sauf pour une pièce du support de téléphone. Avant d'imprimer, sélectionnez le PLA réellement chargé et vérifiez l'aperçu des couches.
 
 - Le couvercle s'imprime à plat, tenons vers le haut. Le châssis s'imprime fond vers le bas, cavité ouverte.
 - Après l'impression, retirez les fils des logements d'écrou (laissez en place les deux petites nervures à l'entrée de chaque logement), des trous d'insert, des emboîtements et des ouvertures pour câbles.
@@ -118,7 +122,7 @@ Les trois options conservent le diviseur de batterie 30 k / 10 k du firmware. Se
 
 ## Matériel et électronique à acheter
 
-**Seules deux longueurs de vis sont nécessaires : M3 × 10 mm et M3 × 25 mm**, toutes deux à tête cylindrique bombée d'environ 5,5 mm de diamètre (pas de têtes fraisées). Les rondelles des cartes sont imprimées. N'ajoutez pas de rondelles sous les vis du couvercle, du support ou des pattes ESP32, car leurs longueurs supposent que la tête appuie directement sur le plastique. Le support de téléphone inclinable optionnel nécessite en plus deux vis M3 × 30 mm.
+**Seules deux longueurs de vis sont nécessaires : M3 × 10 mm et M3 × 25 mm**, toutes deux à tête cylindrique bombée d'environ 5,5 mm de diamètre (pas de têtes fraisées). Les rondelles des cartes sont imprimées. N'ajoutez pas de rondelles sous les vis du couvercle, du support ou des pattes ESP32, car leurs longueurs supposent que la tête appuie directement sur le plastique.
 
 Les liens ci-dessous mènent vers un fournisseur ou une recherche Amazon US. Vérifiez les dimensions et caractéristiques indiquées avant de commander, car des cartes vendues sous le même nom peuvent avoir des perçages différents.
 
@@ -126,11 +130,10 @@ Les liens ci-dessous mènent vers un fournisseur ou une recherche Amazon US. Vé
 
 | Qté | Pièce | Utilisation | Acheter |
 |---:|---|---|---|
-| 16 (+ réserve) | Inserts filetés en laiton M3 × 5,7 mm à insérer à chaud, taille courante de 4,6 mm de diamètre extérieur (p. ex. ruthex RX-M3x5.7) | 12 dans le châssis, 4 dans le support ESP32 | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
-| 16 | Vis à tête cylindrique bombée M3 × 10 mm | 4 couvercle, 2 support, 4 pattes ESP32, 4 L298N, 2 clips à ultrasons | [recherche](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
+| 20 (+ réserve) | Inserts filetés en laiton M3 × 5,7 mm à insérer à chaud, taille courante de 4,6 mm de diamètre extérieur (p. ex. ruthex RX-M3x5.7) | 12 dans le châssis, 4 dans le support ESP32, 4 dans la colonne du support de téléphone | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
+| 19 | Vis à tête cylindrique bombée M3 × 10 mm | 4 couvercle, 2 support, 4 pattes ESP32, 4 L298N, 2 clips à ultrasons, 3 support de téléphone | [recherche](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
 | 14 | Vis à tête cylindrique bombée M3 × 25 mm | 8 moteurs, 4 capteurs de vitesse, 2 support de téléphone | [recherche](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
-| 2 | Vis à tête cylindrique bombée M3 × 30 mm *(support inclinable uniquement)* | axe et vis de blocage du support de téléphone inclinable | [recherche](https://www.amazon.com/s?k=M3+x+30+pan+head+screws+ISO+7045) |
-| 14 (+1) | Écrous hexagonaux M3, 5,5 mm sur plats, ≈ 2,4 mm d'épaisseur | 4 couvercle, 8 moteurs, 2 support de téléphone, +1 pour l'axe du support de téléphone inclinable | [recherche](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
+| 14 | Écrous hexagonaux M3, 5,5 mm sur plats, ≈ 2,4 mm d'épaisseur | 4 couvercle, 8 moteurs, 2 support de téléphone | [recherche](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
 | 4 | Petits colliers de serrage (≤ 3 mm de large) | Convertisseur 5 V et plaque à trous sur le support des cartes d'alimentation | [recherche](https://www.amazon.com/s?k=small+cable+ties+2.5mm) |
 | ≈ 350 g | PLA 1,75 mm | toutes les pièces imprimées | [recherche](https://www.amazon.com/s?k=PLA+filament+1.75mm) |
 
@@ -149,7 +152,7 @@ Les liens ci-dessous mènent vers un fournisseur ou une recherche Amazon US. Vé
 | 1 | Convertisseur 5 V, ≥ 2 A, max. 21 × 43 × 14 mm | Se fixe sur le support des cartes d'alimentation. En 3S, un module LM2596 convient. En 2S, choisissez un modèle qui fournit encore 5 V à partir de 6 V en entrée (p. ex. MP1584 ou buck-boost). | [recherche](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | Petite plaque à trous, max. 24 × 34 mm | Diviseurs de batterie et d'écho, commande des voyants ; se place à l'arrière du support | [recherche](https://www.amazon.com/s?k=small+prototype+perfboard) |
 | 1 lot | Résistances 1 % | Diviseur de batterie 30 k + 10 k ; diviseur d'écho 10 k + 20 k ; voyants 4 × 1 k + 4 × 100 k | [recherche](https://www.amazon.com/s?k=1+percent+metal+film+resistor+assortment+10k+20k+30k+1k+100k) |
-| 2 + 2 | Voyants encastrés blancs et rouges *(optionnel)* | Vérifiez la taille de la collerette par rapport aux trous du panneau et la tension des voyants | [recherche](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
+| 2 + 2 | Voyants encastrés blancs et rouges *(optionnel)* | Un filetage de 12 mm va dans `led_adapter` ; pour des voyants de 10, 8 ou 6 mm, imprimez l'adaptateur correspondant. Vérifiez la tension des voyants | [recherche](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
 | 4 | Transistors NPN, p. ex. PN2222A *(optionnel, pour les voyants)* | Commutateur côté masse pour chaque voyant | [recherche](https://www.amazon.com/s?k=PN2222A+transistor) |
 | 1 lot | Câbles Dupont, fil d'alimentation silicone, gaine thermorétractable | Dimensionnez le fil d'alimentation pour le courant de blocage des moteurs | [recherche](https://www.amazon.com/s?k=silicone+wire+kit+20+22+AWG+heat+shrink) |
 
@@ -221,7 +224,7 @@ Placez le HC-SR04 dans le renfoncement avant, les deux transducteurs dans les ou
 
 Montez `ultrasonic_clip_left` à gauche du robot et `ultrasonic_clip_right` à droite, chacun avec sa petite lèvre au-dessus du coin supérieur de la carte. Fixez chaque clip avec une vis M3 × 10 mm dans son insert orienté vers l'intérieur, tête de vis vers l'intérieur du châssis. Serrez jusqu'à ce que le clip repose sur son bossage sans plier la carte. La carte ne doit ni se soulever ni pouvoir être retirée, et les transducteurs doivent rester perpendiculaires à la façade.
 
-Montez les deux voyants blancs avant, les deux voyants rouges arrière (chacun dans un adaptateur LED imprimé) et l'interrupteur à bascule rond avec la visserie fournie. Faites passer les fils loin des roues et des disques d'encodeur.
+Montez les deux voyants blancs avant, les deux voyants rouges arrière (chacun dans l'adaptateur LED imprimé qui correspond à son filetage) et l'interrupteur à bascule rond avec la visserie fournie. Faites passer les fils loin des roues et des disques d'encodeur.
 
 ### 4. Monter l'ESP32 et le pilote de moteurs
 
@@ -333,21 +336,20 @@ Installez l'application Android **OpenBot Robot**. Choisissez **Bluetooth**, acc
   <img src="../../docs/images/compact/step_07_closed.jpg" alt="Corps fermé" width="32%" />
 </p>
 
-Enfoncez deux écrous M3 dans les logements de la base du support. Vissez la base sur la zone avant du couvercle avec deux vis M3 × 25 mm par en dessous. Montez la pince coulissante et tendez-la avec un élastique ou un ressort. Avec le téléphone dans sa coque, vérifiez qu'il est bien tenu, que la caméra a une vue dégagée et qu'aucun bouton n'est enfoncé.
-
-**Support de téléphone inclinable (optionnel).** Pour orienter la caméra vers le haut, par exemple vers une personne debout devant le robot, utilisez `phone_mount_tilt_base` et `phone_mount_tilt_column` à la place de `phone_mount_bottom`. La pince et l'élastique restent les mêmes.
+**Support de téléphone.** Le support s'incline, la caméra peut donc aussi regarder vers le haut, par exemple vers une personne debout devant le robot.
 
 <p align="center">
-  <img src="../../docs/images/compact/phone_tilt_hinge.jpg" alt="Charnière du support de téléphone inclinable" width="32%" />
-  <img src="../../docs/images/compact/phone_tilt_angles.jpg" alt="Support de téléphone inclinable à 0, 10, 20 et 30 degrés" width="64%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_hinge.jpg" alt="Charnière du support de téléphone inclinable" width="32%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Support de téléphone inclinable à 0, 10, 20 et 30 degrés" width="64%" />
 </p>
 
-1. Enfoncez deux écrous M3 dans le pied et vissez-le sur la zone du couvercle avec deux vis M3 × 25 mm par en dessous, comme la base standard.
-2. Enfoncez un écrou M3 dans le logement hexagonal d'une joue. Placez la colonne entre les joues et passez une vis M3 × 30 mm dans le trou arrière depuis l'autre côté, jusque dans cet écrou. Serrez jusqu'à ce que la colonne tourne sans jeu.
-3. Inclinez la colonne vers l'arrière jusqu'à ce qu'un de ses deux trous soit en face d'un trou de la joue. La paire de trous avant donne 0° (en bas) et 20° (en haut) ; la paire arrière donne 10° (en bas) et 30° (en haut).
-4. Vissez la seconde vis M3 × 30 mm dans ce trou, du même côté que la vis d'axe. Les trous de la joue opposée sont plus petits : la vis y taille son propre filetage et ne nécessite pas d'écrou.
+1. Posez quatre inserts M3 dans la colonne, comme à l'étape 1 : un à chaque extrémité du trou d'axe à l'arrière, et un dans chacun des deux trous de blocage avant, qui ne sont ouverts que d'un côté.
+2. Enfoncez deux écrous M3 dans les logements du pied. Vissez le pied sur la zone avant du couvercle avec deux vis M3 × 25 mm par en dessous.
+3. Placez la colonne entre les joues, les trous de blocage ouverts tournés vers la joue qui a cinq trous. Vissez une vis M3 × 10 mm à travers chaque joue dans les inserts du trou d'axe et serrez jusqu'à ce que la colonne tourne sans jeu. Mettez une goutte de frein-filet moyen (bleu) sur les deux vis d'axe pour qu'elles ne se desserrent pas.
+4. Inclinez la colonne vers l'arrière jusqu'à ce qu'un de ses inserts de blocage soit en face d'un trou de la joue. La paire de trous avant donne 0° (en bas) et 20° (en haut) ; la paire arrière donne 10° (en bas) et 30° (en haut). Bloquez-la avec la troisième vis M3 × 10 mm.
+5. Montez la pince coulissante et tendez-la avec un élastique ou un ressort. Avec le téléphone dans sa coque, vérifiez qu'il est bien tenu, que la caméra a une vue dégagée et qu'aucun bouton n'est enfoncé.
 
-Le téléphone est 10,5 mm plus haut que sur le support standard. À 30°, il reste environ 15 mm d'écart avec le boîtier de batterie.
+À 30°, il reste environ 15 mm d'écart avec le boîtier de batterie. Si vous n'avez pas besoin de l'inclinaison, imprimez [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) à la place du pied et de la colonne : enfoncez deux écrous M3 dans ses logements et vissez-la de la même façon sur la zone du couvercle. Elle reçoit la même pince, et le téléphone est 10,5 mm plus bas.
 
 **Ouvertures du couvercle.** Le couvercle comporte deux ouvertures de 1 × 2 tenons, une devant et une derrière la zone du téléphone. Posez le couvercle avec la zone du téléphone vers le capteur à ultrasons à l'avant. La zone est décalée de 16 mm vers l'avant par rapport au centre du couvercle ; la zone de tenons arrière accueille le boîtier de batterie. Enfoncez un `lid_plug` dans chaque ouverture inutilisée ; il restitue les tenons, et un rebord de 1 mm au bas de l'ouverture l'empêche de tomber à travers. Là où passe un câble, utilisez plutôt le `lid_grommet` :
 
@@ -369,7 +371,7 @@ Le châssis accepte aussi la **PCB V2** d'OpenBot (Arduino Nano + pilotes DRV887
 - Ne montez pas le support ESP32, ses quatre pattes, le L298N ni le support des cartes d'alimentation.
 - Posez 4 inserts dans les quatre bossages pour carte longue. Avec les 4 inserts des capteurs et les 2 des ultrasons, cela fait **10 inserts au total**.
 - Montez la carte sur quatre entretoises imprimées de 2,4 mm, avec une rondelle imprimée et une vis M3 × 10 mm à chaque trou.
-- Total de la visserie : **10 × M3 × 10** (4 couvercle, 4 carte, 2 clips), **14 × M3 × 25**, 14 écrous.
+- Total de la visserie : **13 × M3 × 10** (4 couvercle, 4 carte, 2 clips, 3 support de téléphone), **14 × M3 × 25**, 14 écrous.
 
 Commandez la carte à partir des [fichiers de fabrication et de la nomenclature de la PCB V2](../diy/pcb/v2), par exemple chez [JLCPCB](https://jlcpcb.com/) ou [PCBWay](https://www.pcbway.com/). Avant de la fixer, vérifiez la hauteur des composants montés et le dégagement des soudures. Les options de batterie ci-dessus fonctionnent de la même façon avec cette carte.
 

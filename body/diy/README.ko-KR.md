@@ -34,6 +34,8 @@ OpenBot을 만들기 위해 다음 부품들을 프린트하고 조립해야 해
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+휴대폰을 위쪽으로 최대 30°까지 기울이려면 `phone_mount_bottom` 대신 [body/phone_mount](../phone_mount/README.ko-KR.md)의 각도 조절 버전을 출력하세요.
+
 #### 세척하기
 
 조립을 시작하기 전에 3D 출력물을 깨끗이 세척해야 할 수도 있어요.

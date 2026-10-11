@@ -34,6 +34,8 @@ De plus, vous devrez imprimer un support de téléphone à fixer au corps du rob
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+Pour incliner le téléphone vers le haut jusqu'à 30°, imprimez la version inclinable de [body/phone_mount](../phone_mount/README.fr-FR.md) à la place de `phone_mount_bottom`.
+
 #### Nettoyage
 
 Avant de continuer avec la construction, vous devrez peut-être nettoyer l'impression 3D.

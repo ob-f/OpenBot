@@ -34,6 +34,8 @@ In addition, you will need to print a phone mount to be fixed to robot body.
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+To tilt the phone up by up to 30°, print the tilting version from [body/phone_mount](../phone_mount/README.md) instead of `phone_mount_bottom`.
+
 #### Cleaning
 
 Before you proceed with the build, you may need to clean the 3D print.
