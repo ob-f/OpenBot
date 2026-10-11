@@ -378,10 +378,6 @@ GPIO 2、5、12 和 15 是启动配置引脚。如果全部接好后电路板无
 | **顶部** | **底部** |
 | ![顶视图](../../docs/images/compact/top_view.jpg) | ![底面](../../docs/images/compact/underside.jpg) |
 
-<p align="center">
-  <img src="../../docs/images/compact/interior.jpg" alt="内部" width="49%" />
-</p>
-
 渲染图未包含接线。电路板、电池座和 LiPo 电池以简化形状表示。
 
 ## 下一步

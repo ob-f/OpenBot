@@ -378,10 +378,6 @@ Commandez la carte à partir des [fichiers de fabrication et de la nomenclature 
 | **Dessus** | **Dessous** |
 | ![Vue de dessus](../../docs/images/compact/top_view.jpg) | ![Dessous](../../docs/images/compact/underside.jpg) |
 
-<p align="center">
-  <img src="../../docs/images/compact/interior.jpg" alt="Intérieur" width="49%" />
-</p>
-
 Les rendus n'incluent pas le câblage. Les cartes, les supports de piles et la batterie LiPo sont représentés par des formes simplifiées.
 
 ## Ensuite
