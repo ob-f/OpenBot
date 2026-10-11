@@ -1,4 +1,4 @@
-# OpenBot DIY ESP32
+# OpenBot Compact
 
 <p align="center">
   <a href="README.md">English</a> |
@@ -9,9 +9,11 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-一款紧凑的四轮 [OpenBot](../../../../README.zh-CN.md) 车身，适用于 **ESP32 DevKit V1 + L298N** 驱动。它带有兼容乐高的凸点顶盖、螺丝固定的盖板、两件式手机支架、可拆卸的螺丝固定电子元件支架，以及三种电池方案。所有打印件都能放进 **Bambu Lab A1 mini**（最大零件 104 × 168 mm）。
+OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身，适用于 **ESP32 DevKit V1 + L298N** 驱动。它带有兼容乐高的凸点顶盖、螺丝固定的盖板、两件式手机支架、可拆卸的螺丝固定电子元件支架，以及三种电池方案。所有打印件都能放进 **Bambu Lab A1 mini**（最大零件 104 × 168 mm）。
 
-![带手机支架的 OpenBot DIY ESP32](../../../../docs/images/esp32_body/teaser_front.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/teaser_front.jpg" alt="前视图" width="45%" />
+</p>
 
 | | |
 |---|---|
@@ -26,56 +28,45 @@
 
 ## 目录
 
-- [文件夹内容](#文件夹内容)
 - [打印零件](#打印零件) · [打印](#打印)
 - [电池方案](#电池方案)
 - [需要购买的硬件和电子元件](#需要购买的硬件和电子元件)
 - 组装：[1 热熔螺母和顶盖螺母](#1-安装热熔螺母和顶盖螺母) · [2 电机和编码器](#2-安装电机和测速传感器) · [3 超声波传感器和前面板](#3-固定超声波传感器和前面板零件) · [4 ESP32 和驱动板](#4-安装-esp32-和电机驱动板) · [5 接线](#5-连接电源和信号线) · [6 固件和台架测试](#6-配置固件和台架测试) · [7 电池、手机支架和顶盖](#7-安装电池手机支架和顶盖)
 - [集成驱动的替代 PCB](#集成驱动的替代-pcb)
-- [故障排除](#故障排除) · [视图](#视图)
-
-## 文件夹内容
-
-```
-esp32_body/
-├── README.md                  本指南（另有 简体中文、Deutsch、Français、Español、한국어 版本）
-├── esp32_body_A1_mini.3mf     Bambu Studio 项目：所有标准零件按所需数量排在 5 块打印板上（机器人 2 块，每种电池方案 1 块）
-├── stl/                       可直接打印的网格，已按打印方向摆放（mm）
-└── step/                      相同零件的 STEP 实体，便于在 CAD 中修改（mm）
-```
-
-渲染图和接线图位于 [docs/images/esp32_body](../../../../docs/images/esp32_body/)。
-
-STL 和 STEP 文件单位为毫米，且已按打印方向摆放。请按 100 % 比例打印。
+- [故障排除](#故障排除) · [视图](#视图) · [下一步](#下一步)
 
 ## 打印零件
 
-![带电子元件支架的底盘](../../../../docs/images/esp32_body/electronics_mounts.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/electronics_mounts.jpg" alt="带电子元件支架的底盘" width="45%" />
+</p>
 
 | 零件 | 数量 | 安装位置 / 打印方向 |
 |---|---:|---|
-| [bottom_cover](stl/bottom_cover.stl) ([STEP](step/bottom_cover.step)) | 1 | 底盘；底面朝下，无需支撑 |
-| [top_cover](stl/top_cover.stl) ([STEP](step/top_cover.step)) | 1 | 带两个线缆开口的凸点顶盖；平整的底面朝下，凸点朝上 |
-| [lid_plug](stl/lid_plug.stl) ([STEP](step/lid_plug.step)) | 2 | 封住顶盖开口并补全两个凸点。凸点朝上。 |
-| [lid_grommet](stl/lid_grommet.stl) ([STEP](step/lid_grommet.step)) | 1 *(可选)* | 在有线缆穿过的位置代替堵头。凸点朝上。 |
-| [esp32_carrier](stl/esp32_carrier.stl) ([STEP](step/esp32_carrier.step)) | 1 | ESP32 支撑框架；平底朝下 |
-| [esp32_retainer](stl/esp32_retainer.stl) ([STEP](step/esp32_retainer.step)) | 4 | ESP32 角压片；任意压片都适合任意角。平面朝下，凸舌朝上。 |
-| [sensor_support](stl/sensor_support.stl) ([STEP](step/sensor_support.step)) | 4 | 测速传感器支架；任意支架都适合任意车轮 |
-| [ultrasonic_clip_left](stl/ultrasonic_clip_left.stl) ([STEP](step/ultrasonic_clip_left.step)) | 1 | HC-SR04 电路板的**左**上角 |
-| [ultrasonic_clip_right](stl/ultrasonic_clip_right.stl) ([STEP](step/ultrasonic_clip_right.step)) | 1 | HC-SR04 电路板的**右**上角 |
-| [power_board_stand](stl/power_board_stand.stl) ([STEP](step/power_board_stand.step)) | 1 | 在散热片后方固定 5 V 转换器和分压洞洞板。底座朝下。 |
-| [pcb_spacer](stl/pcb_spacer.stl) ([STEP](step/pcb_spacer.step)) | 4 | L298N 下方的 2.4 mm 绝缘垫柱 |
-| [pcb_washer](stl/pcb_washer.stl) ([STEP](step/pcb_washer.step)) | 8 | 0.8 mm 绝缘垫圈：4 个用于 L298N，4 个用于测速传感器 |
-| [phone_mount_bottom](stl/phone_mount_bottom.stl) ([STEP](step/phone_mount_bottom.step)) | 1 | 手机支架底座；立在其底脚上打印，无需支撑 |
-| [phone_mount_top](stl/phone_mount_top.stl) ([STEP](step/phone_mount_top.step)) | 1 | 滑动式手机夹；竖立打印，无需支撑 |
-| [led_adapter](stl/led_adapter.stl) ([STEP](step/led_adapter.step)) | 4 | 面板指示灯适配件：前 2 个，后 2 个 |
-| [encoder_disk](stl/encoder_disk.stl) ([STEP](step/encoder_disk.step)) | 4 | 可选；用**不透光**耗材打印，或使用匹配的成品码盘。平放打印。 |
+| [bottom_cover](cad/stl/bottom_cover.stl) ([STEP](cad/step/bottom_cover.step)) | 1 | 底盘；底面朝下，无需支撑 |
+| [top_cover](cad/stl/top_cover.stl) ([STEP](cad/step/top_cover.step)) | 1 | 带两个线缆开口的凸点顶盖；平整的底面朝下，凸点朝上 |
+| [lid_plug](cad/stl/lid_plug.stl) ([STEP](cad/step/lid_plug.step)) | 2 | 封住顶盖开口并补全两个凸点。凸点朝上。 |
+| [lid_grommet](cad/stl/lid_grommet.stl) ([STEP](cad/step/lid_grommet.step)) | 1 *(可选)* | 在有线缆穿过的位置代替堵头。凸点朝上。 |
+| [esp32_carrier](cad/stl/esp32_carrier.stl) ([STEP](cad/step/esp32_carrier.step)) | 1 | ESP32 支撑框架；平底朝下 |
+| [esp32_retainer](cad/stl/esp32_retainer.stl) ([STEP](cad/step/esp32_retainer.step)) | 4 | ESP32 角压片；任意压片都适合任意角。平面朝下，凸舌朝上。 |
+| [sensor_support](cad/stl/sensor_support.stl) ([STEP](cad/step/sensor_support.step)) | 4 | 测速传感器支架；任意支架都适合任意车轮 |
+| [ultrasonic_clip_left](cad/stl/ultrasonic_clip_left.stl) ([STEP](cad/step/ultrasonic_clip_left.step)) | 1 | HC-SR04 电路板的**左**上角 |
+| [ultrasonic_clip_right](cad/stl/ultrasonic_clip_right.stl) ([STEP](cad/step/ultrasonic_clip_right.step)) | 1 | HC-SR04 电路板的**右**上角 |
+| [power_board_stand](cad/stl/power_board_stand.stl) ([STEP](cad/step/power_board_stand.step)) | 1 | 在散热片后方固定 5 V 转换器和分压洞洞板。底座朝下。 |
+| [pcb_spacer](cad/stl/pcb_spacer.stl) ([STEP](cad/step/pcb_spacer.step)) | 4 | L298N 下方的 2.4 mm 绝缘垫柱 |
+| [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | 0.8 mm 绝缘垫圈：4 个用于 L298N，4 个用于测速传感器 |
+| [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | 手机支架底座；立在其底脚上打印，无需支撑 |
+| [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | 滑动式手机夹；竖立打印，无需支撑 |
+| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | 面板指示灯适配件：前 2 个，后 2 个 |
+| [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | 可选；用**不透光**耗材打印，或使用匹配的成品码盘。平放打印。 |
 
 四个 ESP32 压片完全相同，四个传感器支架也完全相同，因此任意零件都适合任意位置。超声波卡扣是一对左右镜像件。请将它们宽大的背面朝下平放打印。电池所需零件列在[电池方案](#电池方案)中。
 
 ## 打印
 
-在 Bambu Studio 中打开 **[esp32_body_A1_mini.3mf](esp32_body_A1_mini.3mf)**。打印板 1 和 2 包含所有标准零件及所需数量。打印板 3–5 各包含一种电池方案；只打印你选择的那一块。
+所有零件的 STL 和 STEP 文件位于 [cad/stl](cad/stl) 和 [cad/step](cad/step)，已按打印方向摆放，单位为毫米；请按 100 % 比例打印。
+
+在 Bambu Studio 中打开 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**。打印板 1 和 2 包含所有标准零件及所需数量。打印板 3–5 各包含一种电池方案；只打印你选择的那一块。
 
 | 打印板 | 内容 | 时间* | 耗材* |
 |---|---|---:|---:|
@@ -104,21 +95,21 @@ STL 和 STEP 文件单位为毫米，且已按打印方向摆放。请按 100 % 
 | 电池 | 2 节 18650 装在 2 节串联电池座中（约 77 × 41 × 20 mm） | 3 节 18650 装在 3 节串联电池座中（约 76 × 62 × 20 mm） | 2S 或 3S LiPo，**最大 75 × 31 × 20 mm**（例如 3S 450–650 mAh，2S 1000–1300 mAh） |
 | 电压 | 满电 8.4 V，标称 7.4 V | 满电 12.6 V，标称 11.1 V | 满电 8.4 V 或 12.6 V |
 | 能量 | 约 21 Wh（2 × 2800 mAh） | 约 31 Wh（3 × 2800 mAh） | 约 5–10 Wh |
-| 打印零件 | [battery_box_2s](stl/battery_box_2s.stl) + [盖](stl/battery_box_2s_cover.stl)，1 个 [lid_grommet](stl/lid_grommet.stl) | [battery_box_3s](stl/battery_box_3s.stl) + [盖](stl/battery_box_3s_cover.stl)，1 个 [lid_grommet](stl/lid_grommet.stl) | [lipo_tray](stl/lipo_tray.stl) |
+| 打印零件 | [battery_box_2s](cad/stl/battery_box_2s.stl) + [盖](cad/stl/battery_box_2s_cover.stl)，1 个 [lid_grommet](cad/stl/lid_grommet.stl) | [battery_box_3s](cad/stl/battery_box_3s.stl) + [盖](cad/stl/battery_box_3s_cover.stl)，1 个 [lid_grommet](cad/stl/lid_grommet.stl) | [lipo_tray](cad/stl/lipo_tray.stl) |
 | 充电器 | 各槽独立的锂离子充电器 | 各槽独立的锂离子充电器 | LiPo **平衡**充电器 |
 | 说明 | 最适合 TT 电机：经过 L298N 压降后电机得到约 6.4 V。 | 对 3–6 V TT 电机而言电压过高（经过 L298N 后约 10.6 V）。请使用更高电压的电机或限制速度。 | 容量最小。电池藏在车内并受到保护。 |
 
 三种方案都保留固件的 30 k / 10 k 电池分压电阻。只需修改固件中的电压阈值（见[第 6 步](#6-配置固件和台架测试)）。
 
-![顶盖上的 2S 电池盒](../../../../docs/images/esp32_body/battery_box_2s.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/battery_box_2s.jpg" alt="顶盖上的 2S 电池盒" width="32%" />
+  <img src="../../docs/images/compact/battery_box_3s.jpg" alt="顶盖上的 3S 电池盒" width="32%" />
+  <img src="../../docs/images/compact/battery_lipo_tray.jpg" alt="LiPo 托盘" width="32%" />
+</p>
 
-**A 和 B – 顶盖上的电池盒。** 电池盒像乐高积木一样按在手机支架后方的顶盖凸点上。盒底有一条槽，把电池线引向下方，穿过顶盖后部开口。将电池座放入盒中，让引线位于有槽的一端。把引线穿过底部开口和 [lid_grommet](stl/lid_grommet.stl) 进入底盘，然后把带凸点的盒盖按到四根定位柱上。盒盖上也有凸点，因此上面仍能拼插乐高积木。电池盒不会碍到顶盖四角的螺丝。3S 电池盒完全位于顶盖范围内，与后缘相距 14 mm。装上电池盒后，四颗顶盖螺丝仍然都能拧到。
-
-![顶盖上的 3S 电池盒](../../../../docs/images/esp32_body/battery_box_3s.jpg)
+**A 和 B – 顶盖上的电池盒。** 电池盒像乐高积木一样按在手机支架后方的顶盖凸点上。盒底有一条槽，把电池线引向下方，穿过顶盖后部开口。将电池座放入盒中，让引线位于有槽的一端。把引线穿过底部开口和 [lid_grommet](cad/stl/lid_grommet.stl) 进入底盘，然后把带凸点的盒盖按到四根定位柱上。盒盖上也有凸点，因此上面仍能拼插乐高积木。电池盒不会碍到顶盖四角的螺丝。3S 电池盒完全位于顶盖范围内，与后缘相距 14 mm。装上电池盒后，四颗顶盖螺丝仍然都能拧到。
 
 **C – 内置 LiPo 托盘。** 托盘的两条腿立在电机之间的空隙里，正好位于 L298N 和 ESP32 压片螺丝上方。电池自身的高度和合上的顶盖把它压住。用一条 20 mm 魔术贴绑带穿过四个槽，把电池固定在托盘上。如果电池薄于 18 mm，请在上面垫一块泡棉，防止晃动。请先完成 L298N 的全部接线：托盘会挡住它的接线端子，但可以直接向上取出。
-
-![LiPo 托盘](../../../../docs/images/esp32_body/battery_lipo_tray.jpg)
 
 > **锂电池安全。** 请使用正规商家的电芯。18650 电池组请配保护板（BMS）。LiPo 请插上电压报警器，因为固件和电池都不会在电量耗尽时断电。在靠近电池处安装保险丝。LiPo 只能用平衡充电器、在不可燃的表面上、在有人看守时充电。不要使用鼓包或损坏的电池。
 
@@ -180,11 +171,15 @@ STL 和 STEP 文件单位为毫米，且已按打印方向摆放。请按 100 % 
 
 ## 组装
 
-![爆炸图](../../../../docs/images/esp32_body/exploded.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/exploded.jpg" alt="爆炸图" width="45%" />
+</p>
 
 ### 1. 安装热熔螺母和顶盖螺母
 
-![空壳体](../../../../docs/images/esp32_body/step_01_shell.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_01_shell.jpg" alt="空壳体" width="40%" />
+</p>
 
 在 4.0 mm 预留孔中使用标准 M3 × 5.7 mm 热熔螺母（例如 ruthex RX-M3x5.7，外径 4.6 mm）。用恒温烙铁和热熔螺母烙铁头将每个螺母垂直压入并与表面齐平。冷却后再拧入螺丝。
 
@@ -201,7 +196,10 @@ STL 和 STEP 文件单位为毫米，且已按打印方向摆放。请按 100 % 
 
 ### 2. 安装电机和测速传感器
 
-![已装好电机](../../../../docs/images/esp32_body/step_02_motors.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_02_motors.jpg" alt="已装好电机" width="49%" />
+  <img src="../../docs/images/compact/step_03_sensors.jpg" alt="已装好传感器" width="49%" />
+</p>
 
 装入四个 TT 电机，让车轮轴穿出侧面开口，引线朝向中间。每个电机用两颗 M3 × 25 mm 螺丝和螺母固定。确保螺丝不碰到齿轮箱内部。台架测试完成前**先不要装车轮**。
 
@@ -209,11 +207,11 @@ STL 和 STEP 文件单位为毫米，且已按打印方向摆放。请按 100 % 
 
 用手转动每根轴。码盘必须无摩擦地穿过光电槽，传感器引脚不能碰到码盘。
 
-![已装好传感器](../../../../docs/images/esp32_body/step_03_sensors.jpg)
-
 ### 3. 固定超声波传感器和前面板零件
 
-![超声波传感器的固定](../../../../docs/images/esp32_body/ultrasonic_retention.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/ultrasonic_retention.jpg" alt="超声波传感器的固定" width="40%" />
+</p>
 
 把 HC-SR04 放入前部凹槽，两个探头穿过圆孔。凹槽为电路板定位，两个卡扣从内侧压住电路板上沿，使它不会掉进底盘。
 
@@ -233,11 +231,15 @@ STL 和 STEP 文件单位为毫米，且已按打印方向摆放。请按 100 % 
 
 **电源板支架。** 用两根扎带穿过槽孔，将 5 V 转换器绑在支架正面，将分压洞洞板绑在背面。支架放在 L298N 散热片后方的底板上，位于两个后测速传感器之间、开关前方。合上的顶盖会把它压住，因此不需要螺丝。
 
-![已装好电子元件](../../../../docs/images/esp32_body/step_04_electronics.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_04_electronics.jpg" alt="已装好电子元件" width="40%" />
+</p>
 
 ### 5. 连接电源和信号线
 
-![接线图](../../../../docs/images/esp32_body/wiring_diagram.png)
+<p align="center">
+  <img src="../../docs/images/compact/wiring_diagram.png" alt="接线图" width="80%" />
+</p>
 
 使用 ESP32 上印的 GPIO 编号。所有 GND 必须连在一起。走线时远离齿轮、编码器码盘、螺丝尖和顶盖接缝，并扎好以防振动。
 
@@ -266,7 +268,7 @@ STL 和 STEP 文件单位为毫米，且已按打印方向摆放。请按 100 % 
 
 ### 6. 配置固件和台架测试
 
-从[固件文件夹](../../../../firmware/README.zh-CN.md)获取固件，打开 `firmware/openbot/openbot.ino`。
+从[固件文件夹](../../firmware/README.zh-CN.md)获取固件，打开 `firmware/openbot/openbot.ino`。
 
 1. 设置机器人类型，并保持手机模式开启：
 
@@ -321,7 +323,11 @@ GPIO 2、5、12 和 15 是启动配置引脚。如果全部接好后电路板无
 
 ### 7. 安装电池、手机支架和顶盖
 
-![手机支架](../../../../docs/images/esp32_body/step_06_phone_lid.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_06_phone_lid.jpg" alt="手机支架" width="32%" />
+  <img src="../../docs/images/compact/lid_opening.jpg" alt="带堵头和穿线圈的顶盖开口" width="32%" />
+  <img src="../../docs/images/compact/step_07_closed.jpg" alt="合上的车身" width="32%" />
+</p>
 
 把两颗 M3 螺母压入支架底座的螺母槽。用两颗 M3 × 25 mm 螺丝从下方把底座固定到顶盖前部的平台上。装上滑动夹，用橡皮筋或弹簧拉紧。把带壳的手机放进去，检查是否夹牢、摄像头视野无遮挡、没有按到任何按键。
 
@@ -330,17 +336,15 @@ GPIO 2、5、12 和 15 是启动配置引脚。如果全部接好后电路板无
 - **手机有线连接：**用 90° USB 数据线从 ESP32 向上穿过前开口连到手机。在线中串入 USB 电源隔离器，防止手机和 5 V 转换器互相供电。在应用中选择 **USB** 而不是 Bluetooth。
 - **电池盒（方案 A 和 B）：**电池线从后开口向下穿入。
 
-![带堵头和穿线圈的顶盖开口](../../../../docs/images/esp32_body/lid_opening.jpg)
-
 如果使用方案 C，现在装入 LiPo 托盘。把导线从边沿理开，将顶盖平放在底盘上，把四颗 M3 × 10 mm 螺丝（不加垫圈）拧入四角的螺母。均匀拧紧直到贴合。顶盖不能翘起，支架不能晃动。方案 A 和 B 请把电池盒按到手机支架后方的凸点上。
-
-![合上的车身](../../../../docs/images/esp32_body/step_07_closed.jpg)
 
 台架测试通过后再装车轮。第一次请在空旷平坦的地面上慢速行驶，然后重新检查所有螺丝和手机夹。搬动机器人时请拿底盘，不要拿顶盖、手机支架或电池盒。
 
 ## 集成驱动的替代 PCB
 
-![替代 PCB 的安装位置](../../../../docs/images/esp32_body/pcb_option.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/pcb_option.jpg" alt="替代 PCB 的安装位置" width="40%" />
+</p>
 
 底盘也可以安装 OpenBot **PCB V2**（Arduino Nano + DRV8871 驱动），其安装孔距为 121.031 × 28.448 mm。这是另一套电气方案，**不能**直接替换 ESP32。它使用 `PCB_V2` 固件和 Nano 的接线方式。
 
@@ -349,7 +353,7 @@ GPIO 2、5、12 和 15 是启动配置引脚。如果全部接好后电路板无
 - 把电路板装在四个打印的 2.4 mm 垫柱上，每个孔用一个打印垫圈和一颗 M3 × 10 mm 螺丝。
 - 硬件合计：**10 颗 M3 × 10**（顶盖 4、PCB 4、卡扣 2），**14 颗 M3 × 25**，14 颗螺母。
 
-根据 [PCB V2 制造文件和物料清单](../../pcb/v2) 下单制作电路板，例如通过 [JLCPCB](https://jlcpcb.com/) 或 [PCBWay](https://www.pcbway.com/)。固定前请检查已焊元件的高度和焊点间隙。上述电池方案同样适用于这块电路板。
+根据 [PCB V2 制造文件和物料清单](../diy/pcb/v2) 下单制作电路板，例如通过 [JLCPCB](https://jlcpcb.com/) 或 [PCBWay](https://www.pcbway.com/)。固定前请检查已焊元件的高度和焊点间隙。上述电池方案同样适用于这块电路板。
 
 ## 故障排除
 
@@ -368,12 +372,19 @@ GPIO 2、5、12 和 15 是启动配置引脚。如果全部接好后电路板无
 
 ## 视图
 
-| 前 | 后 |
-|---|---|
-| ![前视图](../../../../docs/images/esp32_body/teaser_front.jpg) | ![后视图](../../../../docs/images/esp32_body/teaser_rear.jpg) |
-| **顶部** | **底部** |
-| ![顶视图](../../../../docs/images/esp32_body/top_view.jpg) | ![底面](../../../../docs/images/esp32_body/underside.jpg) |
+<p align="center">
+  <img src="../../docs/images/compact/teaser_front.jpg" alt="前视图" width="32%" />
+  <img src="../../docs/images/compact/teaser_rear.jpg" alt="后视图" width="32%" />
+  <img src="../../docs/images/compact/interior.jpg" alt="内部" width="32%" />
+</p>
 
-![内部](../../../../docs/images/esp32_body/interior.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/top_view.jpg" alt="顶视图" width="32%" />
+  <img src="../../docs/images/compact/underside.jpg" alt="底面" width="32%" />
+</p>
 
 渲染图未包含接线。电路板、电池座和 LiPo 电池以简化形状表示。
+
+## 下一步
+
+在手机上安装 [OpenBot Robot 应用](../../android/robot/README.zh-CN.md)，并按照[第 6 步](#6-配置固件和台架测试)连接机器人。

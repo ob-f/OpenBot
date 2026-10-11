@@ -25,7 +25,7 @@ Hay varias opciones para el cuerpo del robot dependiendo de tus necesidades y ca
 - [Cuerpo delgado](cad/slim_body/README.es-ES.md): Dado que muchas impresoras 3D comunes tienen un volumen de construcción más pequeño, también hemos diseñado una versión más pequeña sin parachoques que cabe en una placa de construcción de 220mmx220mm a 45 grados.
 - [Cuerpo pegable](cad/glue_body/README.es-ES.md): Para imprimir en impresoras 3D con volúmenes de construcción aún más pequeños, también hay un cuerpo modular diseñado por @sloretz con varias partes que necesitan ser pegadas; cabe en una placa de construcción de 150mmx140mm.
 - [Cuerpo bloque](cad/block_body/README.es-ES.md): Este cuerpo diseñado por @Christos-P proporciona múltiples variantes con opciones para espacio extra dentro de la carcasa y una parte superior compatible con lego, manteniendo una huella pequeña que requiere solo 221mmx150mm para imprimir.
-- [Cuerpo ESP32](cad/esp32_body/README.es-ES.md): Un cuerpo compacto para el ESP32 DevKit V1 con controlador de motores L298N (firmware `DIY_ESP32`). Tiene una tapa compatible con lego, soportes atornillados para la electrónica, codificadores de rueda y tres opciones de batería; todas las piezas caben en una cama de 180mmx180mm (p. ej. Bambu Lab A1 mini).
+- [OpenBot Compact](../compact/README.es-ES.md): Para un montaje con ESP32, consulta OpenBot Compact, un cuerpo compacto independiente para el ESP32 DevKit V1 con controlador de motores L298N y tapa compatible con lego; todas las piezas caben en una cama de 180mmx180mm.
 
 #### Montura para el teléfono
 

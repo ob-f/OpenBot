@@ -1,4 +1,4 @@
-# OpenBot DIY ESP32
+# OpenBot Compact
 
 <p align="center">
   <span>English</span> |
@@ -9,9 +9,11 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-A compact four-wheel [OpenBot](../../../../README.md) body for an **ESP32 DevKit V1 + L298N** drive. It has a LEGO-compatible studded lid, a screw-fastened cover, a two-piece phone holder, removable screw-retained electronics mounts and three battery options. Every printed part fits a **Bambu Lab A1 mini** (largest part 104 × 168 mm).
+OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **ESP32 DevKit V1 + L298N** drive. It has a LEGO-compatible studded lid, a screw-fastened cover, a two-piece phone holder, removable screw-retained electronics mounts and three battery options. Every printed part fits a **Bambu Lab A1 mini** (largest part 104 × 168 mm).
 
-![OpenBot DIY ESP32 with phone holder](../../../../docs/images/esp32_body/teaser_front.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/teaser_front.jpg" alt="Front view" width="45%" />
+</p>
 
 | | |
 |---|---|
@@ -26,56 +28,45 @@ A compact four-wheel [OpenBot](../../../../README.md) body for an **ESP32 DevKit
 
 ## Contents
 
-- [What's in this folder](#whats-in-this-folder)
 - [Printed parts](#printed-parts) · [Printing](#printing)
 - [Battery options](#battery-options)
 - [Hardware and electronics to buy](#hardware-and-electronics-to-buy)
 - Assembly: [1 Inserts and nuts](#1-install-inserts-and-lid-nuts) · [2 Motors and encoders](#2-install-motors-and-speed-sensors) · [3 Ultrasonic sensor and panel](#3-secure-the-ultrasonic-sensor-and-panel-parts) · [4 ESP32 and driver](#4-fit-the-esp32-and-motor-driver) · [5 Wiring](#5-wire-power-and-signals) · [6 Firmware and bench test](#6-configure-firmware-and-bench-test) · [7 Battery, phone holder and lid](#7-fit-the-battery-phone-holder-and-lid)
 - [Alternative integrated-driver PCB](#alternative-integrated-driver-pcb)
-- [Troubleshooting](#troubleshooting) · [Views](#views)
-
-## What's in this folder
-
-```
-esp32_body/
-├── README.md                  this guide (also in 简体中文, Deutsch, Français, Español, 한국어)
-├── esp32_body_A1_mini.3mf     Bambu Studio project: all standard parts, in the right quantity, on 5 plates (2 for the robot, 1 per battery option)
-├── stl/                       print-ready meshes, already in print orientation (mm)
-└── step/                      the same parts as STEP solids, for editing in CAD (mm)
-```
-
-Renders and the wiring diagram are in [docs/images/esp32_body](../../../../docs/images/esp32_body/).
-
-STL and STEP files are in millimetres and already in print orientation. Print at 100 % scale.
+- [Troubleshooting](#troubleshooting) · [Views](#views) · [Next](#next)
 
 ## Printed parts
 
-![Chassis with electronics mounts](../../../../docs/images/esp32_body/electronics_mounts.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/electronics_mounts.jpg" alt="Chassis with electronics mounts" width="45%" />
+</p>
 
 | Part | Qty | Where it goes / print orientation |
 |---|---:|---|
-| [bottom_cover](stl/bottom_cover.stl) ([STEP](step/bottom_cover.step)) | 1 | Chassis; floor down, no supports |
-| [top_cover](stl/top_cover.stl) ([STEP](step/top_cover.step)) | 1 | Studded lid with two cable openings; flat underside down, studs up |
-| [lid_plug](stl/lid_plug.stl) ([STEP](step/lid_plug.step)) | 2 | Closes the lid openings; restores the two studs. Studs up. |
-| [lid_grommet](stl/lid_grommet.stl) ([STEP](step/lid_grommet.step)) | 1 *(optional)* | Replaces a plug where a cable passes through. Studs up. |
-| [esp32_carrier](stl/esp32_carrier.stl) ([STEP](step/esp32_carrier.step)) | 1 | ESP32 support frame; flat base down |
-| [esp32_retainer](stl/esp32_retainer.stl) ([STEP](step/esp32_retainer.step)) | 4 | ESP32 corner tabs; any tab fits any corner. Flat down, nib up. |
-| [sensor_support](stl/sensor_support.stl) ([STEP](step/sensor_support.step)) | 4 | Speed-sensor supports; any support fits any wheel |
-| [ultrasonic_clip_left](stl/ultrasonic_clip_left.stl) ([STEP](step/ultrasonic_clip_left.step)) | 1 | Upper **left** corner of the HC-SR04 board |
-| [ultrasonic_clip_right](stl/ultrasonic_clip_right.stl) ([STEP](step/ultrasonic_clip_right.step)) | 1 | Upper **right** corner of the HC-SR04 board |
-| [power_board_stand](stl/power_board_stand.stl) ([STEP](step/power_board_stand.step)) | 1 | Holds the 5 V converter and the divider perfboard behind the heatsink. Base down. |
-| [pcb_spacer](stl/pcb_spacer.stl) ([STEP](step/pcb_spacer.step)) | 4 | 2.4 mm insulating standoffs under the L298N |
-| [pcb_washer](stl/pcb_washer.stl) ([STEP](step/pcb_washer.step)) | 8 | 0.8 mm insulating washers: 4 for the L298N, 4 for the speed sensors |
-| [phone_mount_bottom](stl/phone_mount_bottom.stl) ([STEP](step/phone_mount_bottom.step)) | 1 | Phone-holder base; stands upright on its foot, no supports |
-| [phone_mount_top](stl/phone_mount_top.stl) ([STEP](step/phone_mount_top.step)) | 1 | Sliding phone grip; stands upright, no supports |
-| [led_adapter](stl/led_adapter.stl) ([STEP](step/led_adapter.step)) | 4 | Panel-light adapters: 2 front, 2 rear |
-| [encoder_disk](stl/encoder_disk.stl) ([STEP](step/encoder_disk.step)) | 4 | Optional; print in **opaque** filament, or use matching purchased disks. Prints flat. |
+| [bottom_cover](cad/stl/bottom_cover.stl) ([STEP](cad/step/bottom_cover.step)) | 1 | Chassis; floor down, no supports |
+| [top_cover](cad/stl/top_cover.stl) ([STEP](cad/step/top_cover.step)) | 1 | Studded lid with two cable openings; flat underside down, studs up |
+| [lid_plug](cad/stl/lid_plug.stl) ([STEP](cad/step/lid_plug.step)) | 2 | Closes the lid openings; restores the two studs. Studs up. |
+| [lid_grommet](cad/stl/lid_grommet.stl) ([STEP](cad/step/lid_grommet.step)) | 1 *(optional)* | Replaces a plug where a cable passes through. Studs up. |
+| [esp32_carrier](cad/stl/esp32_carrier.stl) ([STEP](cad/step/esp32_carrier.step)) | 1 | ESP32 support frame; flat base down |
+| [esp32_retainer](cad/stl/esp32_retainer.stl) ([STEP](cad/step/esp32_retainer.step)) | 4 | ESP32 corner tabs; any tab fits any corner. Flat down, nib up. |
+| [sensor_support](cad/stl/sensor_support.stl) ([STEP](cad/step/sensor_support.step)) | 4 | Speed-sensor supports; any support fits any wheel |
+| [ultrasonic_clip_left](cad/stl/ultrasonic_clip_left.stl) ([STEP](cad/step/ultrasonic_clip_left.step)) | 1 | Upper **left** corner of the HC-SR04 board |
+| [ultrasonic_clip_right](cad/stl/ultrasonic_clip_right.stl) ([STEP](cad/step/ultrasonic_clip_right.step)) | 1 | Upper **right** corner of the HC-SR04 board |
+| [power_board_stand](cad/stl/power_board_stand.stl) ([STEP](cad/step/power_board_stand.step)) | 1 | Holds the 5 V converter and the divider perfboard behind the heatsink. Base down. |
+| [pcb_spacer](cad/stl/pcb_spacer.stl) ([STEP](cad/step/pcb_spacer.step)) | 4 | 2.4 mm insulating standoffs under the L298N |
+| [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | 0.8 mm insulating washers: 4 for the L298N, 4 for the speed sensors |
+| [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | Phone-holder base; stands upright on its foot, no supports |
+| [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | Sliding phone grip; stands upright, no supports |
+| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Panel-light adapters: 2 front, 2 rear |
+| [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optional; print in **opaque** filament, or use matching purchased disks. Prints flat. |
 
 The four ESP32 retainers are identical, and so are the four sensor supports, so any one fits any position. The ultrasonic clips are a mirrored left/right pair. Print them lying on their broad back faces. The parts for your battery are listed under [Battery options](#battery-options).
 
 ## Printing
 
-Open **[esp32_body_A1_mini.3mf](esp32_body_A1_mini.3mf)** in Bambu Studio. Plates 1 and 2 hold every standard part in the required quantity. Plates 3–5 each hold one battery option; print only the one you chose.
+STL and STEP files for every part are in [cad/stl](cad/stl) and [cad/step](cad/step), already in print orientation and in millimetres; print at 100 % scale.
+
+Open **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Plates 1 and 2 hold every standard part in the required quantity. Plates 3–5 each hold one battery option; print only the one you chose.
 
 | Plate | Contents | Time* | Filament* |
 |---|---|---:|---:|
@@ -104,21 +95,21 @@ There isn't room inside the chassis for a 3-cell 18650 holder (76 × 62 × 20 mm
 | Battery | 2 × 18650 in a 2-cell series holder (≈ 77 × 41 × 20 mm) | 3 × 18650 in a 3-cell series holder (≈ 76 × 62 × 20 mm) | 2S or 3S LiPo, **max. 75 × 31 × 20 mm** (e.g. 3S 450–650 mAh, 2S 1000–1300 mAh) |
 | Voltage | 8.4 V full, 7.4 V nominal | 12.6 V full, 11.1 V nominal | 8.4 V or 12.6 V full |
 | Energy | ≈ 21 Wh (2 × 2800 mAh) | ≈ 31 Wh (3 × 2800 mAh) | ≈ 5–10 Wh |
-| Printed parts | [battery_box_2s](stl/battery_box_2s.stl) + [cover](stl/battery_box_2s_cover.stl), 1 [lid_grommet](stl/lid_grommet.stl) | [battery_box_3s](stl/battery_box_3s.stl) + [cover](stl/battery_box_3s_cover.stl), 1 [lid_grommet](stl/lid_grommet.stl) | [lipo_tray](stl/lipo_tray.stl) |
+| Printed parts | [battery_box_2s](cad/stl/battery_box_2s.stl) + [cover](cad/stl/battery_box_2s_cover.stl), 1 [lid_grommet](cad/stl/lid_grommet.stl) | [battery_box_3s](cad/stl/battery_box_3s.stl) + [cover](cad/stl/battery_box_3s_cover.stl), 1 [lid_grommet](cad/stl/lid_grommet.stl) | [lipo_tray](cad/stl/lipo_tray.stl) |
 | Charger | Li-ion charger with separate slots | Li-ion charger with separate slots | LiPo **balance** charger |
 | Notes | Best match for TT motors: about 6.4 V reaches them after the L298N's drop. | Over-voltage for 3–6 V TT motors (≈ 10.6 V after the L298N). Use higher-voltage motors or limit speed. | Smallest capacity. The pack is out of sight and protected. |
 
 All three keep the firmware's 30 k / 10 k battery divider. Only the voltage limits in the firmware change (see [step 6](#6-configure-firmware-and-bench-test)).
 
-![2S battery box on the lid](../../../../docs/images/esp32_body/battery_box_2s.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/battery_box_2s.jpg" alt="2S battery box on the lid" width="32%" />
+  <img src="../../docs/images/compact/battery_box_3s.jpg" alt="3S battery box on the lid" width="32%" />
+  <img src="../../docs/images/compact/battery_lipo_tray.jpg" alt="LiPo tray" width="32%" />
+</p>
 
-**A and B – battery box on the lid.** The box presses onto the lid's studs behind the phone holder like a LEGO brick. Its floor has a channel that leads the battery wires down through the rear lid opening. Lay the holder in the box with its wires at the end with the channel. Feed the wires through the floor opening and the [lid_grommet](stl/lid_grommet.stl) into the chassis, then press the studded cover onto the four pegs. The cover has studs too, so LEGO bricks still fit on top. The box clears the corner lid screws. The 3S box sits fully within the lid, with 14 mm between the box and the rear edge. All four lid screws remain accessible with the box installed.
-
-![3S battery box on the lid](../../../../docs/images/esp32_body/battery_box_3s.jpg)
+**A and B – battery box on the lid.** The box presses onto the lid's studs behind the phone holder like a LEGO brick. Its floor has a channel that leads the battery wires down through the rear lid opening. Lay the holder in the box with its wires at the end with the channel. Feed the wires through the floor opening and the [lid_grommet](cad/stl/lid_grommet.stl) into the chassis, then press the studded cover onto the four pegs. The cover has studs too, so LEGO bricks still fit on top. The box clears the corner lid screws. The 3S box sits fully within the lid, with 14 mm between the box and the rear edge. All four lid screws remain accessible with the box installed.
 
 **C – LiPo tray inside.** The tray stands on two legs in the gaps between the motors and sits just above the L298N and the ESP32 retainer screws. The battery's own height and the closed lid hold it down. Strap the pack to the tray with a 20 mm hook-and-loop strap through the four slots. If the pack is thinner than 18 mm, add a foam pad on top so it can't rattle. Do all the L298N wiring first: the tray covers its terminals, but lifts straight out.
-
-![LiPo tray](../../../../docs/images/esp32_body/battery_lipo_tray.jpg)
 
 > **Lithium safety.** Use cells from a reputable dealer. Protect 18650 packs with a protection board (BMS). Fit a plug-in voltage alarm to a LiPo, because neither the firmware nor the pack switches off when it is empty. Fit a fuse close to the battery. Charge LiPos only on a balance charger, on a non-flammable surface, and never unattended. Don't use a pack that is swollen or damaged.
 
@@ -180,11 +171,15 @@ Buy the items for the [battery option](#battery-options) you chose.
 
 ## Assembly
 
-![Exploded view](../../../../docs/images/esp32_body/exploded.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/exploded.jpg" alt="Exploded view" width="45%" />
+</p>
 
 ### 1. Install inserts and lid nuts
 
-![Empty shell](../../../../docs/images/esp32_body/step_01_shell.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_01_shell.jpg" alt="Empty shell" width="40%" />
+</p>
 
 Use standard M3 × 5.7 mm heat-set inserts (for example ruthex RX-M3x5.7, 4.6 mm outer diameter) in the 4.0 mm pilot holes. Press each insert in square and flush with a temperature-controlled iron and insert tip. Let it cool before screwing into it.
 
@@ -201,7 +196,10 @@ Push one M3 hex nut sideways into each of the four corner lid-lock pockets, with
 
 ### 2. Install motors and speed sensors
 
-![Motors installed](../../../../docs/images/esp32_body/step_02_motors.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_02_motors.jpg" alt="Motors installed" width="49%" />
+  <img src="../../docs/images/compact/step_03_sensors.jpg" alt="Sensors installed" width="49%" />
+</p>
 
 Fit the four TT motors with the wheel shafts through the side openings and the wires facing the centre. Fasten each motor with two M3 × 25 mm screws and nuts. Make sure the screws clear the gearbox internals. **Leave the wheels off** until the bench test is done.
 
@@ -209,11 +207,11 @@ Push an encoder disk onto each inboard shaft. Place a sensor support over each o
 
 Turn each shaft by hand. The disk must pass through the optical slot without rubbing, and the sensor leads must stay clear of it.
 
-![Sensors installed](../../../../docs/images/esp32_body/step_03_sensors.jpg)
-
 ### 3. Secure the ultrasonic sensor and panel parts
 
-![Ultrasonic retention](../../../../docs/images/esp32_body/ultrasonic_retention.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/ultrasonic_retention.jpg" alt="Ultrasonic retention" width="40%" />
+</p>
 
 Seat the HC-SR04 in the front recess with both transducers through the round openings. The recess locates the board, and two clips hold its upper edge from inside so it can't fall back into the chassis.
 
@@ -233,11 +231,15 @@ Put the four 2.4 mm printed spacers on the L298N bosses, set the driver on them,
 
 **Power-board stand.** Strap the 5 V converter to the front of the stand and the divider perfboard to the back, each with two cable ties through the slots. The stand sits on the floor behind the L298N heatsink, between the two rear speed sensors and in front of the switch. The closed lid holds it down, so it needs no screws.
 
-![Electronics installed](../../../../docs/images/esp32_body/step_04_electronics.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_04_electronics.jpg" alt="Electronics installed" width="40%" />
+</p>
 
 ### 5. Wire power and signals
 
-![Wiring diagram](../../../../docs/images/esp32_body/wiring_diagram.png)
+<p align="center">
+  <img src="../../docs/images/compact/wiring_diagram.png" alt="Wiring diagram" width="80%" />
+</p>
 
 Use the GPIO numbers printed on the ESP32. All grounds must be connected together. Keep wiring clear of gears, encoder disks, screw tips and the lid seam, and tie it down against vibration.
 
@@ -266,7 +268,7 @@ With option A (2S), the motors see about 6.4 V, which suits common 3–6 V TT mo
 
 ### 6. Configure firmware and bench test
 
-Get the firmware from the [firmware folder](../../../../firmware/README.md) and open `firmware/openbot/openbot.ino`.
+Get the firmware from the [firmware folder](../../firmware/README.md) and open `firmware/openbot/openbot.ino`.
 
 1. Set the robot type and keep phone mode on:
 
@@ -321,7 +323,11 @@ Install the **OpenBot Robot** Android app. Choose **Bluetooth**, grant the permi
 
 ### 7. Fit the battery, phone holder and lid
 
-![Phone holder](../../../../docs/images/esp32_body/step_06_phone_lid.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_06_phone_lid.jpg" alt="Phone holder" width="32%" />
+  <img src="../../docs/images/compact/lid_opening.jpg" alt="Lid openings with plug and grommet" width="32%" />
+  <img src="../../docs/images/compact/step_07_closed.jpg" alt="Closed body" width="32%" />
+</p>
 
 Press two M3 nuts into the pockets in the holder base. Screw the base to the forward pad of the lid with two M3 × 25 mm screws from underneath. Fit the sliding grip and tension it with a rubber band or spring. With the phone in its case, check that it is held firmly, the camera has a clear view and no buttons are pressed.
 
@@ -330,17 +336,15 @@ Press two M3 nuts into the pockets in the holder base. Screw the base to the for
 - **Wired phone link:** route a 90° USB cable from the ESP32 up through the front opening to the phone. Put a USB power blocker in the line so the phone and the 5 V converter don't feed each other. In the app, choose **USB** instead of Bluetooth.
 - **Battery box (options A and B):** the battery wires come down through the rear opening.
 
-![Lid openings with plug and grommet](../../../../docs/images/esp32_body/lid_opening.jpg)
-
 Fit the LiPo tray now if you use option C. Tuck the wires away from the rim, lay the lid flat on the chassis, and drive four M3 × 10 mm screws (no washers) into the corner nuts. Tighten them evenly until seated. The lid must not lift, and the holder must not rock. For options A and B, press the battery box onto the studs behind the phone holder.
-
-![Closed body](../../../../docs/images/esp32_body/step_07_closed.jpg)
 
 Fit the wheels only after the bench test passes. Do the first drive slowly on a clear, level floor, then recheck all screws and the phone grip. Lift the robot by the chassis, not the lid, phone holder or battery box.
 
 ## Alternative integrated-driver PCB
 
-![Alternative PCB footprint](../../../../docs/images/esp32_body/pcb_option.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/pcb_option.jpg" alt="Alternative PCB footprint" width="40%" />
+</p>
 
 The chassis also takes the OpenBot **PCB V2** (Arduino Nano + DRV8871 drivers), which uses a 121.031 × 28.448 mm mounting pattern. This is a different electrical build, **not** an ESP32 drop-in. It runs the `PCB_V2` firmware with the Nano wiring.
 
@@ -349,7 +353,7 @@ The chassis also takes the OpenBot **PCB V2** (Arduino Nano + DRV8871 drivers), 
 - Mount the board on four printed 2.4 mm spacers, with a printed washer and an M3 × 10 mm screw at each hole.
 - Hardware totals: **10 × M3 × 10** (4 lid, 4 PCB, 2 clips), **14 × M3 × 25**, 14 nuts.
 
-Order the board from the [PCB V2 manufacturing files and BOM](../../pcb/v2), for example through [JLCPCB](https://jlcpcb.com/) or [PCBWay](https://www.pcbway.com/). Check the height of the populated components and the solder-joint clearance before you fasten it. The battery options above work the same way with this board.
+Order the board from the [PCB V2 manufacturing files and BOM](../diy/pcb/v2), for example through [JLCPCB](https://jlcpcb.com/) or [PCBWay](https://www.pcbway.com/). Check the height of the populated components and the solder-joint clearance before you fasten it. The battery options above work the same way with this board.
 
 ## Troubleshooting
 
@@ -368,12 +372,19 @@ Order the board from the [PCB V2 manufacturing files and BOM](../../pcb/v2), for
 
 ## Views
 
-| Front | Rear |
-|---|---|
-| ![Front view](../../../../docs/images/esp32_body/teaser_front.jpg) | ![Rear view](../../../../docs/images/esp32_body/teaser_rear.jpg) |
-| **Top** | **Underside** |
-| ![Top view](../../../../docs/images/esp32_body/top_view.jpg) | ![Underside](../../../../docs/images/esp32_body/underside.jpg) |
+<p align="center">
+  <img src="../../docs/images/compact/teaser_front.jpg" alt="Front view" width="32%" />
+  <img src="../../docs/images/compact/teaser_rear.jpg" alt="Rear view" width="32%" />
+  <img src="../../docs/images/compact/interior.jpg" alt="Interior" width="32%" />
+</p>
 
-![Interior](../../../../docs/images/esp32_body/interior.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/top_view.jpg" alt="Top view" width="32%" />
+  <img src="../../docs/images/compact/underside.jpg" alt="Underside" width="32%" />
+</p>
 
 Renders leave out wiring. Boards, battery holders and the LiPo pack are shown as simplified shapes.
+
+## Next
+
+Install the [OpenBot Robot app](../../android/robot/README.md) on your phone and connect to the robot as described in [step 6](#6-configure-firmware-and-bench-test).
