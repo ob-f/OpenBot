@@ -372,15 +372,14 @@ Bestellen Sie die Platine mit den [Fertigungsdateien und der Stückliste der PCB
 
 ## Ansichten
 
-<p align="center">
-  <img src="../../docs/images/compact/teaser_front.jpg" alt="Ansicht von vorne" width="32%" />
-  <img src="../../docs/images/compact/teaser_rear.jpg" alt="Ansicht von hinten" width="32%" />
-  <img src="../../docs/images/compact/interior.jpg" alt="Innenraum" width="32%" />
-</p>
+| Vorne | Hinten |
+|---|---|
+| ![Ansicht von vorne](../../docs/images/compact/teaser_front.jpg) | ![Ansicht von hinten](../../docs/images/compact/teaser_rear.jpg) |
+| **Oben** | **Unten** |
+| ![Ansicht von oben](../../docs/images/compact/top_view.jpg) | ![Unterseite](../../docs/images/compact/underside.jpg) |
 
 <p align="center">
-  <img src="../../docs/images/compact/top_view.jpg" alt="Ansicht von oben" width="32%" />
-  <img src="../../docs/images/compact/underside.jpg" alt="Unterseite" width="32%" />
+  <img src="../../docs/images/compact/interior.jpg" alt="Innenraum" width="49%" />
 </p>
 
 Die Renderings zeigen keine Verkabelung. Platinen, Akkuhalter und der LiPo-Akku sind als vereinfachte Formen dargestellt.

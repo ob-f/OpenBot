@@ -372,15 +372,14 @@ Order the board from the [PCB V2 manufacturing files and BOM](../diy/pcb/v2), fo
 
 ## Views
 
-<p align="center">
-  <img src="../../docs/images/compact/teaser_front.jpg" alt="Front view" width="32%" />
-  <img src="../../docs/images/compact/teaser_rear.jpg" alt="Rear view" width="32%" />
-  <img src="../../docs/images/compact/interior.jpg" alt="Interior" width="32%" />
-</p>
+| Front | Rear |
+|---|---|
+| ![Front view](../../docs/images/compact/teaser_front.jpg) | ![Rear view](../../docs/images/compact/teaser_rear.jpg) |
+| **Top** | **Underside** |
+| ![Top view](../../docs/images/compact/top_view.jpg) | ![Underside](../../docs/images/compact/underside.jpg) |
 
 <p align="center">
-  <img src="../../docs/images/compact/top_view.jpg" alt="Top view" width="32%" />
-  <img src="../../docs/images/compact/underside.jpg" alt="Underside" width="32%" />
+  <img src="../../docs/images/compact/interior.jpg" alt="Interior" width="49%" />
 </p>
 
 Renders leave out wiring. Boards, battery holders and the LiPo pack are shown as simplified shapes.
