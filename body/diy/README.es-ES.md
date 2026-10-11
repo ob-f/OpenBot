@@ -34,6 +34,8 @@ Además, necesitarás imprimir una montura para el teléfono que se fijará al c
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+Para inclinar el teléfono hacia arriba hasta 30°, imprime la versión inclinable de [body/phone_mount](../phone_mount/README.es-ES.md) en lugar de `phone_mount_bottom`.
+
 #### Limpieza
 
 Antes de proceder con la construcción, es posible que necesites limpiar la impresión 3D.

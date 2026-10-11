@@ -34,6 +34,8 @@
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+如果想让手机向上倾斜（最多 30°），可以打印 [body/phone_mount](../phone_mount/README.zh-CN.md) 中的可倾斜版本来代替 `phone_mount_bottom`。
+
 #### 清理
 
 在你继续构建之前，你可能需要清理3D打印件。
