@@ -21,7 +21,7 @@ You will need to print the bottom part and one of the top parts:
 - `block_body_top`([STL](block_body_top.stl), [STEP](block_body_top.step)): basic top part of the body
 - `block_body_top_lego`([STL](block_body_top_lego.stl), [STEP](block_body_top_lego.step)): basic top part of the body with lego-compatible surface
 - `block_body_top_big`([STL](block_body_top_big.stl), [STEP](block_body_top_big.step)): big top part of the body with additional volume for electronics
-- `block_body_top_lego`([STL](block_body_top_big_lego.stl), [STEP](block_body_top_big_lego.step)): big top part of the body with lego-compatible surface
+- `block_body_top_big_lego`([STL](block_body_top_big_lego.stl), [STEP](block_body_top_big_lego.step)): big top part of the body with lego-compatible surface
 
 For the above parts, your build plate needs to be at least 221x150mm.
 
