@@ -17,40 +17,51 @@
 
 ## 직접 만들기
 
-Arduino Nano와 같은 마이크로컨트롤러를 사용하여 OpenBot 소프트웨어 스택과 함께 사용할 수 있는 바퀴가 달린 로봇 본체를 만들 수 있습니다. 저희는 저비용의 쉽게 구할 수 있는 취미 하드웨어를 기반으로 한 [3D 프린팅 본체](diy)를 설계했습니다. [OpenBot Lite](lite)는 교육용으로 개발된 OpenBot DIY 버전의 소형 및 간소화된 변형입니다. 직접 만들고 싶지 않더라도 [단계별 비디오 가이드](lite/#step-by-step-video-guides)가 유용할 수 있습니다. 또한 상업적으로 판매되는 1:16 RC 트럭(예: [이 제품](https://www.amazon.de/dp/B00M3J7DJW))을 위한 [3D 프린팅 본체](rc_truck)도 설계했습니다. OpenBot 프레임워크를 사용한 야외 프로젝트를 위한 범용 플랫폼으로 [다목적 차량](mtv) 제작을 위한 청사진도 제공합니다.
+Arduino Nano와 같은 마이크로컨트롤러를 사용하여 OpenBot 소프트웨어 스택과 함께 사용할 수 있는 바퀴가 달린 로봇 본체를 만들 수 있습니다. 저희는 저비용의 쉽게 구할 수 있는 취미 하드웨어를 기반으로 한 [3D 프린팅 본체](diy)를 설계했습니다. [OpenBot Lite](lite)는 교육용으로 개발된 OpenBot DIY 버전의 소형 및 간소화된 변형입니다. 직접 만들고 싶지 않더라도 [단계별 비디오 가이드](lite/#step-by-step-video-guides)가 유용할 수 있습니다. [OpenBot Compact](compact)는 L298N 모터 드라이버와 ESP32를 위한 소형 3D 프린팅 본체입니다. 레고 호환 덮개가 있으며 모든 부품을 180 mm 프린터로 출력할 수 있습니다. 또한 상업적으로 판매되는 1:16 RC 트럭(예: [이 제품](https://www.amazon.de/dp/B00M3J7DJW))을 위한 [3D 프린팅 본체](rc_truck)도 설계했습니다. OpenBot 프레임워크를 사용한 야외 프로젝트를 위한 범용 플랫폼으로 [다목적 차량](mtv) 제작을 위한 청사진도 제공합니다.
 
 아래는 제작 지침 및 추가 세부 정보가 포함된 여러 예시입니다:
 
 <table style="width:100%;border:none;text-align:center">
   <tr>
-  <td>  <a href="diy">
-    <img  alt="DIY" src="../docs/images/assembly.gif" />
+  <td width="33%">
+  <a href="diy">
+    <img alt="DIY" src="../docs/images/assembly.gif" />
   </a>
   </td>
-  <td>
+  <td width="33%">
   <a href="lite">
     <img alt="Lite" src="../docs/images/openbot_lite.jpg" />
   </a>
   </td>
-  <td>
-  <a href="rc_truck">
-    <img  alt="RC 트럭" src="../docs/images/add_covers_2.JPG" />
-  </a>
-  </td>
-  <td>
-  <a href="mtv">
-    <img alt="다목적 차량" src="../docs/images/MTV/MTV.jpg" />
-  </a>
-  </td>
-  <td>
-  <a href="rtr">
-    <img alt="RTR" src="../docs/images/rtr_tt_assembly.gif" />
+  <td width="33%">
+  <a href="compact">
+    <img alt="Compact" src="../docs/images/compact/compact.jpg" />
   </a>
   </td>
   </tr>
   <tr>
     <td><a href="diy"> DIY </a></td>
     <td><a href="lite"> Lite </a></td>
+    <td><a href="compact"> Compact </a></td>
+  </tr>
+  <tr>
+  <td width="33%">
+  <a href="rc_truck">
+    <img alt="RC 트럭" src="../docs/images/add_covers_2.JPG" />
+  </a>
+  </td>
+  <td width="33%">
+  <a href="mtv">
+    <img alt="다목적 차량" src="../docs/images/MTV/MTV.jpg" />
+  </a>
+  </td>
+  <td width="33%">
+  <a href="rtr">
+    <img alt="RTR" src="../docs/images/rtr_tt_assembly.gif" />
+  </a>
+  </td>
+  </tr>
+  <tr>
     <td><a href="rc_truck"> RC 트럭 </a></td>
     <td><a href="mtv"> 다목적 차량 </a></td>
     <td><a href="rtr"> RTR </a></td>

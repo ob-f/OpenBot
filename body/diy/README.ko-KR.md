@@ -25,7 +25,7 @@ OpenBot을 만들기 위해 다음 부품들을 프린트하고 조립해야 해
 - [슬림 몸체](cad/slim_body/README.ko-KR.md): 많은 3D 프린터가 작은 빌드 볼륨을 가지고 있기 때문에, 범퍼 없이 더 작은 크기로 디자인한 몸체예요. 이 몸체는 220mmx220mm 빌드 플레이트에서 45도 각도로 인쇄할 수 있어요.
 - [접착식 몸체](cad/glue_body/README.ko-KR.md): 더 작은 빌드 볼륨을 가진 3D 프린터를 위한 모듈형 몸체예요. @sloretz가 디자인했으며, 여러 파츠를 접착제로 붙여야 해요. 150mmx140mm 빌드 플레이트에서 인쇄할 수 있어요.
 - [블록형 몸체](cad/block_body/README.ko-KR.md): @Christos-Ps가 디자인한 이 몸체는 내부에 더 많은 공간을 제공하는 여러 가지 변형이 있고, 작은 공간을 유지하면서도 레고 호환 상단 옵션이 있어요. 인쇄에는 221mmx150mm만 필요해요.
-- [ESP32 몸체](cad/esp32_body/README.ko-KR.md): L298N 모터 드라이버와 함께 ESP32 DevKit V1을 사용하는 소형 몸체예요 (`DIY_ESP32` 펌웨어). 레고 호환 덮개, 나사로 고정하는 전자 부품 마운트, 휠 엔코더, 세 가지 배터리 옵션이 있고, 모든 부품이 180mmx180mm 출력판(예: Bambu Lab A1 mini)에 맞아요.
+- [OpenBot Compact](../compact/README.ko-KR.md): ESP32로 만들고 싶다면 OpenBot Compact를 참고하세요. L298N 모터 드라이버와 함께 ESP32 DevKit V1을 쓰는 별도의 소형 몸체로, 레고 호환 덮개가 있고 모든 부품이 180mmx180mm 출력판에 맞아요.
 
 #### 휴대폰 거치대
 

@@ -1,4 +1,4 @@
-# OpenBot DIY ESP32
+# OpenBot Compact
 
 <p align="center">
   <a href="README.md">English</a> |
@@ -9,9 +9,11 @@
   <span>한국어</span>
 </p>
 
-**ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [OpenBot](../../../../README.ko-KR.md) 몸체예요. 레고 호환 스터드 덮개, 나사로 고정하는 커버, 두 부분으로 된 휴대폰 거치대, 나사로 고정하는 분리형 전자 부품 마운트, 세 가지 배터리 옵션이 있어요. 모든 출력 부품이 **Bambu Lab A1 mini**에 맞아요 (가장 큰 부품 104 × 168 mm).
+OpenBot Compact는 **ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [OpenBot](../../README.ko-KR.md) 몸체예요. 레고 호환 스터드 덮개, 나사로 고정하는 커버, 두 부분으로 된 휴대폰 거치대, 나사로 고정하는 분리형 전자 부품 마운트, 세 가지 배터리 옵션이 있어요. 모든 출력 부품이 **Bambu Lab A1 mini**에 맞아요 (가장 큰 부품 104 × 168 mm).
 
-![휴대폰 거치대가 있는 OpenBot DIY ESP32](../../../../docs/images/esp32_body/teaser_front.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/teaser_front.jpg" alt="앞에서 본 모습" width="45%" />
+</p>
 
 | | |
 |---|---|
@@ -26,56 +28,45 @@
 
 ## 목차
 
-- [이 폴더의 내용](#이-폴더의-내용)
 - [출력 부품](#출력-부품) · [출력](#출력)
 - [배터리 옵션](#배터리-옵션)
 - [구매할 하드웨어와 전자 부품](#구매할-하드웨어와-전자-부품)
 - 조립: [1 인서트와 너트](#1-인서트와-덮개-너트-설치하기) · [2 모터와 엔코더](#2-모터와-속도-센서-설치하기) · [3 초음파 센서와 전면](#3-초음파-센서와-전면-부품-고정하기) · [4 ESP32와 드라이버](#4-esp32와-모터-드라이버-설치하기) · [5 배선](#5-전원과-신호-배선하기) · [6 펌웨어와 벤치 테스트](#6-펌웨어-설정과-벤치-테스트) · [7 배터리, 휴대폰 거치대, 덮개](#7-배터리-휴대폰-거치대-덮개-설치하기)
 - [드라이버 통합형 대체 PCB](#드라이버-통합형-대체-pcb)
-- [문제 해결](#문제-해결) · [보기](#보기)
-
-## 이 폴더의 내용
-
-```
-esp32_body/
-├── README.md                  이 가이드 (简体中文, Deutsch, Français, Español, 한국어로도 제공)
-├── esp32_body_A1_mini.3mf     Bambu Studio 프로젝트: 모든 기본 부품을 필요한 수량만큼 출력판 5장에 배치 (로봇용 2장, 배터리 옵션마다 1장)
-├── stl/                       바로 출력할 수 있는 메시, 출력 방향으로 배치됨 (mm)
-└── step/                      같은 부품의 STEP 솔리드, CAD에서 수정용 (mm)
-```
-
-렌더링 이미지와 배선도는 [docs/images/esp32_body](../../../../docs/images/esp32_body/)에 있어요.
-
-STL과 STEP 파일은 밀리미터 단위이고 이미 출력 방향으로 배치되어 있어요. 100 % 배율로 출력하세요.
+- [문제 해결](#문제-해결) · [보기](#보기) · [다음](#다음)
 
 ## 출력 부품
 
-![전자 부품 마운트가 있는 섀시](../../../../docs/images/esp32_body/electronics_mounts.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/electronics_mounts.jpg" alt="전자 부품 마운트가 있는 섀시" width="45%" />
+</p>
 
 | 부품 | 수량 | 설치 위치 / 출력 방향 |
 |---|---:|---|
-| [bottom_cover](stl/bottom_cover.stl) ([STEP](step/bottom_cover.step)) | 1 | 섀시; 바닥을 아래로, 서포트 없음 |
-| [top_cover](stl/top_cover.stl) ([STEP](step/top_cover.step)) | 1 | 케이블 구멍 두 개가 있는 스터드 덮개; 평평한 아랫면을 아래로, 스터드를 위로 |
-| [lid_plug](stl/lid_plug.stl) ([STEP](step/lid_plug.step)) | 2 | 덮개 구멍을 막고 스터드 두 개를 복원해요. 스터드를 위로. |
-| [lid_grommet](stl/lid_grommet.stl) ([STEP](step/lid_grommet.step)) | 1 *(선택)* | 케이블이 지나가는 곳에서 플러그 대신 사용해요. 스터드를 위로. |
-| [esp32_carrier](stl/esp32_carrier.stl) ([STEP](step/esp32_carrier.step)) | 1 | ESP32 지지 프레임; 평평한 바닥을 아래로 |
-| [esp32_retainer](stl/esp32_retainer.stl) ([STEP](step/esp32_retainer.step)) | 4 | ESP32 모서리 고정 탭; 어느 탭이든 어느 모서리에나 맞아요. 평평한 면을 아래로, 돌기를 위로. |
-| [sensor_support](stl/sensor_support.stl) ([STEP](step/sensor_support.step)) | 4 | 속도 센서 지지대; 어느 지지대든 어느 바퀴에나 맞아요 |
-| [ultrasonic_clip_left](stl/ultrasonic_clip_left.stl) ([STEP](step/ultrasonic_clip_left.step)) | 1 | HC-SR04 보드의 위쪽 **왼쪽** 모서리 |
-| [ultrasonic_clip_right](stl/ultrasonic_clip_right.stl) ([STEP](step/ultrasonic_clip_right.step)) | 1 | HC-SR04 보드의 위쪽 **오른쪽** 모서리 |
-| [power_board_stand](stl/power_board_stand.stl) ([STEP](step/power_board_stand.step)) | 1 | 방열판 뒤에서 5 V 컨버터와 분압기 만능기판을 고정해요. 바닥을 아래로. |
-| [pcb_spacer](stl/pcb_spacer.stl) ([STEP](step/pcb_spacer.step)) | 4 | L298N 아래의 2.4 mm 절연 스페이서 |
-| [pcb_washer](stl/pcb_washer.stl) ([STEP](step/pcb_washer.step)) | 8 | 0.8 mm 절연 와셔: L298N용 4개, 속도 센서용 4개 |
-| [phone_mount_bottom](stl/phone_mount_bottom.stl) ([STEP](step/phone_mount_bottom.step)) | 1 | 휴대폰 거치대 받침; 발을 바닥에 두고 세워서 출력, 서포트 없음 |
-| [phone_mount_top](stl/phone_mount_top.stl) ([STEP](step/phone_mount_top.step)) | 1 | 슬라이드식 휴대폰 그립; 세워서 출력, 서포트 없음 |
-| [led_adapter](stl/led_adapter.stl) ([STEP](step/led_adapter.step)) | 4 | 패널 램프 어댑터: 앞쪽 2개, 뒤쪽 2개 |
-| [encoder_disk](stl/encoder_disk.stl) ([STEP](step/encoder_disk.step)) | 4 | 선택 사항; **불투명** 필라멘트로 출력하거나 맞는 기성품 디스크를 사용하세요. 평평하게 출력해요. |
+| [bottom_cover](cad/stl/bottom_cover.stl) ([STEP](cad/step/bottom_cover.step)) | 1 | 섀시; 바닥을 아래로, 서포트 없음 |
+| [top_cover](cad/stl/top_cover.stl) ([STEP](cad/step/top_cover.step)) | 1 | 케이블 구멍 두 개가 있는 스터드 덮개; 평평한 아랫면을 아래로, 스터드를 위로 |
+| [lid_plug](cad/stl/lid_plug.stl) ([STEP](cad/step/lid_plug.step)) | 2 | 덮개 구멍을 막고 스터드 두 개를 복원해요. 스터드를 위로. |
+| [lid_grommet](cad/stl/lid_grommet.stl) ([STEP](cad/step/lid_grommet.step)) | 1 *(선택)* | 케이블이 지나가는 곳에서 플러그 대신 사용해요. 스터드를 위로. |
+| [esp32_carrier](cad/stl/esp32_carrier.stl) ([STEP](cad/step/esp32_carrier.step)) | 1 | ESP32 지지 프레임; 평평한 바닥을 아래로 |
+| [esp32_retainer](cad/stl/esp32_retainer.stl) ([STEP](cad/step/esp32_retainer.step)) | 4 | ESP32 모서리 고정 탭; 어느 탭이든 어느 모서리에나 맞아요. 평평한 면을 아래로, 돌기를 위로. |
+| [sensor_support](cad/stl/sensor_support.stl) ([STEP](cad/step/sensor_support.step)) | 4 | 속도 센서 지지대; 어느 지지대든 어느 바퀴에나 맞아요 |
+| [ultrasonic_clip_left](cad/stl/ultrasonic_clip_left.stl) ([STEP](cad/step/ultrasonic_clip_left.step)) | 1 | HC-SR04 보드의 위쪽 **왼쪽** 모서리 |
+| [ultrasonic_clip_right](cad/stl/ultrasonic_clip_right.stl) ([STEP](cad/step/ultrasonic_clip_right.step)) | 1 | HC-SR04 보드의 위쪽 **오른쪽** 모서리 |
+| [power_board_stand](cad/stl/power_board_stand.stl) ([STEP](cad/step/power_board_stand.step)) | 1 | 방열판 뒤에서 5 V 컨버터와 분압기 만능기판을 고정해요. 바닥을 아래로. |
+| [pcb_spacer](cad/stl/pcb_spacer.stl) ([STEP](cad/step/pcb_spacer.step)) | 4 | L298N 아래의 2.4 mm 절연 스페이서 |
+| [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | 0.8 mm 절연 와셔: L298N용 4개, 속도 센서용 4개 |
+| [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | 휴대폰 거치대 받침; 발을 바닥에 두고 세워서 출력, 서포트 없음 |
+| [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | 슬라이드식 휴대폰 그립; 세워서 출력, 서포트 없음 |
+| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | 패널 램프 어댑터: 앞쪽 2개, 뒤쪽 2개 |
+| [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | 선택 사항; **불투명** 필라멘트로 출력하거나 맞는 기성품 디스크를 사용하세요. 평평하게 출력해요. |
 
 ESP32 고정 탭 4개는 모두 같고, 센서 지지대 4개도 모두 같아서 어느 부품이든 어느 위치에나 맞아요. 초음파 클립은 좌우 대칭 한 쌍이에요. 넓은 뒷면을 바닥에 눕혀서 출력하세요. 배터리용 부품은 [배터리 옵션](#배터리-옵션)에 정리되어 있어요.
 
 ## 출력
 
-Bambu Studio에서 **[esp32_body_A1_mini.3mf](esp32_body_A1_mini.3mf)**를 여세요. 출력판 1과 2에는 모든 기본 부품이 필요한 수량만큼 배치되어 있어요. 출력판 3–5에는 배터리 옵션이 하나씩 들어 있어요. 선택한 옵션의 출력판만 출력하세요.
+모든 부품의 STL과 STEP 파일은 [cad/stl](cad/stl)과 [cad/step](cad/step)에 있고, 이미 출력 방향으로 배치되어 있으며 단위는 밀리미터예요. 100 % 배율로 출력하세요.
+
+Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세요. 출력판 1과 2에는 모든 기본 부품이 필요한 수량만큼 배치되어 있어요. 출력판 3–5에는 배터리 옵션이 하나씩 들어 있어요. 선택한 옵션의 출력판만 출력하세요.
 
 | 출력판 | 내용 | 시간* | 필라멘트* |
 |---|---|---:|---:|
@@ -104,21 +95,21 @@ Bambu Studio에서 **[esp32_body_A1_mini.3mf](esp32_body_A1_mini.3mf)**를 여�
 | 배터리 | 2셀 직렬 홀더에 18650 2개 (약 77 × 41 × 20 mm) | 3셀 직렬 홀더에 18650 3개 (약 76 × 62 × 20 mm) | 2S 또는 3S LiPo, **최대 75 × 31 × 20 mm** (예: 3S 450–650 mAh, 2S 1000–1300 mAh) |
 | 전압 | 완충 8.4 V, 공칭 7.4 V | 완충 12.6 V, 공칭 11.1 V | 완충 8.4 V 또는 12.6 V |
 | 에너지 | 약 21 Wh (2 × 2800 mAh) | 약 31 Wh (3 × 2800 mAh) | 약 5–10 Wh |
-| 출력 부품 | [battery_box_2s](stl/battery_box_2s.stl) + [커버](stl/battery_box_2s_cover.stl), [lid_grommet](stl/lid_grommet.stl) 1개 | [battery_box_3s](stl/battery_box_3s.stl) + [커버](stl/battery_box_3s_cover.stl), [lid_grommet](stl/lid_grommet.stl) 1개 | [lipo_tray](stl/lipo_tray.stl) |
+| 출력 부품 | [battery_box_2s](cad/stl/battery_box_2s.stl) + [커버](cad/stl/battery_box_2s_cover.stl), [lid_grommet](cad/stl/lid_grommet.stl) 1개 | [battery_box_3s](cad/stl/battery_box_3s.stl) + [커버](cad/stl/battery_box_3s_cover.stl), [lid_grommet](cad/stl/lid_grommet.stl) 1개 | [lipo_tray](cad/stl/lipo_tray.stl) |
 | 충전기 | 슬롯이 독립된 리튬이온 충전기 | 슬롯이 독립된 리튬이온 충전기 | LiPo **밸런스** 충전기 |
 | 참고 | TT 모터에 가장 잘 맞아요: L298N의 전압 강하 후 약 6.4 V가 모터에 걸려요. | 3–6 V TT 모터에는 과전압이에요 (L298N 이후 약 10.6 V). 더 높은 전압용 모터를 쓰거나 속도를 제한하세요. | 용량이 가장 작아요. 배터리가 보이지 않고 보호돼요. |
 
 세 가지 모두 펌웨어의 30 k / 10 k 배터리 분압기를 그대로 사용해요. 펌웨어의 전압 한계값만 바뀌어요 ([6단계](#6-펌웨어-설정과-벤치-테스트) 참고).
 
-![덮개 위의 2S 배터리 박스](../../../../docs/images/esp32_body/battery_box_2s.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/battery_box_2s.jpg" alt="덮개 위의 2S 배터리 박스" width="32%" />
+  <img src="../../docs/images/compact/battery_box_3s.jpg" alt="덮개 위의 3S 배터리 박스" width="32%" />
+  <img src="../../docs/images/compact/battery_lipo_tray.jpg" alt="LiPo 트레이" width="32%" />
+</p>
 
-**A와 B – 덮개 위의 배터리 박스.** 박스는 휴대폰 거치대 뒤에서 레고 블록처럼 덮개의 스터드에 끼워져요. 박스 바닥에는 배터리 전선을 덮개 뒤쪽 구멍으로 내려보내는 홈이 있어요. 홀더의 전선이 홈이 있는 쪽 끝으로 오도록 박스에 넣으세요. 전선을 바닥 구멍과 [lid_grommet](stl/lid_grommet.stl)을 통해 섀시 안으로 넣은 다음, 스터드 커버를 네 개의 핀에 눌러 끼우세요. 커버에도 스터드가 있어서 위에 레고 블록을 계속 끼울 수 있어요. 박스는 모서리의 덮개 나사와 겹치지 않아요. 3S 박스는 덮개 안쪽에 완전히 들어가고, 뒤쪽 가장자리와 14 mm 떨어져 있어요. 박스를 설치해도 덮개 나사 네 개에 모두 손이 닿아요.
-
-![덮개 위의 3S 배터리 박스](../../../../docs/images/esp32_body/battery_box_3s.jpg)
+**A와 B – 덮개 위의 배터리 박스.** 박스는 휴대폰 거치대 뒤에서 레고 블록처럼 덮개의 스터드에 끼워져요. 박스 바닥에는 배터리 전선을 덮개 뒤쪽 구멍으로 내려보내는 홈이 있어요. 홀더의 전선이 홈이 있는 쪽 끝으로 오도록 박스에 넣으세요. 전선을 바닥 구멍과 [lid_grommet](cad/stl/lid_grommet.stl)을 통해 섀시 안으로 넣은 다음, 스터드 커버를 네 개의 핀에 눌러 끼우세요. 커버에도 스터드가 있어서 위에 레고 블록을 계속 끼울 수 있어요. 박스는 모서리의 덮개 나사와 겹치지 않아요. 3S 박스는 덮개 안쪽에 완전히 들어가고, 뒤쪽 가장자리와 14 mm 떨어져 있어요. 박스를 설치해도 덮개 나사 네 개에 모두 손이 닿아요.
 
 **C – 내부 LiPo 트레이.** 트레이는 모터 사이의 빈 공간에 다리 두 개로 서고, L298N과 ESP32 고정 탭 나사 바로 위에 놓여요. 배터리 자체의 높이와 닫힌 덮개가 트레이를 눌러 고정해요. 20 mm 벨크로 스트랩을 슬롯 네 개에 끼워 배터리를 트레이에 고정하세요. 배터리 두께가 18 mm보다 얇으면 덜컹거리지 않도록 위에 폼 패드를 올리세요. L298N 배선을 먼저 모두 끝내세요. 트레이가 단자를 가리지만, 위로 곧게 들어 올리면 빠져요.
-
-![LiPo 트레이](../../../../docs/images/esp32_body/battery_lipo_tray.jpg)
 
 > **리튬 배터리 안전.** 신뢰할 수 있는 판매처의 셀을 사용하세요. 18650 팩은 보호 회로 (BMS)로 보호하세요. 펌웨어도 배터리도 방전 시 전원을 끊지 않으므로 LiPo에는 전압 경보기를 꽂으세요. 배터리 가까이에 퓨즈를 다세요. LiPo는 반드시 밸런스 충전기로, 불연성 표면 위에서, 지켜보는 상태에서만 충전하세요. 부풀었거나 손상된 배터리는 사용하지 마세요.
 
@@ -180,11 +171,15 @@ Bambu Studio에서 **[esp32_body_A1_mini.3mf](esp32_body_A1_mini.3mf)**를 여�
 
 ## 조립
 
-![분해도](../../../../docs/images/esp32_body/exploded.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/exploded.jpg" alt="분해도" width="45%" />
+</p>
 
 ### 1. 인서트와 덮개 너트 설치하기
 
-![빈 셸](../../../../docs/images/esp32_body/step_01_shell.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_01_shell.jpg" alt="빈 셸" width="40%" />
+</p>
 
 4.0 mm 가이드 구멍에 표준 M3 × 5.7 mm 열압입 인서트 (예: ruthex RX-M3x5.7, 외경 4.6 mm)를 사용하세요. 온도 조절 인두와 인서트 팁으로 각 인서트를 똑바로, 표면과 같은 높이까지 눌러 넣으세요. 나사를 끼우기 전에 식히세요.
 
@@ -201,7 +196,10 @@ Bambu Studio에서 **[esp32_body_A1_mini.3mf](esp32_body_A1_mini.3mf)**를 여�
 
 ### 2. 모터와 속도 센서 설치하기
 
-![모터 설치](../../../../docs/images/esp32_body/step_02_motors.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_02_motors.jpg" alt="모터 설치" width="49%" />
+  <img src="../../docs/images/compact/step_03_sensors.jpg" alt="센서 설치" width="49%" />
+</p>
 
 바퀴 샤프트가 옆 구멍으로 나오고 전선이 가운데를 향하도록 TT 모터 네 개를 넣으세요. 각 모터를 M3 × 25 mm 나사 두 개와 너트로 고정하세요. 나사가 기어박스 내부에 닿지 않는지 확인하세요. 벤치 테스트를 마칠 때까지 **바퀴는 끼우지 마세요**.
 
@@ -209,11 +207,11 @@ Bambu Studio에서 **[esp32_body_A1_mini.3mf](esp32_body_A1_mini.3mf)**를 여�
 
 각 샤프트를 손으로 돌려 보세요. 디스크가 광학 슬롯을 스치지 않고 지나가야 하고, 센서 다리가 디스크에 닿으면 안 돼요.
 
-![센서 설치](../../../../docs/images/esp32_body/step_03_sensors.jpg)
-
 ### 3. 초음파 센서와 전면 부품 고정하기
 
-![초음파 센서 고정](../../../../docs/images/esp32_body/ultrasonic_retention.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/ultrasonic_retention.jpg" alt="초음파 센서 고정" width="40%" />
+</p>
 
 두 트랜스듀서가 원형 구멍으로 나오도록 HC-SR04를 앞쪽 홈에 넣으세요. 홈이 보드의 위치를 잡아 주고, 클립 두 개가 안쪽에서 보드 윗부분을 잡아서 섀시 안으로 떨어지지 않게 해요.
 
@@ -233,11 +231,15 @@ L298N 보스에 출력한 2.4 mm 스페이서 네 개를 올리고 드라이버�
 
 **전원 보드 스탠드.** 5 V 컨버터는 스탠드 앞면에, 분압기 만능기판은 뒷면에 각각 케이블 타이 두 개를 슬롯에 끼워 묶으세요. 스탠드는 L298N 방열판 뒤, 뒤쪽 속도 센서 두 개 사이, 스위치 앞의 바닥에 놓여요. 닫힌 덮개가 스탠드를 눌러 주므로 나사가 필요 없어요.
 
-![전자 부품 설치](../../../../docs/images/esp32_body/step_04_electronics.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_04_electronics.jpg" alt="전자 부품 설치" width="40%" />
+</p>
 
 ### 5. 전원과 신호 배선하기
 
-![배선도](../../../../docs/images/esp32_body/wiring_diagram.png)
+<p align="center">
+  <img src="../../docs/images/compact/wiring_diagram.png" alt="배선도" width="80%" />
+</p>
 
 ESP32에 인쇄된 GPIO 번호를 사용하세요. 모든 GND는 서로 연결되어야 해요. 배선이 기어, 엔코더 디스크, 나사 끝, 덮개 이음매에 닿지 않게 하고, 진동에 대비해 묶어 두세요.
 
@@ -266,7 +268,7 @@ ESP32에 인쇄된 GPIO 번호를 사용하세요. 모든 GND는 서로 연결�
 
 ### 6. 펌웨어 설정과 벤치 테스트
 
-[펌웨어 폴더](../../../../firmware/README.ko-KR.md)에서 펌웨어를 받아 `firmware/openbot/openbot.ino`를 여세요.
+[펌웨어 폴더](../../firmware/README.ko-KR.md)에서 펌웨어를 받아 `firmware/openbot/openbot.ino`를 여세요.
 
 1. 로봇 종류를 설정하고 휴대폰 모드는 켜 두세요:
 
@@ -321,7 +323,11 @@ GPIO 2, 5, 12, 15는 부트 스트래핑 핀이에요. 모두 연결한 상태�
 
 ### 7. 배터리, 휴대폰 거치대, 덮개 설치하기
 
-![휴대폰 거치대](../../../../docs/images/esp32_body/step_06_phone_lid.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/step_06_phone_lid.jpg" alt="휴대폰 거치대" width="32%" />
+  <img src="../../docs/images/compact/lid_opening.jpg" alt="플러그와 그로밋을 끼운 덮개 구멍" width="32%" />
+  <img src="../../docs/images/compact/step_07_closed.jpg" alt="닫힌 몸체" width="32%" />
+</p>
 
 거치대 받침의 포켓에 M3 너트 두 개를 눌러 넣으세요. 받침을 덮개 앞쪽 패드에 아래에서 M3 × 25 mm 나사 두 개로 고정하세요. 슬라이드 그립을 끼우고 고무줄이나 스프링으로 장력을 주세요. 케이스를 낀 휴대폰을 끼워서 단단히 고정되는지, 카메라 시야가 가려지지 않는지, 버튼이 눌리지 않는지 확인하세요.
 
@@ -330,17 +336,15 @@ GPIO 2, 5, 12, 15는 부트 스트래핑 핀이에요. 모두 연결한 상태�
 - **휴대폰 유선 연결:** 90° USB 케이블을 ESP32에서 앞쪽 구멍을 통해 위로 휴대폰까지 연결하세요. 휴대폰과 5 V 컨버터가 서로 전원을 공급하지 않도록 중간에 USB 전원 차단기를 넣으세요. 앱에서 Bluetooth 대신 **USB**를 선택하세요.
 - **배터리 박스 (옵션 A와 B):** 배터리 전선이 뒤쪽 구멍으로 내려와요.
 
-![플러그와 그로밋을 끼운 덮개 구멍](../../../../docs/images/esp32_body/lid_opening.jpg)
-
 옵션 C를 쓴다면 지금 LiPo 트레이를 넣으세요. 전선을 가장자리에서 치우고 덮개를 섀시 위에 평평하게 올린 다음, M3 × 10 mm 나사 네 개 (와셔 없이)를 모서리 너트에 끼우세요. 닿을 때까지 고르게 조이세요. 덮개가 들리거나 거치대가 흔들리면 안 돼요. 옵션 A와 B는 휴대폰 거치대 뒤의 스터드에 배터리 박스를 눌러 끼우세요.
-
-![닫힌 몸체](../../../../docs/images/esp32_body/step_07_closed.jpg)
 
 바퀴는 벤치 테스트를 통과한 뒤에만 끼우세요. 처음에는 넓고 평평한 바닥에서 천천히 달린 다음, 모든 나사와 휴대폰 그립을 다시 확인하세요. 로봇을 들 때는 덮개, 휴대폰 거치대, 배터리 박스가 아니라 섀시를 잡으세요.
 
 ## 드라이버 통합형 대체 PCB
 
-![대체 PCB 자리](../../../../docs/images/esp32_body/pcb_option.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/pcb_option.jpg" alt="대체 PCB 자리" width="40%" />
+</p>
 
 섀시에는 OpenBot **PCB V2** (Arduino Nano + DRV8871 드라이버)도 장착할 수 있어요. 장착 구멍 배치는 121.031 × 28.448 mm예요. 이것은 다른 전기 구성이며, ESP32를 그대로 대체하는 보드가 **아니에요**. Nano 배선과 함께 `PCB_V2` 펌웨어로 동작해요.
 
@@ -349,7 +353,7 @@ GPIO 2, 5, 12, 15는 부트 스트래핑 핀이에요. 모두 연결한 상태�
 - 보드는 출력한 2.4 mm 스페이서 네 개 위에 올리고, 각 구멍에 출력한 와셔 하나와 M3 × 10 mm 나사 하나를 쓰세요.
 - 하드웨어 합계: **M3 × 10 10개** (덮개 4, PCB 4, 클립 2), **M3 × 25 14개**, 너트 14개.
 
-[PCB V2 제조 파일과 부품 목록](../../pcb/v2)으로 보드를 주문하세요. 예를 들어 [JLCPCB](https://jlcpcb.com/)나 [PCBWay](https://www.pcbway.com/)를 이용할 수 있어요. 고정하기 전에 실장된 부품의 높이와 납땜 부위의 여유 공간을 확인하세요. 위의 배터리 옵션은 이 보드에서도 똑같이 쓸 수 있어요.
+[PCB V2 제조 파일과 부품 목록](../diy/pcb/v2)으로 보드를 주문하세요. 예를 들어 [JLCPCB](https://jlcpcb.com/)나 [PCBWay](https://www.pcbway.com/)를 이용할 수 있어요. 고정하기 전에 실장된 부품의 높이와 납땜 부위의 여유 공간을 확인하세요. 위의 배터리 옵션은 이 보드에서도 똑같이 쓸 수 있어요.
 
 ## 문제 해결
 
@@ -368,12 +372,19 @@ GPIO 2, 5, 12, 15는 부트 스트래핑 핀이에요. 모두 연결한 상태�
 
 ## 보기
 
-| 앞 | 뒤 |
-|---|---|
-| ![앞에서 본 모습](../../../../docs/images/esp32_body/teaser_front.jpg) | ![뒤에서 본 모습](../../../../docs/images/esp32_body/teaser_rear.jpg) |
-| **위** | **아래** |
-| ![위에서 본 모습](../../../../docs/images/esp32_body/top_view.jpg) | ![아랫면](../../../../docs/images/esp32_body/underside.jpg) |
+<p align="center">
+  <img src="../../docs/images/compact/teaser_front.jpg" alt="앞에서 본 모습" width="32%" />
+  <img src="../../docs/images/compact/teaser_rear.jpg" alt="뒤에서 본 모습" width="32%" />
+  <img src="../../docs/images/compact/interior.jpg" alt="내부" width="32%" />
+</p>
 
-![내부](../../../../docs/images/esp32_body/interior.jpg)
+<p align="center">
+  <img src="../../docs/images/compact/top_view.jpg" alt="위에서 본 모습" width="32%" />
+  <img src="../../docs/images/compact/underside.jpg" alt="아랫면" width="32%" />
+</p>
 
 렌더링에는 배선이 포함되어 있지 않아요. 보드, 배터리 홀더, LiPo 배터리는 단순화된 형태로 표시돼요.
+
+## 다음
+
+휴대폰에 [OpenBot Robot 앱](../../android/robot/README.ko-KR.md)을 설치하고 [6단계](#6-펌웨어-설정과-벤치-테스트)에 설명된 대로 로봇과 연결하세요.
