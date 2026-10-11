@@ -21,7 +21,7 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 | **Steuerung** | ESP32 DevKit V1 (30 Pins), OpenBot-Firmware `DIY_ESP32`; Verbindung zum Handy über Bluetooth oder USB-Kabel |
 | **Sensoren** | HC-SR04-Ultraschall (vorne), 4 × optische LM393-Radencoder, Akkuspannung |
 | **Stromversorgung** | Eine Option wählen: 2S- oder 3S-18650-Box auf dem Deckel oder ein kleiner LiPo-Akku im Inneren (siehe [Akku-Optionen](#akku-optionen)) |
-| **Befestigung** | Nur M3 × 10 und M3 × 25 Flachkopfschrauben, M3-Muttern und 16 Gewindeeinsätze |
+| **Befestigung** | Nur M3 × 10 und M3 × 25 Flachkopfschrauben, M3-Muttern und 16 Gewindeeinsätze (die optionale neigbare Handyhalterung braucht zusätzlich zwei M3 × 30) |
 | **Druck** | PLA, zwei A1-mini-Druckplatten, ≈ 11 h und ≈ 300 g, plus die Teile für die gewählte Akku-Option |
 
 > **Links und rechts** bedeuten in dieser Anleitung immer links und rechts **aus Sicht des Roboters**: Stellen Sie sich hinter den Roboter (Seite mit dem Schalter) und schauen Sie über den Deckel nach vorne zum Ultraschallsensor. Dieselbe Konvention verwendet die Firmware für die „linken“ und „rechten“ Motoren und Encoder.
@@ -57,6 +57,8 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 | [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | Isolierende 0,8-mm-Unterlegscheiben: 4 für den L298N, 4 für die Drehzahlsensoren |
 | [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | Basis der Handyhalterung; steht aufrecht auf ihrem Fuß, keine Stützen |
 | [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | Verschiebbarer Handygriff; steht aufrecht, keine Stützen |
+| [phone_mount_tilt_base](cad/stl/phone_mount_tilt_base.stl) ([STEP](cad/step/phone_mount_tilt_base.step)) | 1 *(optional)* | Neigbare Handyhalterung: Fuß mit zwei Scharnierwangen; ersetzt `phone_mount_bottom`. Steht aufrecht auf dem Fuß, keine Stützen |
+| [phone_mount_tilt_column](cad/stl/phone_mount_tilt_column.stl) ([STEP](cad/step/phone_mount_tilt_column.step)) | 1 *(optional)* | Neigbare Handyhalterung: Säule für den normalen Griff `phone_mount_top`. Steht aufrecht, keine Stützen |
 | [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Adapter für die Einbauleuchten: 2 vorne, 2 hinten |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optional; in **lichtundurchlässigem** Filament drucken oder passende gekaufte Scheiben verwenden. Wird flach gedruckt. |
 
@@ -66,7 +68,7 @@ Die vier ESP32-Halter sind identisch, ebenso die vier Sensorhalter, daher passt 
 
 STL- und STEP-Dateien für alle Teile liegen in [cad/stl](cad/stl) und [cad/step](cad/step), bereits in Druckausrichtung und in Millimetern; mit 100 % Skalierung drucken.
 
-Öffnen Sie **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Die Druckplatten 1 und 2 enthalten alle Standardteile in der benötigten Anzahl. Die Druckplatten 3–5 enthalten jeweils eine Akku-Option; drucken Sie nur die gewählte.
+Öffnen Sie **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Die Druckplatten 1 und 2 enthalten alle Standardteile in der benötigten Anzahl. Die Druckplatten 3–5 enthalten jeweils eine Akku-Option; drucken Sie nur die gewählte. Druckplatte 6 enthält die optionale neigbare Handyhalterung mit eigenem Griff.
 
 | Druckplatte | Inhalt | Zeit* | Filament* |
 |---|---|---:|---:|
@@ -75,8 +77,9 @@ STL- und STEP-Dateien für alle Teile liegen in [cad/stl](cad/stl) und [cad/step
 | 3 – Akku A (2S-Box) | 2S-Akkubox, ihr Deckel, Kabeldurchführung für den Deckel | ≈ 1 h 40 min | ≈ 42 g |
 | 4 – Akku B (3S-Box) | 3S-Akkubox, ihr Deckel, Kabeldurchführung für den Deckel | ≈ 2 h 20 min | ≈ 58 g |
 | 5 – Akku C (LiPo-Halter) | LiPo-Halter | ≈ 15 min | ≈ 5 g |
+| 6 – Neigbare Handyhalterung (optional) | Neigefuß, Neigesäule, Handygriff | ≈ 2 h 20 min | ≈ 57 g |
 
-\*Schätzwerte mit Generic PLA; Druckplatten 3–5 aus dem Teilevolumen hochgerechnet. Ihre Zeiten werden abweichen. Klicken Sie vor dem Druck für jede Druckplatte auf **Slice plate**.
+\*Schätzwerte mit Generic PLA; Druckplatten 3–6 aus dem Teilevolumen hochgerechnet. Ihre Zeiten werden abweichen. Klicken Sie vor dem Druck für jede Druckplatte auf **Slice plate**.
 
 Profil: 0,4-mm-Düse, 0,20-mm-Schichten, 4 Wände, 5 obere und 5 untere Schichten, 30 % Gyroid-Füllung, texturierte PEI-Platte. **Kein Teil braucht Stützen.** Die Wandlöcher im Chassis sind rund und höchstens 20 mm groß, und die Mutterntaschen überbrücken etwa 8 mm. Die beiden Teile der Handyhalterung werden stehend gedruckt. Stützen sind im Projekt ausgeschaltet; wenn Sie ein Teil aus dem STL-Ordner hinzufügen, lassen Sie sie ebenfalls aus. Wählen Sie vor dem Druck das tatsächlich geladene PLA und prüfen Sie die Schichtvorschau.
 
@@ -115,7 +118,7 @@ Alle drei behalten den 30-k/10-k-Spannungsteiler der Firmware bei. Nur die Spann
 
 ## Zu kaufende Hardware und Elektronik
 
-**Es werden nur zwei Schraubenlängen benötigt: M3 × 10 mm und M3 × 25 mm**, beide mit Flachkopf und etwa 5,5 mm Kopfdurchmesser (keine Senkköpfe). Die Unterlegscheiben für die Platinen werden gedruckt. Legen Sie unter die Schrauben von Deckel, Träger und ESP32-Haltern keine Scheiben, denn deren Längen setzen voraus, dass der Kopf direkt auf dem Kunststoff aufliegt.
+**Es werden nur zwei Schraubenlängen benötigt: M3 × 10 mm und M3 × 25 mm**, beide mit Flachkopf und etwa 5,5 mm Kopfdurchmesser (keine Senkköpfe). Die Unterlegscheiben für die Platinen werden gedruckt. Legen Sie unter die Schrauben von Deckel, Träger und ESP32-Haltern keine Scheiben, denn deren Längen setzen voraus, dass der Kopf direkt auf dem Kunststoff aufliegt. Die optionale neigbare Handyhalterung braucht zusätzlich zwei M3 × 30 mm Schrauben.
 
 Die Links unten führen zu einem Händler oder einer Amazon-US-Suche. Prüfen Sie vor der Bestellung die angegebenen Maße und Kennwerte, denn Platinen mit demselben Namen können unterschiedliche Lochbilder haben.
 
@@ -126,7 +129,8 @@ Die Links unten führen zu einem Händler oder einer Amazon-US-Suche. Prüfen Si
 | 16 (+ Reserve) | M3 × 5,7 mm Messing-Gewindeeinsätze zum Einschmelzen, gängige Größe mit 4,6 mm Außendurchmesser (z. B. ruthex RX-M3x5.7) | 12 im Chassis, 4 im ESP32-Träger | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
 | 16 | M3 × 10 mm Flachkopfschrauben | 4 Deckel, 2 Träger, 4 ESP32-Halter, 4 L298N, 2 Ultraschall-Clips | [Suche](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
 | 14 | M3 × 25 mm Flachkopfschrauben | 8 Motoren, 4 Drehzahlsensoren, 2 Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
-| 14 | M3-Sechskantmuttern, 5,5 mm Schlüsselweite, ≈ 2,4 mm dick | 4 Deckel, 8 Motoren, 2 Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
+| 2 | M3 × 30 mm Flachkopfschrauben *(nur neigbare Handyhalterung)* | Drehachse und Arretierschraube der neigbaren Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+x+30+pan+head+screws+ISO+7045) |
+| 14 (+1) | M3-Sechskantmuttern, 5,5 mm Schlüsselweite, ≈ 2,4 mm dick | 4 Deckel, 8 Motoren, 2 Handyhalterung, +1 für die Drehachse der neigbaren Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
 | 4 | Kleine Kabelbinder (≤ 3 mm breit) | 5-V-Wandler und Lochrasterplatine am Ständer für die Stromplatinen | [Suche](https://www.amazon.com/s?k=small+cable+ties+2.5mm) |
 | ≈ 350 g | 1,75-mm-PLA | alle gedruckten Teile | [Suche](https://www.amazon.com/s?k=PLA+filament+1.75mm) |
 
@@ -330,6 +334,20 @@ Installieren Sie die Android-App **OpenBot Robot**. Wählen Sie **Bluetooth**, e
 </p>
 
 Drücken Sie zwei M3-Muttern in die Taschen der Halterungsbasis. Schrauben Sie die Basis mit zwei M3 × 25 mm Schrauben von unten an die vordere Fläche des Deckels. Setzen Sie den verschiebbaren Griff ein und spannen Sie ihn mit einem Gummiband oder einer Feder. Prüfen Sie mit dem Handy in seiner Hülle, dass es fest gehalten wird, die Kamera freie Sicht hat und keine Tasten gedrückt werden.
+
+**Neigbare Handyhalterung (optional).** Damit die Kamera nach oben zeigt, etwa auf eine Person vor dem Roboter, verwenden Sie `phone_mount_tilt_base` und `phone_mount_tilt_column` statt `phone_mount_bottom`. Griff und Gummiband bleiben gleich.
+
+<p align="center">
+  <img src="../../docs/images/compact/phone_tilt_hinge.jpg" alt="Scharnier der neigbaren Handyhalterung" width="32%" />
+  <img src="../../docs/images/compact/phone_tilt_angles.jpg" alt="Neigbare Handyhalterung bei 0, 10, 20 und 30 Grad" width="64%" />
+</p>
+
+1. Drücken Sie zwei M3-Muttern in den Fuß und schrauben Sie ihn wie die normale Basis mit zwei M3 × 25 mm Schrauben von unten an die Fläche des Deckels.
+2. Drücken Sie eine M3-Mutter in die Sechskanttasche einer Wange. Setzen Sie die Säule zwischen die Wangen und stecken Sie eine M3 × 30 mm Schraube von der anderen Seite durch das hintere Loch in diese Mutter. Ziehen Sie sie an, bis sich die Säule ohne Spiel drehen lässt.
+3. Neigen Sie die Säule nach hinten, bis eines ihrer beiden Löcher mit einem Loch der Wange fluchtet. Das vordere Lochpaar ergibt 0° (unten) und 20° (oben), das hintere 10° (unten) und 30° (oben).
+4. Drehen Sie die zweite M3 × 30 mm Schraube von derselben Seite wie die Achsschraube durch dieses Loch. Die Löcher in der gegenüberliegenden Wange sind kleiner; die Schraube schneidet dort ihr Gewinde selbst und braucht keine Mutter.
+
+Das Handy sitzt 10,5 mm höher als auf der normalen Halterung. Auch bei 30° bleibt etwa 15 mm Abstand zum Akkukasten.
 
 **Deckelöffnungen.** Der Deckel hat zwei Öffnungen von 1 × 2 Noppen, eine vor und eine hinter der Handyfläche. Setzen Sie den Deckel so auf, dass die Handyfläche zum Ultraschallsensor vorne zeigt. Die Fläche liegt 16 mm vor der Deckelmitte; die hintere Noppenfläche trägt die Akkubox. Drücken Sie in jede ungenutzte Öffnung einen `lid_plug`; er ergänzt die Noppen, und eine 1 mm breite Kante unten in der Öffnung verhindert, dass er durchfällt. Wo ein Kabel durchgeht, verwenden Sie stattdessen die `lid_grommet`:
 
