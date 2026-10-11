@@ -378,10 +378,6 @@ Bestellen Sie die Platine mit den [Fertigungsdateien und der Stückliste der PCB
 | **Oben** | **Unten** |
 | ![Ansicht von oben](../../docs/images/compact/top_view.jpg) | ![Unterseite](../../docs/images/compact/underside.jpg) |
 
-<p align="center">
-  <img src="../../docs/images/compact/interior.jpg" alt="Innenraum" width="49%" />
-</p>
-
 Die Renderings zeigen keine Verkabelung. Platinen, Akkuhalter und der LiPo-Akku sind als vereinfachte Formen dargestellt.
 
 ## Weiter
