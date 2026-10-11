@@ -331,7 +331,7 @@ Install the **OpenBot Robot** Android app. Choose **Bluetooth**, grant the permi
 
 Press two M3 nuts into the pockets in the holder base. Screw the base to the forward pad of the lid with two M3 × 25 mm screws from underneath. Fit the sliding grip and tension it with a rubber band or spring. With the phone in its case, check that it is held firmly, the camera has a clear view and no buttons are pressed.
 
-**Lid openings.** The lid has two 1 × 2-stud openings, one in front of and one behind the phone pad. Fit the lid with the phone pad toward the ultrasonic sensor at the front. The pad is 16 mm forward of the lid centre; the rear stud area carries the battery box. Press a `lid_plug` into each unused opening; it restores the studs. Where a cable passes, use the `lid_grommet` instead:
+**Lid openings.** The lid has two 1 × 2-stud openings, one in front of and one behind the phone pad. Fit the lid with the phone pad toward the ultrasonic sensor at the front. The pad is 16 mm forward of the lid centre; the rear stud area carries the battery box. Press a `lid_plug` into each unused opening; it restores the studs, and a 1 mm ledge at the bottom of the opening stops it from falling through. Where a cable passes, use the `lid_grommet` instead:
 
 - **Wired phone link:** route a 90° USB cable from the ESP32 up through the front opening to the phone. Put a USB power blocker in the line so the phone and the 5 V converter don't feed each other. In the app, choose **USB** instead of Bluetooth.
 - **Battery box (options A and B):** the battery wires come down through the rear opening.
