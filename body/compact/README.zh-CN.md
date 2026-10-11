@@ -21,7 +21,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | **控制器** | ESP32 DevKit V1（30 针），OpenBot 固件 `DIY_ESP32`；通过蓝牙或 USB 线连接手机 |
 | **传感器** | HC-SR04 超声波（前方），4 个 LM393 光电车轮编码器，电池电压 |
 | **供电** | 三选一：顶盖上的 2S 或 3S 18650 电池盒，或车内的小型 LiPo 电池（见[电池方案](#电池方案)） |
-| **紧固件** | 只用 M3 × 10 和 M3 × 25 盘头螺丝、M3 螺母和 16 个热熔螺母 |
+| **紧固件** | 只用 M3 × 10 和 M3 × 25 盘头螺丝、M3 螺母和 16 个热熔螺母（可选的可倾斜手机支架另需两颗 M3 × 30） |
 | **打印** | PLA，两块 A1 mini 打印板，约 11 小时、约 300 g，另加所选电池方案的零件 |
 
 > 本指南中的**左和右**始终指**机器人自身**的左和右：站在机器人后方（开关一侧），越过顶盖向前看向超声波传感器。固件对“左”“右”电机和编码器也使用同样的约定。
@@ -57,6 +57,8 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | 0.8 mm 绝缘垫圈：4 个用于 L298N，4 个用于测速传感器 |
 | [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | 手机支架底座；立在其底脚上打印，无需支撑 |
 | [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | 滑动式手机夹；竖立打印，无需支撑 |
+| [phone_mount_tilt_base](cad/stl/phone_mount_tilt_base.stl) ([STEP](cad/step/phone_mount_tilt_base.step)) | 1 *(可选)* | 可倾斜手机支架：带两片铰链侧板的底座，替代 `phone_mount_bottom`。底座朝下竖立打印，无需支撑 |
+| [phone_mount_tilt_column](cad/stl/phone_mount_tilt_column.stl) ([STEP](cad/step/phone_mount_tilt_column.step)) | 1 *(可选)* | 可倾斜手机支架：立柱，配合标准的 `phone_mount_top` 手机夹。竖立打印，无需支撑 |
 | [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | 面板指示灯适配件：前 2 个，后 2 个 |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | 可选；用**不透光**耗材打印，或使用匹配的成品码盘。平放打印。 |
 
@@ -66,7 +68,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 
 所有零件的 STL 和 STEP 文件位于 [cad/stl](cad/stl) 和 [cad/step](cad/step)，已按打印方向摆放，单位为毫米；请按 100 % 比例打印。
 
-在 Bambu Studio 中打开 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**。打印板 1 和 2 包含所有标准零件及所需数量。打印板 3–5 各包含一种电池方案；只打印你选择的那一块。
+在 Bambu Studio 中打开 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**。打印板 1 和 2 包含所有标准零件及所需数量。打印板 3–5 各包含一种电池方案；只打印你选择的那一块。打印板 6 包含可选的可倾斜手机支架及其手机夹。
 
 | 打印板 | 内容 | 时间* | 耗材* |
 |---|---|---:|---:|
@@ -75,8 +77,9 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | 3 – 电池方案 A（2S 电池盒） | 2S 电池盒、盒盖、顶盖穿线圈 | 约 1 小时 40 分钟 | 约 42 g |
 | 4 – 电池方案 B（3S 电池盒） | 3S 电池盒、盒盖、顶盖穿线圈 | 约 2 小时 20 分钟 | 约 58 g |
 | 5 – 电池方案 C（LiPo 托盘） | LiPo 托盘 | 约 15 分钟 | 约 5 g |
+| 6 – 可倾斜手机支架（可选） | 倾斜底座、倾斜立柱、手机夹 | 约 2 小时 20 分钟 | 约 57 g |
 
-\*使用 Generic PLA 的估算值；打印板 3–5 按零件体积推算。实际时间会有所不同。打印前请对每块打印板点击 **Slice plate**。
+\*使用 Generic PLA 的估算值；打印板 3–6 按零件体积推算。实际时间会有所不同。打印前请对每块打印板点击 **Slice plate**。
 
 配置：0.4 mm 喷嘴，0.20 mm 层高，4 圈外壁，顶部 5 层、底部 5 层，30 % 螺旋二十四面体（gyroid）填充，纹理 PEI 打印板。**所有零件都不需要支撑。**底盘侧壁上的孔都是圆孔，最大 20 mm，螺母槽的桥接长度约 8 mm。手机支架的两个零件竖立打印。项目中已关闭支撑；如果从 STL 文件夹添加零件，也请保持关闭。打印前请选择实际装载的 PLA，并检查层预览。
 
@@ -115,7 +118,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 
 ## 需要购买的硬件和电子元件
 
-**只需要两种长度的螺丝：M3 × 10 mm 和 M3 × 25 mm**，都是头径约 5.5 mm 的盘头螺丝（不要沉头）。电路板用的垫圈是打印的。顶盖、托架和 ESP32 压片的螺丝下面不要加垫圈，因为它们的长度是按螺丝头直接压在塑料上计算的。
+**只需要两种长度的螺丝：M3 × 10 mm 和 M3 × 25 mm**，都是头径约 5.5 mm 的盘头螺丝（不要沉头）。电路板用的垫圈是打印的。顶盖、托架和 ESP32 压片的螺丝下面不要加垫圈，因为它们的长度是按螺丝头直接压在塑料上计算的。可选的可倾斜手机支架另需两颗 M3 × 30 mm 螺丝。
 
 以下链接指向供应商或 Amazon 美国站搜索。下单前请核对标注的尺寸和参数，因为同名电路板的孔位可能不同。
 
@@ -126,7 +129,8 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | 16（+ 备用） | M3 × 5.7 mm 黄铜热熔螺母，常见的 4.6 mm 外径规格（例如 ruthex RX-M3x5.7） | 底盘 12 个，ESP32 托架 4 个 | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
 | 16 | M3 × 10 mm 盘头螺丝 | 顶盖 4、托架 2、ESP32 压片 4、L298N 4、超声波卡扣 2 | [搜索](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
 | 14 | M3 × 25 mm 盘头螺丝 | 电机 8、测速传感器 4、手机支架 2 | [搜索](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
-| 14 | M3 六角螺母，对边 5.5 mm，厚约 2.4 mm | 顶盖 4、电机 8、手机支架 2 | [搜索](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
+| 2 | M3 × 30 mm 盘头螺丝 *（仅可倾斜手机支架）* | 可倾斜手机支架的转轴螺丝和锁定螺丝 | [搜索](https://www.amazon.com/s?k=M3+x+30+pan+head+screws+ISO+7045) |
+| 14 (+1) | M3 六角螺母，对边 5.5 mm，厚约 2.4 mm | 顶盖 4、电机 8、手机支架 2，另加 1 颗用于可倾斜手机支架的转轴 | [搜索](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
 | 4 | 小扎带（宽 ≤ 3 mm） | 在电源板支架上固定 5 V 转换器和洞洞板 | [搜索](https://www.amazon.com/s?k=small+cable+ties+2.5mm) |
 | 约 350 g | 1.75 mm PLA | 所有打印零件 | [搜索](https://www.amazon.com/s?k=PLA+filament+1.75mm) |
 
@@ -330,6 +334,20 @@ GPIO 2、5、12 和 15 是启动配置引脚。如果全部接好后电路板无
 </p>
 
 把两颗 M3 螺母压入支架底座的螺母槽。用两颗 M3 × 25 mm 螺丝从下方把底座固定到顶盖前部的平台上。装上滑动夹，用橡皮筋或弹簧拉紧。把带壳的手机放进去，检查是否夹牢、摄像头视野无遮挡、没有按到任何按键。
+
+**可倾斜手机支架（可选）。** 如果想让摄像头朝上，例如拍到站在机器人前面的人，就用 `phone_mount_tilt_base` 和 `phone_mount_tilt_column` 代替 `phone_mount_bottom`。手机夹和橡皮筋保持不变。
+
+<p align="center">
+  <img src="../../docs/images/compact/phone_tilt_hinge.jpg" alt="可倾斜手机支架的铰链" width="32%" />
+  <img src="../../docs/images/compact/phone_tilt_angles.jpg" alt="可倾斜手机支架处于 0°、10°、20° 和 30°" width="64%" />
+</p>
+
+1. 把两颗 M3 螺母压入底座，并像标准底座一样，用两颗 M3 × 25 mm 螺丝从下方固定到顶盖平台上。
+2. 把一颗 M3 螺母压入一侧侧板的六角槽。把立柱放到两片侧板之间，从另一侧将一颗 M3 × 30 mm 螺丝穿过后孔拧入这颗螺母。拧到立柱能转动且没有晃动为止。
+3. 把立柱向后倾斜，直到它的两个孔之一与侧板上的某个孔对齐。侧板前面一对孔对应 0°（下）和 20°（上），后面一对对应 10°（下）和 30°（上）。
+4. 从与转轴螺丝相同的一侧，把第二颗 M3 × 30 mm 螺丝穿过该孔拧入。另一侧侧板上的孔较小，螺丝会在那里自攻出螺纹，不需要螺母。
+
+手机比标准支架高 10.5 mm。在 30° 时，它与电池盒之间仍有约 15 mm 的间隙。
 
 **顶盖开口。** 顶盖有两个 1 × 2 凸点大小的开口，一个在手机平台前方，一个在后方。安装顶盖时，让手机平台朝向前方的超声波传感器。平台位于顶盖中心前方 16 mm 处；后部凸点区域用于放电池盒。在每个不用的开口中按入一个 `lid_plug`，它会补全凸点，开口底部 1 mm 宽的台阶可防止它掉下去。有线缆穿过的地方改用 `lid_grommet`：
 

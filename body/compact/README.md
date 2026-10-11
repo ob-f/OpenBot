@@ -21,7 +21,7 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 | **Controller** | ESP32 DevKit V1 (30-pin), OpenBot firmware `DIY_ESP32`; phone link by Bluetooth or USB cable |
 | **Sensors** | HC-SR04 ultrasonic (front), 4 × LM393 optical wheel encoders, battery voltage |
 | **Power** | Choose one: 2S or 3S 18650 box on the lid, or a small LiPo pack inside (see [Battery options](#battery-options)) |
-| **Fasteners** | Only M3 × 10 and M3 × 25 pan-head screws, M3 nuts and 16 heat-set inserts |
+| **Fasteners** | Only M3 × 10 and M3 × 25 pan-head screws, M3 nuts and 16 heat-set inserts (the optional tilting phone holder adds two M3 × 30) |
 | **Printing** | PLA, two A1 mini plates, ≈ 11 h and ≈ 300 g, plus the parts for your chosen battery option |
 
 > **Left and right** in this guide always mean the **robot's own** left and right: stand behind the robot (switch end) and look forward over the lid toward the ultrasonic sensor. This is the same convention the firmware uses for "left" and "right" motors and encoders.
@@ -57,6 +57,8 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 | [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | 0.8 mm insulating washers: 4 for the L298N, 4 for the speed sensors |
 | [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | Phone-holder base; stands upright on its foot, no supports |
 | [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | Sliding phone grip; stands upright, no supports |
+| [phone_mount_tilt_base](cad/stl/phone_mount_tilt_base.stl) ([STEP](cad/step/phone_mount_tilt_base.step)) | 1 *(optional)* | Tilting phone holder: foot with two hinge cheeks; replaces `phone_mount_bottom`. Stands upright on its foot, no supports |
+| [phone_mount_tilt_column](cad/stl/phone_mount_tilt_column.stl) ([STEP](cad/step/phone_mount_tilt_column.step)) | 1 *(optional)* | Tilting phone holder: column for the standard `phone_mount_top` grip. Stands upright, no supports |
 | [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Panel-light adapters: 2 front, 2 rear |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optional; print in **opaque** filament, or use matching purchased disks. Prints flat. |
 
@@ -66,7 +68,7 @@ The four ESP32 retainers are identical, and so are the four sensor supports, so 
 
 STL and STEP files for every part are in [cad/stl](cad/stl) and [cad/step](cad/step), already in print orientation and in millimetres; print at 100 % scale.
 
-Open **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Plates 1 and 2 hold every standard part in the required quantity. Plates 3–5 each hold one battery option; print only the one you chose.
+Open **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Plates 1 and 2 hold every standard part in the required quantity. Plates 3–5 each hold one battery option; print only the one you chose. Plate 6 holds the optional tilting phone holder with its own grip.
 
 | Plate | Contents | Time* | Filament* |
 |---|---|---:|---:|
@@ -75,8 +77,9 @@ Open **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Plates 
 | 3 – Battery A (2S box) | 2S battery box, its cover, lid grommet | ≈ 1 h 40 min | ≈ 42 g |
 | 4 – Battery B (3S box) | 3S battery box, its cover, lid grommet | ≈ 2 h 20 min | ≈ 58 g |
 | 5 – Battery C (LiPo tray) | LiPo tray | ≈ 15 min | ≈ 5 g |
+| 6 – Tilting phone holder (optional) | tilt base, tilt column, phone grip | ≈ 2 h 20 min | ≈ 57 g |
 
-\*Estimates with Generic PLA; plates 3–5 are scaled from part volume. Your times will differ. Press **Slice plate** for each plate before printing.
+\*Estimates with Generic PLA; plates 3–6 are scaled from part volume. Your times will differ. Press **Slice plate** for each plate before printing.
 
 Profile: 0.4 mm nozzle, 0.20 mm layers, 4 walls, 5 top and 5 bottom layers, 30 % gyroid infill, textured PEI plate. **No part needs supports.** The wall holes in the chassis are round and at most 20 mm across, and its nut pockets bridge about 8 mm. The two phone-holder parts print standing upright. Supports are switched off in the project; if you add a part from the STL folder, leave them off too. Before printing, select the PLA that is actually loaded and check the layer preview.
 
@@ -115,7 +118,7 @@ All three keep the firmware's 30 k / 10 k battery divider. Only the voltage limi
 
 ## Hardware and electronics to buy
 
-**Only two screw lengths are needed: M3 × 10 mm and M3 × 25 mm**, both pan head with a head about 5.5 mm across (no countersunk heads). Washers for the circuit boards are printed. Don't add washers under the lid, carrier or ESP32-retainer screws, because their lengths assume the head seats directly on the plastic.
+**Only two screw lengths are needed: M3 × 10 mm and M3 × 25 mm**, both pan head with a head about 5.5 mm across (no countersunk heads). Washers for the circuit boards are printed. Don't add washers under the lid, carrier or ESP32-retainer screws, because their lengths assume the head seats directly on the plastic. The optional tilting phone holder also needs two M3 × 30 mm screws.
 
 The links below go to a supplier or an Amazon US search. Check the listed dimensions and ratings before you order, because boards sold under the same name can have different hole patterns.
 
@@ -126,7 +129,8 @@ The links below go to a supplier or an Amazon US search. Check the listed dimens
 | 16 (+ spares) | M3 × 5.7 mm brass heat-set inserts, the common 4.6 mm OD size (e.g. ruthex RX-M3x5.7) | 12 in the chassis, 4 in the ESP32 carrier | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
 | 16 | M3 × 10 mm pan-head screws | 4 lid, 2 carrier, 4 ESP32 retainers, 4 L298N, 2 ultrasonic clips | [search](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
 | 14 | M3 × 25 mm pan-head screws | 8 motors, 4 speed sensors, 2 phone holder | [search](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
-| 14 | M3 hex nuts, 5.5 mm across flats, ≈ 2.4 mm thick | 4 lid, 8 motors, 2 phone holder | [search](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
+| 2 | M3 × 30 mm pan-head screws *(tilting phone holder only)* | pivot and lock screw of the tilting phone holder | [search](https://www.amazon.com/s?k=M3+x+30+pan+head+screws+ISO+7045) |
+| 14 (+1) | M3 hex nuts, 5.5 mm across flats, ≈ 2.4 mm thick | 4 lid, 8 motors, 2 phone holder, +1 for the pivot of the tilting phone holder | [search](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
 | 4 | Small cable ties (≤ 3 mm wide) | 5 V converter and perfboard on the power-board stand | [search](https://www.amazon.com/s?k=small+cable+ties+2.5mm) |
 | ≈ 350 g | 1.75 mm PLA | all printed parts | [search](https://www.amazon.com/s?k=PLA+filament+1.75mm) |
 
@@ -330,6 +334,20 @@ Install the **OpenBot Robot** Android app. Choose **Bluetooth**, grant the permi
 </p>
 
 Press two M3 nuts into the pockets in the holder base. Screw the base to the forward pad of the lid with two M3 × 25 mm screws from underneath. Fit the sliding grip and tension it with a rubber band or spring. With the phone in its case, check that it is held firmly, the camera has a clear view and no buttons are pressed.
+
+**Tilting phone holder (optional).** To point the camera upward, for example at a person standing in front of the robot, use `phone_mount_tilt_base` and `phone_mount_tilt_column` instead of `phone_mount_bottom`. The grip and the band stay the same.
+
+<p align="center">
+  <img src="../../docs/images/compact/phone_tilt_hinge.jpg" alt="Hinge of the tilting phone holder" width="32%" />
+  <img src="../../docs/images/compact/phone_tilt_angles.jpg" alt="Tilting phone holder at 0, 10, 20 and 30 degrees" width="64%" />
+</p>
+
+1. Press two M3 nuts into the foot and screw it to the lid pad with two M3 × 25 mm screws from underneath, like the standard base.
+2. Press an M3 nut into the hex pocket of one cheek. Set the column between the cheeks and push an M3 × 30 mm screw through the rear hole from the other side into this nut. Tighten it until the column turns without play.
+3. Tilt the column back until one of its two holes lines up with a cheek hole. The front pair of cheek holes gives 0° (lower) and 20° (upper); the rear pair gives 10° (lower) and 30° (upper).
+4. Drive the second M3 × 30 mm screw through that hole from the same side as the pivot screw. The holes in the far cheek are smaller, so the screw cuts its own thread there and needs no nut.
+
+The phone sits 10.5 mm higher than on the standard holder. At 30° it still clears the battery box by about 15 mm.
 
 **Lid openings.** The lid has two 1 × 2-stud openings, one in front of and one behind the phone pad. Fit the lid with the phone pad toward the ultrasonic sensor at the front. The pad is 16 mm forward of the lid centre; the rear stud area carries the battery box. Press a `lid_plug` into each unused opening; it restores the studs, and a 1 mm ledge at the bottom of the opening stops it from falling through. Where a cable passes, use the `lid_grommet` instead:
 
