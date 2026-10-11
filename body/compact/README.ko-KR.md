@@ -9,7 +9,7 @@
   <span>한국어</span>
 </p>
 
-OpenBot Compact는 **ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [OpenBot](../../README.ko-KR.md) 몸체예요. 레고 호환 스터드 덮개, 나사로 고정하는 커버, 두 부분으로 된 휴대폰 거치대, 나사로 고정하는 분리형 전자 부품 마운트, 세 가지 배터리 옵션이 있어요. 모든 출력 부품이 **Bambu Lab A1 mini**에 맞아요 (가장 큰 부품 104 × 168 mm).
+OpenBot Compact는 **ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [OpenBot](../../README.ko-KR.md) 몸체예요. 레고 호환 스터드 덮개, 나사로 고정하는 커버, 각도 조절 휴대폰 거치대, 나사로 고정하는 분리형 전자 부품 마운트, 세 가지 배터리 옵션이 있어요. 모든 출력 부품이 **Bambu Lab A1 mini**에 맞아요 (가장 큰 부품 104 × 168 mm).
 
 <p align="center">
   <img src="../../docs/images/compact/teaser_front.jpg" alt="앞에서 본 모습" width="45%" />
@@ -21,8 +21,8 @@ OpenBot Compact는 **ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [Ope
 | **컨트롤러** | ESP32 DevKit V1 (30핀), OpenBot 펌웨어 `DIY_ESP32`; 휴대폰과 블루투스 또는 USB 케이블로 연결 |
 | **센서** | HC-SR04 초음파 (앞쪽), LM393 광학 휠 엔코더 4개, 배터리 전압 |
 | **전원** | 하나를 선택하세요: 덮개 위의 2S 또는 3S 18650 박스, 또는 내부의 소형 LiPo 배터리 ([배터리 옵션](#배터리-옵션) 참고) |
-| **체결 부품** | M3 × 10, M3 × 25 둥근머리 나사, M3 너트, 열압입 인서트 16개만 사용 (선택 사항인 각도 조절 휴대폰 거치대에는 M3 × 30 두 개가 추가로 필요) |
-| **출력** | PLA, A1 mini 출력판 2장, 약 11시간, 약 300 g, 그리고 선택한 배터리 옵션의 부품 |
+| **체결 부품** | M3 × 10, M3 × 25 둥근머리 나사, M3 너트, 열압입 인서트 20개만 사용 |
+| **출력** | PLA, A1 mini 출력판 2장, 약 12시간, 약 305 g, 그리고 선택한 배터리 옵션의 부품 |
 
 > 이 가이드에서 **왼쪽과 오른쪽**은 항상 **로봇 기준**의 왼쪽과 오른쪽이에요. 로봇 뒤(스위치 쪽)에 서서 덮개 너머로 앞쪽의 초음파 센서를 바라보세요. 펌웨어도 "왼쪽"과 "오른쪽" 모터와 엔코더에 같은 기준을 사용해요.
 
@@ -55,33 +55,37 @@ OpenBot Compact는 **ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [Ope
 | [power_board_stand](cad/stl/power_board_stand.stl) ([STEP](cad/step/power_board_stand.step)) | 1 | 방열판 뒤에서 5 V 컨버터와 분압기 만능기판을 고정해요. 바닥을 아래로. |
 | [pcb_spacer](cad/stl/pcb_spacer.stl) ([STEP](cad/step/pcb_spacer.step)) | 4 | L298N 아래의 2.4 mm 절연 스페이서 |
 | [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | 0.8 mm 절연 와셔: L298N용 4개, 속도 센서용 4개 |
-| [phone_mount_bottom](cad/stl/phone_mount_bottom.stl) ([STEP](cad/step/phone_mount_bottom.step)) | 1 | 휴대폰 거치대 받침; 발을 바닥에 두고 세워서 출력, 서포트 없음 |
-| [phone_mount_top](cad/stl/phone_mount_top.stl) ([STEP](cad/step/phone_mount_top.step)) | 1 | 슬라이드식 휴대폰 그립; 세워서 출력, 서포트 없음 |
-| [phone_mount_tilt_base](cad/stl/phone_mount_tilt_base.stl) ([STEP](cad/step/phone_mount_tilt_base.step)) | 1 *(선택)* | 각도 조절 휴대폰 거치대: 힌지 측판 두 개가 달린 받침, `phone_mount_bottom` 대신 사용. 받침을 아래로 세워서 출력, 서포트 없음 |
-| [phone_mount_tilt_column](cad/stl/phone_mount_tilt_column.stl) ([STEP](cad/step/phone_mount_tilt_column.step)) | 1 *(선택)* | 각도 조절 휴대폰 거치대: 기본 `phone_mount_top` 그립을 끼우는 기둥. 세워서 출력, 서포트 없음 |
-| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | 패널 램프 어댑터: 앞쪽 2개, 뒤쪽 2개 |
+| [phone_mount_tilt_base](../phone_mount/phone_mount_tilt_base.stl) ([STEP](../phone_mount/phone_mount_tilt_base.step)) | 1 | 힌지 측판 두 개가 달린 휴대폰 거치대 받침; 발을 바닥에 두고 세워서 출력, 서포트 없음 |
+| [phone_mount_tilt_column](../phone_mount/phone_mount_tilt_column.stl) ([STEP](../phone_mount/phone_mount_tilt_column.step)) | 1 | 휴대폰 거치대 기둥, 뒤로 0–30° 기울어짐; 세워서 출력, 고무줄 돌기 아래에만 서포트 |
+| [phone_mount_top](../phone_mount/phone_mount_top.stl) ([STEP](../phone_mount/phone_mount_top.step)) | 1 | 슬라이드식 휴대폰 그립; 세워서 출력, 고무줄 돌기 아래에만 서포트 |
+| [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) ([STEP](../phone_mount/phone_mount_bottom.step)) | 1 *(선택)* | 각도 조절 받침과 기둥 대신 쓰는 고정형 휴대폰 거치대 받침; 발을 바닥에 두고 세워서 출력, 고무줄 돌기 아래에만 서포트 |
+| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | 12 mm 패널 램프용 어댑터: 앞쪽 2개, 뒤쪽 2개 |
+| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(선택)* | 10 mm 패널 램프용, `led_adapter` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
+| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(선택)* | 8 mm 패널 램프용, `led_adapter` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
+| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(선택)* | 6 mm 패널 램프용, `led_adapter` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | 선택 사항; **불투명** 필라멘트로 출력하거나 맞는 기성품 디스크를 사용하세요. 평평하게 출력해요. |
 
 ESP32 고정 탭 4개는 모두 같고, 센서 지지대 4개도 모두 같아서 어느 부품이든 어느 위치에나 맞아요. 초음파 클립은 좌우 대칭 한 쌍이에요. 넓은 뒷면을 바닥에 눕혀서 출력하세요. 배터리용 부품은 [배터리 옵션](#배터리-옵션)에 정리되어 있어요.
 
 ## 출력
 
-모든 부품의 STL과 STEP 파일은 [cad/stl](cad/stl)과 [cad/step](cad/step)에 있고, 이미 출력 방향으로 배치되어 있으며 단위는 밀리미터예요. 100 % 배율로 출력하세요.
+모든 부품의 STL과 STEP 파일은 [cad/stl](cad/stl)과 [cad/step](cad/step)에 있고, 이미 출력 방향으로 배치되어 있으며 단위는 밀리미터예요. 100 % 배율로 출력하세요. 휴대폰 거치대 부품은 다른 차체와 공용이며 [body/phone_mount](../phone_mount)에 있어요.
 
-Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세요. 출력판 1과 2에는 모든 기본 부품이 필요한 수량만큼 배치되어 있어요. 출력판 3–5에는 배터리 옵션이 하나씩 들어 있어요. 선택한 옵션의 출력판만 출력하세요. 출력판 6에는 선택 사항인 각도 조절 휴대폰 거치대와 그 그립이 들어 있어요.
+Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세요. 출력판 1과 2에는 모든 기본 부품이 필요한 수량만큼 배치되어 있어요. 출력판 3–5에는 배터리 옵션이 하나씩 들어 있어요. 선택한 옵션의 출력판만 출력하세요. 출력판 6에는 선택 사항인 고정형 휴대폰 거치대가, 출력판 7에는 10, 8, 6 mm 램프용 선택 LED 어댑터가 들어 있어요.
 
 | 출력판 | 내용 | 시간* | 필라멘트* |
 |---|---|---:|---:|
-| 1 – 섀시와 부속품 | 섀시, 휴대폰 거치대 (두 부품), 센서 지지대 4개, LED 어댑터 4개, 엔코더 디스크 2개, ESP32 고정 탭 2개, 오른쪽 초음파 클립, 스페이서 2개, 와셔 6개 | 약 7시간 50분 | 약 215 g |
-| 2 – 덮개와 부속품 | 스터드 덮개, ESP32 캐리어, 전원 보드 스탠드, 덮개 플러그 2개, 엔코더 디스크 2개, ESP32 고정 탭 2개, 왼쪽 초음파 클립, 스페이서 2개, 와셔 2개 | 약 3시간 20분 | 약 80 g |
+| 1 – 섀시와 부속품 | 섀시, 전원 보드 스탠드, ESP32 캐리어, 센서 지지대 4개, LED 어댑터 4개, 초음파 클립 2개, ESP32 고정 탭 4개, 스페이서 4개, 와셔 8개 | 약 7시간 50분 | 약 215 g |
+| 2 – 덮개와 휴대폰 거치대 | 스터드 덮개, 각도 조절 휴대폰 거치대(받침, 기둥, 그립), 엔코더 디스크 4개, 덮개 플러그 2개 | 약 3시간 50분 | 약 90 g |
 | 3 – 배터리 A (2S 박스) | 2S 배터리 박스, 커버, 덮개 그로밋 | 약 1시간 40분 | 약 42 g |
 | 4 – 배터리 B (3S 박스) | 3S 배터리 박스, 커버, 덮개 그로밋 | 약 2시간 20분 | 약 58 g |
 | 5 – 배터리 C (LiPo 트레이) | LiPo 트레이 | 약 15분 | 약 5 g |
-| 6 – 각도 조절 휴대폰 거치대 (선택) | 각도 조절 받침, 각도 조절 기둥, 휴대폰 그립 | 약 2시간 20분 | 약 57 g |
+| 6 – 고정형 휴대폰 거치대 (선택) | 고정형 휴대폰 거치대 받침 | 약 1시간 | 약 23 g |
+| 7 – LED 어댑터 (선택) | 10, 8, 6 mm용 각 4개; 필요한 크기만 출력 | 약 25분 | 약 10 g |
 
-\*Generic PLA 기준 추정치예요. 출력판 3–6는 부품 부피로 계산했어요. 실제 시간은 다를 수 있어요. 출력 전에 각 출력판에서 **Slice plate**를 누르세요.
+\*Generic PLA 기준 추정치예요. 출력판 2–7는 부품 부피로 계산했어요. 실제 시간은 다를 수 있어요. 출력 전에 각 출력판에서 **Slice plate**를 누르세요.
 
-프로필: 0.4 mm 노즐, 0.20 mm 레이어, 벽 4개, 상단 5층과 하단 5층, 자이로이드 채움 30 %, 텍스처 PEI 출력판. **서포트가 필요한 부품은 없어요.** 섀시의 벽 구멍은 원형이고 최대 20 mm이며, 너트 포켓은 약 8 mm를 브리지로 출력해요. 휴대폰 거치대의 두 부품은 세워서 출력해요. 프로젝트에서는 서포트가 꺼져 있어요. STL 폴더에서 부품을 추가할 때도 서포트를 끈 상태로 두세요. 출력 전에 실제로 넣은 PLA를 선택하고 레이어 미리보기를 확인하세요.
+프로필: 0.4 mm 노즐, 0.20 mm 레이어, 벽 4개, 상단 5층과 하단 5층, 자이로이드 채움 30 %, 텍스처 PEI 출력판. **휴대폰 거치대 부품만 서포트가 필요하고, 그것도 작은 고무줄 돌기 아래뿐이에요.** 섀시의 벽 구멍은 원형이고 최대 20 mm이며, 너트 포켓은 약 8 mm를 브리지로 출력해요. 휴대폰 거치대 부품은 세워서 출력하고, 프로젝트는 이 부품에만 서포트를 켜 둬요. 홈 안쪽 돌기 테두리 아래에 작은 트리 서포트가 생기며, 홈의 열린 뒤쪽으로 펜치를 넣어 빼면 돼요. 다른 부품은 모두 서포트가 꺼져 있어요. STL 폴더에서 부품을 추가할 때도 휴대폰 거치대 부품이 아니면 서포트를 끈 상태로 두세요. 출력 전에 실제로 넣은 PLA를 선택하고 레이어 미리보기를 확인하세요.
 
 - 덮개는 스터드를 위로 해서 평평하게 출력해요. 섀시는 바닥을 아래로, 내부를 위로 열어서 출력해요.
 - 출력 후 너트 포켓 (각 포켓 입구의 작은 리브 두 개는 그대로 두세요), 인서트 구멍, 소켓, 케이블 구멍에서 실 찌꺼기를 제거하세요.
@@ -118,7 +122,7 @@ Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세�
 
 ## 구매할 하드웨어와 전자 부품
 
-**나사 길이는 M3 × 10 mm와 M3 × 25 mm 두 가지만 필요해요.** 둘 다 머리 지름 약 5.5 mm의 둥근머리 나사예요 (접시머리 제외). 회로 기판용 와셔는 출력해서 써요. 덮개, 캐리어, ESP32 고정 탭 나사 아래에는 와셔를 넣지 마세요. 나사 길이가 머리가 플라스틱에 바로 닿는 것을 전제로 정해졌어요. 선택 사항인 각도 조절 휴대폰 거치대에는 M3 × 30 mm 나사 두 개가 추가로 필요해요.
+**나사 길이는 M3 × 10 mm와 M3 × 25 mm 두 가지만 필요해요.** 둘 다 머리 지름 약 5.5 mm의 둥근머리 나사예요 (접시머리 제외). 회로 기판용 와셔는 출력해서 써요. 덮개, 캐리어, ESP32 고정 탭 나사 아래에는 와셔를 넣지 마세요. 나사 길이가 머리가 플라스틱에 바로 닿는 것을 전제로 정해졌어요.
 
 아래 링크는 판매처 또는 Amazon US 검색으로 연결돼요. 같은 이름으로 팔리는 보드라도 구멍 배치가 다를 수 있으니 주문 전에 표시된 치수와 사양을 확인하세요.
 
@@ -126,11 +130,10 @@ Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세�
 
 | 수량 | 부품 | 용도 | 구매 |
 |---:|---|---|---|
-| 16 (+ 여분) | M3 × 5.7 mm 황동 열압입 인서트, 외경 4.6 mm 일반 규격 (예: ruthex RX-M3x5.7) | 섀시에 12개, ESP32 캐리어에 4개 | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
-| 16 | M3 × 10 mm 둥근머리 나사 | 덮개 4, 캐리어 2, ESP32 고정 탭 4, L298N 4, 초음파 클립 2 | [검색](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
+| 20 (+ 여분) | M3 × 5.7 mm 황동 열압입 인서트, 외경 4.6 mm 일반 규격 (예: ruthex RX-M3x5.7) | 섀시에 12개, ESP32 캐리어에 4개, 휴대폰 거치대 기둥에 4개 | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
+| 19 | M3 × 10 mm 둥근머리 나사 | 덮개 4, 캐리어 2, ESP32 고정 탭 4, L298N 4, 초음파 클립 2, 휴대폰 거치대 3 | [검색](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
 | 14 | M3 × 25 mm 둥근머리 나사 | 모터 8, 속도 센서 4, 휴대폰 거치대 2 | [검색](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
-| 2 | M3 × 30 mm 둥근머리 나사 *(각도 조절 거치대 전용)* | 각도 조절 휴대폰 거치대의 회전축 나사와 고정 나사 | [검색](https://www.amazon.com/s?k=M3+x+30+pan+head+screws+ISO+7045) |
-| 14 (+1) | M3 육각 너트, 맞변 거리 5.5 mm, 두께 약 2.4 mm | 덮개 4, 모터 8, 휴대폰 거치대 2, 각도 조절 거치대 회전축용 +1 | [검색](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
+| 14 | M3 육각 너트, 맞변 거리 5.5 mm, 두께 약 2.4 mm | 덮개 4, 모터 8, 휴대폰 거치대 2 | [검색](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
 | 4 | 작은 케이블 타이 (폭 3 mm 이하) | 전원 보드 스탠드의 5 V 컨버터와 만능기판 | [검색](https://www.amazon.com/s?k=small+cable+ties+2.5mm) |
 | 약 350 g | 1.75 mm PLA | 모든 출력 부품 | [검색](https://www.amazon.com/s?k=PLA+filament+1.75mm) |
 
@@ -149,7 +152,7 @@ Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세�
 | 1 | 5 V 컨버터, 2 A 이상, 최대 21 × 43 × 14 mm | 전원 보드 스탠드에 맞아요. 3S에는 LM2596 모듈을 쓸 수 있어요. 2S에는 6 V 입력에서도 5 V를 내는 종류를 고르세요 (예: MP1584 또는 벅-부스트). | [검색](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | 작은 만능기판, 최대 24 × 34 mm | 배터리 분압기와 에코 분압기, 램프 구동 회로; 스탠드 뒷면에 붙여요 | [검색](https://www.amazon.com/s?k=small+prototype+perfboard) |
 | 1세트 | 1 % 저항 | 배터리 분압기 30 k + 10 k; 에코 분압기 10 k + 20 k; 램프 1 k 4개 + 100 k 4개 | [검색](https://www.amazon.com/s?k=1+percent+metal+film+resistor+assortment+10k+20k+30k+1k+100k) |
-| 2 + 2 | 흰색과 빨간색 패널 표시등 *(선택)* | 베젤 크기가 패널 구멍에 맞는지, 램프 전압이 맞는지 확인하세요 | [검색](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
+| 2 + 2 | 흰색과 빨간색 패널 표시등 *(선택)* | 12 mm 나사산은 `led_adapter`에 맞아요. 10, 8, 6 mm 램프는 맞는 크기의 어댑터를 출력하세요. 램프 전압을 확인하세요 | [검색](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
 | 4 | NPN 트랜지스터, 예: PN2222A *(선택, 램프용)* | 각 램프의 로우사이드 스위치 | [검색](https://www.amazon.com/s?k=PN2222A+transistor) |
 | 1세트 | 듀폰 점퍼선, 실리콘 전원선, 수축 튜브 | 전원선은 모터 구속 전류에 맞춰 선택하세요 | [검색](https://www.amazon.com/s?k=silicone+wire+kit+20+22+AWG+heat+shrink) |
 
@@ -221,7 +224,7 @@ Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세�
 
 `ultrasonic_clip_left`는 로봇의 왼쪽에, `ultrasonic_clip_right`는 오른쪽에 달고, 각각의 작은 립이 PCB 위쪽 모서리 위에 오게 하세요. 각 클립을 안쪽을 향한 인서트에 M3 × 10 mm 나사 하나로 고정하고, 나사 머리가 섀시 안쪽을 향하게 하세요. PCB가 휘지 않고 클립이 보스에 닿을 때까지 조이세요. 보드가 들리거나 빠지면 안 되고, 트랜스듀서는 전면판과 직각을 유지해야 해요.
 
-흰색 전조등 두 개, 빨간색 후미등 두 개 (각각 출력한 LED 어댑터에 넣어요), 원형 로커 스위치를 함께 제공된 고정 부품으로 다세요. 전선은 바퀴와 엔코더 디스크에서 멀리 정리하세요.
+흰색 전조등 두 개, 빨간색 후미등 두 개 (각각 나사산 크기에 맞는 출력 LED 어댑터에 넣어요), 원형 로커 스위치를 함께 제공된 고정 부품으로 다세요. 전선은 바퀴와 엔코더 디스크에서 멀리 정리하세요.
 
 ### 4. ESP32와 모터 드라이버 설치하기
 
@@ -333,21 +336,20 @@ GPIO 2, 5, 12, 15는 부트 스트래핑 핀이에요. 모두 연결한 상태�
   <img src="../../docs/images/compact/step_07_closed.jpg" alt="닫힌 몸체" width="32%" />
 </p>
 
-거치대 받침의 포켓에 M3 너트 두 개를 눌러 넣으세요. 받침을 덮개 앞쪽 패드에 아래에서 M3 × 25 mm 나사 두 개로 고정하세요. 슬라이드 그립을 끼우고 고무줄이나 스프링으로 장력을 주세요. 케이스를 낀 휴대폰을 끼워서 단단히 고정되는지, 카메라 시야가 가려지지 않는지, 버튼이 눌리지 않는지 확인하세요.
-
-**각도 조절 휴대폰 거치대 (선택).** 카메라를 위쪽으로 향하게 하려면(예: 로봇 앞에 서 있는 사람을 보려면) `phone_mount_bottom` 대신 `phone_mount_tilt_base`와 `phone_mount_tilt_column`을 쓰세요. 그립과 고무줄은 그대로 써요.
+**휴대폰 거치대.** 거치대가 기울어지기 때문에 카메라가 위쪽도 볼 수 있어요(예: 로봇 앞에 서 있는 사람).
 
 <p align="center">
-  <img src="../../docs/images/compact/phone_tilt_hinge.jpg" alt="각도 조절 휴대폰 거치대의 힌지" width="32%" />
-  <img src="../../docs/images/compact/phone_tilt_angles.jpg" alt="0°, 10°, 20°, 30°의 각도 조절 휴대폰 거치대" width="64%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_hinge.jpg" alt="각도 조절 휴대폰 거치대의 힌지" width="32%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="0°, 10°, 20°, 30°의 각도 조절 휴대폰 거치대" width="64%" />
 </p>
 
-1. 받침에 M3 너트 두 개를 눌러 넣고, 기본 받침과 똑같이 M3 × 25 mm 나사 두 개로 아래에서 덮개 패드에 고정하세요.
-2. 한쪽 측판의 육각 포켓에 M3 너트를 눌러 넣으세요. 기둥을 두 측판 사이에 넣고, 반대쪽에서 M3 × 30 mm 나사를 뒤쪽 구멍에 끼워 이 너트에 조이세요. 기둥이 유격 없이 돌아갈 때까지만 조이세요.
-3. 기둥의 두 구멍 중 하나가 측판 구멍과 맞을 때까지 기둥을 뒤로 기울이세요. 측판의 앞쪽 구멍 한 쌍은 0°(아래)와 20°(위), 뒤쪽 한 쌍은 10°(아래)와 30°(위)예요.
-4. 두 번째 M3 × 30 mm 나사를 회전축 나사와 같은 쪽에서 그 구멍에 넣어 조이세요. 반대쪽 측판의 구멍은 더 작아서 나사가 스스로 나사산을 내므로 너트가 필요 없어요.
+1. 1단계와 같은 방법으로 기둥에 M3 인서트 네 개를 넣으세요. 뒤쪽 회전축 구멍의 양쪽 끝에 하나씩, 한쪽만 열려 있는 앞쪽 고정 구멍 두 개에 하나씩 넣어요.
+2. 받침 발의 포켓에 M3 너트 두 개를 눌러 넣으세요. 받침을 덮개 앞쪽 패드에 아래에서 M3 × 25 mm 나사 두 개로 고정하세요.
+3. 열린 고정 구멍이 구멍 다섯 개짜리 측판을 향하도록 기둥을 두 측판 사이에 넣으세요. 양쪽 측판을 통해 회전축 인서트에 M3 × 10 mm 나사를 하나씩 조이고, 기둥이 유격 없이 돌아갈 때까지 조이세요. 두 회전축 나사에 중강도(파란색) 나사 고정제를 한 방울씩 발라 풀리지 않게 하세요.
+4. 기둥의 고정 인서트 하나가 측판 구멍과 맞을 때까지 기둥을 뒤로 기울이세요. 측판의 앞쪽 구멍 한 쌍은 0°(아래)와 20°(위), 뒤쪽 한 쌍은 10°(아래)와 30°(위)예요. 세 번째 M3 × 10 mm 나사로 고정하세요.
+5. 슬라이드 그립을 끼우고 고무줄이나 스프링으로 장력을 주세요. 케이스를 낀 휴대폰을 끼워서 단단히 고정되는지, 카메라 시야가 가려지지 않는지, 버튼이 눌리지 않는지 확인하세요.
 
-휴대폰은 기본 거치대보다 10.5 mm 높게 놓여요. 30°에서도 배터리 상자와 약 15 mm 떨어져 있어요.
+30°에서도 배터리 상자와 약 15 mm 떨어져 있어요. 각도 조절이 필요 없으면 받침과 기둥 대신 [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl)을 출력하세요. 포켓에 M3 너트 두 개를 눌러 넣고 같은 방법으로 덮개 패드에 고정하면 돼요. 같은 그립을 쓰고, 휴대폰은 10.5 mm 낮게 놓여요.
 
 **덮개 구멍.** 덮개에는 휴대폰 패드 앞과 뒤에 1 × 2 스터드 크기의 구멍이 하나씩 있어요. 휴대폰 패드가 앞쪽의 초음파 센서를 향하도록 덮개를 올리세요. 패드는 덮개 중심에서 16 mm 앞쪽에 있고, 뒤쪽 스터드 영역에는 배터리 박스가 올라가요. 쓰지 않는 구멍에는 `lid_plug`를 눌러 끼우세요. 스터드가 복원되고, 구멍 아래쪽의 1 mm 턱이 플러그가 빠지지 않게 받쳐 줘요. 케이블이 지나가는 곳에는 대신 `lid_grommet`을 사용하세요:
 
@@ -369,7 +371,7 @@ GPIO 2, 5, 12, 15는 부트 스트래핑 핀이에요. 모두 연결한 상태�
 - ESP32 캐리어, 고정 탭 4개, L298N, 전원 보드 스탠드는 빼세요.
 - 긴 PCB용 보스 네 곳에 인서트 4개를 넣으세요. 센서용 4개와 초음파용 2개를 합쳐 **인서트는 모두 10개**예요.
 - 보드는 출력한 2.4 mm 스페이서 네 개 위에 올리고, 각 구멍에 출력한 와셔 하나와 M3 × 10 mm 나사 하나를 쓰세요.
-- 하드웨어 합계: **M3 × 10 10개** (덮개 4, PCB 4, 클립 2), **M3 × 25 14개**, 너트 14개.
+- 하드웨어 합계: **M3 × 10 13개** (덮개 4, PCB 4, 클립 2, 휴대폰 거치대 3), **M3 × 25 14개**, 너트 14개.
 
 [PCB V2 제조 파일과 부품 목록](../diy/pcb/v2)으로 보드를 주문하세요. 예를 들어 [JLCPCB](https://jlcpcb.com/)나 [PCBWay](https://www.pcbway.com/)를 이용할 수 있어요. 고정하기 전에 실장된 부품의 높이와 납땜 부위의 여유 공간을 확인하세요. 위의 배터리 옵션은 이 보드에서도 똑같이 쓸 수 있어요.
 
