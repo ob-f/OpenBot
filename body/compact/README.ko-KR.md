@@ -372,15 +372,14 @@ GPIO 2, 5, 12, 15는 부트 스트래핑 핀이에요. 모두 연결한 상태�
 
 ## 보기
 
-<p align="center">
-  <img src="../../docs/images/compact/teaser_front.jpg" alt="앞에서 본 모습" width="32%" />
-  <img src="../../docs/images/compact/teaser_rear.jpg" alt="뒤에서 본 모습" width="32%" />
-  <img src="../../docs/images/compact/interior.jpg" alt="내부" width="32%" />
-</p>
+| 앞 | 뒤 |
+|---|---|
+| ![앞에서 본 모습](../../docs/images/compact/teaser_front.jpg) | ![뒤에서 본 모습](../../docs/images/compact/teaser_rear.jpg) |
+| **위** | **아래** |
+| ![위에서 본 모습](../../docs/images/compact/top_view.jpg) | ![아랫면](../../docs/images/compact/underside.jpg) |
 
 <p align="center">
-  <img src="../../docs/images/compact/top_view.jpg" alt="위에서 본 모습" width="32%" />
-  <img src="../../docs/images/compact/underside.jpg" alt="아랫면" width="32%" />
+  <img src="../../docs/images/compact/interior.jpg" alt="내부" width="49%" />
 </p>
 
 렌더링에는 배선이 포함되어 있지 않아요. 보드, 배터리 홀더, LiPo 배터리는 단순화된 형태로 표시돼요.

@@ -372,15 +372,14 @@ Commandez la carte à partir des [fichiers de fabrication et de la nomenclature 
 
 ## Vues
 
-<p align="center">
-  <img src="../../docs/images/compact/teaser_front.jpg" alt="Vue avant" width="32%" />
-  <img src="../../docs/images/compact/teaser_rear.jpg" alt="Vue arrière" width="32%" />
-  <img src="../../docs/images/compact/interior.jpg" alt="Intérieur" width="32%" />
-</p>
+| Avant | Arrière |
+|---|---|
+| ![Vue avant](../../docs/images/compact/teaser_front.jpg) | ![Vue arrière](../../docs/images/compact/teaser_rear.jpg) |
+| **Dessus** | **Dessous** |
+| ![Vue de dessus](../../docs/images/compact/top_view.jpg) | ![Dessous](../../docs/images/compact/underside.jpg) |
 
 <p align="center">
-  <img src="../../docs/images/compact/top_view.jpg" alt="Vue de dessus" width="32%" />
-  <img src="../../docs/images/compact/underside.jpg" alt="Dessous" width="32%" />
+  <img src="../../docs/images/compact/interior.jpg" alt="Intérieur" width="49%" />
 </p>
 
 Les rendus n'incluent pas le câblage. Les cartes, les supports de piles et la batterie LiPo sont représentés par des formes simplifiées.
