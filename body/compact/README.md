@@ -378,10 +378,6 @@ Order the board from the [PCB V2 manufacturing files and BOM](../diy/pcb/v2), fo
 | **Top** | **Underside** |
 | ![Top view](../../docs/images/compact/top_view.jpg) | ![Underside](../../docs/images/compact/underside.jpg) |
 
-<p align="center">
-  <img src="../../docs/images/compact/interior.jpg" alt="Interior" width="49%" />
-</p>
-
 Renders leave out wiring. Boards, battery holders and the LiPo pack are shown as simplified shapes.
 
 ## Next

@@ -378,10 +378,6 @@ Encarga la placa con los [archivos de fabricación y la lista de materiales de l
 | **Arriba** | **Abajo** |
 | ![Vista superior](../../docs/images/compact/top_view.jpg) | ![Parte inferior](../../docs/images/compact/underside.jpg) |
 
-<p align="center">
-  <img src="../../docs/images/compact/interior.jpg" alt="Interior" width="49%" />
-</p>
-
 Los renders no incluyen el cableado. Las placas, los portapilas y la batería LiPo se muestran como formas simplificadas.
 
 ## Siguiente paso
