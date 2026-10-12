@@ -56,10 +56,10 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 | [phone_mount_tilt_column](../phone_mount/phone_mount_tilt_column.stl) ([STEP](../phone_mount/phone_mount_tilt_column.step)) | 1 | Phone-holder column, tilts back 0–30°; stands upright, supports only under the band stud |
 | [phone_mount_top](../phone_mount/phone_mount_top.stl) ([STEP](../phone_mount/phone_mount_top.step)) | 1 | Sliding phone grip; stands upright, supports only under the band stud |
 | [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) ([STEP](../phone_mount/phone_mount_bottom.step)) | 1 *(optional)* | Fixed phone-holder base instead of the tilting base and column; stands upright on its foot, supports only under the band stud |
-| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Adapters for 12 mm panel lights: 2 front, 2 rear |
-| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(optional)* | Same for 10 mm panel lights, instead of `led_adapter`; 6 mm long so short threads still reach the nut |
-| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(optional)* | Same for 8 mm panel lights, instead of `led_adapter`; 6 mm long so short threads still reach the nut |
-| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(optional)* | Same for 6 mm panel lights, instead of `led_adapter`; 6 mm long so short threads still reach the nut |
+| [led_adapter_12mm](cad/stl/led_adapter_12mm.stl) ([STEP](cad/step/led_adapter_12mm.step)) | 4 | Adapters for 12 mm panel lights: 2 front, 2 rear |
+| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(optional)* | Same for 10 mm panel lights, instead of `led_adapter_12mm`; 6 mm long so short threads still reach the nut |
+| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(optional)* | Same for 8 mm panel lights, instead of `led_adapter_12mm`; 6 mm long so short threads still reach the nut |
+| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(optional)* | Same for 6 mm panel lights, instead of `led_adapter_12mm`; 6 mm long so short threads still reach the nut |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optional; print in **opaque** filament, or use matching purchased disks. Prints flat. |
 
 The four sensor supports are identical, so any one fits any position. The parts for your battery are listed under [Battery options](#battery-options).
@@ -149,7 +149,7 @@ The links below go to a supplier or an Amazon US search. Check the listed dimens
 | 1 | 5 V converter, ≥ 2 A, max. 21 × 43 × 14 mm | Fits the power-board stand. For 3S, an LM2596 module works. For 2S, choose a type that still gives 5 V from a 6 V input (e.g. MP1584 or a buck-boost). | [search](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | Small perfboard, max. 24 × 34 mm | Battery and echo dividers, light drivers; sits on the back of the stand | [search](https://www.amazon.com/s?k=small+prototype+perfboard) |
 | 1 set | 1 % resistors | Battery divider 30 k + 10 k; echo divider 10 k + 20 k; lights 4 × 1 k + 4 × 100 k | [search](https://www.amazon.com/s?k=1+percent+metal+film+resistor+assortment+10k+20k+30k+1k+100k) |
-| 2 + 2 | White and red panel indicators *(optional)* | 12 mm thread fits `led_adapter`; for 10, 8 or 6 mm lights print the matching adapter. Check the lamp voltage | [search](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
+| 2 + 2 | White and red panel indicators *(optional)* | 12 mm thread fits `led_adapter_12mm`; for 10, 8 or 6 mm lights print the matching adapter. Check the lamp voltage | [search](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
 | 4 | NPN transistors, e.g. PN2222A *(optional, for lights)* | Low-side switch for each lamp | [search](https://www.amazon.com/s?k=PN2222A+transistor) |
 | 1 set | Dupont jumpers, silicone power wire, heat-shrink | Size the power wire for the motor stall current | [search](https://www.amazon.com/s?k=silicone+wire+kit+20+22+AWG+heat+shrink) |
 

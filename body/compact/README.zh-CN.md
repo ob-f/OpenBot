@@ -56,10 +56,10 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | [phone_mount_tilt_column](../phone_mount/phone_mount_tilt_column.stl) ([STEP](../phone_mount/phone_mount_tilt_column.step)) | 1 | 手机支架立柱，可向后倾斜 0–30°；竖立打印，只在挂橡皮筋的凸柱下方需要支撑 |
 | [phone_mount_top](../phone_mount/phone_mount_top.stl) ([STEP](../phone_mount/phone_mount_top.step)) | 1 | 滑动式手机夹；竖立打印，只在挂橡皮筋的凸柱下方需要支撑 |
 | [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) ([STEP](../phone_mount/phone_mount_bottom.step)) | 1 *（可选）* | 固定式手机支架底座，代替可倾斜的底座和立柱；立在其底脚上打印，只在挂橡皮筋的凸柱下方需要支撑 |
-| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | 12 mm 面板指示灯适配件：前 2 个，后 2 个 |
-| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(可选)* | 适用于 10 mm 面板指示灯，代替 `led_adapter`；长 6 mm，螺纹较短的指示灯也能拧上螺母 |
-| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(可选)* | 适用于 8 mm 面板指示灯，代替 `led_adapter`；长 6 mm，螺纹较短的指示灯也能拧上螺母 |
-| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(可选)* | 适用于 6 mm 面板指示灯，代替 `led_adapter`；长 6 mm，螺纹较短的指示灯也能拧上螺母 |
+| [led_adapter_12mm](cad/stl/led_adapter_12mm.stl) ([STEP](cad/step/led_adapter_12mm.step)) | 4 | 12 mm 面板指示灯适配件：前 2 个，后 2 个 |
+| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(可选)* | 适用于 10 mm 面板指示灯，代替 `led_adapter_12mm`；长 6 mm，螺纹较短的指示灯也能拧上螺母 |
+| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(可选)* | 适用于 8 mm 面板指示灯，代替 `led_adapter_12mm`；长 6 mm，螺纹较短的指示灯也能拧上螺母 |
+| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(可选)* | 适用于 6 mm 面板指示灯，代替 `led_adapter_12mm`；长 6 mm，螺纹较短的指示灯也能拧上螺母 |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | 可选；用**不透光**耗材打印，或使用匹配的成品码盘。平放打印。 |
 
 四个传感器支架完全相同，因此任意一个都适合任意位置。电池所需零件列在[电池方案](#电池方案)中。
@@ -149,7 +149,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | 1 | 5 V 转换器，≥ 2 A，最大 21 × 43 × 14 mm | 装在电源板支架上。3S 可用 LM2596 模块。2S 请选择输入 6 V 时仍能输出 5 V 的型号（例如 MP1584 或升降压模块）。 | [搜索](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | 小洞洞板，最大 24 × 34 mm | 电池分压和回波分压电路、灯驱动；装在支架背面 | [搜索](https://www.amazon.com/s?k=small+prototype+perfboard) |
 | 1 套 | 1 % 精度电阻 | 电池分压 30 k + 10 k；回波分压 10 k + 20 k；灯 4 × 1 k + 4 × 100 k | [搜索](https://www.amazon.com/s?k=1+percent+metal+film+resistor+assortment+10k+20k+30k+1k+100k) |
-| 2 + 2 | 白色和红色面板指示灯 *(可选)* | 12 mm 螺纹配 `led_adapter`；10、8 或 6 mm 的指示灯请打印对应尺寸的适配件。请核对灯的电压 | [搜索](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
+| 2 + 2 | 白色和红色面板指示灯 *(可选)* | 12 mm 螺纹配 `led_adapter_12mm`；10、8 或 6 mm 的指示灯请打印对应尺寸的适配件。请核对灯的电压 | [搜索](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
 | 4 | NPN 三极管，例如 PN2222A *(可选，用于指示灯)* | 每个灯的低边开关 | [搜索](https://www.amazon.com/s?k=PN2222A+transistor) |
 | 1 套 | 杜邦线、硅胶电源线、热缩管 | 电源线按电机堵转电流选型 | [搜索](https://www.amazon.com/s?k=silicone+wire+kit+20+22+AWG+heat+shrink) |
 
