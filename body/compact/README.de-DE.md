@@ -21,7 +21,7 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 | **Steuerung** | ESP32 DevKit V1 (30 Pins), OpenBot-Firmware `DIY_ESP32`; Verbindung zum Handy über Bluetooth oder USB-Kabel |
 | **Sensoren** | HC-SR04-Ultraschall (vorne), 4 × optische LM393-Radencoder, Akkuspannung |
 | **Stromversorgung** | Eine Option wählen: 2S- oder 3S-18650-Box auf dem Deckel oder ein kleiner LiPo-Akku im Inneren (siehe [Akku-Optionen](#akku-optionen)) |
-| **Befestigung** | Nur M3 × 10 und M3 × 25 Flachkopfschrauben, M3-Muttern und 20 Gewindeeinsätze |
+| **Befestigung** | Nur M3 × 10 und M3 × 25 Flachkopfschrauben, M3-Muttern und 19 Gewindeeinsätze |
 | **Druck** | PLA, zwei A1-mini-Druckplatten, ≈ 12 h und ≈ 305 g, plus die Teile für die gewählte Akku-Option |
 
 > **Links und rechts** bedeuten in dieser Anleitung immer links und rechts **aus Sicht des Roboters**: Stellen Sie sich hinter den Roboter (Seite mit dem Schalter) und schauen Sie über den Deckel nach vorne zum Ultraschallsensor. Dieselbe Konvention verwendet die Firmware für die „linken“ und „rechten“ Motoren und Encoder.
@@ -31,7 +31,7 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 - [Gedruckte Teile](#gedruckte-teile) · [Drucken](#drucken)
 - [Akku-Optionen](#akku-optionen)
 - [Zu kaufende Hardware und Elektronik](#zu-kaufende-hardware-und-elektronik)
-- Montage: [1 Einsätze und Muttern](#1-einsätze-und-deckelmuttern-einsetzen) · [2 Motoren und Encoder](#2-motoren-und-drehzahlsensoren-einbauen) · [3 Ultraschallsensor und Front](#3-ultraschallsensor-und-frontteile-befestigen) · [4 ESP32 und Treiber](#4-esp32-und-motortreiber-einbauen) · [5 Verkabelung](#5-strom-und-signale-verkabeln) · [6 Firmware und Testlauf](#6-firmware-einrichten-und-testlauf) · [7 Akku, Handyhalterung und Deckel](#7-akku-handyhalterung-und-deckel-montieren)
+- Montage: [1 Einsätze](#1-einsätze-einsetzen) · [2 Motoren und Encoder](#2-motoren-und-drehzahlsensoren-einbauen) · [3 Ultraschallsensor und Front](#3-ultraschallsensor-und-frontteile-befestigen) · [4 ESP32 und Treiber](#4-esp32-und-motortreiber-einbauen) · [5 Verkabelung](#5-strom-und-signale-verkabeln) · [6 Firmware und Testlauf](#6-firmware-einrichten-und-testlauf) · [7 Akku, Handyhalterung und Deckel](#7-akku-handyhalterung-und-deckel-montieren)
 - [Alternative Platine mit integriertem Treiber](#alternative-platine-mit-integriertem-treiber)
 - [Fehlersuche](#fehlersuche) · [Ansichten](#ansichten) · [Weiter](#weiter)
 
@@ -47,11 +47,8 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 | [top_cover](cad/stl/top_cover.stl) ([STEP](cad/step/top_cover.step)) | 1 | Deckel mit Noppen und zwei Kabelöffnungen; flache Unterseite nach unten, Noppen nach oben |
 | [lid_plug](cad/stl/lid_plug.stl) ([STEP](cad/step/lid_plug.step)) | 2 | Verschließt die Deckelöffnungen und ergänzt die zwei Noppen. Noppen nach oben. |
 | [lid_grommet](cad/stl/lid_grommet.stl) ([STEP](cad/step/lid_grommet.step)) | 1 *(optional)* | Ersetzt einen Stopfen, wo ein Kabel durchgeht. Noppen nach oben. |
-| [esp32_carrier](cad/stl/esp32_carrier.stl) ([STEP](cad/step/esp32_carrier.step)) | 1 | Trägerrahmen für den ESP32; flache Basis nach unten |
-| [esp32_retainer](cad/stl/esp32_retainer.stl) ([STEP](cad/step/esp32_retainer.step)) | 4 | Eckhalter für den ESP32; jeder Halter passt an jede Ecke. Flach nach unten, Nase nach oben. |
+| [esp32_carrier](cad/stl/esp32_carrier.stl) ([STEP](cad/step/esp32_carrier.step)) | 1 | ESP32-Träger mit vier Schnapphaken; steht auf seiner flachen Basis, keine Stützen |
 | [sensor_support](cad/stl/sensor_support.stl) ([STEP](cad/step/sensor_support.step)) | 4 | Halter für die Drehzahlsensoren; jeder Halter passt an jedes Rad |
-| [ultrasonic_clip_left](cad/stl/ultrasonic_clip_left.stl) ([STEP](cad/step/ultrasonic_clip_left.step)) | 1 | Obere **linke** Ecke der HC-SR04-Platine |
-| [ultrasonic_clip_right](cad/stl/ultrasonic_clip_right.stl) ([STEP](cad/step/ultrasonic_clip_right.step)) | 1 | Obere **rechte** Ecke der HC-SR04-Platine |
 | [power_board_stand](cad/stl/power_board_stand.stl) ([STEP](cad/step/power_board_stand.step)) | 1 | Hält den 5-V-Wandler und die Teiler-Lochrasterplatine hinter dem Kühlkörper. Basis nach unten. |
 | [pcb_spacer](cad/stl/pcb_spacer.stl) ([STEP](cad/step/pcb_spacer.step)) | 4 | Isolierende 2,4-mm-Abstandshalter unter dem L298N |
 | [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | Isolierende 0,8-mm-Unterlegscheiben: 4 für den L298N, 4 für die Drehzahlsensoren |
@@ -65,7 +62,7 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 | [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(optional)* | Dasselbe für 6-mm-Einbauleuchten, statt `led_adapter`; 6 mm lang, damit auch kurze Gewinde die Mutter erreichen |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optional; in **lichtundurchlässigem** Filament drucken oder passende gekaufte Scheiben verwenden. Wird flach gedruckt. |
 
-Die vier ESP32-Halter sind identisch, ebenso die vier Sensorhalter, daher passt jedes Teil an jede Position. Die Ultraschall-Clips sind ein gespiegeltes Links/Rechts-Paar. Drucken Sie sie liegend auf ihrer breiten Rückseite. Die Teile für Ihren Akku sind unter [Akku-Optionen](#akku-optionen) aufgeführt.
+Die vier Sensorhalter sind identisch, daher passt jeder an jede Position. Die Teile für Ihren Akku sind unter [Akku-Optionen](#akku-optionen) aufgeführt.
 
 ## Drucken
 
@@ -75,7 +72,7 @@ STL- und STEP-Dateien für alle Teile liegen in [cad/stl](cad/stl) und [cad/step
 
 | Druckplatte | Inhalt | Zeit* | Filament* |
 |---|---|---:|---:|
-| 1 – Chassis und Zubehör | Chassis, Ständer für die Stromplatinen, ESP32-Träger, 4 Sensorhalter, 4 LED-Adapter, beide Ultraschall-Clips, 4 ESP32-Halter, 4 Abstandshalter, 8 Unterlegscheiben | ≈ 7 h 50 min | ≈ 215 g |
+| 1 – Chassis und Zubehör | Chassis, Ständer für die Stromplatinen, ESP32-Träger, 4 Sensorhalter, 4 LED-Adapter, 4 Abstandshalter, 8 Unterlegscheiben | ≈ 7 h 50 min | ≈ 215 g |
 | 2 – Deckel und Handyhalterung | Deckel mit Noppen, neigbare Handyhalterung (Fuß, Säule, Griff), 4 Encoderscheiben, 2 Deckelstopfen | ≈ 3 h 50 min | ≈ 90 g |
 | 3 – Akku A (2S-Box) | 2S-Akkubox, ihr Deckel, Kabeldurchführung für den Deckel | ≈ 1 h 40 min | ≈ 42 g |
 | 4 – Akku B (3S-Box) | 3S-Akkubox, ihr Deckel, Kabeldurchführung für den Deckel | ≈ 2 h 20 min | ≈ 58 g |
@@ -85,10 +82,10 @@ STL- und STEP-Dateien für alle Teile liegen in [cad/stl](cad/stl) und [cad/step
 
 \*Schätzwerte mit Generic PLA; Druckplatten 2–7 aus dem Teilevolumen hochgerechnet. Ihre Zeiten werden abweichen. Klicken Sie vor dem Druck für jede Druckplatte auf **Slice plate**.
 
-Profil: 0,4-mm-Düse, 0,20-mm-Schichten, 4 Wände, 5 obere und 5 untere Schichten, 30 % Gyroid-Füllung, texturierte PEI-Platte. **Nur die Teile der Handyhalterung brauchen Stützen, und nur unter dem kleinen Zapfen für das Gummiband.** Die Wandlöcher im Chassis sind rund und höchstens 20 mm groß, und die Mutterntaschen überbrücken etwa 8 mm. Die Teile der Handyhalterung werden stehend gedruckt, und das Projekt schaltet Stützen nur für sie ein: ein kleiner Baum unter dem Rand des Zapfens im Kanal. Ziehen Sie ihn mit einer Zange durch die offene Rückseite des Kanals heraus. Für alle anderen Teile sind Stützen aus; wenn Sie ein Teil aus dem STL-Ordner hinzufügen, lassen Sie sie aus, außer bei Teilen der Handyhalterung. Wählen Sie vor dem Druck das tatsächlich geladene PLA und prüfen Sie die Schichtvorschau.
+Profil: 0,4-mm-Düse, 0,20-mm-Schichten, 4 Wände, 5 obere und 5 untere Schichten, 30 % Gyroid-Füllung, texturierte PEI-Platte. **Nur die Teile der Handyhalterung brauchen Stützen, und nur unter dem kleinen Zapfen für das Gummiband.** Die Wandlöcher im Chassis sind rund und höchstens 20 mm groß. Die Teile der Handyhalterung werden stehend gedruckt, und das Projekt schaltet Stützen nur für sie ein: ein kleiner Baum unter dem Rand des Zapfens im Kanal. Ziehen Sie ihn mit einer Zange durch die offene Rückseite des Kanals heraus. Für alle anderen Teile sind Stützen aus; wenn Sie ein Teil aus dem STL-Ordner hinzufügen, lassen Sie sie aus, außer bei Teilen der Handyhalterung. Wählen Sie vor dem Druck das tatsächlich geladene PLA und prüfen Sie die Schichtvorschau.
 
 - Der Deckel wird flach mit den Noppen nach oben gedruckt. Das Chassis wird mit dem Boden nach unten und offenem Innenraum gedruckt.
-- Entfernen Sie nach dem Druck Fäden aus den Mutterntaschen (die zwei kleinen Rippen an jeder Taschenöffnung bleiben stehen), den Löchern für die Einsätze, den Aufnahmen und den Kabelöffnungen.
+- Entfernen Sie nach dem Druck Fäden aus den Löchern für die Einsätze, den Aufnahmen und den Kabelöffnungen.
 - Drucken Sie die 0,8-mm-Unterlegscheiben flach mit 0,20 mm. Sie isolieren die Platinen und verteilen die Schraubenkraft. Ziehen Sie nur an, bis die Schraube aufsitzt, und ersetzen Sie jede verformte Scheibe.
 - Halten Sie PLA-Teile von heißen Autos und direkter Sommersonne fern, denn PLA wird bei etwa 55 °C weich.
 
@@ -116,13 +113,13 @@ Alle drei behalten den 30-k/10-k-Spannungsteiler der Firmware bei. Nur die Spann
 
 **A und B – Akkubox auf dem Deckel.** Die Box wird wie ein LEGO-Stein hinter der Handyhalterung auf die Noppen des Deckels gedrückt. Ihr Boden hat einen Kanal, der die Akkukabel nach unten durch die hintere Deckelöffnung führt. Legen Sie den Halter so in die Box, dass seine Kabel am Ende mit dem Kanal liegen. Führen Sie die Kabel durch die Bodenöffnung und die [lid_grommet](cad/stl/lid_grommet.stl) ins Chassis und drücken Sie dann den Deckel mit Noppen auf die vier Zapfen. Auch dieser Deckel hat Noppen, sodass LEGO-Steine weiterhin oben passen. Die Box ragt nicht über die Deckelschrauben in den Ecken. Die 3S-Box liegt vollständig auf dem Deckel, mit 14 mm Abstand zur Hinterkante. Alle vier Deckelschrauben bleiben bei montierter Box zugänglich.
 
-**C – LiPo-Halter innen.** Der Halter steht auf zwei Beinen in den Lücken zwischen den Motoren und sitzt knapp über dem L298N und den Schrauben der ESP32-Halter. Die Höhe des Akkus und der geschlossene Deckel halten ihn unten. Befestigen Sie den Akku mit einem 20-mm-Klettband durch die vier Schlitze am Halter. Ist der Akku dünner als 18 mm, legen Sie ein Schaumstoffpolster darauf, damit er nicht klappert. Erledigen Sie zuerst die gesamte Verkabelung des L298N: Der Halter verdeckt seine Klemmen, lässt sich aber gerade herausheben.
+**C – LiPo-Halter innen.** Der Halter steht auf zwei Beinen in den Lücken zwischen den Motoren und sitzt knapp über dem L298N und den Schnapphaken des ESP32-Trägers. Die Höhe des Akkus und der geschlossene Deckel halten ihn unten. Befestigen Sie den Akku mit einem 20-mm-Klettband durch die vier Schlitze am Halter. Ist der Akku dünner als 18 mm, legen Sie ein Schaumstoffpolster darauf, damit er nicht klappert. Erledigen Sie zuerst die gesamte Verkabelung des L298N: Der Halter verdeckt seine Klemmen, lässt sich aber gerade herausheben.
 
 > **Lithium-Sicherheit.** Verwenden Sie Zellen von einem seriösen Händler. Schützen Sie 18650-Akkus mit einer Schutzplatine (BMS). Stecken Sie an einen LiPo einen Spannungswarner, denn weder die Firmware noch der Akku schalten bei leerem Akku ab. Bauen Sie nahe am Akku eine Sicherung ein. Laden Sie LiPos nur mit einem Balance-Ladegerät, auf einer nicht brennbaren Unterlage und nie unbeaufsichtigt. Verwenden Sie keinen aufgeblähten oder beschädigten Akku.
 
 ## Zu kaufende Hardware und Elektronik
 
-**Es werden nur zwei Schraubenlängen benötigt: M3 × 10 mm und M3 × 25 mm**, beide mit Flachkopf und etwa 5,5 mm Kopfdurchmesser (keine Senkköpfe). Die Unterlegscheiben für die Platinen werden gedruckt. Legen Sie unter die Schrauben von Deckel, Träger und ESP32-Haltern keine Scheiben, denn deren Längen setzen voraus, dass der Kopf direkt auf dem Kunststoff aufliegt.
+**Es werden nur zwei Schraubenlängen benötigt: M3 × 10 mm und M3 × 25 mm**, beide mit Flachkopf und etwa 5,5 mm Kopfdurchmesser (keine Senkköpfe). Die Unterlegscheiben für die Platinen werden gedruckt. Legen Sie unter die Schrauben von Deckel und Träger keine Scheiben, denn deren Längen setzen voraus, dass der Kopf direkt auf dem Kunststoff aufliegt.
 
 Die Links unten führen zu einem Händler oder einer Amazon-US-Suche. Prüfen Sie vor der Bestellung die angegebenen Maße und Kennwerte, denn Platinen mit demselben Namen können unterschiedliche Lochbilder haben.
 
@@ -130,10 +127,10 @@ Die Links unten führen zu einem Händler oder einer Amazon-US-Suche. Prüfen Si
 
 | Anz. | Teil | Verwendung | Kaufen |
 |---:|---|---|---|
-| 20 (+ Reserve) | M3 × 5,7 mm Messing-Gewindeeinsätze zum Einschmelzen, gängige Größe mit 4,6 mm Außendurchmesser (z. B. ruthex RX-M3x5.7) | 12 im Chassis, 4 im ESP32-Träger, 4 in der Säule der Handyhalterung | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
-| 19 | M3 × 10 mm Flachkopfschrauben | 4 Deckel, 2 Träger, 4 ESP32-Halter, 4 L298N, 2 Ultraschall-Clips, 3 Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
-| 14 | M3 × 25 mm Flachkopfschrauben | 8 Motoren, 4 Drehzahlsensoren, 2 Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
-| 14 | M3-Sechskantmuttern, 5,5 mm Schlüsselweite, ≈ 2,4 mm dick | 4 Deckel, 8 Motoren, 2 Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
+| 19 (+ Reserve) | M3 × 5,7 mm Messing-Gewindeeinsätze zum Einschmelzen, gängige Größe mit 4,6 mm Außendurchmesser (z. B. ruthex RX-M3x5.7) | 14 im Chassis, 5 in der Handyhalterung | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
+| 15 | M3 × 10 mm Flachkopfschrauben | 4 Deckel, 2 Träger, 4 L298N, 5 Handyhalterung | [Suche](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
+| 12 | M3 × 25 mm Flachkopfschrauben | 8 Motoren, 4 Drehzahlsensoren (+2 für die feste Handyhalterung) | [Suche](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
+| 8 | M3-Sechskantmuttern, 5,5 mm Schlüsselweite, ≈ 2,4 mm dick | 8 Motoren (+2 für die feste Handyhalterung) | [Suche](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
 | 4 | Kleine Kabelbinder (≤ 3 mm breit) | 5-V-Wandler und Lochrasterplatine am Ständer für die Stromplatinen | [Suche](https://www.amazon.com/s?k=small+cable+ties+2.5mm) |
 | ≈ 350 g | 1,75-mm-PLA | alle gedruckten Teile | [Suche](https://www.amazon.com/s?k=PLA+filament+1.75mm) |
 
@@ -182,7 +179,7 @@ Kaufen Sie die Teile für die gewählte [Akku-Option](#akku-optionen).
   <img src="../../docs/images/compact/exploded.jpg" alt="Explosionsansicht" width="45%" />
 </p>
 
-### 1. Einsätze und Deckelmuttern einsetzen
+### 1. Einsätze einsetzen
 
 <p align="center">
   <img src="../../docs/images/compact/step_01_shell.jpg" alt="Leeres Gehäuse" width="40%" />
@@ -190,16 +187,14 @@ Kaufen Sie die Teile für die gewählte [Akku-Option](#akku-optionen).
 
 Verwenden Sie Standard-Gewindeeinsätze M3 × 5,7 mm (zum Beispiel ruthex RX-M3x5.7, 4,6 mm Außendurchmesser) in den 4,0-mm-Vorbohrungen. Drücken Sie jeden Einsatz mit einem temperaturgeregelten Lötkolben und Einsatzspitze gerade und bündig ein. Lassen Sie ihn abkühlen, bevor Sie hineinschrauben.
 
-Setzen Sie **12 Einsätze im Chassis** ein:
+Setzen Sie **14 Einsätze im Chassis** ein:
 
 - 4 in die Dome für den L298N
 - 4 in die Dome für die Drehzahlsensoren
 - 2 in das **vordere** Paar der Dome für die lange Platine (diese halten den ESP32-Träger)
-- 2 in die nach innen gerichteten Dome über der Ultraschallöffnung
+- 4 in die Eckpfosten oben an den Wänden (diese halten den Deckel)
 
-Setzen Sie **4 weitere in die Haltepfosten des ESP32-Trägers** ein. Lassen Sie die zwei hinteren Dome für die lange Platine leer, denn nur die [alternative Platine](#alternative-platine-mit-integriertem-treiber) verwendet sie.
-
-Schieben Sie in jede der vier Mutterntaschen in den Ecken eine M3-Sechskantmutter seitlich ein, mit einer Ecke voran und zwei Flächen an den Taschenwänden. Zwei kleine Rippen an der Öffnung jeder Tasche verengen sie leicht, sodass die Mutter einen festen Druck braucht (eine flache Schraubendreherspitze hilft) und dann hörbar an ihnen vorbeirutscht. Danach bleibt sie sitzen, auch wenn das Chassis umgedreht wird. Ist eine Mutter zu locker oder geht nicht hinein, prüfen Sie, ob die Tasche frei von Fäden ist.
+Lassen Sie die zwei hinteren Dome für die lange Platine leer, denn nur die [alternative Platine](#alternative-platine-mit-integriertem-treiber) verwendet sie.
 
 ### 2. Motoren und Drehzahlsensoren einbauen
 
@@ -220,9 +215,7 @@ Drehen Sie jede Welle von Hand. Die Scheibe muss ohne zu schleifen durch den opt
   <img src="../../docs/images/compact/ultrasonic_retention.jpg" alt="Halterung des Ultraschallsensors" width="40%" />
 </p>
 
-Setzen Sie den HC-SR04 in die vordere Vertiefung, sodass beide Wandler durch die runden Öffnungen ragen. Die Vertiefung positioniert die Platine, und zwei Clips halten ihre Oberkante von innen, damit sie nicht ins Chassis zurückfallen kann.
-
-Montieren Sie `ultrasonic_clip_left` auf der linken Seite des Roboters und `ultrasonic_clip_right` auf der rechten, jeweils mit der kleinen Lippe über der oberen Platinenecke. Befestigen Sie jeden Clip mit einer M3 × 10 mm Schraube in seinem nach innen gerichteten Einsatz, Schraubenkopf zur Innenseite des Chassis. Ziehen Sie an, bis der Clip auf seinem Dom aufliegt, ohne die Platine zu verbiegen. Die Platine darf sich nicht anheben oder herausziehen lassen, und die Wandler sollten rechtwinklig zur Frontwand bleiben.
+Schieben Sie den HC-SR04 von innen gerade in die vordere Vertiefung, sodass beide Wandler durch die runden Öffnungen ragen, bis die zwei federnden Arme an seinen Enden über den oberen Ecken einrasten. Die Vertiefung positioniert die Platine, und die Arme verhindern, dass sie ins Chassis zurückfällt. Zum Herausnehmen drücken Sie die oberen Enden beider Arme nach außen und ziehen die Platine zurück.
 
 Montieren Sie die zwei weißen Frontleuchten, die zwei roten Rückleuchten (jeweils im gedruckten LED-Adapter, der zu ihrem Gewinde passt) und den runden Wippschalter mit dem mitgelieferten Befestigungsmaterial. Verlegen Sie die Kabel weg von den Rädern und Encoderscheiben.
 
@@ -230,9 +223,7 @@ Montieren Sie die zwei weißen Frontleuchten, die zwei roten Rückleuchten (jewe
 
 **Flashen Sie zuerst die Firmware** ([Schritt 6](#6-firmware-einrichten-und-testlauf)), wenn Sie kein gewinkeltes USB-Kabel haben. Sobald der L298N eingebaut ist, passt kein gerader USB-Stecker mehr in den ESP32.
 
-Schrauben Sie den ESP32-Träger mit zwei M3 × 10 mm Schrauben an die zwei vorderen Dome für die lange Platine. Setzen Sie den ESP32 mit seinen eigenen Befestigungslöchern auf die vier 2,2-mm-Zentrierstifte. Keine Schraube geht durch die ESP32-Platine.
-
-Setzen Sie auf jeden der vier Trägerpfosten einen Halter, mit der Nase nach unten. Schwenken Sie den Halter, bis die Nase in das Eckloch des ESP32 fällt, und befestigen Sie ihn dann mit einer M3 × 10 mm Schraube. Jeder Halter passt an jede Ecke. Der Halter liegt auf seinem Pfosten auf und lässt etwa 0,25 mm Luft über der Platine, sodass Anziehen die Platine nicht quetschen kann. Wenn die Löcher Ihrer Platine nicht zu den Stiften passen, wenden Sie keine Gewalt an.
+Schrauben Sie den ESP32-Träger mit zwei M3 × 10 mm Schrauben an die zwei vorderen Dome für die lange Platine; seine Basis liegt flach auf dem Chassisboden. Drücken Sie den ESP32 mit seinen eigenen Befestigungslöchern auf die vier 2,2-mm-Zentrierstifte, bis die vier Eckhaken über der Platine einrasten. Keine Schraube geht durch die ESP32-Platine. Zum Herausnehmen drücken Sie die zwei Haken an einem Ende nach außen und heben dieses Ende an. Wenn die Löcher Ihrer Platine nicht zu den Stiften passen, wenden Sie keine Gewalt an.
 
 Legen Sie die vier gedruckten 2,4-mm-Abstandshalter auf die Dome für den L298N, setzen Sie den Treiber darauf und befestigen Sie jede Ecke mit einer gedruckten 0,8-mm-Unterlegscheibe und einer M3 × 10 mm Schraube (Lochbild 37 × 37 mm). Prüfen Sie, dass die Lötstellen auf der Unterseite das Chassis nicht berühren und der Kühlkörper Luft hat.
 
@@ -336,27 +327,27 @@ Installieren Sie die Android-App **OpenBot Robot**. Wählen Sie **Bluetooth**, e
   <img src="../../docs/images/compact/step_07_closed.jpg" alt="Geschlossener Körper" width="32%" />
 </p>
 
-**Handyhalterung.** Die Halterung lässt sich neigen, sodass die Kamera auch nach oben schauen kann, etwa auf eine Person vor dem Roboter.
+**Handyhalterung.** Die Halterung lässt sich neigen, sodass die Kamera auch nach oben schauen kann, etwa auf eine Person vor dem Roboter. Soll die Kamera stattdessen nach unten schauen, schrauben Sie den Fuß um 180° gedreht an und setzen das Handy mit dem Bildschirm zur Säule ein.
 
 <p align="center">
   <img src="../../docs/images/phone_mount/phone_tilt_hinge.jpg" alt="Scharnier der neigbaren Handyhalterung" width="32%" />
-  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Neigbare Handyhalterung bei 0, 10, 20 und 30 Grad" width="64%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Neigbare Handyhalterung bei 0, 15 und 30 Grad, oben normal und unten gedreht montiert" width="64%" />
 </p>
 
-1. Schmelzen Sie wie in Schritt 1 vier M3-Einsätze in die Säule ein: je einen in beide Enden des hinteren Drehlochs und je einen in die zwei vorderen Arretierlöcher, die nur auf einer Seite offen sind.
-2. Drücken Sie zwei M3-Muttern in die Taschen des Fußes. Schrauben Sie den Fuß mit zwei M3 × 25 mm Schrauben von unten an die vordere Fläche des Deckels.
-3. Setzen Sie die Säule so zwischen die Wangen, dass die offenen Arretierlöcher zur Wange mit fünf Löchern zeigen. Drehen Sie durch jede Wange eine M3 × 10 mm Schraube in die Einsätze des Drehlochs und ziehen Sie sie an, bis sich die Säule ohne Spiel drehen lässt. Geben Sie auf beide Achsschrauben einen Tropfen mittelfeste (blaue) Schraubensicherung, damit sie sich nicht lösen.
-4. Neigen Sie die Säule nach hinten, bis einer ihrer Arretiereinsätze mit einem Loch der Wange fluchtet. Das vordere Lochpaar ergibt 0° (unten) und 20° (oben), das hintere 10° (unten) und 30° (oben). Arretieren Sie die Säule mit der dritten M3 × 10 mm Schraube.
+1. Schmelzen Sie wie in Schritt 1 drei M3-Einsätze in die Säule ein: je einen in beide Enden des hinteren Drehlochs und einen in das vordere Arretierloch, das nur auf einer Seite offen ist.
+2. Schmelzen Sie zwei M3-Einsätze in die Löcher an der Unterseite des Fußes ein. Schrauben Sie den Fuß mit zwei M3 × 10 mm Schrauben von unten an die vordere Fläche des Deckels.
+3. Setzen Sie die Säule so zwischen die Wangen, dass das offene Arretierloch zur Wange mit vier Löchern zeigt. Drehen Sie durch jede Wange eine M3 × 10 mm Schraube in die Einsätze des Drehlochs und ziehen Sie sie an, bis sich die Säule ohne Spiel drehen lässt. Geben Sie auf beide Achsschrauben einen Tropfen mittelfeste (blaue) Schraubensicherung, damit sie sich nicht lösen.
+4. Neigen Sie die Säule, bis ihr Arretiereinsatz mit einem der drei Löcher der Wange fluchtet: Das unterste ergibt 0°, das mittlere 15° und das oberste 30°. Arretieren Sie die Säule mit der dritten M3 × 10 mm Schraube.
 5. Setzen Sie den verschiebbaren Griff ein und spannen Sie ihn mit einem Gummiband oder einer Feder. Prüfen Sie mit dem Handy in seiner Hülle, dass es fest gehalten wird, die Kamera freie Sicht hat und keine Tasten gedrückt werden.
 
-Auch bei 30° bleibt etwa 15 mm Abstand zum Akkukasten. Wenn Sie keine Neigung brauchen, drucken Sie [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) statt Fuß und Säule: Drücken Sie zwei M3-Muttern in die Taschen und schrauben Sie die Basis genauso an die Fläche des Deckels. Sie nimmt denselben Griff auf, und das Handy sitzt 10,5 mm tiefer.
+Auch bei 30° bleibt etwa 15 mm Abstand zum Akkukasten. Wenn Sie keine Neigung brauchen, drucken Sie [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) statt Fuß und Säule: Drücken Sie zwei M3-Muttern in die Taschen und schrauben Sie die Basis mit zwei M3 × 25 mm Schrauben von unten an die Fläche des Deckels. Sie nimmt denselben Griff auf, und das Handy sitzt 10,5 mm tiefer.
 
 **Deckelöffnungen.** Der Deckel hat zwei Öffnungen von 1 × 2 Noppen, eine vor und eine hinter der Handyfläche. Setzen Sie den Deckel so auf, dass die Handyfläche zum Ultraschallsensor vorne zeigt. Die Fläche liegt 16 mm vor der Deckelmitte; die hintere Noppenfläche trägt die Akkubox. Drücken Sie in jede ungenutzte Öffnung einen `lid_plug`; er ergänzt die Noppen, und eine 1 mm breite Kante unten in der Öffnung verhindert, dass er durchfällt. Wo ein Kabel durchgeht, verwenden Sie stattdessen die `lid_grommet`:
 
 - **Kabelverbindung zum Handy:** Führen Sie ein 90°-USB-Kabel vom ESP32 durch die vordere Öffnung nach oben zum Handy. Setzen Sie einen USB-Power-Blocker in die Leitung, damit sich Handy und 5-V-Wandler nicht gegenseitig speisen. Wählen Sie in der App **USB** statt Bluetooth.
 - **Akkubox (Optionen A und B):** Die Akkukabel kommen durch die hintere Öffnung nach unten.
 
-Bauen Sie jetzt den LiPo-Halter ein, wenn Sie Option C verwenden. Legen Sie die Kabel vom Rand weg, setzen Sie den Deckel flach auf das Chassis und drehen Sie vier M3 × 10 mm Schrauben (ohne Scheiben) in die Muttern in den Ecken. Ziehen Sie sie gleichmäßig an, bis sie aufsitzen. Der Deckel darf sich nicht anheben, und die Halterung darf nicht wackeln. Drücken Sie bei den Optionen A und B die Akkubox hinter der Handyhalterung auf die Noppen.
+Bauen Sie jetzt den LiPo-Halter ein, wenn Sie Option C verwenden. Legen Sie die Kabel vom Rand weg, setzen Sie den Deckel flach auf das Chassis und drehen Sie vier M3 × 10 mm Schrauben (ohne Scheiben) in die Einsätze in den Ecken. Ziehen Sie sie gleichmäßig an, bis sie aufsitzen. Der Deckel darf sich nicht anheben, und die Halterung darf nicht wackeln. Drücken Sie bei den Optionen A und B die Akkubox hinter der Handyhalterung auf die Noppen.
 
 Montieren Sie die Räder erst, wenn der Testlauf bestanden ist. Fahren Sie das erste Mal langsam auf einem freien, ebenen Boden und prüfen Sie danach alle Schrauben und den Handygriff. Heben Sie den Roboter am Chassis an, nicht am Deckel, an der Handyhalterung oder an der Akkubox.
 
@@ -368,10 +359,10 @@ Montieren Sie die Räder erst, wenn der Testlauf bestanden ist. Fahren Sie das e
 
 Das Chassis nimmt auch die OpenBot-**PCB V2** (Arduino Nano + DRV8871-Treiber) auf, die ein Befestigungsraster von 121,031 × 28,448 mm hat. Das ist ein anderer elektrischer Aufbau und **kein** direkter Ersatz für den ESP32. Sie läuft mit der Firmware `PCB_V2` und der Nano-Verkabelung.
 
-- Lassen Sie den ESP32-Träger, seine vier Halter, den L298N und den Ständer für die Stromplatinen weg.
-- Setzen Sie 4 Einsätze in die vier Dome für die lange Platine. Mit den 4 Sensor- und 2 Ultraschalleinsätzen sind das **insgesamt 10 Einsätze**.
+- Lassen Sie den ESP32-Träger, den L298N und den Ständer für die Stromplatinen weg.
+- Setzen Sie 4 Einsätze in die vier Dome für die lange Platine. Mit den 4 Einsätzen für die Sensoren, 4 für den Deckel und 5 für die Handyhalterung sind das **insgesamt 17 Einsätze**.
 - Montieren Sie die Platine auf vier gedruckten 2,4-mm-Abstandshaltern, mit einer gedruckten Unterlegscheibe und einer M3 × 10 mm Schraube an jedem Loch.
-- Hardware insgesamt: **13 × M3 × 10** (4 Deckel, 4 Platine, 2 Clips, 3 Handyhalterung), **14 × M3 × 25**, 14 Muttern.
+- Hardware insgesamt: **13 × M3 × 10** (4 Deckel, 4 Platine, 5 Handyhalterung), **12 × M3 × 25**, 8 Muttern.
 
 Bestellen Sie die Platine mit den [Fertigungsdateien und der Stückliste der PCB V2](../diy/pcb/v2), zum Beispiel bei [JLCPCB](https://jlcpcb.com/) oder [PCBWay](https://www.pcbway.com/). Prüfen Sie vor dem Festschrauben die Höhe der bestückten Bauteile und den Abstand der Lötstellen. Die Akku-Optionen oben funktionieren mit dieser Platine genauso.
 
@@ -387,7 +378,7 @@ Bestellen Sie die Platine mit den [Fertigungsdateien und der Stückliste der PCB
 | Keine Zählung von einem Encoder | Sensor nicht an 3,3 V, Scheibe nicht im Schlitz oder Scheibe nicht lichtundurchlässig |
 | Roboter dreht, obwohl er geradeaus fahren soll | Die Motorkabel einer Seite sind vertauscht; tauschen Sie das Paar an OUT1/OUT2 oder OUT3/OUT4 |
 | Akkuwert falsch oder App zeigt „niedrig“ | Der Teiler muss 30 k (oben) / 10 k (unten) sein, und die Spannungsgrenzen müssen zu Ihrer Option passen |
-| Deckel sitzt nicht auf | Ein Kabel ist am Rand eingeklemmt, der LiPo ist zu dick, oder eine Mutter ist nicht ganz an den Rippen vorbei in ihre Tasche geschoben |
+| Deckel sitzt nicht auf | Ein Kabel ist am Rand eingeklemmt, der LiPo ist zu dick, oder ein Deckeleinsatz steht über seinen Pfosten hinaus |
 | Akkubox sitzt locker auf dem Deckel | Die gedruckten Noppen sind zu klein geraten. Erhöhen Sie den Fluss leicht oder prüfen Sie die Maßgenauigkeit des Druckers und drucken Sie die Box neu |
 
 ## Ansichten
