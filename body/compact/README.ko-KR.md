@@ -56,10 +56,10 @@ OpenBot Compact는 **ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [Ope
 | [phone_mount_tilt_column](../phone_mount/phone_mount_tilt_column.stl) ([STEP](../phone_mount/phone_mount_tilt_column.step)) | 1 | 휴대폰 거치대 기둥, 뒤로 0–30° 기울어짐; 세워서 출력, 고무줄 돌기 아래에만 서포트 |
 | [phone_mount_top](../phone_mount/phone_mount_top.stl) ([STEP](../phone_mount/phone_mount_top.step)) | 1 | 슬라이드식 휴대폰 그립; 세워서 출력, 고무줄 돌기 아래에만 서포트 |
 | [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) ([STEP](../phone_mount/phone_mount_bottom.step)) | 1 *(선택)* | 각도 조절 받침과 기둥 대신 쓰는 고정형 휴대폰 거치대 받침; 발을 바닥에 두고 세워서 출력, 고무줄 돌기 아래에만 서포트 |
-| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | 12 mm 패널 램프용 어댑터: 앞쪽 2개, 뒤쪽 2개 |
-| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(선택)* | 10 mm 패널 램프용, `led_adapter` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
-| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(선택)* | 8 mm 패널 램프용, `led_adapter` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
-| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(선택)* | 6 mm 패널 램프용, `led_adapter` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
+| [led_adapter_12mm](cad/stl/led_adapter_12mm.stl) ([STEP](cad/step/led_adapter_12mm.step)) | 4 | 12 mm 패널 램프용 어댑터: 앞쪽 2개, 뒤쪽 2개 |
+| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(선택)* | 10 mm 패널 램프용, `led_adapter_12mm` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
+| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(선택)* | 8 mm 패널 램프용, `led_adapter_12mm` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
+| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(선택)* | 6 mm 패널 램프용, `led_adapter_12mm` 대신 사용; 나사산이 짧아도 너트가 닿도록 길이 6 mm |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | 선택 사항; **불투명** 필라멘트로 출력하거나 맞는 기성품 디스크를 사용하세요. 평평하게 출력해요. |
 
 센서 지지대 4개는 모두 같아서 어느 것이든 어느 위치에나 맞아요. 배터리용 부품은 [배터리 옵션](#배터리-옵션)에 정리되어 있어요.
@@ -149,7 +149,7 @@ Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세�
 | 1 | 5 V 컨버터, 2 A 이상, 최대 21 × 43 × 14 mm | 전원 보드 스탠드에 맞아요. 3S에는 LM2596 모듈을 쓸 수 있어요. 2S에는 6 V 입력에서도 5 V를 내는 종류를 고르세요 (예: MP1584 또는 벅-부스트). | [검색](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | 작은 만능기판, 최대 24 × 34 mm | 배터리 분압기와 에코 분압기, 램프 구동 회로; 스탠드 뒷면에 붙여요 | [검색](https://www.amazon.com/s?k=small+prototype+perfboard) |
 | 1세트 | 1 % 저항 | 배터리 분압기 30 k + 10 k; 에코 분압기 10 k + 20 k; 램프 1 k 4개 + 100 k 4개 | [검색](https://www.amazon.com/s?k=1+percent+metal+film+resistor+assortment+10k+20k+30k+1k+100k) |
-| 2 + 2 | 흰색과 빨간색 패널 표시등 *(선택)* | 12 mm 나사산은 `led_adapter`에 맞아요. 10, 8, 6 mm 램프는 맞는 크기의 어댑터를 출력하세요. 램프 전압을 확인하세요 | [검색](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
+| 2 + 2 | 흰색과 빨간색 패널 표시등 *(선택)* | 12 mm 나사산은 `led_adapter_12mm`에 맞아요. 10, 8, 6 mm 램프는 맞는 크기의 어댑터를 출력하세요. 램프 전압을 확인하세요 | [검색](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
 | 4 | NPN 트랜지스터, 예: PN2222A *(선택, 램프용)* | 각 램프의 로우사이드 스위치 | [검색](https://www.amazon.com/s?k=PN2222A+transistor) |
 | 1세트 | 듀폰 점퍼선, 실리콘 전원선, 수축 튜브 | 전원선은 모터 구속 전류에 맞춰 선택하세요 | [검색](https://www.amazon.com/s?k=silicone+wire+kit+20+22+AWG+heat+shrink) |
 

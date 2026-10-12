@@ -56,10 +56,10 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 | [phone_mount_tilt_column](../phone_mount/phone_mount_tilt_column.stl) ([STEP](../phone_mount/phone_mount_tilt_column.step)) | 1 | Säule der Handyhalterung, neigt sich 0–30° nach hinten; steht aufrecht, Stützen nur unter dem Zapfen für das Gummiband |
 | [phone_mount_top](../phone_mount/phone_mount_top.stl) ([STEP](../phone_mount/phone_mount_top.step)) | 1 | Verschiebbarer Handygriff; steht aufrecht, Stützen nur unter dem Zapfen für das Gummiband |
 | [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) ([STEP](../phone_mount/phone_mount_bottom.step)) | 1 *(optional)* | Feste Basis der Handyhalterung statt Neigefuß und Säule; steht aufrecht auf ihrem Fuß, Stützen nur unter dem Zapfen für das Gummiband |
-| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Adapter für 12-mm-Einbauleuchten: 2 vorne, 2 hinten |
-| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(optional)* | Dasselbe für 10-mm-Einbauleuchten, statt `led_adapter`; 6 mm lang, damit auch kurze Gewinde die Mutter erreichen |
-| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(optional)* | Dasselbe für 8-mm-Einbauleuchten, statt `led_adapter`; 6 mm lang, damit auch kurze Gewinde die Mutter erreichen |
-| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(optional)* | Dasselbe für 6-mm-Einbauleuchten, statt `led_adapter`; 6 mm lang, damit auch kurze Gewinde die Mutter erreichen |
+| [led_adapter_12mm](cad/stl/led_adapter_12mm.stl) ([STEP](cad/step/led_adapter_12mm.step)) | 4 | Adapter für 12-mm-Einbauleuchten: 2 vorne, 2 hinten |
+| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(optional)* | Dasselbe für 10-mm-Einbauleuchten, statt `led_adapter_12mm`; 6 mm lang, damit auch kurze Gewinde die Mutter erreichen |
+| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(optional)* | Dasselbe für 8-mm-Einbauleuchten, statt `led_adapter_12mm`; 6 mm lang, damit auch kurze Gewinde die Mutter erreichen |
+| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(optional)* | Dasselbe für 6-mm-Einbauleuchten, statt `led_adapter_12mm`; 6 mm lang, damit auch kurze Gewinde die Mutter erreichen |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optional; in **lichtundurchlässigem** Filament drucken oder passende gekaufte Scheiben verwenden. Wird flach gedruckt. |
 
 Die vier Sensorhalter sind identisch, daher passt jeder an jede Position. Die Teile für Ihren Akku sind unter [Akku-Optionen](#akku-optionen) aufgeführt.
@@ -149,7 +149,7 @@ Die Links unten führen zu einem Händler oder einer Amazon-US-Suche. Prüfen Si
 | 1 | 5-V-Wandler, ≥ 2 A, max. 21 × 43 × 14 mm | Passt auf den Ständer für die Stromplatinen. Für 3S funktioniert ein LM2596-Modul. Für 2S einen Typ wählen, der auch aus 6 V Eingang noch 5 V liefert (z. B. MP1584 oder Buck-Boost). | [Suche](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | Kleine Lochrasterplatine, max. 24 × 34 mm | Akku- und Echo-Spannungsteiler, Lichttreiber; sitzt auf der Rückseite des Ständers | [Suche](https://www.amazon.com/s?k=small+prototype+perfboard) |
 | 1 Satz | 1-%-Widerstände | Akku-Teiler 30 k + 10 k; Echo-Teiler 10 k + 20 k; Leuchten 4 × 1 k + 4 × 100 k | [Suche](https://www.amazon.com/s?k=1+percent+metal+film+resistor+assortment+10k+20k+30k+1k+100k) |
-| 2 + 2 | Weiße und rote Einbauleuchten *(optional)* | 12-mm-Gewinde passt in `led_adapter`; für 10-, 8- oder 6-mm-Leuchten den passenden Adapter drucken. Lampenspannung prüfen | [Suche](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
+| 2 + 2 | Weiße und rote Einbauleuchten *(optional)* | 12-mm-Gewinde passt in `led_adapter_12mm`; für 10-, 8- oder 6-mm-Leuchten den passenden Adapter drucken. Lampenspannung prüfen | [Suche](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
 | 4 | NPN-Transistoren, z. B. PN2222A *(optional, für die Leuchten)* | Low-Side-Schalter für jede Leuchte | [Suche](https://www.amazon.com/s?k=PN2222A+transistor) |
 | 1 Satz | Dupont-Kabel, Silikon-Stromkabel, Schrumpfschlauch | Stromkabel für den Blockierstrom der Motoren auslegen | [Suche](https://www.amazon.com/s?k=silicone+wire+kit+20+22+AWG+heat+shrink) |
 
