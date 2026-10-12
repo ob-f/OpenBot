@@ -21,7 +21,7 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 | **Controller** | ESP32 DevKit V1 (30-pin), OpenBot firmware `DIY_ESP32`; phone link by Bluetooth or USB cable |
 | **Sensors** | HC-SR04 ultrasonic (front), 4 × LM393 optical wheel encoders, battery voltage |
 | **Power** | Choose one: 2S or 3S 18650 box on the lid, or a small LiPo pack inside (see [Battery options](#battery-options)) |
-| **Fasteners** | Only M3 × 10 and M3 × 25 pan-head screws, M3 nuts and 20 heat-set inserts |
+| **Fasteners** | Only M3 × 10 and M3 × 25 pan-head screws, M3 nuts and 19 heat-set inserts |
 | **Printing** | PLA, two A1 mini plates, ≈ 12 h and ≈ 305 g, plus the parts for your chosen battery option |
 
 > **Left and right** in this guide always mean the **robot's own** left and right: stand behind the robot (switch end) and look forward over the lid toward the ultrasonic sensor. This is the same convention the firmware uses for "left" and "right" motors and encoders.
@@ -31,7 +31,7 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 - [Printed parts](#printed-parts) · [Printing](#printing)
 - [Battery options](#battery-options)
 - [Hardware and electronics to buy](#hardware-and-electronics-to-buy)
-- Assembly: [1 Inserts and nuts](#1-install-inserts-and-lid-nuts) · [2 Motors and encoders](#2-install-motors-and-speed-sensors) · [3 Ultrasonic sensor and panel](#3-secure-the-ultrasonic-sensor-and-panel-parts) · [4 ESP32 and driver](#4-fit-the-esp32-and-motor-driver) · [5 Wiring](#5-wire-power-and-signals) · [6 Firmware and bench test](#6-configure-firmware-and-bench-test) · [7 Battery, phone holder and lid](#7-fit-the-battery-phone-holder-and-lid)
+- Assembly: [1 Inserts](#1-install-the-inserts) · [2 Motors and encoders](#2-install-motors-and-speed-sensors) · [3 Ultrasonic sensor and panel](#3-secure-the-ultrasonic-sensor-and-panel-parts) · [4 ESP32 and driver](#4-fit-the-esp32-and-motor-driver) · [5 Wiring](#5-wire-power-and-signals) · [6 Firmware and bench test](#6-configure-firmware-and-bench-test) · [7 Battery, phone holder and lid](#7-fit-the-battery-phone-holder-and-lid)
 - [Alternative integrated-driver PCB](#alternative-integrated-driver-pcb)
 - [Troubleshooting](#troubleshooting) · [Views](#views) · [Next](#next)
 
@@ -47,11 +47,8 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 | [top_cover](cad/stl/top_cover.stl) ([STEP](cad/step/top_cover.step)) | 1 | Studded lid with two cable openings; flat underside down, studs up |
 | [lid_plug](cad/stl/lid_plug.stl) ([STEP](cad/step/lid_plug.step)) | 2 | Closes the lid openings; restores the two studs. Studs up. |
 | [lid_grommet](cad/stl/lid_grommet.stl) ([STEP](cad/step/lid_grommet.step)) | 1 *(optional)* | Replaces a plug where a cable passes through. Studs up. |
-| [esp32_carrier](cad/stl/esp32_carrier.stl) ([STEP](cad/step/esp32_carrier.step)) | 1 | ESP32 support frame; flat base down |
-| [esp32_retainer](cad/stl/esp32_retainer.stl) ([STEP](cad/step/esp32_retainer.step)) | 4 | ESP32 corner tabs; any tab fits any corner. Flat down, nib up. |
+| [esp32_carrier](cad/stl/esp32_carrier.stl) ([STEP](cad/step/esp32_carrier.step)) | 1 | ESP32 carrier with four snap hooks; stands on its flat base, no supports |
 | [sensor_support](cad/stl/sensor_support.stl) ([STEP](cad/step/sensor_support.step)) | 4 | Speed-sensor supports; any support fits any wheel |
-| [ultrasonic_clip_left](cad/stl/ultrasonic_clip_left.stl) ([STEP](cad/step/ultrasonic_clip_left.step)) | 1 | Upper **left** corner of the HC-SR04 board |
-| [ultrasonic_clip_right](cad/stl/ultrasonic_clip_right.stl) ([STEP](cad/step/ultrasonic_clip_right.step)) | 1 | Upper **right** corner of the HC-SR04 board |
 | [power_board_stand](cad/stl/power_board_stand.stl) ([STEP](cad/step/power_board_stand.step)) | 1 | Holds the 5 V converter and the divider perfboard behind the heatsink. Base down. |
 | [pcb_spacer](cad/stl/pcb_spacer.stl) ([STEP](cad/step/pcb_spacer.step)) | 4 | 2.4 mm insulating standoffs under the L298N |
 | [pcb_washer](cad/stl/pcb_washer.stl) ([STEP](cad/step/pcb_washer.step)) | 8 | 0.8 mm insulating washers: 4 for the L298N, 4 for the speed sensors |
@@ -65,7 +62,7 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 | [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(optional)* | Same for 6 mm panel lights, instead of `led_adapter`; 6 mm long so short threads still reach the nut |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Optional; print in **opaque** filament, or use matching purchased disks. Prints flat. |
 
-The four ESP32 retainers are identical, and so are the four sensor supports, so any one fits any position. The ultrasonic clips are a mirrored left/right pair. Print them lying on their broad back faces. The parts for your battery are listed under [Battery options](#battery-options).
+The four sensor supports are identical, so any one fits any position. The parts for your battery are listed under [Battery options](#battery-options).
 
 ## Printing
 
@@ -75,7 +72,7 @@ Open **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Plates 
 
 | Plate | Contents | Time* | Filament* |
 |---|---|---:|---:|
-| 1 – Chassis and accessories | chassis, power-board stand, ESP32 carrier, 4 sensor supports, 4 LED adapters, both ultrasonic clips, 4 ESP32 retainers, 4 spacers, 8 washers | ≈ 7 h 50 min | ≈ 215 g |
+| 1 – Chassis and accessories | chassis, power-board stand, ESP32 carrier, 4 sensor supports, 4 LED adapters, 4 spacers, 8 washers | ≈ 7 h 50 min | ≈ 215 g |
 | 2 – Lid and phone holder | studded lid, tilting phone holder (base, column, grip), 4 encoder disks, 2 lid plugs | ≈ 3 h 50 min | ≈ 90 g |
 | 3 – Battery A (2S box) | 2S battery box, its cover, lid grommet | ≈ 1 h 40 min | ≈ 42 g |
 | 4 – Battery B (3S box) | 3S battery box, its cover, lid grommet | ≈ 2 h 20 min | ≈ 58 g |
@@ -85,10 +82,10 @@ Open **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)** in Bambu Studio. Plates 
 
 \*Estimates with Generic PLA; plates 2–7 are scaled from part volume. Your times will differ. Press **Slice plate** for each plate before printing.
 
-Profile: 0.4 mm nozzle, 0.20 mm layers, 4 walls, 5 top and 5 bottom layers, 30 % gyroid infill, textured PEI plate. **Only the phone-holder parts need supports, and only under the small band stud.** The wall holes in the chassis are round and at most 20 mm across, and its nut pockets bridge about 8 mm. The phone-holder parts print standing upright, and the project turns supports on for them alone: a small tree under the lip of the band stud, inside the channel. Pull it out with pliers through the open back of the channel. Supports are off for every other part; if you add a part from the STL folder, leave them off unless it is a phone-holder part. Before printing, select the PLA that is actually loaded and check the layer preview.
+Profile: 0.4 mm nozzle, 0.20 mm layers, 4 walls, 5 top and 5 bottom layers, 30 % gyroid infill, textured PEI plate. **Only the phone-holder parts need supports, and only under the small band stud.** The wall holes in the chassis are round and at most 20 mm across. The phone-holder parts print standing upright, and the project turns supports on for them alone: a small tree under the lip of the band stud, inside the channel. Pull it out with pliers through the open back of the channel. Supports are off for every other part; if you add a part from the STL folder, leave them off unless it is a phone-holder part. Before printing, select the PLA that is actually loaded and check the layer preview.
 
 - The lid prints flat with its studs up. The chassis prints floor down with the cavity open.
-- After printing, clear strings from nut pockets (leave the two small ribs at each pocket mouth in place), insert holes, sockets and cable openings.
+- After printing, clear strings from insert holes, sockets and cable openings.
 - Print the 0.8 mm washers flat at 0.20 mm. They insulate the boards and spread the screw load. Tighten only until seated and replace any washer that deforms.
 - Keep PLA parts out of hot cars and direct summer sun, because PLA softens at about 55 °C.
 
@@ -116,13 +113,13 @@ All three keep the firmware's 30 k / 10 k battery divider. Only the voltage limi
 
 **A and B – battery box on the lid.** The box presses onto the lid's studs behind the phone holder like a LEGO brick. Its floor has a channel that leads the battery wires down through the rear lid opening. Lay the holder in the box with its wires at the end with the channel. Feed the wires through the floor opening and the [lid_grommet](cad/stl/lid_grommet.stl) into the chassis, then press the studded cover onto the four pegs. The cover has studs too, so LEGO bricks still fit on top. The box clears the corner lid screws. The 3S box sits fully within the lid, with 14 mm between the box and the rear edge. All four lid screws remain accessible with the box installed.
 
-**C – LiPo tray inside.** The tray stands on two legs in the gaps between the motors and sits just above the L298N and the ESP32 retainer screws. The battery's own height and the closed lid hold it down. Strap the pack to the tray with a 20 mm hook-and-loop strap through the four slots. If the pack is thinner than 18 mm, add a foam pad on top so it can't rattle. Do all the L298N wiring first: the tray covers its terminals, but lifts straight out.
+**C – LiPo tray inside.** The tray stands on two legs in the gaps between the motors and sits just above the L298N and the snap hooks of the ESP32 carrier. The battery's own height and the closed lid hold it down. Strap the pack to the tray with a 20 mm hook-and-loop strap through the four slots. If the pack is thinner than 18 mm, add a foam pad on top so it can't rattle. Do all the L298N wiring first: the tray covers its terminals, but lifts straight out.
 
 > **Lithium safety.** Use cells from a reputable dealer. Protect 18650 packs with a protection board (BMS). Fit a plug-in voltage alarm to a LiPo, because neither the firmware nor the pack switches off when it is empty. Fit a fuse close to the battery. Charge LiPos only on a balance charger, on a non-flammable surface, and never unattended. Don't use a pack that is swollen or damaged.
 
 ## Hardware and electronics to buy
 
-**Only two screw lengths are needed: M3 × 10 mm and M3 × 25 mm**, both pan head with a head about 5.5 mm across (no countersunk heads). Washers for the circuit boards are printed. Don't add washers under the lid, carrier or ESP32-retainer screws, because their lengths assume the head seats directly on the plastic.
+**Only two screw lengths are needed: M3 × 10 mm and M3 × 25 mm**, both pan head with a head about 5.5 mm across (no countersunk heads). Washers for the circuit boards are printed. Don't add washers under the lid or carrier screws, because their lengths assume the head seats directly on the plastic.
 
 The links below go to a supplier or an Amazon US search. Check the listed dimensions and ratings before you order, because boards sold under the same name can have different hole patterns.
 
@@ -130,10 +127,10 @@ The links below go to a supplier or an Amazon US search. Check the listed dimens
 
 | Qty | Part | Used for | Buy |
 |---:|---|---|---|
-| 20 (+ spares) | M3 × 5.7 mm brass heat-set inserts, the common 4.6 mm OD size (e.g. ruthex RX-M3x5.7) | 12 in the chassis, 4 in the ESP32 carrier, 4 in the phone-holder column | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
-| 19 | M3 × 10 mm pan-head screws | 4 lid, 2 carrier, 4 ESP32 retainers, 4 L298N, 2 ultrasonic clips, 3 phone holder | [search](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
-| 14 | M3 × 25 mm pan-head screws | 8 motors, 4 speed sensors, 2 phone holder | [search](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
-| 14 | M3 hex nuts, 5.5 mm across flats, ≈ 2.4 mm thick | 4 lid, 8 motors, 2 phone holder | [search](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
+| 19 (+ spares) | M3 × 5.7 mm brass heat-set inserts, the common 4.6 mm OD size (e.g. ruthex RX-M3x5.7) | 14 in the chassis, 5 in the phone holder | [ruthex](https://www.ruthex.de/products/ruthex-gewindeeinsatz-m3-100-stuck-rx-m3x5-7-messing-gewindebuchsen) |
+| 15 | M3 × 10 mm pan-head screws | 4 lid, 2 carrier, 4 L298N, 5 phone holder | [search](https://www.amazon.com/s?k=M3+x+10+pan+head+screws+ISO+7045) |
+| 12 | M3 × 25 mm pan-head screws | 8 motors, 4 speed sensors (+2 for the fixed phone holder) | [search](https://www.amazon.com/s?k=M3+x+25+pan+head+screws+ISO+7045) |
+| 8 | M3 hex nuts, 5.5 mm across flats, ≈ 2.4 mm thick | 8 motors (+2 for the fixed phone holder) | [search](https://www.amazon.com/s?k=M3+hex+nuts+DIN+934) |
 | 4 | Small cable ties (≤ 3 mm wide) | 5 V converter and perfboard on the power-board stand | [search](https://www.amazon.com/s?k=small+cable+ties+2.5mm) |
 | ≈ 350 g | 1.75 mm PLA | all printed parts | [search](https://www.amazon.com/s?k=PLA+filament+1.75mm) |
 
@@ -182,7 +179,7 @@ Buy the items for the [battery option](#battery-options) you chose.
   <img src="../../docs/images/compact/exploded.jpg" alt="Exploded view" width="45%" />
 </p>
 
-### 1. Install inserts and lid nuts
+### 1. Install the inserts
 
 <p align="center">
   <img src="../../docs/images/compact/step_01_shell.jpg" alt="Empty shell" width="40%" />
@@ -190,16 +187,14 @@ Buy the items for the [battery option](#battery-options) you chose.
 
 Use standard M3 × 5.7 mm heat-set inserts (for example ruthex RX-M3x5.7, 4.6 mm outer diameter) in the 4.0 mm pilot holes. Press each insert in square and flush with a temperature-controlled iron and insert tip. Let it cool before screwing into it.
 
-Install **12 inserts in the chassis**:
+Install **14 inserts in the chassis**:
 
 - 4 in the L298N bosses
 - 4 in the speed-sensor bosses
 - 2 in the **front** pair of long-PCB bosses (these hold the ESP32 carrier)
-- 2 in the inward-facing bosses above the ultrasonic opening
+- 4 in the corner posts at the top of the walls (these hold the lid)
 
-Install **4 more in the ESP32 carrier's** retaining posts. Leave the two rear long-PCB bosses empty, because only the [alternative PCB](#alternative-integrated-driver-pcb) uses them.
-
-Push one M3 hex nut sideways into each of the four corner lid-lock pockets, with a corner leading and two flats against the pocket walls. Two small ribs at the mouth of each pocket narrow it slightly, so the nut needs a firm push (a flat screwdriver tip helps) and then clicks past them. Once in, it stays put even when the chassis is turned over. If a nut is too loose or won't go in, check that the pocket is free of strings.
+Leave the two rear long-PCB bosses empty, because only the [alternative PCB](#alternative-integrated-driver-pcb) uses them.
 
 ### 2. Install motors and speed sensors
 
@@ -220,9 +215,7 @@ Turn each shaft by hand. The disk must pass through the optical slot without rub
   <img src="../../docs/images/compact/ultrasonic_retention.jpg" alt="Ultrasonic retention" width="40%" />
 </p>
 
-Seat the HC-SR04 in the front recess with both transducers through the round openings. The recess locates the board, and two clips hold its upper edge from inside so it can't fall back into the chassis.
-
-Fit `ultrasonic_clip_left` on the robot's left and `ultrasonic_clip_right` on the robot's right, each with its small lip over the upper PCB corner. Fix each clip with one M3 × 10 mm screw into its inward-facing insert, screw head toward the inside of the chassis. Tighten until the clip sits on its boss without bending the PCB. The board must not lift or pull out, and the transducers should stay square to the front panel.
+Push the HC-SR04 straight into the front recess from inside, with both transducers through the round openings, until the two flexible arms at its ends click over its upper corners. The recess locates the board, and the arms stop it from falling back into the chassis. To take it out, push the tops of both arms outward and pull the board back.
 
 Fit the two white front lights, the two red rear lights (each in the printed LED adapter that matches its thread size) and the round rocker switch, using the retaining hardware supplied with them. Route the wires away from the wheels and encoder disks.
 
@@ -230,9 +223,7 @@ Fit the two white front lights, the two red rear lights (each in the printed LED
 
 **Flash the firmware first** ([step 6](#6-configure-firmware-and-bench-test)) if you don't have a right-angle USB cable. Once the L298N is in, a straight USB plug no longer fits the ESP32.
 
-Screw the ESP32 carrier to the two front long-PCB bosses with two M3 × 10 mm screws. Lower the ESP32 onto the four 2.2 mm locating pegs through its own mounting holes. No screw passes through the ESP32 PCB.
-
-Put a retaining tab on each of the four carrier posts with its nib facing down. Swing the tab until the nib drops into the ESP32's corner hole, then fasten it with one M3 × 10 mm screw. Any tab fits any corner. The tab bottoms out on its post and leaves about 0.25 mm above the PCB, so tightening can't crush the board. If your board's holes don't line up with the pegs, don't force it.
+Screw the ESP32 carrier to the two front long-PCB bosses with two M3 × 10 mm screws; its base sits flat on the chassis floor. Press the ESP32 down onto the four 2.2 mm locating pegs, through its own mounting holes, until the four corner hooks click over the board. No screw passes through the ESP32 PCB. To take the board out, push the two hooks at one end outward and lift that end. If your board's holes don't line up with the pegs, don't force it.
 
 Put the four 2.4 mm printed spacers on the L298N bosses, set the driver on them, and fix each corner with a printed 0.8 mm washer and an M3 × 10 mm screw (37 × 37 mm pattern). Check that solder joints underneath clear the chassis and that the heatsink has room to breathe.
 
@@ -336,27 +327,27 @@ Install the **OpenBot Robot** Android app. Choose **Bluetooth**, grant the permi
   <img src="../../docs/images/compact/step_07_closed.jpg" alt="Closed body" width="32%" />
 </p>
 
-**Phone holder.** The holder tilts, so the camera can also look up, for example at a person standing in front of the robot.
+**Phone holder.** The holder tilts, so the camera can also look up, for example at a person standing in front of the robot. To make the camera look down instead, screw the foot on turned around by 180° and put the phone in with its screen toward the column.
 
 <p align="center">
   <img src="../../docs/images/phone_mount/phone_tilt_hinge.jpg" alt="Hinge of the tilting phone holder" width="32%" />
-  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Tilting phone holder at 0, 10, 20 and 30 degrees" width="64%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Tilting phone holder at 0, 15 and 30 degrees, mounted normally (top) and turned around (bottom)" width="64%" />
 </p>
 
-1. Melt four M3 inserts into the column, the same way as in step 1: one into each end of the pivot hole at the back, and one into each of the two front lock holes, which are open on one side only.
-2. Press two M3 nuts into the pockets in the foot. Screw the foot to the forward pad of the lid with two M3 × 25 mm screws from underneath.
-3. Set the column between the cheeks with the open lock holes toward the cheek that has five holes. Drive an M3 × 10 mm screw through each cheek into the pivot inserts and tighten them until the column turns without play. Put a drop of medium-strength (blue) threadlocker on both pivot screws so they cannot work loose.
-4. Tilt the column back until one of its lock inserts lines up with a cheek hole. The front pair of cheek holes gives 0° (lower) and 20° (upper); the rear pair gives 10° (lower) and 30° (upper). Lock it there with the third M3 × 10 mm screw.
+1. Melt three M3 inserts into the column, the same way as in step 1: one into each end of the pivot hole at the back, and one into the front lock hole, which is open on one side only.
+2. Melt two M3 inserts into the holes in the bottom of the foot. Screw the foot to the forward pad of the lid with two M3 × 10 mm screws from underneath.
+3. Set the column between the cheeks with the open lock hole toward the cheek that has four holes. Drive an M3 × 10 mm screw through each cheek into the pivot inserts and tighten them until the column turns without play. Put a drop of medium-strength (blue) threadlocker on both pivot screws so they cannot work loose.
+4. Tilt the column until its lock insert lines up with one of the three cheek holes: the lowest gives 0°, the middle one 15° and the top one 30°. Lock it there with the third M3 × 10 mm screw.
 5. Fit the sliding grip and tension it with a rubber band or spring. With the phone in its case, check that it is held firmly, the camera has a clear view and no buttons are pressed.
 
-At 30° the phone still clears the battery box by about 15 mm. If you don't need the tilt, print [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) instead of the foot and column: press two M3 nuts into its pockets and screw it to the lid pad the same way. It takes the same grip, and the phone sits 10.5 mm lower.
+At 30° the phone still clears the battery box by about 15 mm. If you don't need the tilt, print [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) instead of the foot and column: press two M3 nuts into its pockets and screw it to the lid pad with two M3 × 25 mm screws from underneath. It takes the same grip, and the phone sits 10.5 mm lower.
 
 **Lid openings.** The lid has two 1 × 2-stud openings, one in front of and one behind the phone pad. Fit the lid with the phone pad toward the ultrasonic sensor at the front. The pad is 16 mm forward of the lid centre; the rear stud area carries the battery box. Press a `lid_plug` into each unused opening; it restores the studs, and a 1 mm ledge at the bottom of the opening stops it from falling through. Where a cable passes, use the `lid_grommet` instead:
 
 - **Wired phone link:** route a 90° USB cable from the ESP32 up through the front opening to the phone. Put a USB power blocker in the line so the phone and the 5 V converter don't feed each other. In the app, choose **USB** instead of Bluetooth.
 - **Battery box (options A and B):** the battery wires come down through the rear opening.
 
-Fit the LiPo tray now if you use option C. Tuck the wires away from the rim, lay the lid flat on the chassis, and drive four M3 × 10 mm screws (no washers) into the corner nuts. Tighten them evenly until seated. The lid must not lift, and the holder must not rock. For options A and B, press the battery box onto the studs behind the phone holder.
+Fit the LiPo tray now if you use option C. Tuck the wires away from the rim, lay the lid flat on the chassis, and drive four M3 × 10 mm screws (no washers) into the corner inserts. Tighten them evenly until seated. The lid must not lift, and the holder must not rock. For options A and B, press the battery box onto the studs behind the phone holder.
 
 Fit the wheels only after the bench test passes. Do the first drive slowly on a clear, level floor, then recheck all screws and the phone grip. Lift the robot by the chassis, not the lid, phone holder or battery box.
 
@@ -368,10 +359,10 @@ Fit the wheels only after the bench test passes. Do the first drive slowly on a 
 
 The chassis also takes the OpenBot **PCB V2** (Arduino Nano + DRV8871 drivers), which uses a 121.031 × 28.448 mm mounting pattern. This is a different electrical build, **not** an ESP32 drop-in. It runs the `PCB_V2` firmware with the Nano wiring.
 
-- Leave out the ESP32 carrier, its four retainers, the L298N and the power-board stand.
-- Put 4 inserts in the four long-PCB bosses. With the 4 sensor and 2 ultrasonic inserts, that is **10 inserts in total**.
+- Leave out the ESP32 carrier, the L298N and the power-board stand.
+- Put 4 inserts in the four long-PCB bosses. With the 4 sensor, 4 lid and 5 phone-holder inserts, that is **17 inserts in total**.
 - Mount the board on four printed 2.4 mm spacers, with a printed washer and an M3 × 10 mm screw at each hole.
-- Hardware totals: **13 × M3 × 10** (4 lid, 4 PCB, 2 clips, 3 phone holder), **14 × M3 × 25**, 14 nuts.
+- Hardware totals: **13 × M3 × 10** (4 lid, 4 PCB, 5 phone holder), **12 × M3 × 25**, 8 nuts.
 
 Order the board from the [PCB V2 manufacturing files and BOM](../diy/pcb/v2), for example through [JLCPCB](https://jlcpcb.com/) or [PCBWay](https://www.pcbway.com/). Check the height of the populated components and the solder-joint clearance before you fasten it. The battery options above work the same way with this board.
 
@@ -387,7 +378,7 @@ Order the board from the [PCB V2 manufacturing files and BOM](../diy/pcb/v2), fo
 | No counts from an encoder | Sensor not on 3.3 V, disk not in the slot, or disk not opaque |
 | Robot turns when it should go straight | One side's motor wires are swapped, so swap the pair on OUT1/OUT2 or OUT3/OUT4 |
 | Battery reading wrong or app shows "low" | Divider must be 30 k (top) / 10 k (bottom), and the voltage limits must match your option |
-| Lid won't seat | A wire is trapped on the rim, the LiPo is too thick, or a nut is not fully pushed past the ribs into its pocket |
+| Lid won't seat | A wire is trapped on the rim, the LiPo is too thick, or a lid insert stands proud of its post |
 | Battery box loose on the lid | Printed studs came out undersize. Raise flow slightly or check the printer's dimensional accuracy, then reprint the box |
 
 ## Views

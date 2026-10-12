@@ -9,7 +9,7 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-El soporte de teléfono de dos piezas que usan las carrocerías [DIY](../diy/README.es-ES.md), [RC truck](../rc_truck/README.es-ES.md) y [Compact](../compact/README.es-ES.md). Una pinza deslizante sujeta el teléfono contra un apoyo y se tensa con una goma elástica o un muelle ligero. Una versión inclinable opcional mantiene el teléfono a 0°, 10°, 20° o 30° para que la cámara mire hacia arriba, por ejemplo a una persona de pie delante del robot.
+El soporte de teléfono de dos piezas que usan las carrocerías [DIY](../diy/README.es-ES.md), [RC truck](../rc_truck/README.es-ES.md) y [Compact](../compact/README.es-ES.md). Una pinza deslizante sujeta el teléfono contra un apoyo y se tensa con una goma elástica o un muelle ligero. Una versión inclinable opcional mantiene el teléfono a 0°, 15° o 30° para que la cámara mire hacia arriba, por ejemplo a una persona de pie delante del robot. Montado girado 180°, la cámara mira en cambio hacia abajo.
 
 ## Piezas
 
@@ -28,15 +28,15 @@ Los archivos ya están en la orientación de impresión: imprime cada pieza de p
 
 <p align="center">
   <img src="../../docs/images/phone_mount/phone_tilt_hinge.jpg" alt="Bisagra del soporte de teléfono inclinable" width="32%" />
-  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Soporte de teléfono inclinable a 0, 10, 20 y 30 grados" width="64%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Soporte de teléfono inclinable a 0, 15 y 30 grados, montado normal (arriba) y girado (abajo)" width="64%" />
 </p>
 
-La base inclinable usa los mismos dos agujeros de montaje que la base estándar y encaja en los mismos huecos: la placa superior DIY, el bastidor y el elevador de cámara del RC truck y la tapa Compact. Sus mejillas empiezan 5 mm por encima de la parte inferior del pie, así que no tocan el borde de esos huecos. El teléfono queda 10,5 mm más alto que en el soporte estándar. A 30°, la parte superior de la columna se desplaza unos 22 mm hacia atrás; comprueba que nada de tu carrocería estorba.
+La base inclinable usa los mismos dos agujeros de montaje que la base estándar y encaja en los mismos huecos: la placa superior DIY, el bastidor y el elevador de cámara del RC truck y la tapa Compact. Sus mejillas empiezan 5 mm por encima de la parte inferior del pie, así que no tocan el borde de esos huecos. El teléfono queda 10,5 mm más alto que en el soporte estándar. A 30°, la parte superior de la columna se desplaza unos 22 mm hacia atrás (hacia delante si la base está girada); comprueba que nada de tu carrocería estorba. También puedes atornillar la base girada 180°. La columna se inclina entonces hacia delante: coloca el teléfono con la pantalla hacia la columna y la cámara mirará hacia delante y hacia abajo.
 
-Además de los tornillos de montaje, necesitas tres tornillos de cabeza alomada M3 × 10 mm y cuatro insertos roscados M3 (4,6 mm de diámetro exterior, 5,7 mm de largo). Las roscas de latón aguantan aunque cambies el ángulo a menudo.
+Además de los tornillos de montaje, necesitas tres tornillos de cabeza alomada M3 × 10 mm y cinco insertos roscados M3 (4,6 mm de diámetro exterior, 5,7 mm de largo). Las roscas de latón aguantan aunque cambies el ángulo a menudo.
 
-1. Coloca en caliente cuatro insertos roscados M3 (4,6 mm de diámetro exterior, 5,7 mm de largo) en la columna: uno en cada extremo del agujero del eje, en la parte trasera, y uno en cada uno de los dos agujeros de bloqueo delanteros, que solo están abiertos por un lado.
-2. Introduce dos tuercas M3 en el pie y atorníllalo a la carrocería igual que la base estándar.
-3. Coloca la columna entre las mejillas con los agujeros de bloqueo abiertos hacia la mejilla que tiene cinco agujeros. Atornilla un tornillo M3 × 10 mm a través de cada mejilla en los insertos del eje y apriétalos hasta que la columna gire sin holgura. Pon una gota de fijador de roscas de resistencia media (azul) en los dos tornillos del eje para que no se aflojen.
-4. Inclina la columna hacia atrás hasta que uno de sus insertos de bloqueo coincida con un agujero de la mejilla. El par de agujeros delantero da 0° (abajo) y 20° (arriba); el trasero, 10° (abajo) y 30° (arriba). Bloquéala con el tercer tornillo M3 × 10 mm.
+1. Coloca en caliente tres insertos roscados M3 (4,6 mm de diámetro exterior, 5,7 mm de largo) en la columna: uno en cada extremo del agujero del eje, en la parte trasera, y uno en el agujero de bloqueo delantero, que solo está abierto por un lado.
+2. Coloca dos insertos M3 en los agujeros de la base del pie. Atornilla el pie desde abajo a la carrocería por los mismos dos agujeros de montaje que la base estándar, con tornillos que entren unos 5 mm en el pie (M3 × 10 mm a través de la tapa Compact de 5 mm).
+3. Coloca la columna entre las mejillas con el agujero de bloqueo abierto hacia la mejilla que tiene cuatro agujeros. Atornilla un tornillo M3 × 10 mm a través de cada mejilla en los insertos del eje y apriétalos hasta que la columna gire sin holgura. Pon una gota de fijador de roscas de resistencia media (azul) en los dos tornillos del eje para que no se aflojen.
+4. Inclina la columna hasta que su inserto de bloqueo coincida con uno de los tres agujeros de la mejilla: el más bajo da 0°, el del medio 15° y el más alto 30°. Bloquéala con el tercer tornillo M3 × 10 mm.
 5. Monta `phone_mount_top` y la goma como en el soporte estándar.
