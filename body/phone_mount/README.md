@@ -9,7 +9,7 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-The two-part phone holder used by the [DIY](../diy/README.md), [RC truck](../rc_truck/README.md) and [Compact](../compact/README.md) bodies. A sliding grip holds the phone against a ledge and is tensioned by a rubber band or a light spring. An optional tilting version holds the phone at 0°, 10°, 20° or 30° so the camera can look up, for example at a person standing in front of the robot.
+The two-part phone holder used by the [DIY](../diy/README.md), [RC truck](../rc_truck/README.md) and [Compact](../compact/README.md) bodies. A sliding grip holds the phone against a ledge and is tensioned by a rubber band or a light spring. An optional tilting version holds the phone at 0°, 15° or 30° so the camera can look up, for example at a person standing in front of the robot. Mounted turned around, it tilts the camera down instead.
 
 ## Parts
 
@@ -28,15 +28,15 @@ The files are stored in print orientation: print every part standing upright as 
 
 <p align="center">
   <img src="../../docs/images/phone_mount/phone_tilt_hinge.jpg" alt="Hinge of the tilting phone holder" width="32%" />
-  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Tilting phone holder at 0, 10, 20 and 30 degrees" width="64%" />
+  <img src="../../docs/images/phone_mount/phone_tilt_angles.jpg" alt="Tilting phone holder at 0, 15 and 30 degrees, mounted normally (top) and turned around (bottom)" width="64%" />
 </p>
 
-The tilting base uses the same two mounting holes as the standard base and fits the same pockets: the DIY top plate, the RC truck frame and camera elevator, and the Compact lid. Its cheeks start 5 mm above the bottom of the foot, so they clear those pockets. The phone sits 10.5 mm higher than on the standard holder. At 30° the top of the column moves about 22 mm backward, so check that nothing on your body is in the way.
+The tilting base uses the same two mounting holes as the standard base and fits the same pockets: the DIY top plate, the RC truck frame and camera elevator, and the Compact lid. Its cheeks start 5 mm above the bottom of the foot, so they clear those pockets. The phone sits 10.5 mm higher than on the standard holder. At 30° the top of the column moves about 22 mm backward (forward when turned around), so check that nothing on your body is in the way. You can also screw the base on turned around by 180°. The column then leans forward: put the phone in with its screen toward the column, so the camera faces forward and looks down.
 
-Besides the mounting screws, you need three M3 × 10 mm pan-head screws and four M3 heat-set inserts (4.6 mm outer diameter, 5.7 mm long). The brass threads keep their grip however often you change the angle.
+Besides the mounting screws, you need three M3 × 10 mm pan-head screws and five M3 heat-set inserts (4.6 mm outer diameter, 5.7 mm long). The brass threads keep their grip however often you change the angle.
 
-1. Melt four M3 heat-set inserts (4.6 mm outer diameter, 5.7 mm long) into the column: one into each end of the pivot hole at the back, and one into each of the two front lock holes, which are open on one side only.
-2. Press two M3 nuts into the foot and screw it to the body like the standard base.
-3. Set the column between the cheeks with the open lock holes toward the cheek that has five holes. Drive an M3 × 10 mm screw through each cheek into the pivot inserts and tighten them until the column turns without play. Put a drop of medium-strength (blue) threadlocker on both pivot screws so they cannot work loose.
-4. Tilt the column back until one of its lock inserts lines up with a cheek hole. The front pair of cheek holes gives 0° (lower) and 20° (upper); the rear pair gives 10° (lower) and 30° (upper). Lock it there with the third M3 × 10 mm screw.
+1. Melt three M3 heat-set inserts (4.6 mm outer diameter, 5.7 mm long) into the column: one into each end of the pivot hole at the back, and one into the front lock hole, which is open on one side only.
+2. Melt two M3 inserts into the holes in the bottom of the foot. Screw the foot to the body from underneath through the same two mounting holes as the standard base, using screws that reach about 5 mm into the foot (M3 × 10 mm through the 5 mm Compact lid).
+3. Set the column between the cheeks with the open lock hole toward the cheek that has four holes. Drive an M3 × 10 mm screw through each cheek into the pivot inserts and tighten them until the column turns without play. Put a drop of medium-strength (blue) threadlocker on both pivot screws so they cannot work loose.
+4. Tilt the column until its lock insert lines up with one of the three cheek holes: the lowest gives 0°, the middle one 15° and the top one 30°. Lock it there with the third M3 × 10 mm screw.
 5. Fit `phone_mount_top` and the band as on the standard holder.
