@@ -56,10 +56,10 @@ OpenBot Compact es un cuerpo [OpenBot](../../README.es-ES.md) compacto de cuatro
 | [phone_mount_tilt_column](../phone_mount/phone_mount_tilt_column.stl) ([STEP](../phone_mount/phone_mount_tilt_column.step)) | 1 | Columna del soporte de teléfono, se inclina 0–30° hacia atrás; de pie, soportes solo bajo el saliente de la goma |
 | [phone_mount_top](../phone_mount/phone_mount_top.stl) ([STEP](../phone_mount/phone_mount_top.step)) | 1 | Pinza deslizante del teléfono; de pie, soportes solo bajo el saliente de la goma |
 | [phone_mount_bottom](../phone_mount/phone_mount_bottom.stl) ([STEP](../phone_mount/phone_mount_bottom.step)) | 1 *(opcional)* | Base fija del soporte de teléfono en lugar del pie y la columna inclinables; de pie sobre su base, soportes solo bajo el saliente de la goma |
-| [led_adapter](cad/stl/led_adapter.stl) ([STEP](cad/step/led_adapter.step)) | 4 | Adaptadores para pilotos de panel de 12 mm: 2 delante, 2 detrás |
-| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(opcional)* | Igual para pilotos de 10 mm, en lugar de `led_adapter`; 6 mm de largo para que las roscas cortas lleguen a la tuerca |
-| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(opcional)* | Igual para pilotos de 8 mm, en lugar de `led_adapter`; 6 mm de largo para que las roscas cortas lleguen a la tuerca |
-| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(opcional)* | Igual para pilotos de 6 mm, en lugar de `led_adapter`; 6 mm de largo para que las roscas cortas lleguen a la tuerca |
+| [led_adapter_12mm](cad/stl/led_adapter_12mm.stl) ([STEP](cad/step/led_adapter_12mm.step)) | 4 | Adaptadores para pilotos de panel de 12 mm: 2 delante, 2 detrás |
+| [led_adapter_10mm](cad/stl/led_adapter_10mm.stl) ([STEP](cad/step/led_adapter_10mm.step)) | 4 *(opcional)* | Igual para pilotos de 10 mm, en lugar de `led_adapter_12mm`; 6 mm de largo para que las roscas cortas lleguen a la tuerca |
+| [led_adapter_8mm](cad/stl/led_adapter_8mm.stl) ([STEP](cad/step/led_adapter_8mm.step)) | 4 *(opcional)* | Igual para pilotos de 8 mm, en lugar de `led_adapter_12mm`; 6 mm de largo para que las roscas cortas lleguen a la tuerca |
+| [led_adapter_6mm](cad/stl/led_adapter_6mm.stl) ([STEP](cad/step/led_adapter_6mm.step)) | 4 *(opcional)* | Igual para pilotos de 6 mm, en lugar de `led_adapter_12mm`; 6 mm de largo para que las roscas cortas lleguen a la tuerca |
 | [encoder_disk](cad/stl/encoder_disk.stl) ([STEP](cad/step/encoder_disk.step)) | 4 | Opcional; imprime en filamento **opaco** o usa discos comprados compatibles. Se imprime en plano. |
 
 Los cuatro soportes de sensor son idénticos, así que cualquiera sirve para cualquier posición. Las piezas de tu batería aparecen en [Opciones de batería](#opciones-de-batería).
@@ -149,7 +149,7 @@ Los enlaces de abajo llevan a un proveedor o a una búsqueda en Amazon US. Compr
 | 1 | Convertidor de 5 V, ≥ 2 A, máx. 21 × 43 × 14 mm | Encaja en el soporte de las placas de alimentación. Para 3S sirve un módulo LM2596. Para 2S, elige un tipo que siga dando 5 V con 6 V de entrada (p. ej. MP1584 o buck-boost). | [búsqueda](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | Placa perforada pequeña, máx. 24 × 34 mm | Divisores de batería y de eco, control de las luces; va en la parte trasera del soporte | [búsqueda](https://www.amazon.com/s?k=small+prototype+perfboard) |
 | 1 juego | Resistencias del 1 % | Divisor de batería 30 k + 10 k; divisor de eco 10 k + 20 k; luces 4 × 1 k + 4 × 100 k | [búsqueda](https://www.amazon.com/s?k=1+percent+metal+film+resistor+assortment+10k+20k+30k+1k+100k) |
-| 2 + 2 | Pilotos de panel blancos y rojos *(opcional)* | La rosca de 12 mm encaja en `led_adapter`; para pilotos de 10, 8 o 6 mm imprime el adaptador correspondiente. Comprueba la tensión de los pilotos | [búsqueda](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
+| 2 + 2 | Pilotos de panel blancos y rojos *(opcional)* | La rosca de 12 mm encaja en `led_adapter_12mm`; para pilotos de 10, 8 o 6 mm imprime el adaptador correspondiente. Comprueba la tensión de los pilotos | [búsqueda](https://www.amazon.com/s?k=12mm+panel+LED+indicator+12V+white+red) |
 | 4 | Transistores NPN, p. ej. PN2222A *(opcional, para las luces)* | Interruptor en el lado de masa para cada piloto | [búsqueda](https://www.amazon.com/s?k=PN2222A+transistor) |
 | 1 juego | Cables Dupont, cable de alimentación de silicona, termorretráctil | Dimensiona el cable de alimentación para la corriente de bloqueo de los motores | [búsqueda](https://www.amazon.com/s?k=silicone+wire+kit+20+22+AWG+heat+shrink) |
 
