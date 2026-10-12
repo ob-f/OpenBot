@@ -62,3 +62,48 @@ jobs:
           cp controller/build/outputs/apk/release/controller-release.apk "Controller-${version}.apk"
           gh release upload "$RELEASE_TAG" "OpenBot-${version}.apk" "Controller-${version}.apk" \
             --repo "$GITHUB_REPOSITORY"
+
+  upload-flutter-controller-apk-to-release:
+    name: Add Flutter Controller Release Apk to Release Assets
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+    defaults:
+      run:
+        working-directory: controller/flutter
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+      - name: Verify release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.1'
+          channel: 'stable'
+          cache: true
+      - name: Decode Release Keystore and create key.properties
+        working-directory: controller/flutter/android
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=%s\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" "$PWD/release.keystore" > key.properties
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build Release Apk
+        run: flutter build apk --release
+      - name: Upload release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(printf '%s' "$RELEASE_TAG" | sed 's/[^-a-zA-Z0-9.]/_/g; s/^v//')
+          cp build/app/outputs/flutter-apk/app-release.apk "Flutter-Controller-${version}.apk"
+          gh release upload "$RELEASE_TAG" "Flutter-Controller-${version}.apk" \
+            --clobber --repo "$GITHUB_REPOSITORY"
