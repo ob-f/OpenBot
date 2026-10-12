@@ -166,7 +166,7 @@ public abstract class CameraFragment extends ControlsFragment {
     try {
       if (cameraProvider != null) {
         cameraProvider.unbindAll();
-        WebRtcServer.setLocalPreviewActive(this, true);
+        WebRtcServer.setLocalPreviewActive(this, true, this::switchCameraForController);
         cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
       }
     } catch (Exception e) {
@@ -212,7 +212,7 @@ public abstract class CameraFragment extends ControlsFragment {
   public void onDestroy() {
     super.onDestroy();
     cameraExecutor.shutdown();
-    WebRtcServer.setLocalPreviewActive(this, false);
+    WebRtcServer.setLocalPreviewActive(this, false, null);
     ControllerToBotEventBus.unsubscribe(getClass().getSimpleName() + "_localCameraLifecycle");
   }
 
@@ -232,6 +232,12 @@ public abstract class CameraFragment extends ControlsFragment {
             : CameraSelector.LENS_FACING_FRONT;
     preferencesManager.setCameraSwitch(!preferencesManager.getCameraSwitch());
     bindCameraUseCases();
+  }
+
+  // SWITCH_CAMERA from the controller while this preview owns the camera.
+  private boolean switchCameraForController() {
+    toggleCamera();
+    return lensFacing == CameraSelector.LENS_FACING_FRONT;
   }
 
   public void setAnalyserResolution(Size resolutionSize) {

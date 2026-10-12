@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.app.robot.utils.AndGate;
@@ -105,6 +106,7 @@ public class WebRtcServer implements IVideoServer {
   private static final Object frameLock = new Object();
   private static WeakReference<WebRtcServer> activeServer = new WeakReference<>(null);
   private static Object localPreviewOwner;
+  private static BooleanSupplier localPreviewSwitchCamera;
   private static CapturerObserver sharedFrameObserver;
 
   private VideoSource videoSource;
@@ -202,12 +204,19 @@ public class WebRtcServer implements IVideoServer {
 
   // Shared camera frames from CameraFragment
 
-  /** Called on the main thread when a CameraFragment binds or releases the camera preview. */
-  public static void setLocalPreviewActive(Object owner, boolean active) {
+  /**
+   * Called on the main thread when a CameraFragment binds or releases the camera preview.
+   * switchCamera flips the preview between front and back camera and returns true if it is now
+   * on the front camera; it is used for SWITCH_CAMERA while the preview owns the camera.
+   */
+  public static void setLocalPreviewActive(
+      Object owner, boolean active, BooleanSupplier switchCamera) {
     if (active) {
       localPreviewOwner = owner;
+      localPreviewSwitchCamera = switchCamera;
     } else if (localPreviewOwner == owner) {
       localPreviewOwner = null;
+      localPreviewSwitchCamera = null;
     } else {
       return; // a newer preview already owns the camera
     }
@@ -310,14 +319,11 @@ public class WebRtcServer implements IVideoServer {
 
   // local methods
   private void startServer() {
+    // Always start a fresh call with a new offer. The web and native Android controllers drop
+    // their peer connection on VIDEO_COMMAND STOP and wait for a new offer after START, and the
+    // Flutter controller replaces its peer connection when a new offer arrives.
+    closeCall();
     streaming = true;
-    if (peerConnection != null) {
-      // The Flutter controller keeps one peer connection per session and cannot accept a new
-      // offer on it, so reuse the existing call and just resume the video.
-      applyVideoSource();
-      startClient();
-      return;
-    }
 
     initializeSurfaceViews();
     initializePeerConnectionFactory();
@@ -348,8 +354,9 @@ public class WebRtcServer implements IVideoServer {
             case "SWITCH_CAMERA":
               Log.d(TAG, "Received SWITCH_CAMERA command");
               if (localPreviewOwner != null) {
-                // The robot preview owns the camera; WebRTC is only forwarding its frames.
-                emitSwitchCameraStatus("ERROR:LOCAL_PREVIEW_ACTIVE");
+                // The robot preview owns the camera and WebRTC forwards its frames, so switch
+                // the preview's camera instead.
+                switchLocalPreviewCamera();
                 break;
               }
               if (!(videoCapturer instanceof CameraVideoCapturer)) {
@@ -395,6 +402,18 @@ public class WebRtcServer implements IVideoServer {
                       }
                     }),
         LOCAL_CAMERA_RELEASE_DELAY_MS);
+  }
+
+  private void switchLocalPreviewCamera() {
+    mainHandler.post(
+        () -> {
+          BooleanSupplier switchCamera = localPreviewSwitchCamera;
+          if (switchCamera == null) {
+            emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
+            return;
+          }
+          emitSwitchCameraStatus(switchCamera.getAsBoolean() ? "FRONT" : "BACK");
+        });
   }
 
   private void resumeLocalCamera() {
@@ -470,14 +489,14 @@ public class WebRtcServer implements IVideoServer {
     }
   }
 
-  // Pause only: release the camera and stop sending frames, but keep the call alive.
+  // Ends the call: controllers drop their peer connection on VIDEO_COMMAND STOP, and the next
+  // startServer() sends them a fresh offer.
   private void stopServer() {
-    streaming = false;
-    applyVideoSource();
+    closeCall();
     stopClient();
   }
 
-  // Ends the call and frees all WebRTC resources. Only used when the controller disconnects.
+  // Releases the camera and frees all WebRTC resources.
   private void closeCall() {
     if (factory == null) {
       return; // nothing was started
@@ -792,40 +811,51 @@ public class WebRtcServer implements IVideoServer {
               Log.d(TAG, "Ignoring WebRTC event: no active call");
               return;
             }
-            String commandType = "";
-            // The controller sometimes sends webrtc_event as a JSON string instead of an object.
-            Object rawEvent = event.get("webrtc_event");
-            JSONObject webRtcEvent =
-                rawEvent instanceof JSONObject
-                    ? (JSONObject) rawEvent
-                    : new JSONObject(rawEvent.toString());
-            String type = webRtcEvent.getString("type");
-            switch (type) {
-              case "offer":
-                Timber.d("connectToSignallingServer: received an offer $isInitiator $isStarted");
-                peerConnection.setRemoteDescription(
-                    new SimpleSdpObserver(),
-                    new SessionDescription(
-                        SessionDescription.Type.OFFER, webRtcEvent.getString("sdp")));
-                doAnswer();
-                break;
+            // Any exception would end this subscription and every later call would never get
+            // the controller's answer, so a bad message is logged and skipped.
+            try {
+              String commandType = "";
+              // The controller sometimes sends webrtc_event as a JSON string instead of an object.
+              Object rawEvent = event.get("webrtc_event");
+              JSONObject webRtcEvent =
+                  rawEvent instanceof JSONObject
+                      ? (JSONObject) rawEvent
+                      : new JSONObject(rawEvent.toString());
+              String type = webRtcEvent.getString("type");
+              switch (type) {
+                case "offer":
+                  Timber.d("connectToSignallingServer: received an offer $isInitiator $isStarted");
+                  peerConnection.setRemoteDescription(
+                      new SimpleSdpObserver(),
+                      new SessionDescription(
+                          SessionDescription.Type.OFFER, webRtcEvent.getString("sdp")));
+                  doAnswer();
+                  break;
 
-              case "answer":
-                String remoteDescr = webRtcEvent.getString("sdp");
-                Timber.i("Got remote description %s", remoteDescr);
-                peerConnection.setRemoteDescription(
-                    new SimpleSdpObserver(),
-                    new SessionDescription(SessionDescription.Type.ANSWER, remoteDescr));
-                break;
+                case "answer":
+                  String remoteDescr = webRtcEvent.getString("sdp");
+                  Timber.i("Got remote description %s", remoteDescr);
+                  peerConnection.setRemoteDescription(
+                      new SimpleSdpObserver(),
+                      new SessionDescription(SessionDescription.Type.ANSWER, remoteDescr));
+                  break;
 
-              case "candidate":
-                IceCandidate candidate =
-                    new IceCandidate(
-                        webRtcEvent.getString("id"),
-                        webRtcEvent.getInt("label"),
-                        webRtcEvent.getString("candidate"));
-                peerConnection.addIceCandidate(candidate);
-                break;
+                case "candidate":
+                  // The Flutter controller uses the standard sdpMid/sdpMLineIndex names.
+                  IceCandidate candidate =
+                      new IceCandidate(
+                          webRtcEvent.has("id")
+                              ? webRtcEvent.getString("id")
+                              : webRtcEvent.getString("sdpMid"),
+                          webRtcEvent.has("label")
+                              ? webRtcEvent.getInt("label")
+                              : webRtcEvent.getInt("sdpMLineIndex"),
+                          webRtcEvent.getString("candidate"));
+                  peerConnection.addIceCandidate(candidate);
+                  break;
+              }
+            } catch (JSONException e) {
+              Log.e(TAG, "Ignoring malformed WebRTC event: " + event, e);
             }
           },
           error -> Log.d(TAG, "Error occurred in handleControllerWebRtcEvents: %s", error),

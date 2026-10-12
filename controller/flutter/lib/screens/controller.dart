@@ -47,6 +47,9 @@ class ControllerState extends State<Controller> {
 
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
+  // Signaling messages are applied one at a time, so candidates never reach a peer connection
+  // that is being replaced.
+  Future<void> _signalingQueue = Future.value();
 
   Future<void> videoConnection() async {
     initRenderers();
@@ -65,7 +68,7 @@ class ControllerState extends State<Controller> {
       "sdp": sdp,
     };
     if (description["type"] == "offer") {
-      _setRemoteDescription(description);
+      _enqueueSignaling(() => _setRemoteDescription(description));
     }
     if (description["type"] == "candidate") {
       var candidateValue = {
@@ -73,19 +76,30 @@ class ControllerState extends State<Controller> {
         "label": label,
         "candidate": candidate,
       };
-      _addCandidate(candidateValue);
+      _enqueueSignaling(() => _addCandidate(candidateValue));
     }
   }
 
-  void _setRemoteDescription(doc) async {
-    RTCSessionDescription description =
-        RTCSessionDescription(doc["sdp"], doc["type"]);
-    await _peerConnection
-        ?.setRemoteDescription(description)
-        .whenComplete(() => createAnswer());
+  void _enqueueSignaling(Future<void> Function() task) {
+    _signalingQueue = _signalingQueue
+        .then((_) => task())
+        .catchError((e) => log("WebRTC signaling error: $e"));
   }
 
-  void _addCandidate(candidateValue) async {
+  Future<void> _setRemoteDescription(doc) async {
+    // The robot starts a new call with a fresh offer every time it restarts video, so a second
+    // offer belongs to a new call: replace the peer connection instead of renegotiating on it.
+    if (await _peerConnection?.getRemoteDescription() != null) {
+      await _peerConnection?.close();
+      _peerConnection = await _createPeerConnection();
+    }
+    RTCSessionDescription description =
+        RTCSessionDescription(doc["sdp"], doc["type"]);
+    await _peerConnection?.setRemoteDescription(description);
+    await createAnswer();
+  }
+
+  Future<void> _addCandidate(candidateValue) async {
     dynamic candidate = RTCIceCandidate(candidateValue['candidate'],
         candidateValue['id'], candidateValue['label']);
     await _peerConnection?.addCandidate(candidate);
@@ -137,7 +151,7 @@ class ControllerState extends State<Controller> {
     return pc;
   }
 
-  void createAnswer() async {
+  Future<void> createAnswer() async {
     final Map<String, dynamic> offerSdpConstraints =
         Constants.offerSdpConstraints;
     RTCSessionDescription? description =
