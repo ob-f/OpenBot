@@ -25,6 +25,7 @@ There are several options for the robot body depending on your needs and capabil
 - [Slim body](cad/slim_body/README.md): Since a lot of common 3D printers have a smaller build volume, we have also designed a smaller version without bumpers which fits on a 220mmx220mm build plate at 45 degrees.
 - [Glueable body](cad/glue_body/README.md): For printing on 3D printers with even smaller build volumes, there is also a modular body designed by @sloretz with serveral parts that need to be glued together; it fits on a 150mmx140mm build plate.
 - [Blocky body](cad/block_body/README.md): This body designed by @Christos-Ps provides multiple variants with options for extra space inside the shell and a lego-compatible top while maintaining a small footprint that requires only 221mmx150mm for printing.
+- [OpenBot Compact](../compact/README.md): For an ESP32 build, see OpenBot Compact, a separate compact body for the ESP32 DevKit V1 with an L298N motor driver and a LEGO-compatible lid; all parts fit a 180mmx180mm build plate.
 
 #### Phone mount
 
@@ -32,6 +33,8 @@ In addition, you will need to print a phone mount to be fixed to robot body.
 
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
+
+To tilt the phone up by up to 30°, print the tilting version from [body/phone_mount](../phone_mount/README.md) instead of `phone_mount_bottom`.
 
 #### Cleaning
 
