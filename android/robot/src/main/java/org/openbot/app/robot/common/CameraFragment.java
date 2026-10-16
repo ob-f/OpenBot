@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import org.openbot.app.robot.R;
 import org.openbot.app.robot.env.ControllerToBotEventBus;
 import org.openbot.app.robot.env.ImageUtils;
+import org.openbot.app.robot.env.WebRtcServer;
 import org.openbot.app.robot.utils.Constants;
 import org.openbot.app.robot.utils.Enums;
 import org.openbot.app.robot.utils.PermissionUtils;
@@ -165,6 +166,7 @@ public abstract class CameraFragment extends ControlsFragment {
     try {
       if (cameraProvider != null) {
         cameraProvider.unbindAll();
+        WebRtcServer.setLocalPreviewActive(this, true, this::switchCameraForController);
         cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
       }
     } catch (Exception e) {
@@ -181,6 +183,7 @@ public abstract class CameraFragment extends ControlsFragment {
 
       rotationDegrees = image.getImageInfo().getRotationDegrees();
       converter.yuvToRgb(image.getImage(), bitmapBuffer);
+      WebRtcServer.onLocalPreviewFrame(image);
       processFrame(bitmapBuffer, image);
     } finally {
       image.close();
@@ -209,6 +212,7 @@ public abstract class CameraFragment extends ControlsFragment {
   public void onDestroy() {
     super.onDestroy();
     cameraExecutor.shutdown();
+    WebRtcServer.setLocalPreviewActive(this, false, null);
     ControllerToBotEventBus.unsubscribe(getClass().getSimpleName() + "_localCameraLifecycle");
   }
 
@@ -228,6 +232,12 @@ public abstract class CameraFragment extends ControlsFragment {
             : CameraSelector.LENS_FACING_FRONT;
     preferencesManager.setCameraSwitch(!preferencesManager.getCameraSwitch());
     bindCameraUseCases();
+  }
+
+  // SWITCH_CAMERA from the controller while this preview owns the camera.
+  private boolean switchCameraForController() {
+    toggleCamera();
+    return lensFacing == CameraSelector.LENS_FACING_FRONT;
   }
 
   public void setAnalyserResolution(Size resolutionSize) {
