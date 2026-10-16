@@ -346,6 +346,10 @@ public class WebRtcServer implements IVideoServer {
   private static final long LOCAL_CAMERA_RELEASE_DELAY_MS = 300;
   private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+  // Incremented on closeCall() so stale camera switches are ignored.
+  private volatile int callSession = 0;
+  private Runnable pendingCameraSwitch;
+
   private void monitorCameraControlEvents() {
     ControllerToBotEventBus.subscribe(
         this.getClass().getSimpleName(),
@@ -353,18 +357,8 @@ public class WebRtcServer implements IVideoServer {
           switch (event.getString("command")) {
             case "SWITCH_CAMERA":
               Log.d(TAG, "Received SWITCH_CAMERA command");
-              if (localPreviewOwner != null) {
-                // The robot preview owns the camera and WebRTC forwards its frames, so switch
-                // the preview's camera instead.
-                switchLocalPreviewCamera();
-                break;
-              }
-              if (!(videoCapturer instanceof CameraVideoCapturer)) {
-                Log.e(TAG, "Cannot switch camera: capturer is not ready");
-                emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
-                break;
-              }
-              switchCameraWithoutConflictingWithLocalPreview();
+              // Run on main thread, same as closeCall().
+              mainHandler.post(this::handleSwitchCamera);
               break;
           }
         },
@@ -377,31 +371,65 @@ public class WebRtcServer implements IVideoServer {
         );
   }
 
+  private void handleSwitchCamera() {
+    if (localPreviewOwner != null) {
+      // Preview owns the camera, so switch the preview's camera instead.
+      switchLocalPreviewCamera();
+      return;
+    }
+    if (!(videoCapturer instanceof CameraVideoCapturer)) {
+      Log.e(TAG, "Cannot switch camera: capturer is not ready");
+      emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
+      return;
+    }
+    if (pendingCameraSwitch != null) {
+      return; // switch already pending
+    }
+    switchCameraWithoutConflictingWithLocalPreview();
+  }
+
   // Pauses the local preview camera first so we don't open two cameras at once.
   private void switchCameraWithoutConflictingWithLocalPreview() {
     emitLocalCameraCommand(Constants.CMD_PAUSE_LOCAL_CAMERA);
 
-    mainHandler.postDelayed(
-        () ->
-            ((CameraVideoCapturer) videoCapturer)
-                .switchCamera(
-                    new CameraVideoCapturer.CameraSwitchHandler() {
-                      @Override
-                      public void onCameraSwitchDone(boolean isFrontCamera) {
-                        String cameraName = isFrontCamera ? "FRONT" : "BACK";
-                        Log.d(TAG, "Camera switched successfully to " + cameraName);
-                        emitSwitchCameraStatus(cameraName);
-                        resumeLocalCamera();
-                      }
+    int session = callSession;
+    CameraVideoCapturer capturer = (CameraVideoCapturer) videoCapturer;
+    pendingCameraSwitch =
+        () -> {
+          pendingCameraSwitch = null;
+          if (!isCurrentCameraSwitch(session, capturer)) {
+            return;
+          }
+          capturer.switchCamera(
+              new CameraVideoCapturer.CameraSwitchHandler() {
+                @Override
+                public void onCameraSwitchDone(boolean isFrontCamera) {
+                  if (!isCurrentCameraSwitch(session, capturer)) {
+                    return;
+                  }
+                  String cameraName = isFrontCamera ? "FRONT" : "BACK";
+                  Log.d(TAG, "Camera switched successfully to " + cameraName);
+                  emitSwitchCameraStatus(cameraName);
+                  resumeLocalCamera();
+                }
 
-                      @Override
-                      public void onCameraSwitchError(String errorDescription) {
-                        Log.e(TAG, "Camera switch failed: " + errorDescription);
-                        emitSwitchCameraStatus("ERROR:" + errorDescription);
-                        resumeLocalCamera();
-                      }
-                    }),
-        LOCAL_CAMERA_RELEASE_DELAY_MS);
+                @Override
+                public void onCameraSwitchError(String errorDescription) {
+                  if (!isCurrentCameraSwitch(session, capturer)) {
+                    return;
+                  }
+                  Log.e(TAG, "Camera switch failed: " + errorDescription);
+                  emitSwitchCameraStatus("ERROR:" + errorDescription);
+                  resumeLocalCamera();
+                }
+              });
+        };
+    mainHandler.postDelayed(pendingCameraSwitch, LOCAL_CAMERA_RELEASE_DELAY_MS);
+  }
+
+  // Check the switch still belongs to the current call.
+  private boolean isCurrentCameraSwitch(int session, CameraVideoCapturer capturer) {
+    return session == callSession && streaming && factory != null && videoCapturer == capturer;
   }
 
   private void switchLocalPreviewCamera() {
@@ -498,6 +526,12 @@ public class WebRtcServer implements IVideoServer {
 
   // Releases the camera and frees all WebRTC resources.
   private void closeCall() {
+    callSession++;
+    if (pendingCameraSwitch != null) {
+      mainHandler.removeCallbacks(pendingCameraSwitch);
+      pendingCameraSwitch = null;
+      resumeLocalCamera();
+    }
     if (factory == null) {
       return; // nothing was started
     }
