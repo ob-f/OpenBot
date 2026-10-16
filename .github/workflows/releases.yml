@@ -44,7 +44,7 @@ jobs:
       - name: Assemble Release Apk
         id: assemble_release_apk
         run: |
-          ./gradlew assembleRelease \
+          ./gradlew :robot:assembleRelease \
             -Pandroid.injected.signing.store.file=$PWD/release.keystore \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
@@ -53,18 +53,17 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      - name: Upload release APKs
+      - name: Upload release APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(printf '%s' "$RELEASE_TAG" | sed 's/[^-a-zA-Z0-9.]/_/g; s/^v//')
           cp robot/build/outputs/apk/release/robot-release.apk "OpenBot-${version}.apk"
-          cp controller/build/outputs/apk/release/controller-release.apk "Controller-${version}.apk"
-          gh release upload "$RELEASE_TAG" "OpenBot-${version}.apk" "Controller-${version}.apk" \
+          gh release upload "$RELEASE_TAG" "OpenBot-${version}.apk" \
             --repo "$GITHUB_REPOSITORY"
 
-  upload-flutter-controller-apk-to-release:
-    name: Add Flutter Controller Release Apk to Release Assets
+  upload-controller-apk-to-release:
+    name: Add Controller Release Apk to Release Assets
     runs-on: ubuntu-latest
     env:
       RELEASE_TAG: ${{ github.event.release.tag_name }}
@@ -97,13 +96,27 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       - name: Install dependencies
         run: flutter pub get
+      - name: Derive build name and number from release tag
+        id: version
+        run: |
+          # Same scheme as the robot app (app-versioning plugin): major * 10000 + minor * 100 + patch
+          if [[ ! "$RELEASE_TAG" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' must look like v<major>.<minor>.<patch>"
+            exit 1
+          fi
+          major=${BASH_REMATCH[1]} minor=${BASH_REMATCH[2]} patch=${BASH_REMATCH[3]}
+          echo "build_name=${major}.${minor}.${patch}" >> "$GITHUB_OUTPUT"
+          echo "build_number=$((10#$major * 10000 + 10#$minor * 100 + 10#$patch))" >> "$GITHUB_OUTPUT"
       - name: Build Release Apk
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release \
+            --build-name=${{ steps.version.outputs.build_name }} \
+            --build-number=${{ steps.version.outputs.build_number }}
       - name: Upload release APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(printf '%s' "$RELEASE_TAG" | sed 's/[^-a-zA-Z0-9.]/_/g; s/^v//')
-          cp build/app/outputs/flutter-apk/app-release.apk "Flutter-Controller-${version}.apk"
-          gh release upload "$RELEASE_TAG" "Flutter-Controller-${version}.apk" \
-            --clobber --repo "$GITHUB_REPOSITORY"
+          cp build/app/outputs/flutter-apk/app-release.apk "Controller-${version}.apk"
+          gh release upload "$RELEASE_TAG" "Controller-${version}.apk" \
+            --repo "$GITHUB_REPOSITORY"
