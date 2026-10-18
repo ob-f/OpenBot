@@ -243,8 +243,8 @@ Verwenden Sie die auf dem ESP32 aufgedruckten GPIO-Nummern. Alle Massen müssen 
 
 | Verbindung | ESP32-GPIO | Hinweise |
 |---|---|---|
-| L298N IN1 / IN2 (linke Motoren) | 13 / 12 | |
-| L298N IN3 / IN4 (rechte Motoren) | 15 / 2 | |
+| L298N IN1 / IN2 (linke Motoren) | 32 / 33 | |
+| L298N IN3 / IN4 (rechte Motoren) | 25 / 26 | |
 | L298N ENA / ENB | – | Die Enable-Jumper gesteckt lassen (die Geschwindigkeit wird per PWM an den IN-Pins gesetzt) |
 | Encoder vorne links / vorne rechts | 35 / 22 | |
 | Encoder hinten links / hinten rechts *(optional)* | 34 / 23 | |
@@ -252,9 +252,9 @@ Verwenden Sie die auf dem ESP32 aufgedruckten GPIO-Nummern. Alle Massen müssen 
 | Ultraschall ECHO | 18 | über einen Teiler 10 k (ECHO → GPIO18) / 20 k (GPIO18 → GND) |
 | Akkuspannung | 4 | 30 k vom geschalteten Akku-Plus an GPIO4, 10 k von GPIO4 an GND |
 | Frontleuchten L / R *(optional)* | 19 / 21 | über NPN-Transistorstufen |
-| Rückleuchten L / R *(optional)* | 25 / 26 | über NPN-Transistorstufen, Firmware-Änderung nötig |
+| Rückleuchten L / R *(optional)* | 16 / 17 | über NPN-Transistorstufen, Firmware-Änderung nötig |
 
-- **Motoren:** Schließen Sie beide linken Motoren parallel an OUT1/OUT2 und beide rechten Motoren an OUT3/OUT4 an. Dreht sich eine Seite falsch herum, tauschen Sie die zwei Motorkabel dieser Seite.
+- **Motoren:** Schließen Sie beide linken Motoren parallel an OUT1/OUT2 an, + (rot) an OUT2 und − (schwarz) an OUT1. Schließen Sie beide rechten Motoren an OUT3/OUT4 an, + (rot) an OUT3 und − (schwarz) an OUT4. Die beiden Seiten sind gespiegelt, so fahren beide vorwärts. Dreht sich eine Seite trotzdem falsch herum, tauschen Sie die zwei Motorkabel dieser Seite.
 - **Encoder:** Versorgen Sie die LM393-Platinen mit **3,3 V**, nicht mit 5 V. Ihre eingebauten Pull-ups halten die Ausgänge dann auf einem für den ESP32 sicheren Pegel. GPIO34 und GPIO35 sind reine Eingänge und haben keine internen Pull-ups.
 - **Leuchten:** Jede Leuchte wird über einen NPN-Transistor geschaltet (1 k Basiswiderstand, 100 k Pull-down von Basis nach Emitter). Treiben Sie eine Einbauleuchte nie direkt von einem ESP32-Pin.
 
@@ -296,15 +296,15 @@ Holen Sie die Firmware aus dem [Firmware-Ordner](../../firmware/README.de-DE.md)
    #define HAS_SPEED_SENSORS_BACK 1   // read the rear encoders as well
    #define HAS_LEDS_FRONT 1           // white lights on GPIO19/21 (default pins)
    #define HAS_LEDS_BACK 1            // red lights, and change their pins:
-   const int PIN_LED_LB = 25;         // default 5
-   const int PIN_LED_RB = 26;         // default 18
+   const int PIN_LED_LB = 16;         // default 5
+   const int PIN_LED_RB = 17;         // default 18
    ```
 
 5. Installieren Sie in der Arduino IDE das **esp32-Boardpaket 2.0.17**. Die Firmware verwendet `ledcSetup`/`ledcAttachPin`, die in Version 3.x entfernt wurden. Wählen Sie dann **ESP32 Dev Module** und laden Sie hoch.
 
 **USB-Zugang.** Der ESP32 sitzt kopfüber in seinem Träger, daher liegt seine USB-Buchse unter der Platine und zeigt auf die Stromklemme des L298N, die nur etwa 8,5 mm entfernt ist. Mit eingebautem Treiber passt nur ein gewinkelter Stecker, dessen Kabel zwischen den beiden Platinen nach oben führt. Flashen Sie entweder vor dem Einbau des L298N oder verwenden Sie ein 90°-Kabel.
 
-GPIO 2, 5, 12 und 15 sind Boot-Strapping-Pins. Wenn die Platine mit allem angeschlossen nicht bootet oder sich nicht flashen lässt, prüfen Sie, was an ihnen zieht, vor allem an GPIO12, der beim Reset low sein muss.
+Die Motor-Pins sind keine Boot-Pins des ESP32, daher bleiben die Motoren beim Einschalten aus. Nur GPIO 5 (Sonar-Trigger) ist ein Boot-Pin. Wenn die Platine mit allem angeschlossen nicht bootet oder sich nicht flashen lässt, trennen Sie den Sonar-Trigger und versuchen Sie es erneut.
 
 **Testlauf** (Räder ab, Chassis aufgebockt, Serieller Monitor mit 115200 Baud):
 
@@ -372,7 +372,7 @@ Bestellen Sie die Platine mit den [Fertigungsdateien und der Stückliste der PCB
 |---|---|
 | Kompilierfehler zu `ledcSetup` / `ledcAttachPin` | Der esp32-Core ist 3.x. Installieren Sie 2.0.17. |
 | USB-Stecker passt nicht in den ESP32 | Der L298N ist im Weg. Verwenden Sie einen 90°-Stecker oder bauen Sie zum Flashen den Treiber aus. |
-| ESP32 bootet oder flasht nach dem Verkabeln nicht | Belastung an GPIO12/2/15/5. Trennen Sie die Eingänge des L298N und versuchen Sie es erneut. |
+| ESP32 bootet oder flasht nach dem Verkabeln nicht | Belastung an GPIO 5 (Sonar-Trigger). Trennen Sie ihn und versuchen Sie es erneut. |
 | ESP32 startet neu, wenn die Motoren anlaufen | Schwacher oder leerer Akku oder ein 5-V-Wandler, der aus 2S nicht regeln kann. Messen Sie die 5-V-Schiene unter Last. |
 | Sonar immer 0 oder unregelmäßig | `HAS_INDICATORS` ist noch 1, oder der Echo-Teiler fehlt oder ist falsch |
 | Keine Zählung von einem Encoder | Sensor nicht an 3,3 V, Scheibe nicht im Schlitz oder Scheibe nicht lichtundurchlässig |
