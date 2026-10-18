@@ -838,29 +838,43 @@ unsigned long display_time = 0;
 // SETUP
 //------------------------------------------------------//
 void setup() {
-#if (MCU == ESP32 && OPENBOT != MTV)
-  // Stop the motors before anything else; some motor pins may float or be pulled high at boot
-  for (int pin : { PIN_PWM_LF1, PIN_PWM_LF2, PIN_PWM_LB1, PIN_PWM_LB2,
-                   PIN_PWM_RF1, PIN_PWM_RF2, PIN_PWM_RB1, PIN_PWM_RB2 }) {
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
-  }
-#endif
 #if (OPENBOT == LITE)
   coast_mode = !coast_mode;
 #endif
-  // Outputs
+  // Motors first, so they are stopped as early as possible after boot
 #if (OPENBOT == RC_CAR)
   pinMode(PIN_PWM_T, OUTPUT);
   pinMode(PIN_PWM_S, OUTPUT);
   // Attach the ESC and SERVO
   ESC.attach(PIN_PWM_T, 1000, 2000);    // (pin, min pulse width, max pulse width in microseconds)
   SERVO.attach(PIN_PWM_S, 1000, 2000);  // (pin, min pulse width, max pulse width in microseconds)
+#elif (OPENBOT == MTV)
+  ledcSetup(LHS_PWM_OUT, FREQ, RES);
+  ledcSetup(RHS_PWM_OUT, FREQ, RES);
+  ledcAttachPin(PIN_PWM_L, LHS_PWM_OUT);
+  ledcAttachPin(PIN_PWM_R, RHS_PWM_OUT);
+  pinMode(PIN_DIR_L, OUTPUT);
+  pinMode(PIN_DIR_R, OUTPUT);
+  digitalWrite(PIN_DIR_L, LOW);
+  digitalWrite(PIN_DIR_R, LOW);
 #elif (MCU == NANO)
   pinMode(PIN_PWM_L1, OUTPUT);
   pinMode(PIN_PWM_L2, OUTPUT);
   pinMode(PIN_PWM_R1, OUTPUT);
   pinMode(PIN_PWM_R2, OUTPUT);
+#else  // ESP32: PWM via LEDC, duty 0 until driven
+  ledcSetup(CH_PWM_L1, FREQ, RES);
+  ledcSetup(CH_PWM_L2, FREQ, RES);
+  ledcSetup(CH_PWM_R1, FREQ, RES);
+  ledcSetup(CH_PWM_R2, FREQ, RES);
+  ledcAttachPin(PIN_PWM_LF1, CH_PWM_L1);
+  ledcAttachPin(PIN_PWM_LB1, CH_PWM_L1);
+  ledcAttachPin(PIN_PWM_LF2, CH_PWM_L2);
+  ledcAttachPin(PIN_PWM_LB2, CH_PWM_L2);
+  ledcAttachPin(PIN_PWM_RF1, CH_PWM_R1);
+  ledcAttachPin(PIN_PWM_RB1, CH_PWM_R1);
+  ledcAttachPin(PIN_PWM_RF2, CH_PWM_R2);
+  ledcAttachPin(PIN_PWM_RB2, CH_PWM_R2);
 #endif
   // Initialize with the I2C addr 0x3C
 #if (HAS_OLED)
@@ -930,23 +944,6 @@ void setup() {
 #endif
 
 #if (MCU == ESP32 && OPENBOT != MTV)
-  // PWMs
-  // Configure PWM functionalitites
-  ledcSetup(CH_PWM_L1, FREQ, RES);
-  ledcSetup(CH_PWM_L2, FREQ, RES);
-  ledcSetup(CH_PWM_R1, FREQ, RES);
-  ledcSetup(CH_PWM_R2, FREQ, RES);
-
-  // Attach the channel to the GPIO to be controlled
-  ledcAttachPin(PIN_PWM_LF1, CH_PWM_L1);
-  ledcAttachPin(PIN_PWM_LB1, CH_PWM_L1);
-  ledcAttachPin(PIN_PWM_LF2, CH_PWM_L2);
-  ledcAttachPin(PIN_PWM_LB2, CH_PWM_L2);
-  ledcAttachPin(PIN_PWM_RF1, CH_PWM_R1);
-  ledcAttachPin(PIN_PWM_RB1, CH_PWM_R1);
-  ledcAttachPin(PIN_PWM_RF2, CH_PWM_R2);
-  ledcAttachPin(PIN_PWM_RB2, CH_PWM_R2);
-
 #if (HAS_LEDS_BACK)
   ledcSetup(CH_LED_LB, FREQ, RES);
   ledcSetup(CH_LED_RB, FREQ, RES);
@@ -961,22 +958,6 @@ void setup() {
   ledcAttachPin(PIN_LED_RF, CH_LED_RF);
 #endif
 
-#endif
-
-#if (OPENBOT == MTV)
-  // PWMs
-  // PWM signal configuration using the ESP32 API
-  ledcSetup(LHS_PWM_OUT, FREQ, RES);
-  ledcSetup(RHS_PWM_OUT, FREQ, RES);
-
-  // Attach the channel to the GPIO to be controlled
-  ledcAttachPin(PIN_PWM_L, LHS_PWM_OUT);
-  ledcAttachPin(PIN_PWM_R, RHS_PWM_OUT);
-
-  pinMode(PIN_DIR_L, OUTPUT);
-  pinMode(PIN_DIR_R, OUTPUT);
-  pinMode(PIN_DIR_L, LOW);
-  pinMode(PIN_DIR_R, LOW);
 #endif
 
   Serial.begin(115200, SERIAL_8N1);
