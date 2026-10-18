@@ -243,8 +243,8 @@ Usa los números de GPIO impresos en el ESP32. Todas las masas deben estar unida
 
 | Conexión | GPIO del ESP32 | Notas |
 |---|---|---|
-| L298N IN1 / IN2 (motores izquierdos) | 13 / 12 | |
-| L298N IN3 / IN4 (motores derechos) | 15 / 2 | |
+| L298N IN1 / IN2 (motores izquierdos) | 32 / 33 | |
+| L298N IN3 / IN4 (motores derechos) | 25 / 26 | |
 | L298N ENA / ENB | – | Deja puestos los puentes de habilitación (la velocidad se ajusta por PWM en los pines IN) |
 | Codificador delantero izquierdo / delantero derecho | 35 / 22 | |
 | Codificador trasero izquierdo / trasero derecho *(opcional)* | 34 / 23 | |
@@ -252,9 +252,9 @@ Usa los números de GPIO impresos en el ESP32. Todas las masas deben estar unida
 | Ultrasonidos ECHO | 18 | a través de un divisor de 10 k (ECHO → GPIO18) / 20 k (GPIO18 → GND) |
 | Tensión de la batería | 4 | 30 k desde el + de la batería tras el interruptor hasta GPIO4, 10 k de GPIO4 a GND |
 | Luces delanteras I / D *(opcional)* | 19 / 21 | a través de etapas con transistor NPN |
-| Luces traseras I / D *(opcional)* | 25 / 26 | a través de etapas con transistor NPN, requiere cambio en el firmware |
+| Luces traseras I / D *(opcional)* | 16 / 17 | a través de etapas con transistor NPN, requiere cambio en el firmware |
 
-- **Motores:** conecta los dos motores izquierdos en paralelo a OUT1/OUT2 y los dos derechos a OUT3/OUT4. Si un lado gira al revés, intercambia los dos cables de motor de ese lado.
+- **Motores:** conecta los dos motores izquierdos en paralelo a OUT1/OUT2, + (rojo) a OUT2 y − (negro) a OUT1. Conecta los dos motores derechos a OUT3/OUT4, + (rojo) a OUT3 y − (negro) a OUT4. Los dos lados están reflejados, así ambos avanzan. Si un lado aún gira al revés, intercambia los dos cables de motor de ese lado.
 - **Codificadores:** alimenta las placas LM393 con **3,3 V**, no con 5 V. Sus resistencias pull-up integradas mantienen entonces las salidas a un nivel seguro para el ESP32. GPIO34 y GPIO35 son solo de entrada y no tienen pull-up interno.
 - **Luces:** cada piloto se conmuta con un transistor NPN (resistencia de base de 1 k, pull-down de 100 k entre base y emisor). Nunca alimentes un piloto directamente desde un pin del ESP32.
 
@@ -296,15 +296,15 @@ Descarga el firmware de la [carpeta del firmware](../../firmware/README.es-ES.md
    #define HAS_SPEED_SENSORS_BACK 1   // read the rear encoders as well
    #define HAS_LEDS_FRONT 1           // white lights on GPIO19/21 (default pins)
    #define HAS_LEDS_BACK 1            // red lights, and change their pins:
-   const int PIN_LED_LB = 25;         // default 5
-   const int PIN_LED_RB = 26;         // default 18
+   const int PIN_LED_LB = 16;         // default 5
+   const int PIN_LED_RB = 17;         // default 18
    ```
 
 5. En el Arduino IDE, instala el **paquete de placas esp32 2.0.17**. El firmware usa `ledcSetup`/`ledcAttachPin`, que se eliminaron en la versión 3.x. Después selecciona **ESP32 Dev Module** y sube el programa.
 
 **Acceso USB.** El ESP32 va boca abajo en su soporte, así que su conector USB queda bajo la placa, frente al borne de alimentación del L298N, a solo unos 8,5 mm. Con el controlador montado solo cabe un conector acodado, con el cable saliendo hacia arriba entre las dos placas. Flashea antes de montar el L298N o usa un cable de 90°.
 
-Los GPIO 2, 5, 12 y 15 son pines de configuración de arranque. Si la placa no arranca o no se deja flashear con todo conectado, revisa qué tira de ellos, sobre todo de GPIO12, que debe estar a nivel bajo en el reinicio.
+Los pines de los motores no son pines de arranque del ESP32, así que los motores no se mueven al encender. Solo el GPIO 5 (disparo del sonar) es un pin de arranque. Si la placa no arranca o no se deja flashear con todo conectado, desconecta el disparo del sonar y vuelve a intentarlo.
 
 **Prueba en banco** (sin ruedas, chasis elevado, monitor serie a 115200 baudios):
 
@@ -372,7 +372,7 @@ Encarga la placa con los [archivos de fabricación y la lista de materiales de l
 |---|---|
 | Errores de compilación sobre `ledcSetup` / `ledcAttachPin` | El núcleo esp32 es 3.x. Instala la 2.0.17. |
 | El conector USB no entra en el ESP32 | El L298N estorba. Usa un conector de 90° o desmonta el controlador para flashear. |
-| El ESP32 no arranca o no se flashea una vez cableado | Carga en GPIO12/2/15/5. Desconecta las entradas del L298N y vuelve a intentarlo. |
+| El ESP32 no arranca o no se flashea una vez cableado | Carga en el GPIO 5 (disparo del sonar). Desconéctalo y vuelve a intentarlo. |
 | El ESP32 se reinicia al arrancar los motores | Batería débil o descargada, o un convertidor de 5 V que no regula a partir de 2S. Mide la línea de 5 V con carga. |
 | Sonar siempre a 0 o errático | `HAS_INDICATORS` sigue en 1, o el divisor de eco falta o es incorrecto |
 | Sin recuentos de un codificador | Sensor sin 3,3 V, disco fuera de la ranura o disco no opaco |

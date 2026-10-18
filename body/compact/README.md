@@ -243,8 +243,8 @@ Use the GPIO numbers printed on the ESP32. All grounds must be connected togethe
 
 | Connection | ESP32 GPIO | Notes |
 |---|---|---|
-| L298N IN1 / IN2 (left motors) | 13 / 12 | |
-| L298N IN3 / IN4 (right motors) | 15 / 2 | |
+| L298N IN1 / IN2 (left motors) | 32 / 33 | |
+| L298N IN3 / IN4 (right motors) | 25 / 26 | |
 | L298N ENA / ENB | – | Leave the enable jumpers fitted (speed is set by PWM on the IN pins) |
 | Encoder front left / front right | 35 / 22 | |
 | Encoder rear left / rear right *(optional)* | 34 / 23 | |
@@ -252,9 +252,9 @@ Use the GPIO numbers printed on the ESP32. All grounds must be connected togethe
 | Ultrasonic ECHO | 18 | through a 10 k (ECHO → GPIO18) / 20 k (GPIO18 → GND) divider |
 | Battery voltage | 4 | 30 k from switched battery + to GPIO4, 10 k from GPIO4 to GND |
 | Front lights L / R *(optional)* | 19 / 21 | through NPN transistor stages |
-| Rear lights L / R *(optional)* | 25 / 26 | through NPN transistor stages, firmware edit needed |
+| Rear lights L / R *(optional)* | 16 / 17 | through NPN transistor stages, firmware edit needed |
 
-- **Motors:** wire both left motors in parallel to OUT1/OUT2 and both right motors to OUT3/OUT4. If a side turns the wrong way, swap that side's two motor wires.
+- **Motors:** wire both left motors in parallel to OUT1/OUT2, + (red) to OUT2 and − (black) to OUT1. Wire both right motors to OUT3/OUT4, + (red) to OUT3 and − (black) to OUT4. The two sides are mirrored, so this makes both drive forward. If a side still turns the wrong way, swap that side's two motor wires.
 - **Encoders:** power the LM393 boards from **3.3 V**, not 5 V. Their on-board pull-ups then keep the outputs at a safe level for the ESP32. GPIO34 and GPIO35 are input-only and have no internal pull-ups.
 - **Lights:** each lamp is switched by an NPN transistor (1 k base resistor, 100 k base-to-emitter pull-down). Never drive a panel lamp directly from an ESP32 pin.
 
@@ -296,15 +296,15 @@ Get the firmware from the [firmware folder](../../firmware/README.md) and open `
    #define HAS_SPEED_SENSORS_BACK 1   // read the rear encoders as well
    #define HAS_LEDS_FRONT 1           // white lights on GPIO19/21 (default pins)
    #define HAS_LEDS_BACK 1            // red lights, and change their pins:
-   const int PIN_LED_LB = 25;         // default 5
-   const int PIN_LED_RB = 26;         // default 18
+   const int PIN_LED_LB = 16;         // default 5
+   const int PIN_LED_RB = 17;         // default 18
    ```
 
 5. In the Arduino IDE, install the **esp32 board package 2.0.17**. The firmware uses `ledcSetup`/`ledcAttachPin`, which were removed in core 3.x. Then select **ESP32 Dev Module** and upload.
 
 **USB access.** The ESP32 sits upside down in its carrier, so its USB socket is underneath the board and faces the L298N's power terminal only about 8.5 mm away. With the driver installed, only a right-angle plug fits, with the cable leaving upward between the two boards. Either flash before fitting the L298N, or use a 90° cable.
 
-GPIO 2, 5, 12 and 15 are boot-strapping pins. If the board won't boot or flash with everything connected, check what is pulling on them, and GPIO12 most of all, since it must be low at reset.
+The motor pins are not ESP32 boot pins, so the motors stay off at power-on. Only GPIO 5 (sonar trigger) is a boot pin. If the board won't boot or flash with everything connected, disconnect the sonar trigger and retry.
 
 **Bench test** (wheels off, chassis propped up, Serial Monitor at 115200 baud):
 
@@ -372,7 +372,7 @@ Order the board from the [PCB V2 manufacturing files and BOM](../diy/pcb/v2), fo
 |---|---|
 | Compile errors about `ledcSetup` / `ledcAttachPin` | The esp32 core is 3.x. Install 2.0.17. |
 | USB plug won't go into the ESP32 | The L298N is in the way. Use a 90° plug or remove the driver to flash. |
-| ESP32 won't boot or flash once wired | Loading on GPIO12/2/15/5. Disconnect the L298N inputs and retry. |
+| ESP32 won't boot or flash once wired | Loading on GPIO 5 (sonar trigger). Disconnect it and retry. |
 | ESP32 resets when the motors start | Weak or flat battery, or a 5 V converter that can't regulate from 2S. Check the 5 V rail under load. |
 | Sonar always 0 or erratic | `HAS_INDICATORS` is still 1, or the echo divider is missing or wrong |
 | No counts from an encoder | Sensor not on 3.3 V, disk not in the slot, or disk not opaque |
