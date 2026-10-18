@@ -1748,9 +1748,10 @@ void process_voltage_msg() {
 #if HAS_VOLTAGE_DIVIDER
   voltage_interval = atol(msg_buf);  // convert to long
 #endif
-  Serial.println(String("vmin:") + String(VOLTAGE_MIN, 2));
-  Serial.println(String("vlow:") + String(VOLTAGE_LOW, 2));
-  Serial.println(String("vmax:") + String(VOLTAGE_MAX, 2));
+  // sendData() also sends over Bluetooth, so the app gets the limits on either link.
+  sendData(String("vmin:") + String(VOLTAGE_MIN, 2));
+  sendData(String("vlow:") + String(VOLTAGE_LOW, 2));
+  sendData(String("vmax:") + String(VOLTAGE_MAX, 2));
 }
 
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
