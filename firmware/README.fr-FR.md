@@ -17,11 +17,21 @@ La tâche principale du MCU est de gérer le contrôle de bas niveau du véhicul
 
 ## Configuration
 
-Tout d'abord, vous devez configurer votre matériel au début du code. Si vous avez fait la construction DIY (en utilisant le pilote de moteur L298N), réglez `OPENBOT DIY`. Si vous avez utilisé le PCB personnalisé, vérifiez la version et réglez soit `OPENBOT PCB_V1` soit `OPENBOT PCB_V2`. Si vous avez un kit OpenBot, réglez `OPENBOT RTR_TT`. Si vous avez adapté un camion RC, réglez `OPENBOT RC_CAR`. Si vous utilisez la version DIY plus petite pour l'éducation, réglez `OPENBOT LITE`. Si vous utilisez le kit OpenBot prêt à l'emploi avec des moteurs 520, réglez `OPENBOT RTR_520`. Si vous avez construit le véhicule tout-terrain, vous devez régler `OPENBOT MTV`. Pour faire fonctionner l'`OpenBot DIY` avec l'ESP32, réglez OpenBot `DIY_ESP32`.
+Tout d'abord, vous devez configurer votre matériel au début du code. Si vous avez fait la construction DIY (en utilisant le pilote de moteur L298N), réglez `OPENBOT DIY`. Si vous avez utilisé le PCB personnalisé, vérifiez la version et réglez soit `OPENBOT PCB_V1` soit `OPENBOT PCB_V2`. Si vous avez un kit OpenBot, réglez `OPENBOT RTR_TT`. Si vous avez adapté un camion RC, réglez `OPENBOT RC_CAR`. Si vous utilisez la version DIY plus petite pour l'éducation, réglez `OPENBOT LITE`. Si vous utilisez le kit OpenBot prêt à l'emploi avec des moteurs 520, réglez `OPENBOT RTR_520`. Si vous avez construit le véhicule tout-terrain, vous devez régler `OPENBOT MTV`.
+
+Le firmware détecte la carte que vous sélectionnez dans l'Arduino IDE. Chaque châssis prend en charge ces cartes ; avec une autre carte, la compilation s'arrête avec une erreur :
+
+| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|:---:|:---:|
+| `DIY` | ✓ | ✓ |
+| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
+| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+
+`DIY_ESP32` a été remplacé par `DIY` avec une carte ESP32 sélectionnée.
 
 ## Bluetooth
 
-Vous pouvez également faire fonctionner l'OpenBot via Bluetooth, pour cela vous pouvez activer le Bluetooth en réglant `BLUETOOTH 1` (désactiver : 0). Pour que le Bluetooth fonctionne, vous avez besoin d'OpenBot avec des cartes ESP32 comme `(RTR_520, MTV, DIY_ESP32)`.
+Vous pouvez également faire fonctionner l'OpenBot via Bluetooth, pour cela vous pouvez activer le Bluetooth en réglant `BLUETOOTH 1` (désactiver : 0). Pour que le Bluetooth fonctionne, vous avez besoin d'OpenBot avec des cartes ESP32 comme `RTR_TT2`, `RTR_520`, `MTV` ou `DIY` avec un ESP32.
 
 ## Configuration
 

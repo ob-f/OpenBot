@@ -17,11 +17,21 @@ MCU의 주요 작업은 차량의 저수준 제어를 처리하고 차량에 장
 
 ## 설정
 
-먼저 코드 시작 부분에서 하드웨어 구성을 설정해야 합니다. DIY 빌드(L298N 모터 드라이버 사용)를 수행한 경우 `OPENBOT DIY`를 설정합니다. 맞춤형 PCB를 사용한 경우 버전을 확인하고 `OPENBOT PCB_V1` 또는 `OPENBOT PCB_V2`를 설정합니다. OpenBot 키트를 보유한 경우 `OPENBOT RTR_TT`를 설정합니다. RC 트럭을 개조한 경우 `OPENBOT RC_CAR`를 설정합니다. 교육용으로 더 작은 DIY 버전을 사용하는 경우 `OPENBOT LITE`를 설정합니다. 520-모터가 장착된 OpenBot Ready-to-Run 키트를 사용하는 경우 `OPENBOT RTR_520`을 설정합니다. 다목적 차량을 제작한 경우 `OPENBOT MTV`를 설정해야 합니다. ESP32와 함께 `OpenBot DIY`를 실행하려면 OpenBot `DIY_ESP32`를 설정합니다.
+먼저 코드 시작 부분에서 하드웨어 구성을 설정해야 합니다. DIY 빌드(L298N 모터 드라이버 사용)를 수행한 경우 `OPENBOT DIY`를 설정합니다. 맞춤형 PCB를 사용한 경우 버전을 확인하고 `OPENBOT PCB_V1` 또는 `OPENBOT PCB_V2`를 설정합니다. OpenBot 키트를 보유한 경우 `OPENBOT RTR_TT`를 설정합니다. RC 트럭을 개조한 경우 `OPENBOT RC_CAR`를 설정합니다. 교육용으로 더 작은 DIY 버전을 사용하는 경우 `OPENBOT LITE`를 설정합니다. 520-모터가 장착된 OpenBot Ready-to-Run 키트를 사용하는 경우 `OPENBOT RTR_520`을 설정합니다. 다목적 차량을 제작한 경우 `OPENBOT MTV`를 설정해야 합니다.
+
+펌웨어는 Arduino IDE에서 선택한 보드를 자동으로 인식합니다. 각 본체가 지원하는 보드는 다음과 같으며, 다른 보드를 선택하면 오류와 함께 빌드가 중단됩니다:
+
+| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|:---:|:---:|
+| `DIY` | ✓ | ✓ |
+| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
+| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+
+`DIY_ESP32`는 ESP32 보드를 선택한 `DIY`로 대체되었습니다.
 
 ## 블루투스
 
-OpenBot을 블루투스를 통해 실행할 수도 있으며, 이를 위해 `BLUETOOTH 1`을 설정하여 블루투스를 활성화할 수 있습니다(비활성화: 0). 블루투스를 사용하려면 `(RTR_520, MTV, DIY_ESP32)`와 같은 ESP32 보드가 있는 OpenBot이 필요합니다.
+OpenBot을 블루투스를 통해 실행할 수도 있으며, 이를 위해 `BLUETOOTH 1`을 설정하여 블루투스를 활성화할 수 있습니다(비활성화: 0). 블루투스를 사용하려면 `RTR_TT2`, `RTR_520`, `MTV` 또는 ESP32를 사용하는 `DIY`와 같은 ESP32 보드가 있는 OpenBot이 필요합니다.
 
 ## 구성
 

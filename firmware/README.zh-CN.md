@@ -17,11 +17,19 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
 
 ## 设置
 
-首先，您需要在代码开始时设置硬件配置。如果您进行了DIY构建（使用L298N电机驱动器），请设置`OPENBOT DIY`。如果您使用了定制PCB，请检查版本并设置`OPENBOT PCB_V1`或`OPENBOT PCB_V2`。如果您有OpenBot套件，请设置`OPENBOT RTR_TT`。如果您改装了RC卡车，请设置`OPENBOT RC_CAR`。如果您使用较小的教育版DIY版本，请设置`OPENBOT LITE`。如果您使用带有520电机的OpenBot即插即用套件，请设置`OPENBOT RTR_520`。如果您构建了多地形车辆，请设置`OPENBOT MTV`。要使用ESP32运行`OpenBot DIY`，请设置OpenBot `DIY_ESP32`。
+首先，您需要在代码开始时设置硬件配置。如果您进行了DIY构建（使用L298N电机驱动器），请设置`OPENBOT DIY`。如果您使用了定制PCB，请检查版本并设置`OPENBOT PCB_V1`或`OPENBOT PCB_V2`。如果您有OpenBot套件，请设置`OPENBOT RTR_TT`。如果您改装了RC卡车，请设置`OPENBOT RC_CAR`。如果您使用较小的教育版DIY版本，请设置`OPENBOT LITE`。如果您使用带有520电机的OpenBot即插即用套件，请设置`OPENBOT RTR_520`。如果您构建了多地形车辆，请设置`OPENBOT MTV`。固件会识别您在 Arduino IDE 中选择的开发板。各车体支持的开发板如下；选择其他开发板时，编译会报错并停止：
+
+| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|:---:|:---:|
+| `DIY` | ✓ | ✓ |
+| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
+| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+
+`DIY_ESP32` 已被选择 ESP32 开发板时的 `DIY` 取代。
 
 ## 蓝牙
 
-您也可以通过蓝牙运行OpenBot，为此您可以通过设置`BLUETOOTH 1`（禁用：0）来启用蓝牙。要使蓝牙工作，您需要使用ESP32板的OpenBot，如`(RTR_520, MTV, DIY_ESP32)`。
+您也可以通过蓝牙运行OpenBot，为此您可以通过设置`BLUETOOTH 1`（禁用：0）来启用蓝牙。要使蓝牙工作，您需要使用ESP32板的OpenBot，如`RTR_TT2`、`RTR_520`、`MTV` 或使用 ESP32 的 `DIY`。
 
 ## 配置
 

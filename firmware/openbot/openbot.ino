@@ -37,18 +37,26 @@
 #define NANO 328 //Atmega328p
 #define ESP32 32 //ESP32
 
-//Robot bodies with Atmega328p as MCU --> Select Arduino Nano as board
-#define DIY 0        // DIY without PCB
-#define PCB_V1 1     // DIY with PCB V1
-#define PCB_V2 2     // DIY with PCB V2
-#define RTR_TT 3     // Ready-to-Run with TT-motors
-#define RC_CAR 4     // RC truck prototypes
-#define LITE 5       // Smaller DIY version for education
-//Robot bodies with ESP32 as MCU --> Select ESP32 Dev Module as board
-#define RTR_TT2 6   // Ready-to-Run with TT-motors
-#define RTR_520 7    // Ready-to-Run with 520-motors
-#define MTV 8        // Multi Terrain Vehicle
-#define DIY_ESP32 9  // DIY without PCB
+// The MCU is detected from the board selected in the Arduino IDE:
+// Nano: "Arduino Nano", ESP32: "ESP32 Dev Module" (esp32 board package 2.0.17)
+#if defined(ARDUINO_ARCH_ESP32)
+#define MCU ESP32
+#elif defined(__AVR_ATmega328P__)
+#define MCU NANO
+#else
+#error "Unsupported board. Select Arduino Nano or ESP32 Dev Module."
+#endif
+
+//Robot bodies          Boards
+#define DIY 0        // Nano, ESP32   DIY without PCB
+#define PCB_V1 1     // Nano          DIY with PCB V1
+#define PCB_V2 2     // Nano          DIY with PCB V2
+#define RTR_TT 3     // Nano          Ready-to-Run with TT-motors
+#define RC_CAR 4     // Nano          RC truck prototypes
+#define LITE 5       // Nano          Smaller DIY version for education
+#define RTR_TT2 6    // ESP32         Ready-to-Run with TT-motors
+#define RTR_520 7    // ESP32         Ready-to-Run with 520-motors
+#define MTV 8        // ESP32         Multi Terrain Vehicle
 
 // Gamepad drive modes
 #define GAMEPAD_GAME 0
@@ -59,7 +67,8 @@
 // SETUP - Choose your body
 //------------------------------------------------------//
 
-// Setup the OpenBot version (DIY, PCB_V1, PCB_V2, RTR_TT, RC_CAR, LITE, RTR_TT2, RTR_520, DIY_ESP32)
+// Setup the OpenBot body (DIY, PCB_V1, PCB_V2, RTR_TT, RC_CAR, LITE, RTR_TT2, RTR_520, MTV)
+// and select a board it supports (see above)
 #define OPENBOT DIY
 
 //------------------------------------------------------//
@@ -105,7 +114,7 @@ boolean coast_mode = 1;
 // HAS_LEDS_BACK                        Enable/Disable back LEDs
 // HAS_LEDS_STATUS                      Enable/Disable status LEDs
 // HAS_BLUETOOTH                        Enable/Disable bluetooth connectivity (1,0)
-// NOTE: HAS_BLUETOOTH will only work with the ESP32 board (RTR_TT2, RTR_520, MTV, DIY_ESP32)
+// NOTE: HAS_BLUETOOTH will only work with an ESP32 board (RTR_TT2, RTR_520, MTV, DIY with ESP32)
 
 // PIN_TRIGGER                          Arduino pin tied to trigger pin on ultrasonic sensor.
 // PIN_ECHO                             Arduino pin tied to echo pin on ultrasonic sensor.
@@ -124,7 +133,7 @@ boolean coast_mode = 1;
 //-------------------------DIY--------------------------//
 #if (OPENBOT == DIY)
 const String robot_type = "DIY";
-#define MCU NANO
+#if (MCU == NANO)
 #define HAS_VOLTAGE_DIVIDER 0
 const float VOLTAGE_DIVIDER_FACTOR = (20 + 10) / 10;
 const float VOLTAGE_MIN = 2.5f;
@@ -148,10 +157,71 @@ const int PIN_ECHO = 11;
 const int PIN_LED_LI = 4;
 const int PIN_LED_RI = 7;
 
+#else  // ESP32
+#include <esp_wifi.h>
+#define HAS_BLUETOOTH 1
+#define analogWrite ledcWrite
+#define attachPinChangeInterrupt attachInterrupt
+#define detachPinChangeInterrupt detachInterrupt
+#define digitalPinToPinChangeInterrupt digitalPinToInterrupt
+#define PIN_PWM_L1 CH_PWM_L1
+#define PIN_PWM_L2 CH_PWM_L2
+#define PIN_PWM_R1 CH_PWM_R1
+#define PIN_PWM_R2 CH_PWM_R2
+#define HAS_VOLTAGE_DIVIDER 1
+const float VOLTAGE_DIVIDER_FACTOR = (30 + 10) / 10;
+const float VOLTAGE_MIN = 6.0f;
+const float VOLTAGE_LOW = 9.0f;
+const float VOLTAGE_MAX = 12.6f;
+const float ADC_FACTOR = 3.3 / 4095;
+#define HAS_INDICATORS 1
+#define HAS_SONAR 1
+#define SONAR_MEDIAN 0
+#define HAS_SPEED_SENSORS_FRONT 1
+//PWM properties
+const int FREQ = 5000;
+const int RES = 8;
+const int CH_PWM_L1 = 0;
+const int CH_PWM_L2 = 1;
+const int CH_PWM_R1 = 2;
+const int CH_PWM_R2 = 3;
+const int CH_LED_LF = 4;
+const int CH_LED_RF = 5;
+const int CH_LED_LB = 6;
+const int CH_LED_RB = 7;
+// Motors: L298N IN1/IN2 (left), IN3/IN4 (right); not on boot pins
+const int PIN_PWM_LF1 = 32;
+const int PIN_PWM_LF2 = 33;
+const int PIN_PWM_LB1 = 32;
+const int PIN_PWM_LB2 = 33;
+const int PIN_PWM_RF1 = 25;
+const int PIN_PWM_RF2 = 26;
+const int PIN_PWM_RB1 = 25;
+const int PIN_PWM_RB2 = 26;
+const int PIN_SPEED_LF = 35;
+const int PIN_SPEED_LB = 34;
+const int PIN_SPEED_RF = 22;
+const int PIN_SPEED_RB = 23;
+const int PIN_VIN = 4;
+const int PIN_TRIGGER = 5;
+const int PIN_ECHO = 18;
+const int PIN_LED_LI = 5;
+const int PIN_LED_RI = 18;
+const int PIN_LED_LB = 5;
+const int PIN_LED_RB = 18;
+const int PIN_LED_LF = 19;
+const int PIN_LED_RF = 21;
+const int PIN_LED_Y = 14;
+const int PIN_LED_G = 27;
+const int PIN_LED_B = 13;
+#endif
+
 //-------------------------PCB_V1-----------------------//
 #elif (OPENBOT == PCB_V1)
 const String robot_type = "PCB_V1";
-#define MCU NANO
+#if (MCU != NANO)
+#error "PCB_V1 needs an Arduino Nano board."
+#endif
 #define HAS_VOLTAGE_DIVIDER 1
 const float VOLTAGE_DIVIDER_FACTOR = (100 + 33) / 33;
 const float VOLTAGE_MIN = 2.5f;
@@ -178,7 +248,9 @@ const int PIN_LED_RI = 8;
 //-------------------------PCB_V2-----------------------//
 #elif (OPENBOT == PCB_V2)
 const String robot_type = "PCB_V2";
-#define MCU NANO
+#if (MCU != NANO)
+#error "PCB_V2 needs an Arduino Nano board."
+#endif
 #define HAS_VOLTAGE_DIVIDER 1
 const float VOLTAGE_DIVIDER_FACTOR = (20 + 10) / 10;
 const float VOLTAGE_MIN = 2.5f;
@@ -205,7 +277,9 @@ const int PIN_LED_RI = 8;
 //-------------------------RTR_TT-----------------------//
 #elif (OPENBOT == RTR_TT)
 const String robot_type = "RTR_TT";
-#define MCU NANO
+#if (MCU != NANO)
+#error "RTR_TT needs an Arduino Nano board."
+#endif
 #define HAS_VOLTAGE_DIVIDER 1
 const float VOLTAGE_DIVIDER_FACTOR = (30 + 10) / 10;
 const float VOLTAGE_MIN = 2.5f;
@@ -256,7 +330,9 @@ const int BUMPER_RB = 561;
 //-------------------------RC_CAR-----------------------//
 #elif (OPENBOT == RC_CAR)
 const String robot_type = "RC_CAR";
-#define MCU NANO
+#if (MCU != NANO)
+#error "RC_CAR needs an Arduino Nano board."
+#endif
 #include <Servo.h>
 Servo ESC;
 Servo SERVO;
@@ -280,7 +356,9 @@ const int PIN_LED_RI = 8;
 //-------------------------LITE-------------------------//
 #elif (OPENBOT == LITE)
 const String robot_type = "LITE";
-#define MCU NANO
+#if (MCU != NANO)
+#error "LITE needs an Arduino Nano board."
+#endif
 const float VOLTAGE_MIN = 2.5f;
 const float VOLTAGE_LOW = 4.5f;
 const float VOLTAGE_MAX = 5.0f;
@@ -295,7 +373,9 @@ const int PIN_LED_RI = 7;
 //-------------------------RTR_TT2----------------------//
 #elif (OPENBOT == RTR_TT2)
 const String robot_type = "RTR_TT2";
-#define MCU ESP32
+#if (MCU != ESP32)
+#error "RTR_TT2 needs an ESP32 board."
+#endif
 #include <esp_wifi.h>
 #define HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
@@ -371,7 +451,9 @@ const int BUMPER_RB = 2000;
 //-------------------------RTR_520----------------------//
 #elif (OPENBOT == RTR_520)
 const String robot_type = "RTR_520";
-#define MCU ESP32
+#if (MCU != ESP32)
+#error "RTR_520 needs an ESP32 board."
+#endif
 #include <esp_wifi.h>
 #define HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
@@ -447,7 +529,9 @@ const int BUMPER_RB = 2000;
 //---------------------------MTV------------------------//
 #elif (OPENBOT == MTV)
 const String robot_type = "MTV";
-#define MCU ESP32
+#if (MCU != ESP32)
+#error "MTV needs an ESP32 board."
+#endif
 #include <esp_wifi.h>
 #define HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
@@ -487,66 +571,6 @@ const int RES = 8;
 const int LHS_PWM_OUT = 0;
 const int RHS_PWM_OUT = 1;
 
-//-------------------------DIY_ESP32----------------------//
-#elif (OPENBOT == DIY_ESP32)
-const String robot_type = "DIY_ESP32";
-#define MCU ESP32
-#include <esp_wifi.h>
-#define HAS_BLUETOOTH 1
-#define analogWrite ledcWrite
-#define attachPinChangeInterrupt attachInterrupt
-#define detachPinChangeInterrupt detachInterrupt
-#define digitalPinToPinChangeInterrupt digitalPinToInterrupt
-#define PIN_PWM_L1 CH_PWM_L1
-#define PIN_PWM_L2 CH_PWM_L2
-#define PIN_PWM_R1 CH_PWM_R1
-#define PIN_PWM_R2 CH_PWM_R2
-#define HAS_VOLTAGE_DIVIDER 1
-const float VOLTAGE_DIVIDER_FACTOR = (30 + 10) / 10;
-const float VOLTAGE_MIN = 6.0f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
-const float ADC_FACTOR = 3.3 / 4095;
-#define HAS_INDICATORS 1
-#define HAS_SONAR 1
-#define SONAR_MEDIAN 0
-#define HAS_SPEED_SENSORS_FRONT 1
-//PWM properties
-const int FREQ = 5000;
-const int RES = 8;
-const int CH_PWM_L1 = 0;
-const int CH_PWM_L2 = 1;
-const int CH_PWM_R1 = 2;
-const int CH_PWM_R2 = 3;
-const int CH_LED_LF = 4;
-const int CH_LED_RF = 5;
-const int CH_LED_LB = 6;
-const int CH_LED_RB = 7;
-// Motors: L298N IN1/IN2 (left), IN3/IN4 (right); not on boot pins
-const int PIN_PWM_LF1 = 32;
-const int PIN_PWM_LF2 = 33;
-const int PIN_PWM_LB1 = 32;
-const int PIN_PWM_LB2 = 33;
-const int PIN_PWM_RF1 = 25;
-const int PIN_PWM_RF2 = 26;
-const int PIN_PWM_RB1 = 25;
-const int PIN_PWM_RB2 = 26;
-const int PIN_SPEED_LF = 35;
-const int PIN_SPEED_LB = 34;
-const int PIN_SPEED_RF = 22;
-const int PIN_SPEED_RB = 23;
-const int PIN_VIN = 4;
-const int PIN_TRIGGER = 5;
-const int PIN_ECHO = 18;
-const int PIN_LED_LI = 5;
-const int PIN_LED_RI = 18;
-const int PIN_LED_LB = 5;
-const int PIN_LED_RB = 18;
-const int PIN_LED_LF = 19;
-const int PIN_LED_RF = 21;
-const int PIN_LED_Y = 14;
-const int PIN_LED_G = 27;
-const int PIN_LED_B = 13;
 #endif
 //------------------------------------------------------//
 
@@ -1941,7 +1965,7 @@ void send_wheel_reading(long duration) {
 
 void update_indicator() {
   if (indicator_left > 0) {
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_LI == PIN_LED_LB)
+#if (MCU == ESP32 && PIN_LED_LI == PIN_LED_LB)
     ledcDetachPin(PIN_LED_LB);
 #endif
     digitalWrite(PIN_LED_LI, !digitalRead(PIN_LED_LI));
@@ -1951,12 +1975,12 @@ void update_indicator() {
 #else
     digitalWrite(PIN_LED_LI, LOW);
 #endif
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_LI == PIN_LED_LB)
+#if (MCU == ESP32 && PIN_LED_LI == PIN_LED_LB)
     ledcAttachPin(PIN_LED_LB, CH_LED_LB);
 #endif
   }
   if (indicator_right > 0) {
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_RI == PIN_LED_RB)
+#if (MCU == ESP32 && PIN_LED_RI == PIN_LED_RB)
     ledcDetachPin(PIN_LED_RB);
 #endif
     digitalWrite(PIN_LED_RI, !digitalRead(PIN_LED_RI));
@@ -1966,7 +1990,7 @@ void update_indicator() {
 #else
     digitalWrite(PIN_LED_RI, LOW);
 #endif
-#if ((OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32) && PIN_LED_RI == PIN_LED_RB)
+#if (MCU == ESP32 && PIN_LED_RI == PIN_LED_RB)
     ledcAttachPin(PIN_LED_RB, CH_LED_RB);
 #endif
   }
@@ -1977,7 +2001,7 @@ void update_indicator() {
 #if (HAS_LEDS_FRONT || HAS_LEDS_BACK)
 void update_light() {
 #if (HAS_LEDS_FRONT)
-#if (OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32)
+#if (MCU == ESP32)
   analogWrite(CH_LED_LF, light_front);
   analogWrite(CH_LED_RF, light_front);
 #else
@@ -1987,7 +2011,7 @@ void update_light() {
 #endif
 
 #if (HAS_LEDS_BACK)
-#if (OPENBOT == RTR_TT2 || OPENBOT == RTR_520 || OPENBOT == DIY_ESP32)
+#if (MCU == ESP32)
   analogWrite(CH_LED_LB, light_back);
   analogWrite(CH_LED_RB, light_back);
 #else
