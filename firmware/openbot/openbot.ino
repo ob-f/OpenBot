@@ -539,14 +539,16 @@ const int CH_LED_LF = 4;
 const int CH_LED_RF = 5;
 const int CH_LED_LB = 6;
 const int CH_LED_RB = 7;
-const int PIN_PWM_LF1 = 13;
-const int PIN_PWM_LF2 = 12;
-const int PIN_PWM_LB1 = 13;
-const int PIN_PWM_LB2 = 12;
-const int PIN_PWM_RF1 = 15;
-const int PIN_PWM_RF2 = 2;
-const int PIN_PWM_RB1 = 15;
-const int PIN_PWM_RB2 = 2;
+// Motors: L298N IN1/IN2 (left), IN3/IN4 (right), on pins that
+// are not ESP32 boot pins, so the motors stay off at power-on
+const int PIN_PWM_LF1 = 32;
+const int PIN_PWM_LF2 = 33;
+const int PIN_PWM_LB1 = 32;
+const int PIN_PWM_LB2 = 33;
+const int PIN_PWM_RF1 = 25;
+const int PIN_PWM_RF2 = 26;
+const int PIN_PWM_RB1 = 25;
+const int PIN_PWM_RB2 = 26;
 const int PIN_SPEED_LF = 35;
 const int PIN_SPEED_LB = 34;
 const int PIN_SPEED_RF = 22;
@@ -562,7 +564,7 @@ const int PIN_LED_LF = 19;
 const int PIN_LED_RF = 21;
 const int PIN_LED_Y = 14;
 const int PIN_LED_G = 27;
-const int PIN_LED_B = 26;
+const int PIN_LED_B = 13;
 #endif
 //------------------------------------------------------//
 
