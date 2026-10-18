@@ -40,6 +40,8 @@ Der einfachste Weg, eine der Apps zu erhalten, ist, sie direkt auf das Telefon h
 
 Alternativ können Sie die APKs aus den Assets einer beliebigen [Veröffentlichung](https://github.com/ob-f/OpenBot/releases) herunterladen. Wenn Sie die neueste App aus dem Master-Branch möchten, können Sie sie auch aus den Build-Artefakten [hier](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22) herunterladen. Beachten Sie, dass sie möglicherweise nicht stabil ist. Wenn Sie später Änderungen an der App vornehmen möchten, folgen Sie den untenstehenden Schritten, um die App zu kompilieren und auf Ihrem Telefon zu installieren.
 
+> **Hinweis:** Das Release-Asset `Controller-<version>.apk` wird jetzt aus der [Flutter-Controller-App](../controller/flutter/README.de-DE.md) gebaut und nicht mehr aus der alten Android-Controller-App in diesem Ordner. Der Flutter-Controller verwendet eine andere Paket-ID (`org.openbot.app.controller` statt `org.openbot.controller`) und aktualisiert daher eine bestehende Installation des alten Controllers **nicht**. Wenn Sie den alten Controller bereits installiert haben, installieren Sie den neuen Controller separat; die alte App können Sie danach deinstallieren.
+
 ## Apps bauen
 
 ### Voraussetzungen

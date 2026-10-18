@@ -11,6 +11,12 @@
 
 This Controller app serves as a `remote controller` for the [OpenBot](https://www.openbot.org) vehicle similar as a BT controller (e.g. PS3/4 or Xbox). It runs on another Android/iOS device and supports live video/audio streaming in addition to control.
 
+## Install the app
+
+On Android, download `Controller-<version>.apk` from the assets of the latest [release](https://github.com/ob-f/OpenBot/releases) and [install](https://www.lifewire.com/install-apk-on-android-4177185) it on your phone.
+
+> **Note for existing users:** This app replaces the legacy [Android controller app](../../android/controller/README.md) as the controller APK published with each release. Because the two apps use different package IDs (`org.openbot.app.controller` vs. `org.openbot.controller`), installing this APK will not update the legacy app; it is installed as a separate app alongside it. You can uninstall the legacy controller once you have switched.
+
 ## Getting Started
 Begin by installing [Flutter](https://flutter.dev/) on your system. Choose the appropriate download for your operating system, which includes options for Windows, macOS, Linux, and ChromeOS. Follow the official Flutter installation guide for detailed instructions: [Flutter Installation Guide](https://docs.flutter.dev/get-started/install)
 

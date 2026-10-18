@@ -40,6 +40,8 @@ La forma más fácil de obtener cualquiera de las aplicaciones es descargándola
 
 Alternativamente, puedes descargar los apks desde los assets de cualquier [release](https://github.com/ob-f/OpenBot/releases). Si deseas la última aplicación de la rama principal, también puedes descargarla desde los artefactos de compilación [aquí](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22). Ten en cuenta que puede no ser estable. Si deseas realizar cambios en la aplicación más adelante, sigue los pasos a continuación para compilar la aplicación y desplegarla en tu teléfono.
 
+> **Nota:** El archivo `Controller-<version>.apk` de cada release ahora se compila a partir de la [aplicación Flutter Controller](../controller/flutter/README.es-ES.md) en lugar de la antigua aplicación de control para Android de esta carpeta. El controlador de Flutter usa un ID de paquete distinto (`org.openbot.app.controller` en lugar de `org.openbot.controller`), por lo que **no** actualizará una instalación existente del controlador antiguo. Si ya tienes instalado el controlador antiguo, instala el nuevo por separado; después puedes desinstalar la aplicación antigua.
+
 ## Compilar las aplicaciones
 
 ### Requisitos previos

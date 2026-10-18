@@ -40,6 +40,8 @@
 
 或者，你可以从任何[发布](https://github.com/ob-f/OpenBot/releases)的资产中下载apk。如果你想要来自主分支的最新应用程序，你也可以从构建工件[这里](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22)下载。请注意，它可能不稳定。如果你以后想对应用程序进行更改，请按照以下步骤编译应用程序并将其部署到手机上。
 
+> **注意：** 发布资源中的 `Controller-<version>.apk` 现在由 [Flutter 控制器应用](../controller/flutter/README.zh-CN.md) 构建，而不再是此文件夹中的旧版 Android 控制器应用。Flutter 控制器使用不同的包 ID（`org.openbot.app.controller`，而不是 `org.openbot.controller`），因此**不会**更新已安装的旧版控制器。如果你已经安装了旧版控制器，请单独安装新控制器；之后可以卸载旧版应用。
+
 ## 构建应用程序
 
 ### 先决条件

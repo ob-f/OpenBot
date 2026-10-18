@@ -41,6 +41,8 @@ The easiest way to get either of the apps is to download it directly to the phon
 
 Alternatively, you can download the apks from the assets of any [release](https://github.com/ob-f/OpenBot/releases). If you want the latest app from the master branch, you can also download it from the build artifacts [here](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22). Note, that it may not be stable. If you would like to make changes to the app later, follow the steps below to compile the app and deploy it on your phone.
 
+> **Note:** The `Controller-<version>.apk` release asset is now built from the [Flutter Controller App](../controller/flutter/README.md) instead of the legacy Android controller app in this folder. The Flutter controller uses a different package ID (`org.openbot.app.controller` instead of `org.openbot.controller`), so it will **not** update an existing legacy controller installation. If you already have the legacy controller installed, install the new controller separately; you can uninstall the legacy app afterwards.
+
 ## Build the apps
 
 ### Prerequisites

@@ -11,6 +11,8 @@
 
 이 안드로이드 앱은 [OpenBot](https://www.openbot.org) 차량의 `리모컨` 역할을 해요. 기본적으로 PS3/4나 Xbox 리모컨처럼 비슷한 기능을 하지만, 다른 안드로이드 기기에서 실행된답니다!
 
+> **참고:** 이 기존 컨트롤러 앱은 더 이상 릴리스와 함께 배포되지 않습니다. 이제 릴리스 에셋 `Controller-<version>.apk`는 다른 패키지 ID(`org.openbot.app.controller`)를 사용하는 [Flutter 컨트롤러 앱](../../controller/flutter/README.ko-KR.md)입니다. 기존 사용자는 이 앱을 별도의 앱으로 설치해야 하며, 이 앱을 업데이트하지 않습니다.
+
 ## 연결
 
 컨트롤러 앱을 실행하면 바로 로봇에 연결을 시도해요. 다음 화면이 보여요:

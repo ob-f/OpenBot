@@ -11,6 +11,8 @@
 
 Diese Android-App dient als `Fernsteuerung` für das [OpenBot](https://www.openbot.org) Fahrzeug. Im Grunde erfüllt sie eine ähnliche Funktion wie ein PS3/4- oder Xbox-Controller, läuft jedoch auf einem anderen Android-Gerät.
 
+> **Hinweis:** Diese alte Controller-App wird nicht mehr mit den Releases veröffentlicht. Das Release-Asset `Controller-<version>.apk` ist jetzt die [Flutter-Controller-App](../../controller/flutter/README.de-DE.md), die eine andere Paket-ID verwendet (`org.openbot.app.controller`). Bestehende Nutzer müssen sie als separate App installieren; sie aktualisiert diese App nicht.
+
 ## Verbindung
 
 Wenn die Controller-App gestartet wird, versucht sie sofort, eine Verbindung zum Roboter herzustellen. Wir sehen den folgenden Bildschirm:

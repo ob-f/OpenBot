@@ -11,6 +11,8 @@
 
 Esta aplicación de Android sirve como un `control remoto` para el vehículo [OpenBot](https://www.openbot.org). Básicamente, realiza una función similar a la de un control remoto de PS3/4 o Xbox, pero ejecutándose en otro dispositivo Android.
 
+> **Nota:** Esta antigua aplicación de control ya no se publica con los releases. El archivo `Controller-<version>.apk` de cada release es ahora la [aplicación Flutter Controller](../../controller/flutter/README.es-ES.md), que usa un ID de paquete distinto (`org.openbot.app.controller`). Los usuarios actuales deben instalarla como una aplicación aparte; no actualizará esta.
+
 ## Conexión
 
 Cuando se inicia la aplicación del controlador, intenta conectarse inmediatamente al robot. Vemos la siguiente pantalla:
