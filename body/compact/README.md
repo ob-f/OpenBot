@@ -283,12 +283,12 @@ Get the firmware from the [firmware folder](../../firmware/README.md) and open `
 
 3. In the same block, set the battery limits for your battery option. The divider factor stays as it is.
 
-   | Option | `VOLTAGE_MIN` | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
-   |---|---:|---:|---:|
-   | A – 2S 18650, or 2S LiPo | 6.0f | 6.8f | 8.4f |
-   | B – 3S 18650, or 3S LiPo | 9.0f | 10.2f | 12.6f |
+   | Option | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+   |---|---:|---:|
+   | A – 2S 18650, or 2S LiPo | 6.8f | 8.4f |
+   | B – 3S 18650, or 3S LiPo | 10.2f | 12.6f |
 
-   The app uses these limits for its battery gauge and low-battery warning. The default minimum of 6.0 V would show a 3S pack as usable down to 2 V per cell. The firmware never cuts the motors on low voltage, so the protection board (options A and B) or a LiPo voltage alarm (option C) has to protect the cells.
+   The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full). Leave `VOLTAGE_MIN` as it is: the firmware only uses it for the minimum motor speed when `NO_PHONE_MODE` is on. The firmware never cuts the motors on low voltage, so the protection board (options A and B) or a LiPo voltage alarm (option C) has to protect the cells.
 
 4. Optional, in the same block:
 

@@ -283,12 +283,12 @@ Récupérez le firmware dans le [dossier firmware](../../firmware/README.fr-FR.m
 
 3. Dans le même bloc, réglez les limites de batterie pour votre option. Le facteur du diviseur reste inchangé.
 
-   | Option | `VOLTAGE_MIN` | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
-   |---|---:|---:|---:|
-   | A – 18650 2S ou LiPo 2S | 6.0f | 6.8f | 8.4f |
-   | B – 18650 3S ou LiPo 3S | 9.0f | 10.2f | 12.6f |
+   | Option | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+   |---|---:|---:|
+   | A – 18650 2S ou LiPo 2S | 6.8f | 8.4f |
+   | B – 18650 3S ou LiPo 3S | 10.2f | 12.6f |
 
-   L'application utilise ces limites pour sa jauge de batterie et l'alerte de batterie faible. Avec le minimum par défaut de 6,0 V, une batterie 3S apparaîtrait utilisable jusqu'à 2 V par cellule. Le firmware ne coupe jamais les moteurs en cas de tension faible ; la carte de protection (options A et B) ou une alarme de tension LiPo (option C) doit donc protéger les cellules.
+   La jauge de batterie de l'application va de `VOLTAGE_LOW` (vide) à `VOLTAGE_MAX` (pleine). Laissez `VOLTAGE_MIN` inchangé : le firmware ne l'utilise que pour la vitesse minimale des moteurs lorsque `NO_PHONE_MODE` est activé. Le firmware ne coupe jamais les moteurs en cas de tension faible ; la carte de protection (options A et B) ou une alarme de tension LiPo (option C) doit donc protéger les cellules.
 
 4. Optionnel, dans le même bloc :
 

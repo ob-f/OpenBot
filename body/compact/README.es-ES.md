@@ -283,12 +283,12 @@ Descarga el firmware de la [carpeta del firmware](../../firmware/README.es-ES.md
 
 3. En el mismo bloque, ajusta los límites de batería para tu opción. El factor del divisor no cambia.
 
-   | Opción | `VOLTAGE_MIN` | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
-   |---|---:|---:|---:|
-   | A – 18650 2S o LiPo 2S | 6.0f | 6.8f | 8.4f |
-   | B – 18650 3S o LiPo 3S | 9.0f | 10.2f | 12.6f |
+   | Opción | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+   |---|---:|---:|
+   | A – 18650 2S o LiPo 2S | 6.8f | 8.4f |
+   | B – 18650 3S o LiPo 3S | 10.2f | 12.6f |
 
-   La app usa estos límites para su indicador de batería y el aviso de batería baja. Con el mínimo por defecto de 6,0 V, una batería 3S aparecería como utilizable hasta 2 V por celda. El firmware nunca corta los motores por baja tensión, así que la placa de protección (opciones A y B) o una alarma de tensión LiPo (opción C) debe proteger las celdas.
+   El indicador de batería de la app va de `VOLTAGE_LOW` (vacía) a `VOLTAGE_MAX` (llena). Deja `VOLTAGE_MIN` como está: el firmware solo lo usa para la velocidad mínima de los motores cuando `NO_PHONE_MODE` está activado. El firmware nunca corta los motores por baja tensión, así que la placa de protección (opciones A y B) o una alarma de tensión LiPo (opción C) debe proteger las celdas.
 
 4. Opcional, en el mismo bloque:
 

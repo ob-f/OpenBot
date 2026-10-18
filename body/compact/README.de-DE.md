@@ -283,12 +283,12 @@ Holen Sie die Firmware aus dem [Firmware-Ordner](../../firmware/README.de-DE.md)
 
 3. Setzen Sie im selben Block die Akkugrenzen für Ihre Akku-Option. Der Teilerfaktor bleibt unverändert.
 
-   | Option | `VOLTAGE_MIN` | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
-   |---|---:|---:|---:|
-   | A – 2S 18650 oder 2S-LiPo | 6.0f | 6.8f | 8.4f |
-   | B – 3S 18650 oder 3S-LiPo | 9.0f | 10.2f | 12.6f |
+   | Option | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+   |---|---:|---:|
+   | A – 2S 18650 oder 2S-LiPo | 6.8f | 8.4f |
+   | B – 3S 18650 oder 3S-LiPo | 10.2f | 12.6f |
 
-   Die App verwendet diese Grenzen für ihre Akkuanzeige und die Warnung bei niedrigem Akkustand. Mit dem Standardminimum von 6,0 V würde ein 3S-Akku bis hinunter zu 2 V pro Zelle als nutzbar angezeigt. Die Firmware schaltet die Motoren bei niedriger Spannung nie ab, daher müssen die Schutzplatine (Optionen A und B) oder ein LiPo-Spannungswarner (Option C) die Zellen schützen.
+   Die Akkuanzeige der App reicht von `VOLTAGE_LOW` (leer) bis `VOLTAGE_MAX` (voll). Lassen Sie `VOLTAGE_MIN` unverändert: Die Firmware verwendet es nur für die minimale Motorgeschwindigkeit, wenn `NO_PHONE_MODE` aktiv ist. Die Firmware schaltet die Motoren bei niedriger Spannung nie ab, daher müssen die Schutzplatine (Optionen A und B) oder ein LiPo-Spannungswarner (Option C) die Zellen schützen.
 
 4. Optional, im selben Block:
 
