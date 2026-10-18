@@ -838,6 +838,14 @@ unsigned long display_time = 0;
 // SETUP
 //------------------------------------------------------//
 void setup() {
+#if (MCU == ESP32 && OPENBOT != MTV)
+  // Stop the motors before anything else; some motor pins may float or be pulled high at boot
+  for (int pin : { PIN_PWM_LF1, PIN_PWM_LF2, PIN_PWM_LB1, PIN_PWM_LB2,
+                   PIN_PWM_RF1, PIN_PWM_RF2, PIN_PWM_RB1, PIN_PWM_RB2 }) {
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, LOW);
+  }
+#endif
 #if (OPENBOT == LITE)
   coast_mode = !coast_mode;
 #endif
