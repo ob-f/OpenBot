@@ -1482,9 +1482,12 @@ void gamepad_control(float &left, float &right) {
       left = gamepad_trigger(gamepad->throttle(), gamepad->r2()) - gamepad_trigger(gamepad->brake(), gamepad->l2());
       break;
   }
+  // Game mode steers like a car when reversing (mirrored); joystick mode always turns the
+  // way the stick points, so turning on the spot doesn't flip when the stick wobbles.
+  bool mirror = gamepad_drive_mode == GAMEPAD_GAME && left < 0;
   right = left;
-  left += left >= 0 ? steering : -steering;
-  right += right >= 0 ? -steering : steering;
+  left += mirror ? -steering : steering;
+  right += mirror ? steering : -steering;
   left = constrain(left, -1.0f, 1.0f);
   right = constrain(right, -1.0f, 1.0f);
 }
