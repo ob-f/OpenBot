@@ -771,8 +771,7 @@ void setup() {
   // Attach the ESC and SERVO
   ESC.attach(PIN_PWM_T, 1000, 2000);    // (pin, min pulse width, max pulse width in microseconds)
   SERVO.attach(PIN_PWM_S, 1000, 2000);  // (pin, min pulse width, max pulse width in microseconds)
-#endif
-#if (MCU == NANO)
+#elif (MCU == NANO)
   pinMode(PIN_PWM_L1, OUTPUT);
   pinMode(PIN_PWM_L2, OUTPUT);
   pinMode(PIN_PWM_R1, OUTPUT);
@@ -954,8 +953,7 @@ void loop() {
   if (distance_estimate > 3 * TURN_DISTANCE) {
     ctrl_left = distance_estimate;
     ctrl_right = ctrl_left;
-    digitalWrite(PIN_LED_LI, LOW);
-    digitalWrite(PIN_LED_RI, LOW);
+    set_indicator_leds(LOW, LOW);
   }
   // Turn slightly
   else if (distance_estimate > 2 * TURN_DISTANCE) {
@@ -971,8 +969,7 @@ void loop() {
   else {
     ctrl_left = -ctrl_slow;
     ctrl_right = -ctrl_slow;
-    digitalWrite(PIN_LED_LI, HIGH);
-    digitalWrite(PIN_LED_RI, HIGH);
+    set_indicator_leds(HIGH, HIGH);
   }
   // Flip controls if needed and set indicator light
   if (ctrl_left != ctrl_right) {
@@ -980,11 +977,9 @@ void loop() {
       int temp = ctrl_left;
       ctrl_left = ctrl_right;
       ctrl_right = temp;
-      digitalWrite(PIN_LED_LI, HIGH);
-      digitalWrite(PIN_LED_RI, LOW);
+      set_indicator_leds(HIGH, LOW);
     } else {
-      digitalWrite(PIN_LED_LI, LOW);
-      digitalWrite(PIN_LED_RI, HIGH);
+      set_indicator_leds(LOW, HIGH);
     }
   }
 
@@ -1250,6 +1245,14 @@ void coast_right_motors() {
 }
 
 #endif
+
+// Set the indicator LEDs directly (no phone mode); does nothing without indicators
+void set_indicator_leds(int left, int right) {
+#if (HAS_INDICATORS)
+  digitalWrite(PIN_LED_LI, left);
+  digitalWrite(PIN_LED_RI, right);
+#endif
+}
 
 boolean almost_equal(int a, int b, int eps) {
   return abs(a - b) <= eps;
