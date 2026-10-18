@@ -90,7 +90,9 @@ class ControllerState extends State<Controller> {
     // The robot starts a new call with a fresh offer every time it restarts video, so a second
     // offer belongs to a new call: replace the peer connection instead of renegotiating on it.
     if (await _peerConnection?.getRemoteDescription() != null) {
-      await _peerConnection?.close();
+      final oldConnection = _peerConnection;
+      await oldConnection?.close();
+      await oldConnection?.dispose();
       _peerConnection = await _createPeerConnection();
     }
     RTCSessionDescription description =

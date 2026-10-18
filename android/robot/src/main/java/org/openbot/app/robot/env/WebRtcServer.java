@@ -121,7 +121,11 @@ public class WebRtcServer implements IVideoServer {
     this.context = context;
     activeServer = new WeakReference<>(this);
 
-    andGate = new AndGate(() -> startServer(), () -> stopServer());
+    // Start and stop run on the main thread, like closeCall() and the camera handoff, so call
+    // setup and teardown never overlap. The gate itself is updated from connection threads.
+    andGate =
+        new AndGate(
+            () -> mainHandler.post(this::startServer), () -> mainHandler.post(this::stopServer));
     andGate.addCondition("connected");
     andGate.addCondition("view set");
     andGate.addCondition("camera permission");
@@ -349,6 +353,8 @@ public class WebRtcServer implements IVideoServer {
   // Incremented on closeCall() so stale camera switches are ignored.
   private volatile int callSession = 0;
   private Runnable pendingCameraSwitch;
+  // True while the local preview is paused for a WebRTC camera switch.
+  private boolean localPreviewPausedForSwitch = false;
 
   private void monitorCameraControlEvents() {
     ControllerToBotEventBus.subscribe(
@@ -382,14 +388,15 @@ public class WebRtcServer implements IVideoServer {
       emitSwitchCameraStatus("ERROR:CAPTURER_NOT_READY");
       return;
     }
-    if (pendingCameraSwitch != null) {
-      return; // switch already pending
+    if (pendingCameraSwitch != null || localPreviewPausedForSwitch) {
+      return; // a switch is already waiting or in progress
     }
     switchCameraWithoutConflictingWithLocalPreview();
   }
 
   // Pauses the local preview camera first so we don't open two cameras at once.
   private void switchCameraWithoutConflictingWithLocalPreview() {
+    localPreviewPausedForSwitch = true;
     emitLocalCameraCommand(Constants.CMD_PAUSE_LOCAL_CAMERA);
 
     int session = callSession;
@@ -400,27 +407,35 @@ public class WebRtcServer implements IVideoServer {
           if (!isCurrentCameraSwitch(session, capturer)) {
             return;
           }
+          // The switch callbacks arrive on the camera thread; handle them on the main thread so
+          // they are ordered with closeCall().
           capturer.switchCamera(
               new CameraVideoCapturer.CameraSwitchHandler() {
                 @Override
                 public void onCameraSwitchDone(boolean isFrontCamera) {
-                  if (!isCurrentCameraSwitch(session, capturer)) {
-                    return;
-                  }
-                  String cameraName = isFrontCamera ? "FRONT" : "BACK";
-                  Log.d(TAG, "Camera switched successfully to " + cameraName);
-                  emitSwitchCameraStatus(cameraName);
-                  resumeLocalCamera();
+                  mainHandler.post(
+                      () -> {
+                        if (!isCurrentCameraSwitch(session, capturer)) {
+                          return; // closeCall() already resumed the local preview
+                        }
+                        String cameraName = isFrontCamera ? "FRONT" : "BACK";
+                        Log.d(TAG, "Camera switched successfully to " + cameraName);
+                        emitSwitchCameraStatus(cameraName);
+                        resumeLocalCameraAfterSwitch();
+                      });
                 }
 
                 @Override
                 public void onCameraSwitchError(String errorDescription) {
-                  if (!isCurrentCameraSwitch(session, capturer)) {
-                    return;
-                  }
-                  Log.e(TAG, "Camera switch failed: " + errorDescription);
-                  emitSwitchCameraStatus("ERROR:" + errorDescription);
-                  resumeLocalCamera();
+                  mainHandler.post(
+                      () -> {
+                        if (!isCurrentCameraSwitch(session, capturer)) {
+                          return; // closeCall() already resumed the local preview
+                        }
+                        Log.e(TAG, "Camera switch failed: " + errorDescription);
+                        emitSwitchCameraStatus("ERROR:" + errorDescription);
+                        resumeLocalCameraAfterSwitch();
+                      });
                 }
               });
         };
@@ -446,6 +461,14 @@ public class WebRtcServer implements IVideoServer {
 
   private void resumeLocalCamera() {
     emitLocalCameraCommand(Constants.CMD_RESUME_LOCAL_CAMERA);
+  }
+
+  // Resumes the local preview if a WebRTC camera switch paused it.
+  private void resumeLocalCameraAfterSwitch() {
+    if (localPreviewPausedForSwitch) {
+      localPreviewPausedForSwitch = false;
+      resumeLocalCamera();
+    }
   }
 
   private void emitLocalCameraCommand(String command) {
@@ -530,8 +553,9 @@ public class WebRtcServer implements IVideoServer {
     if (pendingCameraSwitch != null) {
       mainHandler.removeCallbacks(pendingCameraSwitch);
       pendingCameraSwitch = null;
-      resumeLocalCamera();
     }
+    // Covers both a switch still waiting for its delay and one already in progress.
+    resumeLocalCameraAfterSwitch();
     if (factory == null) {
       return; // nothing was started
     }
@@ -540,6 +564,18 @@ public class WebRtcServer implements IVideoServer {
     if (peerConnection != null) {
       peerConnection.dispose();
       peerConnection = null;
+    }
+    // Release the local stream and its tracks. MediaStream.dispose() also disposes the tracks it
+    // holds, so dispose them directly only if no stream was created.
+    if (mediaStream != null) {
+      mediaStream.dispose();
+    } else {
+      if (videoTrackFromCamera != null) {
+        videoTrackFromCamera.dispose();
+      }
+      if (localAudioTrack != null) {
+        localAudioTrack.dispose();
+      }
     }
     mediaStream = null;
     videoSender = null;
@@ -839,63 +875,67 @@ public class WebRtcServer implements IVideoServer {
     void handleControllerWebRtcEvents() {
       ControllerToBotEventBus.subscribe(
           "WEB_RTC_COMMANDS",
-          event -> {
-            if (peerConnection == null) {
-              // Late message after the call closed. Throwing here would end this subscription.
-              Log.d(TAG, "Ignoring WebRTC event: no active call");
-              return;
-            }
-            // Any exception would end this subscription and every later call would never get
-            // the controller's answer, so a bad message is logged and skipped.
-            try {
-              String commandType = "";
-              // The controller sometimes sends webrtc_event as a JSON string instead of an object.
-              Object rawEvent = event.get("webrtc_event");
-              JSONObject webRtcEvent =
-                  rawEvent instanceof JSONObject
-                      ? (JSONObject) rawEvent
-                      : new JSONObject(rawEvent.toString());
-              String type = webRtcEvent.getString("type");
-              switch (type) {
-                case "offer":
-                  Timber.d("connectToSignallingServer: received an offer $isInitiator $isStarted");
-                  peerConnection.setRemoteDescription(
-                      new SimpleSdpObserver(),
-                      new SessionDescription(
-                          SessionDescription.Type.OFFER, webRtcEvent.getString("sdp")));
-                  doAnswer();
-                  break;
-
-                case "answer":
-                  String remoteDescr = webRtcEvent.getString("sdp");
-                  Timber.i("Got remote description %s", remoteDescr);
-                  peerConnection.setRemoteDescription(
-                      new SimpleSdpObserver(),
-                      new SessionDescription(SessionDescription.Type.ANSWER, remoteDescr));
-                  break;
-
-                case "candidate":
-                  // The Flutter controller uses the standard sdpMid/sdpMLineIndex names.
-                  IceCandidate candidate =
-                      new IceCandidate(
-                          webRtcEvent.has("id")
-                              ? webRtcEvent.getString("id")
-                              : webRtcEvent.getString("sdpMid"),
-                          webRtcEvent.has("label")
-                              ? webRtcEvent.getInt("label")
-                              : webRtcEvent.getInt("sdpMLineIndex"),
-                          webRtcEvent.getString("candidate"));
-                  peerConnection.addIceCandidate(candidate);
-                  break;
-              }
-            } catch (JSONException e) {
-              Log.e(TAG, "Ignoring malformed WebRTC event: " + event, e);
-            }
-          },
+          // Signaling arrives on connection threads (e.g. OkHttp's for the web controller).
+          // Handle it on the main thread so it never races with closeCall() disposing the call.
+          event -> mainHandler.post(() -> handleWebRtcEvent(event)),
           error -> Log.d(TAG, "Error occurred in handleControllerWebRtcEvents: %s", error),
           commandJsn ->
               commandJsn.has("webrtc_event") // filter out all non "webrtc_event" messages.
           );
+    }
+
+    // Runs on the main thread.
+    private void handleWebRtcEvent(JSONObject event) {
+      if (peerConnection == null) {
+        // Late message after the call closed.
+        Log.d(TAG, "Ignoring WebRTC event: no active call");
+        return;
+      }
+      // A bad message is logged and skipped; it must not crash the app or affect later calls.
+      try {
+        String commandType = "";
+        // The controller sometimes sends webrtc_event as a JSON string instead of an object.
+        Object rawEvent = event.get("webrtc_event");
+        JSONObject webRtcEvent =
+            rawEvent instanceof JSONObject
+                ? (JSONObject) rawEvent
+                : new JSONObject(rawEvent.toString());
+        String type = webRtcEvent.getString("type");
+        switch (type) {
+          case "offer":
+            Timber.d("connectToSignallingServer: received an offer $isInitiator $isStarted");
+            peerConnection.setRemoteDescription(
+                new SimpleSdpObserver(),
+                new SessionDescription(
+                    SessionDescription.Type.OFFER, webRtcEvent.getString("sdp")));
+            doAnswer();
+            break;
+
+          case "answer":
+            String remoteDescr = webRtcEvent.getString("sdp");
+            Timber.i("Got remote description %s", remoteDescr);
+            peerConnection.setRemoteDescription(
+                new SimpleSdpObserver(),
+                new SessionDescription(SessionDescription.Type.ANSWER, remoteDescr));
+            break;
+
+          case "candidate":
+            // The Flutter controller uses the standard sdpMid/sdpMLineIndex names.
+            IceCandidate candidate =
+                new IceCandidate(
+                    webRtcEvent.has("id")
+                        ? webRtcEvent.getString("id")
+                        : webRtcEvent.getString("sdpMid"),
+                    webRtcEvent.has("label")
+                        ? webRtcEvent.getInt("label")
+                        : webRtcEvent.getInt("sdpMLineIndex"),
+                    webRtcEvent.getString("candidate"));
+            peerConnection.addIceCandidate(candidate);
+            break;
+        }
+      } catch (JSONException | RuntimeException e) {
+        Log.e(TAG, "Ignoring WebRTC event that could not be handled: " + event, e);
+      }
     }
 
     public void shutDown() {

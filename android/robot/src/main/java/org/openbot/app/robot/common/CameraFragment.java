@@ -171,6 +171,8 @@ public abstract class CameraFragment extends ControlsFragment {
       }
     } catch (Exception e) {
       Timber.e("Use case binding failed: %s", e.toString());
+      // No preview frames will arrive, so let WebRTC use its own camera capturer again.
+      WebRtcServer.setLocalPreviewActive(this, false, null);
     }
   }
 
