@@ -94,6 +94,16 @@ def configure(source: str, settings: dict) -> str:
     return source
 
 
+def robot_label(settings: dict) -> str:
+    return " ".join(f"{k}={v}" for k, v in settings.items())
+
+
+def tmp_prefix(line: str) -> str:
+    """The temporary sketch path at the start of a compiler message, if any."""
+    m = re.match(r"(\S*/openbot/)openbot\.ino:", line)
+    return m.group(1) if m else ""
+
+
 def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
     label = " ".join(f"{k}={v}" for k, v in settings.items())
     with tempfile.TemporaryDirectory() as tmp:
@@ -118,6 +128,10 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
     print("::endgroup::", flush=True)
     if not ok:
         print(f"::error::{fqbn} {label}: {verdict}", flush=True)
+        # Show the first compiler errors as annotations, so they appear without opening the log
+        errors = [line.strip() for line in result.stdout.splitlines() if "error:" in line]
+        for line in errors[:5]:
+            print(f"::error::{robot_label(settings)}: {line.replace(tmp_prefix(line), '')}", flush=True)
     return ok
 
 
