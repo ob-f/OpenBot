@@ -11,6 +11,12 @@
 
 Cette application de contrôleur sert de `télécommande` pour le véhicule [OpenBot](https://www.openbot.org), similaire à une manette BT (par exemple, PS3/4 ou Xbox). Elle fonctionne sur un autre appareil Android/iOS et prend en charge la diffusion en direct de vidéo/audio en plus du contrôle.
 
+## Installer l'application
+
+Sur Android, téléchargez `Controller-<version>.apk` depuis les assets de la dernière [release](https://github.com/ob-f/OpenBot/releases) et [installez-le](https://www.lifewire.com/install-apk-on-android-4177185) sur votre téléphone.
+
+> **Remarque pour les utilisateurs existants :** Cette application remplace l'ancienne [application de contrôle Android](../../android/controller/README.fr-FR.md) comme APK de contrôle publié avec chaque release. Les deux applications utilisant des identifiants de package différents (`org.openbot.app.controller` et `org.openbot.controller`), l'installation de cet APK ne met pas à jour l'ancienne application : elle est installée à côté, comme une application distincte. Vous pouvez désinstaller l'ancien contrôleur une fois la transition effectuée.
+
 ## Pour Commencer
 Commencez par installer [Flutter](https://flutter.dev/) sur votre système. Choisissez le téléchargement approprié pour votre système d'exploitation, qui inclut des options pour Windows, macOS, Linux et ChromeOS. Suivez le guide d'installation officiel de Flutter pour des instructions détaillées : [Guide d'Installation Flutter](https://docs.flutter.dev/get-started/install)
 

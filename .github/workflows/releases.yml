@@ -60,7 +60,7 @@ jobs:
           version=$(printf '%s' "$RELEASE_TAG" | sed 's/[^-a-zA-Z0-9.]/_/g; s/^v//')
           cp robot/build/outputs/apk/release/robot-release.apk "OpenBot-${version}.apk"
           gh release upload "$RELEASE_TAG" "OpenBot-${version}.apk" \
-            --repo "$GITHUB_REPOSITORY"
+            --clobber --repo "$GITHUB_REPOSITORY"
 
   upload-controller-apk-to-release:
     name: Add Controller Release Apk to Release Assets
@@ -119,4 +119,4 @@ jobs:
           version=$(printf '%s' "$RELEASE_TAG" | sed 's/[^-a-zA-Z0-9.]/_/g; s/^v//')
           cp build/app/outputs/flutter-apk/app-release.apk "Controller-${version}.apk"
           gh release upload "$RELEASE_TAG" "Controller-${version}.apk" \
-            --repo "$GITHUB_REPOSITORY"
+            --clobber --repo "$GITHUB_REPOSITORY"

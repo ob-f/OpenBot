@@ -11,6 +11,8 @@
 
 Cette application Android sert de `télécommande` pour le véhicule [OpenBot](https://www.openbot.org). Elle fonctionne de manière similaire à une manette PS3/4 ou Xbox, mais sur un autre appareil Android.
 
+> **Remarque :** Cette ancienne application de contrôle n'est plus publiée avec les releases. Le fichier `Controller-<version>.apk` de chaque release est désormais l'[application Flutter Controller](../../controller/flutter/README.fr-FR.md), qui utilise un identifiant de package différent (`org.openbot.app.controller`). Les utilisateurs existants doivent l'installer comme une application distincte ; elle ne mettra pas à jour celle-ci.
+
 ## Connexion
 
 Lorsque l'application de contrôle est lancée, elle essaie immédiatement de se connecter au robot. Nous voyons l'écran suivant :

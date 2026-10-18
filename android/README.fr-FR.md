@@ -40,6 +40,8 @@ Le moyen le plus simple d'obtenir l'une des applications est de la télécharger
 
 Alternativement, vous pouvez télécharger les fichiers apk depuis les assets de n'importe quelle [release](https://github.com/ob-f/OpenBot/releases). Si vous souhaitez obtenir la dernière version de l'application à partir de la branche master, vous pouvez également la télécharger depuis les artefacts de build [ici](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22). Notez qu'elle peut ne pas être stable. Si vous souhaitez apporter des modifications à l'application plus tard, suivez les étapes ci-dessous pour compiler l'application et la déployer sur votre téléphone.
 
+> **Remarque :** Le fichier `Controller-<version>.apk` publié avec chaque release est désormais construit à partir de l'[application Flutter Controller](../controller/flutter/README.fr-FR.md) et non plus de l'ancienne application de contrôle Android de ce dossier. Le contrôleur Flutter utilise un identifiant de package différent (`org.openbot.app.controller` au lieu de `org.openbot.controller`) ; il ne mettra donc **pas** à jour une installation existante de l'ancien contrôleur. Si l'ancien contrôleur est déjà installé, installez le nouveau séparément ; vous pourrez ensuite désinstaller l'ancienne application.
+
 ## Compiler les applications
 
 ### Prérequis
