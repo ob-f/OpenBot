@@ -15,7 +15,7 @@ Diese Controller-App dient als `Fernbedienung` für das [OpenBot](https://www.op
 
 Laden Sie unter Android `Controller-<version>.apk` aus den Assets des neuesten [Release](https://github.com/ob-f/OpenBot/releases) herunter und [installieren](https://www.lifewire.com/install-apk-on-android-4177185) Sie die Datei auf Ihrem Telefon.
 
-> **Hinweis für bestehende Nutzer:** Diese App ersetzt die alte [Android-Controller-App](../../android/controller/README.de-DE.md) als Controller-APK, die mit jedem Release veröffentlicht wird. Da die beiden Apps unterschiedliche Paket-IDs verwenden (`org.openbot.app.controller` bzw. `org.openbot.controller`), wird die alte App durch die Installation dieser APK nicht aktualisiert; die neue App wird stattdessen als separate App daneben installiert. Sobald Sie umgestiegen sind, können Sie den alten Controller deinstallieren.
+> **Hinweis für bestehende Nutzer:** Diese App ersetzt die alte Android-Controller-App als Controller-APK, die mit jedem Release veröffentlicht wird. Da die beiden Apps unterschiedliche Paket-IDs verwenden (`org.openbot.app.controller` bzw. `org.openbot.controller`), wird die alte App durch die Installation dieser APK nicht aktualisiert; die neue App wird stattdessen als separate App daneben installiert. Sobald Sie umgestiegen sind, können Sie den alten Controller deinstallieren.
 
 ## Erste Schritte
 Beginnen Sie mit der Installation von [Flutter](https://flutter.dev/) auf Ihrem System. Wählen Sie den passenden Download für Ihr Betriebssystem, einschließlich Optionen für Windows, macOS, Linux und ChromeOS. Folgen Sie der offiziellen Flutter-Installationsanleitung für detaillierte Anweisungen: [Flutter Installationsanleitung](https://docs.flutter.dev/get-started/install)

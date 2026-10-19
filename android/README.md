@@ -14,7 +14,7 @@
 Click on the links below to read about the features of the apps.
 
 - [Robot App](robot/README.md)
-- [Controller App](controller/README.md)
+- [Controller App](../controller/flutter/README.md) (Flutter)
 
 ## Install the apps
 
@@ -41,7 +41,7 @@ The easiest way to get either of the apps is to download it directly to the phon
 
 Alternatively, you can download the apks from the assets of any [release](https://github.com/ob-f/OpenBot/releases). If you want the latest app from the master branch, you can also download it from the build artifacts [here](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22). Note, that it may not be stable. If you would like to make changes to the app later, follow the steps below to compile the app and deploy it on your phone.
 
-> **Note:** The `Controller-<version>.apk` release asset is now built from the [Flutter Controller App](../controller/flutter/README.md) instead of the legacy Android controller app in this folder. The Flutter controller uses a different package ID (`org.openbot.app.controller` instead of `org.openbot.controller`), so it will **not** update an existing legacy controller installation. If you already have the legacy controller installed, install the new controller separately; you can uninstall the legacy app afterwards.
+> **Note:** The controller app is the [Flutter Controller App](../controller/flutter/README.md); the legacy Android controller app that used to live in this folder has been removed. The Flutter controller uses a different package ID (`org.openbot.app.controller` instead of `org.openbot.controller`), so it will **not** update an existing legacy controller installation. If you still have the legacy controller installed, install the new controller separately and uninstall the legacy app.
 
 ## Build the apps
 
@@ -57,7 +57,7 @@ Alternatively, you can download the apks from the assets of any [release](https:
 
 1. Open Android Studio and select *Open an existing Android Studio project*.
 2. Select the OpenBot/android directory and click OK.
-3. If you want to install the [OpenBot app](robot/README.md) make sure to select the *app* configuration. If you want to install the [Controller app](controller/README.md), select the *controller* configuration. Confirm Gradle Sync if neccessary. To perform a Gradle Sync manually, click on the gradle icon.
+3. If you want to install the [OpenBot app](robot/README.md) make sure to select the *app* configuration. Confirm Gradle Sync if neccessary. To perform a Gradle Sync manually, click on the gradle icon.
   ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. Connect your Android device and make sure USB Debugging in the [developer options](https://developer.android.com/studio/debug/dev-options) is enabled. Depending on your development environment [further steps](https://developer.android.com/studio/run/device) might be necessary. You should see your device in the navigation bar at the top now.
   ![Phone](../docs/images/android_studio_bar_phone.jpg)

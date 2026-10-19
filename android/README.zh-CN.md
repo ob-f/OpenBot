@@ -14,7 +14,7 @@
 点击下面的链接阅读应用程序的功能。
 
 - [机器人应用](robot/README.md)
-- [控制器应用](controller/README.md)
+- [控制器应用](../controller/flutter/README.zh-CN.md)（Flutter）
 
 ## 安装应用程序
 
@@ -40,7 +40,7 @@
 
 或者，你可以从任何[发布](https://github.com/ob-f/OpenBot/releases)的资产中下载apk。如果你想要来自主分支的最新应用程序，你也可以从构建工件[这里](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22)下载。请注意，它可能不稳定。如果你以后想对应用程序进行更改，请按照以下步骤编译应用程序并将其部署到手机上。
 
-> **注意：** 发布资源中的 `Controller-<version>.apk` 现在由 [Flutter 控制器应用](../controller/flutter/README.zh-CN.md) 构建，而不再是此文件夹中的旧版 Android 控制器应用。Flutter 控制器使用不同的包 ID（`org.openbot.app.controller`，而不是 `org.openbot.controller`），因此**不会**更新已安装的旧版控制器。如果你已经安装了旧版控制器，请单独安装新控制器；之后可以卸载旧版应用。
+> **注意：** 控制器应用即 [Flutter 控制器应用](../controller/flutter/README.zh-CN.md)；原先位于此文件夹中的旧版 Android 控制器应用已被移除。Flutter 控制器使用不同的包 ID（`org.openbot.app.controller`，而不是 `org.openbot.controller`），因此**不会**更新已安装的旧版控制器。如果你仍安装着旧版控制器，请单独安装新控制器并卸载旧版应用。
 
 ## 构建应用程序
 
@@ -56,7 +56,7 @@
 
 1. 打开Android Studio并选择*打开现有的Android Studio项目*。
 2. 选择OpenBot/android目录并点击确定。
-3. 如果你想安装[OpenBot应用](app/README.md)，请确保选择*app*配置。如果你想安装[控制器应用](controller/README.md)，请选择*controller*配置。如有必要，确认Gradle同步。要手动执行Gradle同步，请点击gradle图标。
+3. 如果你想安装[OpenBot应用](app/README.md)，请确保选择*app*配置。如有必要，确认Gradle同步。要手动执行Gradle同步，请点击gradle图标。
   ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. 连接你的Android设备，并确保在[开发者选项](https://developer.android.com/studio/debug/dev-options)中启用USB调试。根据你的开发环境，可能需要[进一步的步骤](https://developer.android.com/studio/run/device)。现在你应该可以在顶部的导航栏中看到你的设备。
   ![Phone](../docs/images/android_studio_bar_phone.jpg)

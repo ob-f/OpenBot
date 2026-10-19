@@ -14,7 +14,7 @@
 아래 링크를 클릭하여 앱의 기능에 대해 읽어보세요.
 
 - [로봇 앱](robot/README.md)
-- [컨트롤러 앱](controller/README.md)
+- [컨트롤러 앱](../controller/flutter/README.ko-KR.md) (Flutter)
 
 ## 앱 설치하기
 
@@ -40,7 +40,7 @@
 
 대안으로, [릴리스](https://github.com/ob-f/OpenBot/releases)의 자산에서 apk를 다운로드할 수 있습니다. 최신 앱을 마스터 브랜치에서 원하신다면, [여기](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22)에서 빌드 아티팩트로 다운로드할 수 있습니다. 안정적이지 않을 수 있습니다. 앱을 나중에 변경하고 싶다면 아래 단계를 따라 앱을 컴파일하고 휴대폰에 배포하세요.
 
-> **참고:** 이제 릴리스 에셋 `Controller-<version>.apk`는 이 폴더의 기존 Android 컨트롤러 앱이 아니라 [Flutter 컨트롤러 앱](../controller/flutter/README.ko-KR.md)으로 빌드됩니다. Flutter 컨트롤러는 다른 패키지 ID(`org.openbot.controller` 대신 `org.openbot.app.controller`)를 사용하므로 기존에 설치된 컨트롤러 앱을 업데이트하지 **않습니다**. 기존 컨트롤러가 이미 설치되어 있다면 새 컨트롤러를 별도로 설치하고, 이후 기존 앱은 삭제해도 됩니다.
+> **참고:** 컨트롤러 앱은 [Flutter 컨트롤러 앱](../controller/flutter/README.ko-KR.md)입니다. 이전에 이 폴더에 있던 기존 Android 컨트롤러 앱은 삭제되었습니다. Flutter 컨트롤러는 다른 패키지 ID(`org.openbot.controller` 대신 `org.openbot.app.controller`)를 사용하므로 기존에 설치된 컨트롤러 앱을 업데이트하지 **않습니다**. 기존 컨트롤러가 아직 설치되어 있다면 새 컨트롤러를 별도로 설치하고 기존 앱은 삭제하세요.
 
 ## 앱 빌드하기
 
@@ -56,7 +56,7 @@
 
 1. Android Studio를 열고 *기존 Android Studio 프로젝트 열기*를 선택합니다.
 2. OpenBot/android 디렉토리를 선택하고 OK를 클릭합니다.
-3. [OpenBot 앱](app/README.md)을 설치하려면 *app* 구성을 선택합니다. [컨트롤러 앱](controller/README.md)을 설치하려면 *controller* 구성을 선택합니다. 필요한 경우 Gradle Sync를 확인합니다. 수동으로 Gradle Sync를 수행하려면 gradle 아이콘을 클릭하세요.
+3. [OpenBot 앱](app/README.md)을 설치하려면 *app* 구성을 선택합니다. 필요한 경우 Gradle Sync를 확인합니다. 수동으로 Gradle Sync를 수행하려면 gradle 아이콘을 클릭하세요.
    ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. Android 기기를 연결하고 [개발자 옵션](https://developer.android.com/studio/debug/dev-options)에서 USB 디버깅이 활성화되어 있는지 확인합니다. 개발 환경에 따라 [추가 단계](https://developer.android.com/studio/run/device)가 필요할 수 있습니다. 이제 상단 내비게이션 바에서 기기를 확인할 수 있어야 합니다.
    ![전화](../docs/images/android_studio_bar_phone.jpg)
