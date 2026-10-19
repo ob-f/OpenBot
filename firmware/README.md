@@ -78,7 +78,7 @@ The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full).
 | 2S Li-ion / LiPo | 6.8f | 8.4f |
 | 3S Li-ion / LiPo | 10.2f | 12.6f |
 | 6 × AA | 6.0f | 9.0f |
-| 9 V block | 6.0f | 9.0f |
+| 8 × AA | 8.0f | 12.0f |
 
 If your voltage divider differs from the body's, also set `VOLTAGE_DIVIDER_FACTOR` to (R1 + R2) / R2. `VOLTAGE_MIN` is the lowest voltage at which the motors still turn; the firmware only uses it in no phone mode.
 

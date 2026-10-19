@@ -88,7 +88,7 @@
 
 // 4. Battery: empty / full voltage of the app's battery gauge, or the body's default
 //    Body defaults: 9.0 / 12.6, RC_CAR 6.4 / 8.4, LITE 4.5 / 5.0, MTV 20.0 / 24.0
-//    Other batteries, e.g.: 2S 6.8f / 8.4f, 6 x AA 6.0f / 9.0f, 9 V block 6.0f / 9.0f
+//    Other batteries, e.g.: 2S 6.8f / 8.4f, 6 x AA 6.0f / 9.0f, 8 x AA 8.0f / 12.0f
 #define VOLTAGE_LOW DEFAULT_VOLTAGE_LOW
 #define VOLTAGE_MAX DEFAULT_VOLTAGE_MAX
 #define VOLTAGE_MIN DEFAULT_VOLTAGE_MIN  // lowest voltage at which the motors turn (no phone mode)
