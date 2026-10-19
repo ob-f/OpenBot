@@ -23,14 +23,14 @@ ROOT = SKETCH.parents[2]
 WEB = SKETCH.parents[1] / "web"
 IMAGES = {
     "DIY": "android/robot/src/main/res/drawable-hdpi/diy.gif",
-    "PCB_V1": "android/robot/src/main/res/drawable-hdpi/diy.gif",
-    "PCB_V2": "android/robot/src/main/res/drawable-hdpi/diy.gif",
-    "RTR_TT": "android/robot/src/main/res/drawable-hdpi/rtr_tt.gif",
+    "PCB_V1": "docs/images/pcb_3d_v1.png",
+    "PCB_V2": "docs/images/pcb_3d_v2.png",
+    "RTR_TT": "docs/images/RTR_TT.jpg",
     "RTR_TT2": "android/robot/src/main/res/drawable-hdpi/rtr_tt.gif",
-    "RTR_520": "android/robot/src/main/res/drawable-hdpi/rtr_520.gif",
-    "RC_CAR": "android/robot/src/main/res/drawable-hdpi/rc_car.gif",
+    "RTR_520": "docs/images/RTR_520.jpg",
+    "RC_CAR": "docs/images/add_covers_2.JPG",
     "LITE": "docs/images/openbot_lite.jpg",
-    "MTV": "android/robot/src/main/res/drawable-hdpi/mtv.gif",
+    "MTV": "docs/images/MTV/MTV.jpg",
 }
 
 # Parts, the pins each one needs, and its bit in the live settings (see openbot.ino)
