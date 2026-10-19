@@ -18,7 +18,7 @@ OpenBot Compact is a small four-wheel [OpenBot](../../README.md) body for an **E
 | | |
 |---|---|
 | **Drive** | 4 × TT dual-shaft gear motors, left pair and right pair in parallel on one L298N |
-| **Controller** | ESP32 DevKit V1 (30-pin), OpenBot firmware `DIY_ESP32`; phone link by Bluetooth or USB cable |
+| **Controller** | ESP32 DevKit V1 (30-pin), OpenBot firmware `DIY`; phone link by Bluetooth or USB cable |
 | **Sensors** | HC-SR04 ultrasonic (front), 4 × LM393 optical wheel encoders, battery voltage |
 | **Power** | Choose one: 2S or 3S 18650 box on the lid, or a small LiPo pack inside (see [Battery options](#battery-options)) |
 | **Fasteners** | Only M3 × 10 and M3 × 25 pan-head screws, M3 nuts and 19 heat-set inserts |
@@ -144,7 +144,7 @@ The links below go to a supplier or an Amazon US search. Check the listed dimens
 | 4 | TT wheels | ≈ 65 mm diameter | [search](https://www.amazon.com/s?k=65mm+TT+motor+robot+car+wheels) |
 | 4 | LM393 optical speed sensors | PCB ≈ 14.2 mm wide and ≈ 38.1 mm long, with one 3 mm hole. All four are mounted; by default the firmware reads the front pair. | [search](https://www.amazon.com/s?k=LM393+optical+speed+sensor+module+encoder+disk) |
 | 4 | Encoder disks | Only if not printing them; must match the TT shaft and the sensor slot | [search](https://www.amazon.com/s?k=TT+motor+optical+encoder+disk) |
-| 1 | HC-SR04 ultrasonic sensor | 45.5 × 20.5 mm PCB, transducers 25.5 mm apart (centre to centre) | [search](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
+| 1 | HC-SR04 ultrasonic sensor | 45.5 × 20.5 mm PCB, transducers 25.5 mm apart (centre to centre); a 3.3 V version (e.g. HC-SR04P) also works | [search](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
 | 1 | Round rocker switch | Fits the rear panel hole; rated for the battery voltage and motor current | [search](https://www.amazon.com/s?k=20mm+round+rocker+switch+SPST+DC) |
 | 1 | 5 V converter, ≥ 2 A, max. 21 × 43 × 14 mm | Fits the power-board stand. For 3S, an LM2596 module works. For 2S, choose a type that still gives 5 V from a 6 V input (e.g. MP1584 or a buck-boost). | [search](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | Small perfboard, max. 24 × 34 mm | Battery and echo dividers, light drivers; sits on the back of the stand | [search](https://www.amazon.com/s?k=small+prototype+perfboard) |
@@ -256,6 +256,7 @@ Use the GPIO numbers printed on the ESP32. All grounds must be connected togethe
 
 - **Motors:** wire both left motors in parallel to OUT1/OUT2, + (red) to OUT2 and − (black) to OUT1. Wire both right motors to OUT3/OUT4, + (red) to OUT3 and − (black) to OUT4. The two sides are mirrored, so this makes both drive forward. If a side still turns the wrong way, swap that side's two motor wires.
 - **Encoders:** power the LM393 boards from **3.3 V**, not 5 V. Their on-board pull-ups then keep the outputs at a safe level for the ESP32. GPIO34 and GPIO35 are input-only and have no internal pull-ups.
+- **Sonar:** the standard HC-SR04 needs 5 V and doesn't work reliably at 3.3 V. Power it from the 5 V converter and connect ECHO through the 10 k / 20 k divider, because its 5 V echo signal can damage the ESP32. Or use a 3.3 V-capable version (e.g. HC-SR04P or RCWL-1601). Power it from 3.3 V and connect ECHO directly.
 - **Lights:** each lamp is switched by an NPN transistor (1 k base resistor, 100 k base-to-emitter pull-down). Never drive a panel lamp directly from an ESP32 pin.
 
 #### Power
@@ -271,11 +272,11 @@ Get the firmware from the [firmware folder](../../firmware/README.md) and open `
 1. Set the robot type and keep phone mode on:
 
    ```cpp
-   #define OPENBOT DIY_ESP32
+   #define OPENBOT DIY
    #define NO_PHONE_MODE 0
    ```
 
-2. In the `#elif (OPENBOT == DIY_ESP32)` block, **turn off the indicators**. Their default pins (5 and 18) are the sonar pins in this build:
+2. In the ESP32 part of the `OPENBOT == DIY` block (after `#else  // ESP32`), **turn off the indicators**. Their default pins (5 and 18) are the sonar pins in this build:
 
    ```cpp
    #define HAS_INDICATORS 0   // default is 1
@@ -310,7 +311,7 @@ The motor pins are not ESP32 boot pins, so the motors stay off at power-on. Only
 
 | Send | Expect |
 |---|---|
-| `f` | A feature string that reports `DIY_ESP32` |
+| `f` | A feature string that reports `DIY` |
 | *(watch output)* | A plausible battery voltage and sonar distance |
 | `c60,0`, then `c0,0` | Only the left side turns, forward |
 | `c0,60`, then `c0,0` | Only the right side turns, forward |
