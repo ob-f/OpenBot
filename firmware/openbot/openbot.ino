@@ -54,7 +54,8 @@
 #define COAST_MODE 1     // with no control, the motors coast (1) or brake (0)
 #define DEBUG 0          // debug output on the Serial Monitor (1,0)
 
-// 3. Parts: 1 = on, 0 = off, or DEFAULT_<name> = what your body has:
+// 3. Parts: set 1 (on) or 0 (off) if your robot differs from the standard body.
+//    DEFAULT_... keeps the body's default; the table shows the defaults.
 //
 //                              DIY  PCB_V1/V2  RTR_TT  RTR_TT2/520  LITE  RC_CAR  MTV
 //   HAS_VOLTAGE_DIVIDER         1       1        1          1        0      0      0
