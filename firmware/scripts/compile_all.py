@@ -76,12 +76,11 @@ def check_defaults(source: str) -> list[str]:
         columns.append([first] + [prefix + m for m in more])
     table = {}
     for line in lines[header + 1:]:
-        m = re.match(r"#define (\w+) BODY_DEFAULT\s+//\s+([01](?:\s+[01])+)\s*$", line)
-        if m:
-            table[m.group(1)] = m.group(2).split()
-        elif not line.startswith("#define"):
+        m = re.match(r"//\s+(\w+)\s+([01](?:\s+[01])+)\s*$", line)
+        if not m:
             break
-    body_section = source[source.index("// BODIES"):source.index("// Parts: the settings")]
+        table[m.group(1)] = m.group(2).split()
+    body_section = source[source.index("// BODIES"):source.index("// Pin check")]
     defaults, robot = {}, None
     for line in body_section.splitlines():
         m = re.match(r"#(?:if|elif) \(OPENBOT == (\w+)\)$", line)
@@ -91,7 +90,7 @@ def check_defaults(source: str) -> list[str]:
         m = re.match(r"#define DEFAULT_(\w+) 1$", line)
         if m and robot:
             defaults[robot].add(m.group(1))
-    problems = []
+    problems = [] if table else ["parts table not found"]
     for part, values in table.items():
         for bodies, value in zip(columns, values):
             for body in bodies:
@@ -99,7 +98,6 @@ def check_defaults(source: str) -> list[str]:
                 if actual != int(value):
                     problems.append(f"{part} for {body}: the table says {value}, the body block {actual}")
     return problems
-
 
 def has_define(source: str, name: str) -> bool:
     return len(re.findall(rf"^#define {name}\s", source, re.MULTILINE)) == 1

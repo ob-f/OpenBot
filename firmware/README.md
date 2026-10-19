@@ -19,7 +19,7 @@ The main task of the MCU is to handle the low-level control of the vehicle and p
 
 All settings are in the **SETTINGS** section at the top of `openbot.ino`. You don't need to change anything below it.
 
-To keep your settings when you update the firmware, copy the lines of the SETTINGS section between `#else` and `#endif` into a new file `openbot_settings.h` next to `openbot.ino`, and change them there. If `openbot_settings.h` exists, the firmware uses it instead of the section in `openbot.ino`, and git ignores the file.
+To keep your settings when you update the firmware, copy the lines of the SETTINGS section between `#else` and `#endif` into a new file `openbot_settings.h` next to `openbot.ino`, and change them there. If `openbot_settings.h` exists, the firmware uses it instead of the section in `openbot.ino`, and git ignores it, so it isn't pushed by mistake.
 
 ### Robot body
 
@@ -56,7 +56,7 @@ Each body turns on the parts it normally has:
 
 On an ESP32, the Bluetooth link to the phone is also on.
 
-The settings list every part with `BODY_DEFAULT`, and a table next to them shows each body's defaults. To change a part, replace `BODY_DEFAULT` with `1` (on) or `0` (off), e.g. `#define HAS_SONAR 0` if you haven't installed the ultrasonic sensor. A part that is on but not installed does no harm, but the app shows readings for it that make no sense, such as a sonar distance of 300 cm.
+In the settings, every part is set to the body's default, e.g. `#define HAS_SONAR DEFAULT_HAS_SONAR`, and a table above them shows each body's defaults. To change a part, set it to `1` (on) or `0` (off) instead, e.g. `#define HAS_SONAR 0` if you haven't installed the ultrasonic sensor. A part that is on but not installed does no harm, but the app shows readings for it that make no sense, such as a sonar distance of 300 cm.
 
 | Setting | Part |
 |---|---|
@@ -71,7 +71,7 @@ The settings list every part with `BODY_DEFAULT`, and a table next to them shows
 
 ### Battery
 
-The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full). Each body has defaults for its usual battery; for a different one, uncomment the two lines in the settings and set them, for example:
+The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full). They are set to the body's defaults; for a different battery, set them in the settings, for example `#define VOLTAGE_LOW 6.8f`:
 
 | Battery | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
 |---|---:|---:|
@@ -80,7 +80,7 @@ The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full).
 | 6 × AA | 6.0f | 9.0f |
 | 9 V block | 6.0f | 9.0f |
 
-If your voltage divider differs from the body's, also add `#define VOLTAGE_DIVIDER_FACTOR` with (R1 + R2) / R2. `VOLTAGE_MIN` is the lowest voltage at which the motors still turn; the firmware only uses it in no phone mode.
+If your voltage divider differs from the body's, also set `VOLTAGE_DIVIDER_FACTOR` to (R1 + R2) / R2. `VOLTAGE_MIN` is the lowest voltage at which the motors still turn; the firmware only uses it in no phone mode.
 
 ### Check the configuration
 

@@ -54,27 +54,44 @@
 #define COAST_MODE 1     // with no control, the motors coast (1) or brake (0)
 #define DEBUG 0          // debug output on the Serial Monitor (1,0)
 
-// 3. Parts: 1 = on, 0 = off, BODY_DEFAULT = what your body has
-//                                                DIY  PCB_V1/V2  RTR_TT  RTR_TT2/520  LITE  RC_CAR  MTV
-#define HAS_VOLTAGE_DIVIDER BODY_DEFAULT       //  1       1         1         1         0      0      0
-#define HAS_INDICATORS BODY_DEFAULT            //  1       1         1         1         1      0      0
-#define HAS_SONAR BODY_DEFAULT                 //  1       1         1         1         0      0      0
-#define SONAR_MEDIAN BODY_DEFAULT              //  0       0         0         0         0      0      0
-#define HAS_BUMPER BODY_DEFAULT                //  0       0         1         1         0      0      0
-#define HAS_SPEED_SENSORS_FRONT BODY_DEFAULT   //  1       1         1         1         0      0      1
-#define HAS_SPEED_SENSORS_BACK BODY_DEFAULT    //  0       0         1         1         0      0      1
-#define HAS_SPEED_SENSORS_MIDDLE BODY_DEFAULT  //  0       0         0         0         0      0      1
-#define HAS_LEDS_FRONT BODY_DEFAULT            //  0       0         1         1         0      0      0
-#define HAS_LEDS_BACK BODY_DEFAULT             //  0       0         1         1         0      0      0
-#define HAS_LEDS_STATUS BODY_DEFAULT           //  0       0         1         1         0      0      0
-#define HAS_OLED BODY_DEFAULT                  //  0       0         0         0         0      0      0
-#define HAS_BLUETOOTH BODY_DEFAULT             // Bluetooth link to the phone: on for ESP32 bodies
+// 3. Parts: 1 = on, 0 = off, or DEFAULT_<name> = what your body has:
+//
+//                              DIY  PCB_V1/V2  RTR_TT  RTR_TT2/520  LITE  RC_CAR  MTV
+//   HAS_VOLTAGE_DIVIDER         1       1        1          1        0      0      0
+//   HAS_INDICATORS              1       1        1          1        1      0      0
+//   HAS_SONAR                   1       1        1          1        0      0      0
+//   SONAR_MEDIAN                0       0        0          0        0      0      0
+//   HAS_BUMPER                  0       0        1          1        0      0      0
+//   HAS_SPEED_SENSORS_FRONT     1       1        1          1        0      0      1
+//   HAS_SPEED_SENSORS_BACK      0       0        1          1        0      0      1
+//   HAS_SPEED_SENSORS_MIDDLE    0       0        0          0        0      0      1
+//   HAS_LEDS_FRONT              0       0        1          1        0      0      0
+//   HAS_LEDS_BACK               0       0        1          1        0      0      0
+//   HAS_LEDS_STATUS             0       0        1          1        0      0      0
+//   HAS_OLED                    0       0        0          0        0      0      0
+//   HAS_BLUETOOTH             on for the ESP32 bodies (link to the phone)
 
-// 4. Battery (optional): empty / full voltage of the app's battery gauge
+#define HAS_VOLTAGE_DIVIDER DEFAULT_HAS_VOLTAGE_DIVIDER
+#define HAS_INDICATORS DEFAULT_HAS_INDICATORS
+#define HAS_SONAR DEFAULT_HAS_SONAR
+#define SONAR_MEDIAN DEFAULT_SONAR_MEDIAN
+#define HAS_BUMPER DEFAULT_HAS_BUMPER
+#define HAS_SPEED_SENSORS_FRONT DEFAULT_HAS_SPEED_SENSORS_FRONT
+#define HAS_SPEED_SENSORS_BACK DEFAULT_HAS_SPEED_SENSORS_BACK
+#define HAS_SPEED_SENSORS_MIDDLE DEFAULT_HAS_SPEED_SENSORS_MIDDLE
+#define HAS_LEDS_FRONT DEFAULT_HAS_LEDS_FRONT
+#define HAS_LEDS_BACK DEFAULT_HAS_LEDS_BACK
+#define HAS_LEDS_STATUS DEFAULT_HAS_LEDS_STATUS
+#define HAS_OLED DEFAULT_HAS_OLED
+#define HAS_BLUETOOTH DEFAULT_HAS_BLUETOOTH
+
+// 4. Battery: empty / full voltage of the app's battery gauge, or the body's default
 //    Body defaults: 9.0 / 12.6, RC_CAR 6.4 / 8.4, LITE 4.5 / 5.0, MTV 20.0 / 24.0
-//    Other batteries: 2S 6.8 / 8.4, 6 x AA 6.0 / 9.0, 9 V block 6.0 / 9.0
-// #define VOLTAGE_LOW 6.8f
-// #define VOLTAGE_MAX 8.4f
+//    Other batteries, e.g.: 2S 6.8f / 8.4f, 6 x AA 6.0f / 9.0f, 9 V block 6.0f / 9.0f
+#define VOLTAGE_LOW DEFAULT_VOLTAGE_LOW
+#define VOLTAGE_MAX DEFAULT_VOLTAGE_MAX
+#define VOLTAGE_MIN DEFAULT_VOLTAGE_MIN  // lowest voltage at which the motors turn (no phone mode)
+#define VOLTAGE_DIVIDER_FACTOR DEFAULT_VOLTAGE_DIVIDER_FACTOR  // (R1 + R2) / R2
 #endif
 
 //------------------------------------------------------//
@@ -111,16 +128,14 @@
 #define GAMEPAD_JOYSTICK 1
 #define GAMEPAD_DUAL 2
 
-// Value of a part setting that uses the body's default
-#define BODY_DEFAULT -1
-
 boolean coast_mode = COAST_MODE;
 
 //------------------------------------------------------//
 // BODIES - default parts and pins of each body
 //------------------------------------------------------//
-// Each body sets DEFAULT_<part> for the parts it has. To change a part for your
-// robot, use the settings at the top. Keep the table there in sync (CI checks it).
+// Each body sets DEFAULT_<part> for the parts it has (parts without one are off),
+// and its battery defaults. The settings at the top use them. Keep the parts table
+// there in sync with the bodies (CI checks it).
 
 // PIN_TRIGGER                          Arduino pin tied to trigger pin on ultrasonic sensor.
 // PIN_ECHO                             Arduino pin tied to echo pin on ultrasonic sensor.
@@ -551,113 +566,6 @@ const int RHS_PWM_OUT = 1;
 
 #endif
 //------------------------------------------------------//
-
-//------------------------------------------------------//
-// Parts: the settings, else the body's default, else off
-//------------------------------------------------------//
-#ifndef DEFAULT_HAS_VOLTAGE_DIVIDER
-#define DEFAULT_HAS_VOLTAGE_DIVIDER 0
-#endif
-#if !defined(HAS_VOLTAGE_DIVIDER) || (HAS_VOLTAGE_DIVIDER == BODY_DEFAULT)
-#undef HAS_VOLTAGE_DIVIDER
-#define HAS_VOLTAGE_DIVIDER DEFAULT_HAS_VOLTAGE_DIVIDER
-#endif
-#ifndef DEFAULT_HAS_INDICATORS
-#define DEFAULT_HAS_INDICATORS 0
-#endif
-#if !defined(HAS_INDICATORS) || (HAS_INDICATORS == BODY_DEFAULT)
-#undef HAS_INDICATORS
-#define HAS_INDICATORS DEFAULT_HAS_INDICATORS
-#endif
-#ifndef DEFAULT_HAS_SONAR
-#define DEFAULT_HAS_SONAR 0
-#endif
-#if !defined(HAS_SONAR) || (HAS_SONAR == BODY_DEFAULT)
-#undef HAS_SONAR
-#define HAS_SONAR DEFAULT_HAS_SONAR
-#endif
-#ifndef DEFAULT_SONAR_MEDIAN
-#define DEFAULT_SONAR_MEDIAN 0
-#endif
-#if !defined(SONAR_MEDIAN) || (SONAR_MEDIAN == BODY_DEFAULT)
-#undef SONAR_MEDIAN
-#define SONAR_MEDIAN DEFAULT_SONAR_MEDIAN
-#endif
-#ifndef DEFAULT_HAS_BUMPER
-#define DEFAULT_HAS_BUMPER 0
-#endif
-#if !defined(HAS_BUMPER) || (HAS_BUMPER == BODY_DEFAULT)
-#undef HAS_BUMPER
-#define HAS_BUMPER DEFAULT_HAS_BUMPER
-#endif
-#ifndef DEFAULT_HAS_SPEED_SENSORS_FRONT
-#define DEFAULT_HAS_SPEED_SENSORS_FRONT 0
-#endif
-#if !defined(HAS_SPEED_SENSORS_FRONT) || (HAS_SPEED_SENSORS_FRONT == BODY_DEFAULT)
-#undef HAS_SPEED_SENSORS_FRONT
-#define HAS_SPEED_SENSORS_FRONT DEFAULT_HAS_SPEED_SENSORS_FRONT
-#endif
-#ifndef DEFAULT_HAS_SPEED_SENSORS_BACK
-#define DEFAULT_HAS_SPEED_SENSORS_BACK 0
-#endif
-#if !defined(HAS_SPEED_SENSORS_BACK) || (HAS_SPEED_SENSORS_BACK == BODY_DEFAULT)
-#undef HAS_SPEED_SENSORS_BACK
-#define HAS_SPEED_SENSORS_BACK DEFAULT_HAS_SPEED_SENSORS_BACK
-#endif
-#ifndef DEFAULT_HAS_SPEED_SENSORS_MIDDLE
-#define DEFAULT_HAS_SPEED_SENSORS_MIDDLE 0
-#endif
-#if !defined(HAS_SPEED_SENSORS_MIDDLE) || (HAS_SPEED_SENSORS_MIDDLE == BODY_DEFAULT)
-#undef HAS_SPEED_SENSORS_MIDDLE
-#define HAS_SPEED_SENSORS_MIDDLE DEFAULT_HAS_SPEED_SENSORS_MIDDLE
-#endif
-#ifndef DEFAULT_HAS_OLED
-#define DEFAULT_HAS_OLED 0
-#endif
-#if !defined(HAS_OLED) || (HAS_OLED == BODY_DEFAULT)
-#undef HAS_OLED
-#define HAS_OLED DEFAULT_HAS_OLED
-#endif
-#ifndef DEFAULT_HAS_LEDS_FRONT
-#define DEFAULT_HAS_LEDS_FRONT 0
-#endif
-#if !defined(HAS_LEDS_FRONT) || (HAS_LEDS_FRONT == BODY_DEFAULT)
-#undef HAS_LEDS_FRONT
-#define HAS_LEDS_FRONT DEFAULT_HAS_LEDS_FRONT
-#endif
-#ifndef DEFAULT_HAS_LEDS_BACK
-#define DEFAULT_HAS_LEDS_BACK 0
-#endif
-#if !defined(HAS_LEDS_BACK) || (HAS_LEDS_BACK == BODY_DEFAULT)
-#undef HAS_LEDS_BACK
-#define HAS_LEDS_BACK DEFAULT_HAS_LEDS_BACK
-#endif
-#ifndef DEFAULT_HAS_LEDS_STATUS
-#define DEFAULT_HAS_LEDS_STATUS 0
-#endif
-#if !defined(HAS_LEDS_STATUS) || (HAS_LEDS_STATUS == BODY_DEFAULT)
-#undef HAS_LEDS_STATUS
-#define HAS_LEDS_STATUS DEFAULT_HAS_LEDS_STATUS
-#endif
-#ifndef DEFAULT_HAS_BLUETOOTH
-#define DEFAULT_HAS_BLUETOOTH 0
-#endif
-#if !defined(HAS_BLUETOOTH) || (HAS_BLUETOOTH == BODY_DEFAULT)
-#undef HAS_BLUETOOTH
-#define HAS_BLUETOOTH DEFAULT_HAS_BLUETOOTH
-#endif
-#ifndef VOLTAGE_MIN
-#define VOLTAGE_MIN DEFAULT_VOLTAGE_MIN
-#endif
-#ifndef VOLTAGE_LOW
-#define VOLTAGE_LOW DEFAULT_VOLTAGE_LOW
-#endif
-#ifndef VOLTAGE_MAX
-#define VOLTAGE_MAX DEFAULT_VOLTAGE_MAX
-#endif
-#if !defined(VOLTAGE_DIVIDER_FACTOR) && defined(DEFAULT_VOLTAGE_DIVIDER_FACTOR)
-#define VOLTAGE_DIVIDER_FACTOR DEFAULT_VOLTAGE_DIVIDER_FACTOR
-#endif
 
 #if (NO_PHONE_MODE && !HAS_SONAR)
 #warning "No phone mode without a sonar: the robot drives straight ahead."
