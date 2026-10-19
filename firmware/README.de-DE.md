@@ -17,11 +17,21 @@ Die Hauptaufgabe der MCU besteht darin, die Steuerung des Fahrzeugs auf niedrige
 
 ## Einrichtung
 
-Zuerst müssen Sie Ihre Hardwarekonfiguration am Anfang des Codes einrichten. Wenn Sie den DIY-Bau (mit dem L298N-Motortreiber) durchgeführt haben, setzen Sie `OPENBOT DIY`. Wenn Sie die benutzerdefinierte Leiterplatte verwendet haben, überprüfen Sie die Version und setzen Sie entweder `OPENBOT PCB_V1` oder `OPENBOT PCB_V2`. Wenn Sie ein OpenBot-Kit haben, setzen Sie `OPENBOT RTR_TT`. Wenn Sie einen RC-Truck nachgerüstet haben, setzen Sie `OPENBOT RC_CAR`. Wenn Sie die kleinere DIY-Version für Bildungszwecke verwenden, setzen Sie `OPENBOT LITE`. Wenn Sie das OpenBot Ready-to-Run-Kit mit 520-Motoren verwenden, setzen Sie `OPENBOT RTR_520`. Wenn Sie das Multi Terrain Vehicle gebaut haben, sollten Sie `OPENBOT MTV` setzen. Um den `OpenBot DIY` mit dem ESP32 zu betreiben, setzen Sie OpenBot `DIY_ESP32`.
+Zuerst müssen Sie Ihre Hardwarekonfiguration am Anfang des Codes einrichten. Wenn Sie den DIY-Bau (mit dem L298N-Motortreiber) durchgeführt haben, setzen Sie `OPENBOT DIY`. Wenn Sie die benutzerdefinierte Leiterplatte verwendet haben, überprüfen Sie die Version und setzen Sie entweder `OPENBOT PCB_V1` oder `OPENBOT PCB_V2`. Wenn Sie ein OpenBot-Kit haben, setzen Sie `OPENBOT RTR_TT`. Wenn Sie einen RC-Truck nachgerüstet haben, setzen Sie `OPENBOT RC_CAR`. Wenn Sie die kleinere DIY-Version für Bildungszwecke verwenden, setzen Sie `OPENBOT LITE`. Wenn Sie das OpenBot Ready-to-Run-Kit mit 520-Motoren verwenden, setzen Sie `OPENBOT RTR_520`. Wenn Sie das Multi Terrain Vehicle gebaut haben, sollten Sie `OPENBOT MTV` setzen.
+
+Die Firmware erkennt das Board, das Sie in der Arduino IDE auswählen. Jeder Körper unterstützt diese Boards; mit einem anderen Board bricht der Build mit einer Fehlermeldung ab:
+
+| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|:---:|:---:|
+| `DIY` | ✓ | ✓ |
+| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
+| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+
+`DIY_ESP32` wurde durch `DIY` mit ausgewähltem ESP32-Board ersetzt.
 
 ## Bluetooth
 
-Sie können den OpenBot auch über Bluetooth betreiben, dazu können Sie Bluetooth aktivieren, indem Sie `BLUETOOTH 1` setzen (deaktivieren: 0). Damit Bluetooth funktioniert, benötigen Sie OpenBot mit ESP32-Boards wie `(RTR_520, MTV, DIY_ESP32)`.
+Sie können den OpenBot auch über Bluetooth betreiben, dazu können Sie Bluetooth aktivieren, indem Sie `BLUETOOTH 1` setzen (deaktivieren: 0). Damit Bluetooth funktioniert, benötigen Sie OpenBot mit ESP32-Boards wie `RTR_TT2`, `RTR_520`, `MTV` oder `DIY` mit einem ESP32.
 
 ## Konfiguration
 
@@ -185,6 +195,67 @@ Bevor Sie das Auto mit einem Smartphone testen, auf dem die OpenBot-Anwendung in
 Bevor Sie das Auto laufen lassen, empfehlen wir, die Reifen zu entfernen, den Arduino mit einem Computer zu verbinden und den seriellen Monitor wie im Abschnitt [Testen](#testing) zu beobachten. Die Ausgabe auf dem seriellen Monitor ist etwas einfacher zu parsen (gleich wie OLED) und zeigt die Batteriespannung, die Umdrehungen pro Minute für die linken und rechten Motoren und den geschätzten freien Raum vor dem Auto an. Sie können ein großes Objekt vor dem Ultraschallsensor hin und her bewegen und beobachten, wie sich die Geschwindigkeit der Motoren ändert.
 
 :warning: WARNUNG: Wenn Sie keinen Ultraschallsensor installiert haben oder wenn er deaktiviert ist, fährt das Auto einfach mit _normaler Geschwindigkeit_ (75% PWM) vorwärts und wird schließlich kollidieren. Selbst mit installiertem Sensor kann das Auto gelegentlich aufgrund von Rauschmessungen kollidieren.
+
+### Gamepad-Steuerung
+
+Im Kein-Telefon-Modus können Sie einen ESP32-Körper mit einem Bluetooth-Gamepad steuern, statt ihn selbstständig fahren zu lassen.
+
+#### Einrichtung
+
+1. Fügen Sie in der Arduino IDE unter **Einstellungen > Zusätzliche Boardverwalter-URLs** diese URL hinzu:
+   `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
+2. Installieren Sie im Boardverwalter **esp32_bluepad32** (4.1.0). Es basiert auf demselben esp32-Core (2.0.17) wie die normale Firmware.
+3. Wählen Sie **ESP32 Dev Module** aus den esp32_bluepad32-Boards.
+4. Setzen Sie `NO_PHONE_MODE 1` und `HAS_GAMEPAD 1` und laden Sie hoch.
+
+Das Gamepad nutzt das Bluetooth des ESP32, daher ist die Bluetooth-Verbindung zum Telefon in diesem Modus aus. Um mit der Telefon-App zu fahren, lassen Sie `HAS_GAMEPAD 0` und koppeln Sie das Gamepad stattdessen mit dem Telefon.
+
+#### Koppeln
+
+Schalten Sie den Roboter ein und versetzen Sie das Gamepad in den Kopplungsmodus. Es verbindet sich innerhalb weniger Sekunden und danach jedes Mal, wenn Sie es einschalten. Um ein anderes Gamepad zu koppeln, schalten Sie zuerst das verbundene aus: Es fährt immer nur ein Gamepad.
+
+| Gamepad | Kopplungsmodus |
+|---|---|
+| PS5 DualSense | **Create** gedrückt halten, dann **PS** halten, bis die Lichtleiste blinkt. |
+| PS4 DualShock 4 | **Share** gedrückt halten, dann **PS** halten, bis die Lichtleiste blinkt. |
+| Xbox Wireless (Modell 1708 oder neuer) | Einschalten, dann die Kopplungstaste 3 s lang halten. Aktualisieren Sie vorher die Controller-Firmware auf 5.15 oder neuer (z. B. mit der App Xbox-Zubehör). |
+| Switch Pro, Joy-Con, 8BitDo und andere | Den Bluetooth-Kopplungsmodus des Gamepads verwenden (siehe Anleitung). |
+
+Die [Bluepad32-Liste unterstützter Gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) enthält weitere Modelle, darunter den PS3 DualShock 3, der zusätzliche Einrichtung braucht. Mit `DEBUG 1` zeigt der serielle Monitor den Namen jedes Gamepads an, das sich verbindet.
+
+#### Bedienung
+
+Tasten sind als PlayStation / Xbox angegeben.
+
+| Bedienelement | Funktion |
+|---|---|
+| **R2 / L2** | Vorwärts / rückwärts (Spielmodus) |
+| **Linker Stick** | Lenken (Spielmodus), fahren und lenken (Joystick-Modus) oder linke Seite (Dual-Modus) |
+| **Rechter Stick** | Rechte Seite (Dual-Modus) |
+| **L1** | Nächster Fahrmodus: Spiel → Joystick → Dual. Das Gamepad vibriert einmal: kurz für Spiel, länger für Joystick, am längsten für Dual. |
+| **Steuerkreuz oben / R3** | Schneller |
+| **Steuerkreuz unten / L3** | Langsamer |
+| **Quadrat / X** | Linker Blinker ein oder aus |
+| **Kreis / B** | Rechter Blinker ein oder aus |
+| **Dreieck / Y** | Blinker aus |
+| **Kreuz / A** | Licht ein oder aus |
+| **Start** | Erkunden ein oder aus |
+| **Select / Back** | Hindernisstopp ein oder aus |
+
+Bei Start und Select bedeutet eine lange Vibration ein und eine kurze aus.
+
+**Fahrmodi.** Das Gamepad startet im Modus aus `GAMEPAD_DRIVE_MODE` (Standard: Spiel).
+- **Spiel:** R2 fährt vorwärts, L2 rückwärts, und der linke Stick lenkt. Beim Rückwärtsfahren ist die Lenkung gespiegelt, wie bei einem Auto.
+- **Joystick:** Der linke Stick fährt und lenkt. Der Roboter dreht sich immer in die Richtung, in die der Stick zeigt, auch rückwärts.
+- **Dual:** Jeder Stick steuert eine Seite, wie bei einem Panzer.
+
+**Geschwindigkeiten.** Es gibt drei Geschwindigkeiten: langsam (50 %), normal (75 %, die Startgeschwindigkeit) und schnell (100 %). Das Gamepad zeigt die Geschwindigkeit mit seinen Spieler-LEDs (eine bis drei) oder seiner Lichtleiste (grün, orange, rot) an.
+
+**Erkunden.** Erkunden ist das oben beschriebene Fahren im Kein-Telefon-Modus: Der Roboter fährt selbstständig herum und weicht Hindernissen aus. Beim Start ist es aus; drücken Sie **Start**, um es einzuschalten. Während Erkunden an ist, übernimmt das Gamepad, sobald Sie einen Stick oder Trigger bewegen. Wenn Sie loslassen, hält der Roboter kurz an und erkundet weiter. Erkunden braucht einen angeschlossenen Sonarsensor mit `HAS_SONAR 1`; ohne ihn fährt der Roboter einfach geradeaus (siehe Warnung oben).
+
+**Hindernisstopp.** Während Sie mit dem Gamepad fahren, fährt der Roboter nicht vorwärts, wenn das Sonar ein Hindernis näher als `STOP_DISTANCE` erkennt. Beim Start ist er an; drücken Sie **Select**, um ihn auszuschalten, z. B. um etwas zu schieben. Er funktioniert nur mit einem angeschlossenen Sonarsensor und `HAS_SONAR 1`; sonst hält der Roboter nie vor Hindernissen.
+
+**Sicherheit.** Der Roboter hält an, wenn die Verbindung zum Gamepad abbricht. Die meisten Gamepads senden außerdem ständig Daten; schweigt ein solches Gamepad 0,5 s lang (außer Reichweite, Akku leer), hält der Roboter sofort an, statt auf den Verbindungsabbruch zu warten.
 
 ## Verwendung anderer MCUs (Anforderungen)
 

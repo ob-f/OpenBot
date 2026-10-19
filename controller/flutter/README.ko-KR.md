@@ -11,6 +11,12 @@
 
 이 컨트롤러 앱은 [OpenBot](https://www.openbot.org) 차량의 `리모컨` 역할을 합니다. PS3/4나 Xbox와 같은 Bluetooth 컨트롤러와 유사한 기능을 제공하며, 또 다른 Android/iOS 기기에서 실행됩니다. 이 앱은 제어 기능 외에도 실시간 비디오/오디오 스트리밍을 지원합니다.
 
+## 앱 설치하기
+
+Android에서는 최신 [릴리스](https://github.com/ob-f/OpenBot/releases)의 에셋에서 `Controller-<version>.apk`를 다운로드하여 휴대폰에 [설치](https://www.lifewire.com/install-apk-on-android-4177185)하세요.
+
+> **기존 사용자 참고:** 이 앱은 각 릴리스와 함께 배포되는 컨트롤러 APK로서 기존 [Android 컨트롤러 앱](../../android/controller/README.ko-KR.md)을 대체합니다. 두 앱은 서로 다른 패키지 ID(`org.openbot.app.controller`와 `org.openbot.controller`)를 사용하므로, 이 APK를 설치해도 기존 앱이 업데이트되지 않고 별도의 앱으로 함께 설치됩니다. 새 앱으로 전환한 후에는 기존 컨트롤러를 삭제해도 됩니다.
+
 ## 시작하기
 먼저 시스템에 [Flutter](https://flutter.dev/)를 설치하세요. 운영 체제에 맞는 다운로드 옵션을 선택하고, Windows, macOS, Linux, ChromeOS를 포함한 모든 플랫폼에 대한 설치 방법은 공식 Flutter 설치 가이드에서 확인할 수 있습니다: [Flutter 설치 가이드](https://docs.flutter.dev/get-started/install)
 

@@ -11,6 +11,8 @@
 
 这款安卓应用程序作为 [OpenBot](https://www.openbot.org) 车辆的 `远程控制器`。基本上，它的功能类似于PS3/4或Xbox的遥控器，但运行在另一台安卓设备上。
 
+> **注意：** 这个旧版控制器应用已不再随版本发布。发布资源中的 `Controller-<version>.apk` 现在是 [Flutter 控制器应用](../../controller/flutter/README.zh-CN.md)，它使用不同的包 ID（`org.openbot.app.controller`）。现有用户需要将其作为单独的应用安装；它不会更新本应用。
+
 ## 连接
 
 当控制器应用启动时，它会立即尝试连接到机器人。我们会看到以下屏幕：

@@ -1,0 +1,63 @@
+name: Firmware
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'firmware/**'
+      - '.github/workflows/firmware.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'firmware/**'
+      - '.github/workflows/firmware.yml'
+  workflow_dispatch:
+
+jobs:
+  robots:
+    name: List robot types
+    runs-on: ubuntu-latest
+    outputs:
+      robots: ${{ steps.list.outputs.robots }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: echo "robots=$(python3 firmware/scripts/compile_all.py --list-robots)" >> "$GITHUB_OUTPUT"
+
+  compile:
+    name: ${{ matrix.robot }}
+    needs: robots
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        robot: ${{ fromJSON(needs.robots.outputs.robots) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Find cores
+        id: cores
+        run: echo "cores=$(python3 firmware/scripts/compile_all.py --cores ${{ matrix.robot }})" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Arduino cores
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.arduino15/packages
+            ~/.arduino15/staging
+          key: arduino-${{ runner.os }}-${{ steps.cores.outputs.cores }}
+
+      - name: Install cores and libraries
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls \
+            https://espressif.github.io/arduino-esp32/package_esp32_index.json \
+            https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json
+          arduino-cli core update-index
+          for core in ${{ steps.cores.outputs.cores }}; do arduino-cli core install "$core"; done
+          arduino-cli lib install PinChangeInterrupt "Adafruit SSD1306" "Adafruit GFX Library" Servo
+
+      - name: Compile all combinations
+        run: python3 firmware/scripts/compile_all.py --robot ${{ matrix.robot }}

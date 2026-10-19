@@ -17,11 +17,21 @@ La tâche principale du MCU est de gérer le contrôle de bas niveau du véhicul
 
 ## Configuration
 
-Tout d'abord, vous devez configurer votre matériel au début du code. Si vous avez fait la construction DIY (en utilisant le pilote de moteur L298N), réglez `OPENBOT DIY`. Si vous avez utilisé le PCB personnalisé, vérifiez la version et réglez soit `OPENBOT PCB_V1` soit `OPENBOT PCB_V2`. Si vous avez un kit OpenBot, réglez `OPENBOT RTR_TT`. Si vous avez adapté un camion RC, réglez `OPENBOT RC_CAR`. Si vous utilisez la version DIY plus petite pour l'éducation, réglez `OPENBOT LITE`. Si vous utilisez le kit OpenBot prêt à l'emploi avec des moteurs 520, réglez `OPENBOT RTR_520`. Si vous avez construit le véhicule tout-terrain, vous devez régler `OPENBOT MTV`. Pour faire fonctionner l'`OpenBot DIY` avec l'ESP32, réglez OpenBot `DIY_ESP32`.
+Tout d'abord, vous devez configurer votre matériel au début du code. Si vous avez fait la construction DIY (en utilisant le pilote de moteur L298N), réglez `OPENBOT DIY`. Si vous avez utilisé le PCB personnalisé, vérifiez la version et réglez soit `OPENBOT PCB_V1` soit `OPENBOT PCB_V2`. Si vous avez un kit OpenBot, réglez `OPENBOT RTR_TT`. Si vous avez adapté un camion RC, réglez `OPENBOT RC_CAR`. Si vous utilisez la version DIY plus petite pour l'éducation, réglez `OPENBOT LITE`. Si vous utilisez le kit OpenBot prêt à l'emploi avec des moteurs 520, réglez `OPENBOT RTR_520`. Si vous avez construit le véhicule tout-terrain, vous devez régler `OPENBOT MTV`.
+
+Le firmware détecte la carte que vous sélectionnez dans l'Arduino IDE. Chaque châssis prend en charge ces cartes ; avec une autre carte, la compilation s'arrête avec une erreur :
+
+| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|:---:|:---:|
+| `DIY` | ✓ | ✓ |
+| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
+| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+
+`DIY_ESP32` a été remplacé par `DIY` avec une carte ESP32 sélectionnée.
 
 ## Bluetooth
 
-Vous pouvez également faire fonctionner l'OpenBot via Bluetooth, pour cela vous pouvez activer le Bluetooth en réglant `BLUETOOTH 1` (désactiver : 0). Pour que le Bluetooth fonctionne, vous avez besoin d'OpenBot avec des cartes ESP32 comme `(RTR_520, MTV, DIY_ESP32)`.
+Vous pouvez également faire fonctionner l'OpenBot via Bluetooth, pour cela vous pouvez activer le Bluetooth en réglant `BLUETOOTH 1` (désactiver : 0). Pour que le Bluetooth fonctionne, vous avez besoin d'OpenBot avec des cartes ESP32 comme `RTR_TT2`, `RTR_520`, `MTV` ou `DIY` avec un ESP32.
 
 ## Configuration
 
@@ -185,6 +195,67 @@ Avant de tester la voiture avec un smartphone qui a l'application OpenBot instal
 Avant de faire rouler la voiture, nous vous recommandons de retirer les pneus, de connecter l'Arduino à un ordinateur et d'observer le moniteur série comme dans la section [Test](#testing). La sortie sur le moniteur série est un peu plus facile à analyser (même que l'OLED) et montre la tension de la batterie, le régime pour les moteurs gauche et droit et l'espace libre estimé devant la voiture. Vous pouvez déplacer un grand objet d'avant en arrière devant le capteur ultrasonique et observer la vitesse des moteurs changer.
 
 :warning: AVERTISSEMENT : Si vous n'avez pas installé de capteur ultrasonique ou s'il est désactivé, la voiture roulera simplement en avant à _vitesse normale_ (75% PWM) et finira par entrer en collision. Même avec le capteur installé, la voiture peut parfois entrer en collision en raison de lectures bruyantes.
+
+### Contrôle par manette
+
+En mode sans téléphone, vous pouvez piloter un châssis ESP32 avec une manette Bluetooth au lieu de le laisser rouler seul.
+
+#### Configuration
+
+1. Dans l'Arduino IDE, ajoutez cette URL sous **Préférences > URL de gestionnaire de cartes supplémentaires** :
+   `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
+2. Dans le gestionnaire de cartes, installez **esp32_bluepad32** (4.1.0). Il repose sur le même cœur esp32 (2.0.17) que le firmware habituel.
+3. Sélectionnez **ESP32 Dev Module** parmi les cartes esp32_bluepad32.
+4. Réglez `NO_PHONE_MODE 1` et `HAS_GAMEPAD 1`, puis téléversez.
+
+La manette utilise le Bluetooth de l'ESP32 ; la liaison Bluetooth avec le téléphone est donc désactivée dans ce mode. Pour piloter avec l'application du téléphone, laissez `HAS_GAMEPAD 0` et appairez plutôt la manette avec le téléphone.
+
+#### Appairage
+
+Allumez le robot et mettez la manette en mode d'appairage. Elle se connecte en quelques secondes, puis se reconnecte à chaque fois que vous l'allumez. Pour appairer une autre manette, éteignez d'abord celle qui est connectée : une seule manette pilote à la fois.
+
+| Manette | Mode d'appairage |
+|---|---|
+| PS5 DualSense | Maintenez **Create**, puis maintenez **PS** jusqu'à ce que la barre lumineuse clignote. |
+| PS4 DualShock 4 | Maintenez **Share**, puis maintenez **PS** jusqu'à ce que la barre lumineuse clignote. |
+| Xbox Wireless (modèle 1708 ou plus récent) | Allumez-la, puis maintenez le bouton d'appairage 3 s. Mettez d'abord à jour le firmware de la manette en 5.15 ou plus récent (par ex. avec l'application Accessoires Xbox). |
+| Switch Pro, Joy-Con, 8BitDo et autres | Utilisez le mode d'appairage Bluetooth de la manette (voir son manuel). |
+
+La [liste des manettes prises en charge par Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) contient d'autres modèles, dont la DualShock 3 de la PS3, qui demande une configuration supplémentaire. Avec `DEBUG 1`, le moniteur série affiche le nom de chaque manette qui se connecte.
+
+#### Commandes
+
+Les boutons sont indiqués PlayStation / Xbox.
+
+| Commande | Action |
+|---|---|
+| **R2 / L2** | Avant / arrière (mode jeu) |
+| **Stick gauche** | Diriger (mode jeu), avancer et diriger (mode joystick) ou côté gauche (mode double) |
+| **Stick droit** | Côté droit (mode double) |
+| **L1** | Mode de conduite suivant : jeu → joystick → double. La manette vibre une fois : brièvement pour jeu, plus longtemps pour joystick, le plus longtemps pour double. |
+| **Croix directionnelle haut / R3** | Plus vite |
+| **Croix directionnelle bas / L3** | Plus lentement |
+| **Carré / X** | Clignotant gauche marche ou arrêt |
+| **Rond / B** | Clignotant droit marche ou arrêt |
+| **Triangle / Y** | Clignotants éteints |
+| **Croix / A** | Phares marche ou arrêt |
+| **Start** | Exploration marche ou arrêt |
+| **Select / Back** | Arrêt devant obstacle marche ou arrêt |
+
+Pour Start et Select, une vibration longue signifie marche et une courte signifie arrêt.
+
+**Modes de conduite.** La manette démarre dans le mode défini par `GAMEPAD_DRIVE_MODE` (par défaut : jeu).
+- **Jeu :** R2 avance, L2 recule et le stick gauche dirige. En marche arrière, la direction est inversée, comme une voiture.
+- **Joystick :** le stick gauche avance et dirige. Le robot tourne toujours du côté où pointe le stick, même en marche arrière.
+- **Double :** chaque stick pilote un côté, comme un char.
+
+**Vitesses.** Il y a trois vitesses : lente (50 %), normale (75 %, la vitesse de départ) et rapide (100 %). La manette indique la vitesse avec ses LED de joueur (une à trois) ou sa barre lumineuse (vert, orange, rouge).
+
+**Exploration.** L'exploration est la conduite du mode sans téléphone décrite plus haut : le robot roule seul et contourne les obstacles. Elle est désactivée au démarrage ; appuyez sur **Start** pour l'activer. Pendant l'exploration, bouger un stick ou une gâchette reprend la main. Quand vous relâchez, le robot s'arrête brièvement puis reprend l'exploration. L'exploration nécessite un capteur sonar branché et `HAS_SONAR 1` ; sans lui, le robot roule simplement tout droit (voir l'avertissement plus haut).
+
+**Arrêt devant obstacle.** Lorsque vous pilotez avec la manette, le robot n'avance pas si le sonar détecte un obstacle plus proche que `STOP_DISTANCE`. Il est activé au démarrage ; appuyez sur **Select** pour le désactiver, par exemple pour pousser un objet. Il ne fonctionne qu'avec un capteur sonar branché et `HAS_SONAR 1` ; sinon, le robot ne s'arrête jamais devant les obstacles.
+
+**Sécurité.** Le robot s'arrête quand la manette se déconnecte. La plupart des manettes envoient aussi des données en continu ; si une telle manette se tait pendant 0,5 s (hors de portée, batterie vide), le robot s'arrête immédiatement au lieu d'attendre la déconnexion.
 
 ## Utilisation d'autres MCU (exigences)
 

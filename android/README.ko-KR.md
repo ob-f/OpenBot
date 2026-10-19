@@ -40,6 +40,8 @@
 
 대안으로, [릴리스](https://github.com/ob-f/OpenBot/releases)의 자산에서 apk를 다운로드할 수 있습니다. 최신 앱을 마스터 브랜치에서 원하신다면, [여기](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22)에서 빌드 아티팩트로 다운로드할 수 있습니다. 안정적이지 않을 수 있습니다. 앱을 나중에 변경하고 싶다면 아래 단계를 따라 앱을 컴파일하고 휴대폰에 배포하세요.
 
+> **참고:** 이제 릴리스 에셋 `Controller-<version>.apk`는 이 폴더의 기존 Android 컨트롤러 앱이 아니라 [Flutter 컨트롤러 앱](../controller/flutter/README.ko-KR.md)으로 빌드됩니다. Flutter 컨트롤러는 다른 패키지 ID(`org.openbot.controller` 대신 `org.openbot.app.controller`)를 사용하므로 기존에 설치된 컨트롤러 앱을 업데이트하지 **않습니다**. 기존 컨트롤러가 이미 설치되어 있다면 새 컨트롤러를 별도로 설치하고, 이후 기존 앱은 삭제해도 됩니다.
+
 ## 앱 빌드하기
 
 ### 필수 조건
