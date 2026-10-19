@@ -17,34 +17,80 @@ The main task of the MCU is to handle the low-level control of the vehicle and p
 
 ## Setup
 
-First you have to set up your hardware configuration at the beginning of the code. If you did the DIY build (using the L298N motor driver), set `OPENBOT DIY`.
-If you used the custom PCB, check the version and set either `OPENBOT PCB_V1` or `OPENBOT PCB_V2`. If you have a OpenBot kit set `OPENBOT RTR_TT`. If you have retrofitted an RC truck, set `OPENBOT RC_CAR`. If you use the smaller DIY version for education, set `OPENBOT LITE`. If you use the OpenBot Ready-to-Run kit with 520-motors, set `OPENBOT RTR_520`. if you built the Multi Terrain Vehicle, you should set `OPENBOT MTV`.
+All settings are in the **SETTINGS** section at the top of `openbot.ino`. You don't need to change anything below it.
 
-The firmware detects the board you select in the Arduino IDE. Each body supports these boards; with any other board the build stops with an error:
+To keep your settings when you update the firmware, copy the lines of the SETTINGS section between `#else` and `#endif` into a new file `openbot_settings.h` next to `openbot.ino`, and change them there. If `openbot_settings.h` exists, the firmware uses it instead of the section in `openbot.ino`, and git ignores the file.
 
-| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
-|---|:---:|:---:|
-| `DIY` | ✓ | ✓ |
-| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
-| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+### Robot body
+
+Set `OPENBOT` to your robot body, and select a board it supports in the Arduino IDE. The firmware detects the board; with any other board the build stops with an error.
+
+| Body | `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|---|:---:|:---:|
+| DIY build (L298N motor driver) | `DIY` | ✓ | ✓ |
+| Custom PCB V1 / V2 | `PCB_V1` / `PCB_V2` | ✓ | |
+| Ready-to-Run kit, TT motors | `RTR_TT` | ✓ | |
+| Ready-to-Run kit, TT motors, ESP32 | `RTR_TT2` | | ✓ |
+| Ready-to-Run kit, 520 motors | `RTR_520` | | ✓ |
+| RC truck | `RC_CAR` | ✓ | |
+| OpenBot Lite | `LITE` | ✓ | |
+| Multi Terrain Vehicle | `MTV` | | ✓ |
 
 `DIY_ESP32` has been replaced by `DIY` with an ESP32 board selected.
 
-## Bluetooth
+### Driving
 
-You can run the OpenBot via bluetooth as well, for that you can enable the bluetooth by setting `BLUETOOTH 1` (disable: 0). For bluetooth to work you need OpenBot with ESP32 boards like `RTR_TT2`, `RTR_520`, `MTV`, or `DIY` with an ESP32.
+By default, you drive the robot with the phone app. For [no phone mode](#no-phone-mode), set `NO_PHONE_MODE 1`; with an ESP32 you can then also drive with a [gamepad](#gamepad-control) (`HAS_GAMEPAD 1`). `COAST_MODE` sets whether the motors coast (1) or brake (0) when there is no control, and `DEBUG 1` prints debug output on the Serial Monitor.
 
-## Config
+### Parts
 
-Next, you need to configure which features you want to enable. Disabled features are not compiled to save memory and make the code faster. If a flag is not defined, the feature will be disabled. Each model has some default settings, that you may need to change depending on your configuration.
+Each body turns on the parts it normally has:
 
-- Enable the voltage divider by setting `HAS_VOLTAGE_DIVIDER 1` (disable: 0). If you have a voltage divider, you should also specify the `VOLTAGE_DIVIDER_FACTOR` which is computed as (R1+R2)/R2, `VOLTAGE_MIN` which is the minimum voltage to drive the motors, `VOLTAGE_LOW` which is the minimum battery voltage and `VOLTAGE_MAX` which is the maximum battery voltage.
-- Enable the indicator LEDs by setting `HAS_INDICATORS 1` (disable: 0).
-- Enable the front/back speed sensors by setting `HAS_SPEED_SENSORS_FRONT 1` / `HAS_SPEED_SENSORS_BACK 1` (disable: 0).
-- Enable the ultrasonic sensor by setting `HAS_SONAR 1` (disable: 0). Enable the median filter for sonar measurements by setting `USE_MEDIAN 1` (disable: 0).
-- Enable the bumper sensor which is used to detect collisions by setting `HAS_BUMPER 1` (disable: 0).
-- Enable the OLED display by setting `HAS_OLED 1` (disable: 0).
-- Enable the front/back/status LEDs by setting `HAS_LEDS_FRONT 1` / `HAS_LEDS_BACK 1` / `HAS_LEDS_STATUS 1` (disable: 0).
+| `OPENBOT` | Parts turned on |
+|---|---|
+| `DIY`, `PCB_V1`, `PCB_V2` | Voltage divider, indicators, sonar, front speed sensors |
+| `RTR_TT`, `RTR_TT2`, `RTR_520` | Voltage divider, indicators, sonar, bumper, front and back speed sensors, front, back and status LEDs |
+| `LITE` | Indicators |
+| `RC_CAR` | None |
+| `MTV` | Front, middle and back speed sensors |
+
+On an ESP32, the Bluetooth link to the phone is also on.
+
+The settings list every part with `BODY_DEFAULT`, and a table next to them shows each body's defaults. To change a part, replace `BODY_DEFAULT` with `1` (on) or `0` (off), e.g. `#define HAS_SONAR 0` if you haven't installed the ultrasonic sensor. A part that is on but not installed does no harm, but the app shows readings for it that make no sense, such as a sonar distance of 300 cm.
+
+| Setting | Part |
+|---|---|
+| `HAS_VOLTAGE_DIVIDER` | Battery voltage measurement |
+| `HAS_INDICATORS` | Indicator lights |
+| `HAS_SONAR`, `SONAR_MEDIAN` | Ultrasonic sensor, and a median filter for its readings |
+| `HAS_BUMPER` | Bumper to detect collisions |
+| `HAS_SPEED_SENSORS_FRONT`, `_BACK`, `_MIDDLE` | Wheel speed sensors |
+| `HAS_LEDS_FRONT`, `HAS_LEDS_BACK`, `HAS_LEDS_STATUS` | Front lights, rear lights and status LEDs |
+| `HAS_OLED` | OLED display |
+| `HAS_BLUETOOTH` | Bluetooth link to the phone (ESP32) |
+
+### Battery
+
+The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full). Each body has defaults for its usual battery; for a different one, uncomment the two lines in the settings and set them, for example:
+
+| Battery | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+|---|---:|---:|
+| 2S Li-ion / LiPo | 6.8f | 8.4f |
+| 3S Li-ion / LiPo | 10.2f | 12.6f |
+| 6 × AA | 6.0f | 9.0f |
+| 9 V block | 6.0f | 9.0f |
+
+If your voltage divider differs from the body's, also add `#define VOLTAGE_DIVIDER_FACTOR` with (R1 + R2) / R2. `VOLTAGE_MIN` is the lowest voltage at which the motors still turn; the firmware only uses it in no phone mode.
+
+### Check the configuration
+
+When the robot starts, the Serial Monitor (115200 baud) shows the body and the parts that are on, for example:
+
+```
+OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+```
+
+If two parts use the same pin, the build stops with the error "Two parts use the same pin".
 
 ### Dependencies
 
@@ -191,7 +237,7 @@ Before you proceed, make sure the tires are removed. You will need the Serial Mo
 
 ### No Phone Mode
 
-Before testing the car with a smartphone that has the OpenBot application installed, you can also test the car without a phone first. Simply set the option `NO_PHONE_MODE` to `1`. The car will now drive at _normal_speed_ (75% PWM) and slow down as it detects obstacles with the ultrasonic sensor. Once it gets close to the `TURN_THRESHOLD` (default: 50cm), it will start turning in a random direction and turn on the LED on that side. If the estimated free space in front of the car falls below the `TURN_THRESHOLD`, it will slowly go backwards and both LEDs will turn on. Note that both the car and the Arduino need to be powered. The Arduino can be powered by connecting the 5V pin to the 5V output of the L298N motor driver, or by connecting the USB cable to a power source (e.g. phone).
+Before testing the car with a smartphone that has the OpenBot application installed, you can also test the car without a phone first. Simply set `NO_PHONE_MODE 1` in the settings. The car will now drive at _normal_speed_ (75% PWM) and slow down as it detects obstacles with the ultrasonic sensor. Once it gets close to the `TURN_THRESHOLD` (default: 50cm), it will start turning in a random direction and turn on the LED on that side. If the estimated free space in front of the car falls below the `TURN_THRESHOLD`, it will slowly go backwards and both LEDs will turn on. Note that both the car and the Arduino need to be powered. The Arduino can be powered by connecting the 5V pin to the 5V output of the L298N motor driver, or by connecting the USB cable to a power source (e.g. phone).
 
 Before running the car, we recommend to remove the tires, connect the Arduino to a computer and observe the serial monitor like in the section [Testing](#testing). The output on the serial monitor is a bit easier to parse (same as OLED) and shows the battery voltage, the rpm for the left and right motors and the estimated free space in front of the car. You can move a large object back and forth in front of ultrasonic sensor and observe the speed of the motors changing.
 
@@ -207,7 +253,7 @@ In no phone mode, you can drive an ESP32 body with a Bluetooth gamepad instead o
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. In the Boards Manager, install **esp32_bluepad32** (4.1.0). It is based on the same esp32 core (2.0.17) as the regular firmware.
 3. Select **ESP32 Dev Module** from the esp32_bluepad32 boards.
-4. Set `NO_PHONE_MODE 1` and `HAS_GAMEPAD 1`, and upload.
+4. In the settings, set `NO_PHONE_MODE 1` and `HAS_GAMEPAD 1`, and upload.
 
 The gamepad uses the ESP32's Bluetooth, so the Bluetooth link to the phone is off in this mode. To drive with the phone app, keep `HAS_GAMEPAD 0` and pair the gamepad to the phone instead.
 

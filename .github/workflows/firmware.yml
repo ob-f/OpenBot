@@ -21,6 +21,8 @@ jobs:
       robots: ${{ steps.list.outputs.robots }}
     steps:
       - uses: actions/checkout@v4
+      - name: Check the parts table
+        run: python3 firmware/scripts/compile_all.py --check-defaults
       - id: list
         run: echo "robots=$(python3 firmware/scripts/compile_all.py --list-robots)" >> "$GITHUB_OUTPUT"
 

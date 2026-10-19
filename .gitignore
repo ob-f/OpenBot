@@ -26,3 +26,6 @@ kotlin-profile
 native
 jdks
 /robot/android/FakeDependency.jar
+
+# Your own firmware settings (see firmware/README.md)
+firmware/openbot/openbot_settings.h
