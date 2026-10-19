@@ -186,6 +186,67 @@ Antes de hacer funcionar el coche, recomendamos quitar los neumáticos, conectar
 
 :warning: ADVERTENCIA: Si no tienes un sensor ultrasónico instalado o si está deshabilitado, el coche simplemente avanzará a _velocidad normal_ (75% PWM) y eventualmente colisionará. Incluso con el sensor instalado, el coche puede colisionar ocasionalmente debido a lecturas ruidosas.
 
+### Control con gamepad
+
+En el modo sin teléfono, puedes conducir un cuerpo con ESP32 con un gamepad Bluetooth en lugar de dejar que conduzca solo.
+
+#### Configuración
+
+1. En el Arduino IDE, añade esta URL en **Preferencias > URLs adicionales de gestor de placas**:
+   `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
+2. En el gestor de placas, instala **esp32_bluepad32** (4.1.0). Se basa en el mismo núcleo esp32 (2.0.17) que el firmware normal.
+3. Selecciona **ESP32 Dev Module** entre las placas esp32_bluepad32.
+4. Configura `NO_PHONE_MODE 1` y `HAS_GAMEPAD 1`, y carga el firmware.
+
+El gamepad usa el Bluetooth del ESP32, así que la conexión Bluetooth con el teléfono está desactivada en este modo. Para conducir con la app del teléfono, deja `HAS_GAMEPAD 0` y empareja el gamepad con el teléfono.
+
+#### Emparejamiento
+
+Enciende el robot y pon el gamepad en modo de emparejamiento. Se conecta en pocos segundos y, a partir de entonces, se vuelve a conectar cada vez que lo enciendes. Para emparejar otro gamepad, apaga primero el conectado: solo conduce un gamepad a la vez.
+
+| Gamepad | Modo de emparejamiento |
+|---|---|
+| PS5 DualSense | Mantén **Create** y luego mantén **PS** hasta que la barra de luz parpadee. |
+| PS4 DualShock 4 | Mantén **Share** y luego mantén **PS** hasta que la barra de luz parpadee. |
+| Xbox Wireless (modelo 1708 o posterior) | Enciéndelo y mantén el botón de emparejamiento 3 s. Antes, actualiza el firmware del mando a la versión 5.15 o posterior (p. ej., con la app Accesorios de Xbox). |
+| Switch Pro, Joy-Con, 8BitDo y otros | Usa el modo de emparejamiento Bluetooth del gamepad (consulta su manual). |
+
+La [lista de gamepads compatibles de Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) incluye más modelos, entre ellos el PS3 DualShock 3, que necesita configuración adicional. Con `DEBUG 1`, el monitor serie muestra el nombre de cada gamepad que se conecta.
+
+#### Controles
+
+Los botones se indican como PlayStation / Xbox.
+
+| Control | Acción |
+|---|---|
+| **R2 / L2** | Adelante / atrás (modo juego) |
+| **Stick izquierdo** | Girar (modo juego), avanzar y girar (modo joystick) o lado izquierdo (modo dual) |
+| **Stick derecho** | Lado derecho (modo dual) |
+| **L1** | Siguiente modo de conducción: juego → joystick → dual. El gamepad vibra una vez: corto para juego, más largo para joystick y más largo aún para dual. |
+| **Cruceta arriba / R3** | Más rápido |
+| **Cruceta abajo / L3** | Más lento |
+| **Cuadrado / X** | Intermitente izquierdo sí o no |
+| **Círculo / B** | Intermitente derecho sí o no |
+| **Triángulo / Y** | Intermitentes apagados |
+| **Equis / A** | Luces sí o no |
+| **Start** | Explorar sí o no |
+| **Select / Back** | Parada ante obstáculos sí o no |
+
+Con Start y Select, una vibración larga significa activado y una corta, desactivado.
+
+**Modos de conducción.** El gamepad empieza en el modo fijado por `GAMEPAD_DRIVE_MODE` (por defecto: juego).
+- **Juego:** R2 avanza, L2 retrocede y el stick izquierdo gira. Al dar marcha atrás, la dirección se invierte, como en un coche.
+- **Joystick:** el stick izquierdo avanza y gira. El robot siempre gira hacia donde apunta el stick, también marcha atrás.
+- **Dual:** cada stick mueve un lado, como un tanque.
+
+**Velocidades.** Hay tres velocidades: lenta (50 %), normal (75 %, la velocidad inicial) y rápida (100 %). El gamepad muestra la velocidad con sus LED de jugador (de uno a tres) o su barra de luz (verde, naranja, rojo).
+
+**Explorar.** Explorar es la conducción del modo sin teléfono descrita arriba: el robot se mueve solo y esquiva obstáculos. Está desactivado al arrancar; pulsa **Start** para activarlo. Con explorar activado, al mover un stick o gatillo tomas el control. Al soltarlos, el robot se detiene un momento y sigue explorando. Explorar necesita un sensor sonar conectado y `HAS_SONAR 1`; sin él, el robot simplemente avanza en línea recta (consulta la advertencia de arriba).
+
+**Parada ante obstáculos.** Mientras conduces con el gamepad, el robot no avanza si el sonar detecta un obstáculo a menos de `STOP_DISTANCE`. Está activada al arrancar; pulsa **Select** para desactivarla, por ejemplo para empujar algo. Solo funciona con un sensor sonar conectado y `HAS_SONAR 1`; si no, el robot nunca se detiene ante obstáculos.
+
+**Seguridad.** El robot se detiene cuando el gamepad se desconecta. La mayoría de los gamepads además envían datos continuamente; si uno de ellos deja de enviar durante 0,5 s (fuera de alcance, batería agotada), el robot se detiene de inmediato en lugar de esperar a la desconexión.
+
 ## Usando otros MCUs (requisitos)
 
 Puedes usar cualquier otro MCU con las siguientes características:

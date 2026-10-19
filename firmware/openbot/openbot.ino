@@ -50,7 +50,7 @@
 #define MTV 8        // Multi Terrain Vehicle
 #define DIY_ESP32 9  // DIY without PCB
 
-//Gamepad drive modes
+// Gamepad drive modes
 #define GAMEPAD_GAME 0
 #define GAMEPAD_JOYSTICK 1
 #define GAMEPAD_DUAL 2
@@ -75,27 +75,10 @@
 #define NO_PHONE_MODE 0
 
 // Enable/Disable Bluetooth gamepad in no phone mode (1,0)
-// Drive the robot with a Bluetooth gamepad (PS3/PS4/PS5, Xbox, Switch Pro, 8BitDo, ...)
-// without a phone.
-// - Needs NO_PHONE_MODE 1. With a phone, pair the gamepad to the phone instead.
-// - ESP32 bodies only. Board: install the "esp32_bluepad32" board package (4.1.0) and
-//   select "esp32_bluepad32 > ESP32 Dev Module". It is based on the same esp32 core 2.0.17.
-// - Explore (the robot drives around on its own and steers around obstacles with the sonar)
-//   is off at start; press Start to turn it on or off. While the gamepad is in use it
-//   overrides explore. When the sticks and triggers are released, the robot stops once and
-//   explore (if on) takes over again.
-// - While you drive with the gamepad, the robot stops in front of obstacles (sonar). Press
-//   Select / Back to turn this obstacle stop off or on.
-// Controls (same as the gamepad mapping in the Android app):
-//   L1: cycle drive mode (game, joystick, dual)    L3 / R3 or D-pad down / up: speed
-//   Square / X: left indicator   Circle / B: right indicator   Triangle / Y: indicators off
-//   Cross / A: lights on/off     Start: explore on/off     Select / Back: obstacle stop on/off
+// ESP32 bodies only; needs the esp32_bluepad32 board package. See the firmware README.
 #define HAS_GAMEPAD 0
 
 // Drive mode the gamepad starts in (GAMEPAD_GAME, GAMEPAD_JOYSTICK, GAMEPAD_DUAL)
-// GAMEPAD_GAME:     R2 forward, L2 backward, left stick steers
-// GAMEPAD_JOYSTICK: left stick drives and steers
-// GAMEPAD_DUAL:     left stick left side, right stick right side (tank)
 #define GAMEPAD_DRIVE_MODE GAMEPAD_GAME
 
 // Enable/Disable debug print (1,0)
@@ -539,8 +522,7 @@ const int CH_LED_LF = 4;
 const int CH_LED_RF = 5;
 const int CH_LED_LB = 6;
 const int CH_LED_RB = 7;
-// Motors: L298N IN1/IN2 (left), IN3/IN4 (right), on pins that
-// are not ESP32 boot pins, so the motors stay off at power-on
+// Motors: L298N IN1/IN2 (left), IN3/IN4 (right); not on boot pins
 const int PIN_PWM_LF1 = 32;
 const int PIN_PWM_LF2 = 33;
 const int PIN_PWM_LB1 = 32;
@@ -677,31 +659,27 @@ unsigned int turn_direction = 0;
 int ctrl_max = 192;
 int ctrl_slow = 96;
 int ctrl_min = (int)255.0 * VOLTAGE_MIN / VOLTAGE_MAX;
-bool explore_enabled = !HAS_GAMEPAD;  // off with a gamepad; Start toggles it
+bool explore_enabled = !HAS_GAMEPAD;
 #endif
 
 #if (HAS_GAMEPAD)
-const int GAMEPAD_SPEEDS[] = { 128, 192, 255 };  // slow, normal, fast (same as the app)
+const int GAMEPAD_SPEEDS[] = { 128, 192, 255 };  // slow, normal, fast
 const int GAMEPAD_NUM_SPEEDS = sizeof(GAMEPAD_SPEEDS) / sizeof(GAMEPAD_SPEEDS[0]);
 const float GAMEPAD_DEADZONE = 0.08f;  // fraction of the stick / trigger range
-// A gamepad that loses power or range may only be reported as disconnected after
-// up to 20 s. Most gamepads send reports all the time, even if nothing changes; if
-// such a gamepad sends nothing for GAMEPAD_TIMEOUT ms, the robot stops. Gamepads that
-// only send changes can't be checked this way and stop on the disconnect.
-const unsigned long GAMEPAD_TIMEOUT = 500;
+const unsigned long GAMEPAD_TIMEOUT = 500;  // ms without reports before stopping
 ControllerPtr gamepad = nullptr;
-unsigned long gamepad_data_time = 0;  // last report from the gamepad
-bool gamepad_streams = false;         // the gamepad repeats unchanged reports
-int32_t gamepad_report[9];            // the last report, to detect repeats
+unsigned long gamepad_data_time = 0;
+bool gamepad_streams = false;  // the gamepad keeps sending unchanged reports
+int32_t gamepad_report[9];
 int gamepad_drive_mode = GAMEPAD_DRIVE_MODE;
-int gamepad_speed = 1;           // index into GAMEPAD_SPEEDS
-int gamepad_left = 0;            // last control computed from the gamepad
+int gamepad_speed = 1;  // index into GAMEPAD_SPEEDS
+int gamepad_left = 0;
 int gamepad_right = 0;
-bool gamepad_was_moving = false; // sticks / triggers were moved in the last loop
-uint16_t gamepad_buttons = 0;    // button state of the last update, to detect presses
+bool gamepad_was_moving = false;
+uint16_t gamepad_buttons = 0;
 uint8_t gamepad_dpad = 0;
 uint16_t gamepad_misc = 0;
-bool gamepad_obstacle_stop = true;  // stop in front of obstacles; Select toggles it
+bool gamepad_obstacle_stop = true;
 #endif
 
 #if (HAS_SONAR)
@@ -754,7 +732,7 @@ const unsigned int SCREEN_HEIGHT = 32;  // OLED display height, in pixels
 //Vehicle Control
 int ctrl_left = 0;
 int ctrl_right = 0;
-bool gamepad_driving = false;  // a gamepad controls the motors in this loop (HAS_GAMEPAD)
+bool gamepad_driving = false;
 
 #if (HAS_VOLTAGE_DIVIDER)
 // Voltage measurement
@@ -991,7 +969,6 @@ void setup() {
 #endif
 
 #if (HAS_GAMEPAD)
-  // Paired gamepads reconnect by themselves; a new one can pair at any time (pairing mode).
   BP32.setup(&on_gamepad_connected, &on_gamepad_disconnected);
   BP32.enableVirtualDevice(false);  // no virtual mouse from touchpads
 #if DEBUG
@@ -1026,7 +1003,6 @@ void loop() {
 #if (NO_PHONE_MODE)
   if (gamepad_driving) {
 #if (HAS_GAMEPAD)
-    // The gamepad overrides explore while it is in use
     ctrl_left = gamepad_left;
     ctrl_right = gamepad_right;
     if (gamepad_obstacle_stop) {
@@ -1389,15 +1365,12 @@ void on_gamepad_disconnected(ControllerPtr ctl) {
     return;
   }
   gamepad = nullptr;
-  // If the robot was moving, update_gamepad() stops it in the next loop.
 #if DEBUG
   Serial.println("Gamepad disconnected");
 #endif
 }
 
-// Read the gamepad and compute gamepad_left / gamepad_right.
-// gamepad_driving is set while the sticks or triggers are moved, and for one more
-// loop after they are released (or the gamepad disconnects) to stop the motors.
+// gamepad_driving stays set for one loop after release, to stop the motors
 void update_gamepad() {
   BP32.update();
   bool moving = false;
@@ -1423,7 +1396,6 @@ void update_gamepad() {
   gamepad_was_moving = moving;
 }
 
-// True if the gamepad sent the same report again
 bool gamepad_report_repeated() {
   int32_t report[9] = { gamepad->buttons(), gamepad->dpad(), gamepad->miscButtons(),
                         gamepad->axisX(), gamepad->axisY(), gamepad->axisRX(), gamepad->axisRY(),
@@ -1433,7 +1405,7 @@ bool gamepad_report_repeated() {
   return repeated;
 }
 
-// Scale an axis to -1..1 and remove the dead zone around the center
+// Scale to -1..1 without the dead zone
 float gamepad_axis(int32_t value, float range) {
   float v = constrain(value / range, -1.0f, 1.0f);
   if (fabsf(v) < GAMEPAD_DEADZONE) {
@@ -1442,7 +1414,7 @@ float gamepad_axis(int32_t value, float range) {
   return (v - copysignf(GAMEPAD_DEADZONE, v)) / (1.0f - GAMEPAD_DEADZONE);
 }
 
-// Trigger in 0..1; digital triggers (e.g. Switch Pro) only report the button
+// Digital triggers (e.g. Switch Pro) only report the button
 float gamepad_trigger(int32_t value, bool pressed) {
   float v = gamepad_axis(value, 1023);
   return (v == 0 && pressed) ? 1.0f : v;
@@ -1463,8 +1435,7 @@ void gamepad_control(float &left, float &right) {
       left = gamepad_trigger(gamepad->throttle(), gamepad->r2()) - gamepad_trigger(gamepad->brake(), gamepad->l2());
       break;
   }
-  // Game mode steers like a car when reversing (mirrored); joystick mode always turns the
-  // way the stick points, so turning on the spot doesn't flip when the stick wobbles.
+  // Game mode mirrors steering when reversing, like a car
   bool mirror = gamepad_drive_mode == GAMEPAD_GAME && left < 0;
   right = left;
   left += mirror ? -steering : steering;
@@ -1499,7 +1470,6 @@ void process_gamepad_buttons() {
   }
 #if (HAS_INDICATORS)
   if (pressed & (BUTTON_X | BUTTON_Y | BUTTON_B)) {
-    // Square / X: left, Circle / B: right (press again to turn off), Triangle / Y: off
     bool left = (pressed & BUTTON_X) && !(indicator_left && !indicator_right);
     bool right = (pressed & BUTTON_B) && !(indicator_right && !indicator_left);
     indicator_left = left;
@@ -1515,7 +1485,7 @@ void process_gamepad_buttons() {
     update_light();
   }
 #endif
-  // Long rumble: on, short rumble: off
+  // Long rumble: on, short: off
   if (misc_pressed & MISC_BUTTON_START) {
     explore_enabled = !explore_enabled;
     gamepad->playDualRumble(0, explore_enabled ? 400 : 150, 0x80, 0x80);
@@ -1526,7 +1496,7 @@ void process_gamepad_buttons() {
   }
 }
 
-// Show the speed on the player LEDs / light bar; rumble for a new drive mode.
+// Speed on the player LEDs / light bar; rumble for the drive mode
 void show_gamepad_state(bool rumble) {
   const uint8_t colors[][3] = { { 0, 255, 0 }, { 255, 160, 0 }, { 255, 0, 0 } };  // slow, normal, fast
   gamepad->setPlayerLEDs((1 << (gamepad_speed + 1)) - 1);
@@ -1557,7 +1527,7 @@ void emergency_stop() {
   indicator_time = millis() - indicator_interval;  // update indicators
 #endif
   bumper_time = millis();
-  char bumper_id[3];  // two characters and the terminating nul
+  char bumper_id[3];
   if (almost_equal(bumper_reading, BUMPER_AF, BUMPER_EPS)) {
     collision_cf = 1;
     collision_lf = 1;
@@ -1742,7 +1712,6 @@ void process_voltage_msg() {
 #if HAS_VOLTAGE_DIVIDER
   voltage_interval = atol(msg_buf);  // convert to long
 #endif
-  // sendData() also sends over Bluetooth, so the app gets the limits on either link.
   sendData(String("vmin:") + String(VOLTAGE_MIN, 2));
   sendData(String("vlow:") + String(VOLTAGE_LOW, 2));
   sendData(String("vmax:") + String(VOLTAGE_MAX, 2));
