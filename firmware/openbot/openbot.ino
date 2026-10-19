@@ -943,7 +943,7 @@ void setup() {
   esp_wifi_deinit();
 #endif
 
-#if (MCU == ESP32 && OPENBOT != MTV)
+#if (MCU == ESP32)
 #if (HAS_LEDS_BACK)
   ledcSetup(CH_LED_LB, FREQ, RES);
   ledcSetup(CH_LED_RB, FREQ, RES);
