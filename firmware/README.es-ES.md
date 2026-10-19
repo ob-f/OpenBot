@@ -17,11 +17,21 @@ La tarea principal del MCU es manejar el control de bajo nivel del vehículo y p
 
 ## Configuración
 
-Primero debes configurar tu hardware al inicio del código. Si realizaste la construcción DIY (usando el controlador de motor L298N), configura `OPENBOT DIY`. Si usaste la PCB personalizada, verifica la versión y configura `OPENBOT PCB_V1` o `OPENBOT PCB_V2`. Si tienes un kit OpenBot, configura `OPENBOT RTR_TT`. Si has adaptado un camión RC, configura `OPENBOT RC_CAR`. Si usas la versión DIY más pequeña para educación, configura `OPENBOT LITE`. Si usas el kit OpenBot Ready-to-Run con motores 520, configura `OPENBOT RTR_520`. Si construiste el Vehículo Multi Terreno, deberías configurar `OPENBOT MTV`. Para ejecutar el `OpenBot DIY` con el ESP32, configura OpenBot `DIY_ESP32`.
+Primero debes configurar tu hardware al inicio del código. Si realizaste la construcción DIY (usando el controlador de motor L298N), configura `OPENBOT DIY`. Si usaste la PCB personalizada, verifica la versión y configura `OPENBOT PCB_V1` o `OPENBOT PCB_V2`. Si tienes un kit OpenBot, configura `OPENBOT RTR_TT`. Si has adaptado un camión RC, configura `OPENBOT RC_CAR`. Si usas la versión DIY más pequeña para educación, configura `OPENBOT LITE`. Si usas el kit OpenBot Ready-to-Run con motores 520, configura `OPENBOT RTR_520`. Si construiste el Vehículo Multi Terreno, deberías configurar `OPENBOT MTV`.
+
+El firmware detecta la placa que seleccionas en el Arduino IDE. Cada cuerpo admite estas placas; con cualquier otra placa la compilación se detiene con un error:
+
+| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|:---:|:---:|
+| `DIY` | ✓ | ✓ |
+| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
+| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+
+`DIY_ESP32` se ha sustituido por `DIY` con una placa ESP32 seleccionada.
 
 ## Bluetooth
 
-También puedes ejecutar el OpenBot vía bluetooth, para eso puedes habilitar el bluetooth configurando `BLUETOOTH 1` (deshabilitar: 0). Para que el bluetooth funcione necesitas OpenBot con placas ESP32 como `(RTR_520, MTV, DIY_ESP32)`.
+También puedes ejecutar el OpenBot vía bluetooth, para eso puedes habilitar el bluetooth configurando `BLUETOOTH 1` (deshabilitar: 0). Para que el bluetooth funcione necesitas OpenBot con placas ESP32 como `RTR_TT2`, `RTR_520`, `MTV` o `DIY` con un ESP32.
 
 ## Configuración
 

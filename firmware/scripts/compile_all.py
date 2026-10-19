@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Compile openbot.ino in every combination of its global settings with arduino-cli.
 
-For each robot type (OPENBOT) this compiles all combinations of NO_PHONE_MODE,
-DEBUG and, if the sketch has it, HAS_GAMEPAD, on the matching board. Invalid
-combinations must fail with their #error message.
+For each robot body (OPENBOT) this compiles all combinations of NO_PHONE_MODE,
+DEBUG and, if the sketch has it, HAS_GAMEPAD, on every board the body supports.
+A body supports both boards unless its section has an error like
+'#error "PCB_V1 needs an Arduino Nano board."'. Invalid combinations, and
+unsupported boards, must fail with their #error message.
 
   compile_all.py --list-robots        robot types as JSON (for the CI matrix)
   compile_all.py --cores ROBOT        arduino-cli cores the robot needs
@@ -42,18 +44,22 @@ def read_sketch() -> str:
     return SKETCH.read_text(encoding="utf-8")
 
 
-def robots(source: str) -> dict[str, str]:
-    """Robot type -> MCU ("NANO" or "ESP32"), in the order of the sketch."""
+MCU_NAMES = {"NANO": "an Arduino Nano", "ESP32": "an ESP32"}
+
+
+def robots(source: str) -> dict[str, list[str]]:
+    """Robot body -> supported MCUs ("NANO", "ESP32"), in the order of the sketch."""
     result = {}
     robot = None
     for line in source.splitlines():
         m = re.match(r"#(?:if|elif) \(OPENBOT == (\w+)\)$", line)
         if m:
             robot = m.group(1)
+            result.setdefault(robot, ["NANO", "ESP32"])
             continue
-        m = re.match(r"#define MCU (\w+)", line)
-        if m and robot and robot not in result:
-            result[robot] = m.group(1)
+        m = re.match(r'#error "(\w+) needs (an Arduino Nano|an ESP32) board', line)
+        if m and m.group(1) == robot:
+            result[robot] = [mcu for mcu, name in MCU_NAMES.items() if name == m.group(2)]
     return result
 
 
@@ -61,8 +67,17 @@ def has_define(source: str, name: str) -> bool:
     return len(re.findall(rf"^#define {name}\s", source, re.MULTILINE)) == 1
 
 
-def combinations(source: str, robot: str, mcu: str):
+def combinations(source: str, robot: str, mcus: list[str]):
     """Yield (board, settings, expected_error) for every combination."""
+    for mcu in MCU_NAMES:
+        if mcu in mcus:
+            yield from mcu_combinations(source, robot, mcu)
+        else:
+            # An unsupported board must fail with the body's error
+            yield ("nano" if mcu == "NANO" else "esp32"), {"OPENBOT": robot}, f"{robot} needs {MCU_NAMES[mcus[0]]} board"
+
+
+def mcu_combinations(source: str, robot: str, mcu: str):
     gamepad = has_define(source, "HAS_GAMEPAD")
     for no_phone, debug, pad in itertools.product((0, 1), (0, 1), (0, 1) if gamepad else (0,)):
         settings = {"OPENBOT": robot, "NO_PHONE_MODE": no_phone, "DEBUG": debug}
