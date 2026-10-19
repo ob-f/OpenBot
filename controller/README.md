@@ -29,7 +29,7 @@ Special thanks to Ivo Zivkov [izivkov@gmail.com](mailto:izivkov@gmail.com) for t
 
 ## [Flutter Controller App](flutter)
 
-This controller app serves as a remote controller for the OpenBot vehicle similar as a BT controller (e.g. PS3/4 or Xbox). It runs on another Android/iOS device and supports live video/audio streaming in addition to control.
+This controller app serves as a remote controller for the OpenBot vehicle similar as a BT controller (e.g. PS3/4 or Xbox). It runs on another Android/iOS device and supports live video/audio streaming in addition to control. Both phones must be on the same Wi-Fi network, or one phone must be connected to the other's hotspot.
 
 ## [Web Server Controller](web-server)
 

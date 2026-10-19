@@ -55,6 +55,8 @@ Comienza instalando [Flutter](https://flutter.dev/) en tu sistema. Elige la desc
 
 ## Conexión 
 
+El teléfono del controlador y el del robot deben estar en la misma red Wi-Fi, o uno de ellos debe estar conectado al punto de acceso del otro. No se necesita acceso a internet.
+
 Cuando se inicia la aplicación de control, intenta conectarse inmediatamente al robot y muestra la siguiente pantalla:
 
 <p float="left">

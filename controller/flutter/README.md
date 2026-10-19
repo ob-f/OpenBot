@@ -83,6 +83,8 @@ flutter build apk --release         # for a signed installable APK
 
 ## Connection
 
+The controller and robot phones must be on the same Wi-Fi network, or one phone must be connected to the other's hotspot. No internet access is needed.
+
 When the controller app is started, it immediately tries to connect to the robot and shows the following screen:
 
 <p float="left">

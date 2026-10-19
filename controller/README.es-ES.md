@@ -29,7 +29,7 @@ Agradecimientos especiales a Ivo Zivkov [izivkov@gmail.com](mailto:izivkov@gmail
 
 ## [Aplicación Controladora Flutter](flutter)
 
-Esta aplicación controladora sirve como un control remoto para el vehículo OpenBot similar a un controlador BT (por ejemplo, PS3/4 o Xbox). Funciona en otro dispositivo Android/iOS y soporta transmisión de video/audio en vivo además del control.
+Esta aplicación controladora sirve como un control remoto para el vehículo OpenBot similar a un controlador BT (por ejemplo, PS3/4 o Xbox). Funciona en otro dispositivo Android/iOS y soporta transmisión de video/audio en vivo además del control. Ambos teléfonos deben estar en la misma red Wi-Fi, o uno de ellos debe estar conectado al punto de acceso del otro.
 
 ## [Controlador de Servidor Web](web-server)
 

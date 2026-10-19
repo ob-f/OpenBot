@@ -55,6 +55,8 @@ Beginnen Sie mit der Installation von [Flutter](https://flutter.dev/) auf Ihrem 
 
 ## Verbindung
 
+Controller- und Roboter-Smartphone müssen sich im selben WLAN befinden, oder ein Smartphone muss mit dem Hotspot des anderen verbunden sein. Ein Internetzugang ist nicht erforderlich.
+
 Wenn die Controller-App gestartet wird, versucht sie sofort, eine Verbindung zum Roboter herzustellen und zeigt den folgenden Bildschirm an:
 
 <p float="left">
