@@ -337,7 +337,7 @@ function settingsFile() {
     set("VOLTAGE_MAX", `${v.max.toFixed(1)}f`);
   }
   const header = `// OpenBot settings: ${BODY_NAMES[state.body]} with an ${BOARD_NAMES[state.board]}, ${MODE_SHORT[state.mode]}\n` +
-    "// Made with firmware.openbot.org. Put this file next to openbot.ino, then upload with the Arduino IDE.\n\n";
+    "// Made with tools.openbot.org/firmware. Put this file next to openbot.ino, then upload with the Arduino IDE.\n\n";
   return header + text;
 }
 

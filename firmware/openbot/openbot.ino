@@ -901,7 +901,7 @@ unsigned long display_time = 0;
 
 //------------------------------------------------------//
 // Live settings: battery and parts, changed over serial or Bluetooth
-// with the "p" message (e.g. from firmware.openbot.org) and kept in EEPROM
+// with the "p" message (e.g. from tools.openbot.org/firmware) and kept in EEPROM
 //------------------------------------------------------//
 #include <EEPROM.h>
 #ifndef DEFAULT_VOLTAGE_DIVIDER_FACTOR

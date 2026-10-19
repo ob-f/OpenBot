@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build firmware.openbot.org: the firmware setup page and ready-made firmware.
+"""Build the firmware setup page and its ready-made firmware for tools.openbot.org/firmware.
 
   build_site.py --build ROBOT --out DIR   compile ROBOT's ready-made firmware into DIR
-  build_site.py --site DIR --builds DIR   assemble the site from the web files and the builds
+  build_site.py --site DIR --builds DIR   put the page and the builds into DIR (e.g. _site/firmware)
 
 The bodies, their parts, defaults and pins are read from openbot.ino into
 bodies.json, so the page always matches the firmware.
@@ -167,6 +167,7 @@ def site(out: pathlib.Path, builds: pathlib.Path | None) -> None:
     source = read_sketch()
     if out.exists():
         shutil.rmtree(out)
+    out.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(WEB, out)
     (out / "img").mkdir(exist_ok=True)
     for path in set(IMAGES.values()):
