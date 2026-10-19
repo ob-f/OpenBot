@@ -900,6 +900,137 @@ unsigned long display_time = 0;
 #endif
 
 //------------------------------------------------------//
+// Live settings: battery and parts, changed over serial or Bluetooth
+// with the "p" message (e.g. from firmware.openbot.org) and kept in EEPROM
+//------------------------------------------------------//
+#include <EEPROM.h>
+#ifndef DEFAULT_VOLTAGE_DIVIDER_FACTOR
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR 1
+#endif
+
+// Parts that can be turned off live (bit numbers)
+const uint8_t PART_VOLTAGE_DIVIDER = 0;
+const uint8_t PART_INDICATORS = 1;
+const uint8_t PART_SONAR = 2;
+const uint8_t PART_BUMPER = 3;
+const uint8_t PART_SPEED_SENSORS_FRONT = 4;
+const uint8_t PART_SPEED_SENSORS_BACK = 5;
+const uint8_t PART_SPEED_SENSORS_MIDDLE = 6;
+
+// The parts in this firmware
+const uint16_t PARTS_BUILT = 0
+#if (HAS_VOLTAGE_DIVIDER)
+  | bit(PART_VOLTAGE_DIVIDER)
+#endif
+#if (HAS_INDICATORS)
+  | bit(PART_INDICATORS)
+#endif
+#if (HAS_SONAR)
+  | bit(PART_SONAR)
+#endif
+#if (HAS_BUMPER)
+  | bit(PART_BUMPER)
+#endif
+#if (HAS_SPEED_SENSORS_FRONT)
+  | bit(PART_SPEED_SENSORS_FRONT)
+#endif
+#if (HAS_SPEED_SENSORS_BACK)
+  | bit(PART_SPEED_SENSORS_BACK)
+#endif
+#if (HAS_SPEED_SENSORS_MIDDLE)
+  | bit(PART_SPEED_SENSORS_MIDDLE)
+#endif
+  ;
+
+struct LiveSettings {
+  uint32_t firmware_id;  // the firmware's defaults; saved settings of other firmware are ignored
+  uint16_t parts_off;    // bit per part
+  float voltage_min;
+  float voltage_low;
+  float voltage_max;
+  float voltage_divider_factor;
+};
+LiveSettings live;
+
+uint32_t firmware_id() {
+  // Changes when the body, the parts or the battery defaults change
+  float defaults[] = { VOLTAGE_MIN, VOLTAGE_LOW, VOLTAGE_MAX, DEFAULT_VOLTAGE_DIVIDER_FACTOR };
+  uint32_t id = 2166136261UL ^ (OPENBOT * 31 + PARTS_BUILT);
+  const uint8_t *bytes = (const uint8_t *)defaults;
+  for (unsigned int i = 0; i < sizeof(defaults); i++) {
+    id = (id ^ bytes[i]) * 16777619UL;
+  }
+  return id;
+}
+
+void reset_live_settings() {
+  live.firmware_id = firmware_id();
+  live.parts_off = 0;
+  live.voltage_min = VOLTAGE_MIN;
+  live.voltage_low = VOLTAGE_LOW;
+  live.voltage_max = VOLTAGE_MAX;
+  live.voltage_divider_factor = VOLTAGE_DIVIDER_FACTOR;
+}
+
+void load_live_settings() {
+#if (MCU == ESP32)
+  EEPROM.begin(sizeof(LiveSettings));
+#endif
+  EEPROM.get(0, live);
+  if (live.firmware_id != firmware_id()) {
+    reset_live_settings();
+  }
+}
+
+void save_live_settings() {
+  EEPROM.put(0, live);
+#if (MCU == ESP32)
+  EEPROM.commit();
+#endif
+}
+
+bool part_on(uint8_t part) {
+  return (PARTS_BUILT & ~live.parts_off) & bit(part);
+}
+
+// "p" shows the live settings, "p<key>:<value>:..." changes them, "preset" restores the defaults.
+// Keys: off (parts turned off, bit mask), vlow, vmax, vmin, vdiv
+void process_live_settings_msg() {
+  if (strcmp(msg_buf, "reset") == 0) {
+    reset_live_settings();
+    save_live_settings();
+  } else if (msg_buf[0] != '\0') {
+    char *key = strtok(msg_buf, ":");
+    while (key != NULL) {
+      char *value = strtok(NULL, ":");
+      if (value == NULL) {
+        break;
+      }
+      float number = atof(value);
+      if (strcmp(key, "off") == 0) {
+        live.parts_off = atol(value) & PARTS_BUILT;
+      } else if (number > 0 && strcmp(key, "vlow") == 0) {
+        live.voltage_low = number;
+      } else if (number > 0 && strcmp(key, "vmax") == 0) {
+        live.voltage_max = number;
+      } else if (number > 0 && strcmp(key, "vmin") == 0) {
+        live.voltage_min = number;
+      } else if (number > 0 && strcmp(key, "vdiv") == 0) {
+        live.voltage_divider_factor = number;
+      }
+      key = strtok(NULL, ":");
+    }
+    save_live_settings();
+  }
+#if (NO_PHONE_MODE)
+  ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
+#endif
+  sendData(String("pboard:") + (MCU == NANO ? "nano" : "esp32") + ":have:" + String(PARTS_BUILT) + ":off:" + String(live.parts_off)
+           + ":vlow:" + String(live.voltage_low, 2) + ":vmax:" + String(live.voltage_max, 2)
+           + ":vmin:" + String(live.voltage_min, 2) + ":vdiv:" + String(live.voltage_divider_factor, 2));
+}
+
+//------------------------------------------------------//
 // SETUP
 //------------------------------------------------------//
 void setup() {
@@ -1035,6 +1166,10 @@ void setup() {
   // SERIAL_8N1 - 8 data bits, no parity, 1 stop bit
   // Serial.setTimeout(10);
   Serial.println('r');
+  load_live_settings();
+#if (NO_PHONE_MODE)
+  ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
+#endif
   print_config();
 #if __has_include("openbot_settings.h")
   Serial.println(F("OpenBot settings: openbot_settings.h"));
@@ -1087,25 +1222,25 @@ void print_config() {
   Serial.print(robot_type);
   Serial.print(MCU == NANO ? F(" (Nano):") : F(" (ESP32):"));
 #if (HAS_VOLTAGE_DIVIDER)
-  print_item(F("voltage"), first);
+  if (part_on(PART_VOLTAGE_DIVIDER)) print_item(F("voltage"), first);
 #endif
 #if (HAS_INDICATORS)
-  print_item(F("indicators"), first);
+  if (part_on(PART_INDICATORS)) print_item(F("indicators"), first);
 #endif
 #if (HAS_SONAR)
-  print_item(F("sonar"), first);
+  if (part_on(PART_SONAR)) print_item(F("sonar"), first);
 #endif
 #if (HAS_BUMPER)
-  print_item(F("bumper"), first);
+  if (part_on(PART_BUMPER)) print_item(F("bumper"), first);
 #endif
 #if (HAS_SPEED_SENSORS_FRONT)
-  print_item(F("speed sensors front"), first);
+  if (part_on(PART_SPEED_SENSORS_FRONT)) print_item(F("speed sensors front"), first);
 #endif
 #if (HAS_SPEED_SENSORS_BACK)
-  print_item(F("speed sensors back"), first);
+  if (part_on(PART_SPEED_SENSORS_BACK)) print_item(F("speed sensors back"), first);
 #endif
 #if (HAS_SPEED_SENSORS_MIDDLE)
-  print_item(F("speed sensors middle"), first);
+  if (part_on(PART_SPEED_SENSORS_MIDDLE)) print_item(F("speed sensors middle"), first);
 #endif
 #if (HAS_LEDS_FRONT)
   print_item(F("front lights"), first);
@@ -1187,7 +1322,7 @@ void loop() {
 #endif
 
 #if HAS_BUMPER
-  if (analogRead(PIN_BUMPER) > BUMPER_NOISE && !bumper_event) {
+  if (part_on(PART_BUMPER) && analogRead(PIN_BUMPER) > BUMPER_NOISE && !bumper_event) {
     delayMicroseconds(500);
     for (unsigned int i = 0; i < bumper_array_sz; i++) {
       bumper_array[i] = analogRead(PIN_BUMPER);
@@ -1217,14 +1352,16 @@ void loop() {
 
 #if HAS_SONAR
   // Check for successful sonar reading
-  if (!sonar_sent && ping_success) {
+  if (!part_on(PART_SONAR)) {
+    // turned off live: no readings, nothing in front
+  } else if (!sonar_sent && ping_success) {
     distance = echo_time * US_TO_CM;
     update_distance_estimate();
     send_sonar_reading();
     sonar_sent = true;
   }
   // Measure distance every sonar_interval
-  if ((millis() - sonar_time) >= max(sonar_interval, MAX_SONAR_TIME)) {
+  if (part_on(PART_SONAR) && (millis() - sonar_time) >= max(sonar_interval, MAX_SONAR_TIME)) {
     if (!sonar_sent && !ping_success) {  // Send max val if last ping was not returned
       distance = MAX_SONAR_DISTANCE;
       update_distance_estimate();
@@ -1239,7 +1376,7 @@ void loop() {
 
 #if HAS_INDICATORS
   // Check indicator signal every indicator_interval
-  if ((millis() - indicator_time) >= indicator_interval) {
+  if (part_on(PART_INDICATORS) && (millis() - indicator_time) >= indicator_interval) {
     update_indicator();
     indicator_time = millis();
   }
@@ -1254,14 +1391,15 @@ void loop() {
 #endif
 #if HAS_VOLTAGE_DIVIDER
   // Send voltage reading via serial
-  if ((millis() - voltage_time) >= voltage_interval) {
+  if (part_on(PART_VOLTAGE_DIVIDER) && (millis() - voltage_time) >= voltage_interval) {
     send_voltage_reading();
     voltage_time = millis();
   }
 #endif
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
   // Send wheel odometry reading via serial
-  if ((millis() - wheel_time) >= wheel_interval) {
+  if ((part_on(PART_SPEED_SENSORS_FRONT) || part_on(PART_SPEED_SENSORS_BACK) || part_on(PART_SPEED_SENSORS_MIDDLE))
+      && (millis() - wheel_time) >= wheel_interval) {
     send_wheel_reading(millis() - wheel_time);
     wheel_time = millis();
   }
@@ -1286,7 +1424,7 @@ float get_voltage() {
   for (unsigned int index = 0; index < array_size; index++) {
     array_sum += vin_array[index];
   }
-  return float(array_sum) / array_size * ADC_FACTOR * VOLTAGE_DIVIDER_FACTOR;
+  return float(array_sum) / array_size * ADC_FACTOR * live.voltage_divider_factor;
 }
 
 #endif
@@ -1872,9 +2010,9 @@ void process_voltage_msg() {
 #if HAS_VOLTAGE_DIVIDER
   voltage_interval = atol(msg_buf);  // convert to long
 #endif
-  sendData(String("vmin:") + String(VOLTAGE_MIN, 2));
-  sendData(String("vlow:") + String(VOLTAGE_LOW, 2));
-  sendData(String("vmax:") + String(VOLTAGE_MAX, 2));
+  sendData(String("vmin:") + String(live.voltage_min, 2));
+  sendData(String("vlow:") + String(live.voltage_low, 2));
+  sendData(String("vmax:") + String(live.voltage_max, 2));
 }
 
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
@@ -1888,25 +2026,25 @@ void process_wheel_msg() {
 void process_feature_msg() {
   String msg = "f" + robot_type + ":";
 #if HAS_VOLTAGE_DIVIDER
-  msg += "v:";
+  if (part_on(PART_VOLTAGE_DIVIDER)) msg += "v:";
 #endif
 #if HAS_INDICATORS
-  msg += "i:";
+  if (part_on(PART_INDICATORS)) msg += "i:";
 #endif
 #if HAS_SONAR
-  msg += "s:";
+  if (part_on(PART_SONAR)) msg += "s:";
 #endif
 #if HAS_BUMPER
-  msg += "b:";
+  if (part_on(PART_BUMPER)) msg += "b:";
 #endif
 #if HAS_SPEED_SENSORS_FRONT
-  msg += "wf:";
+  if (part_on(PART_SPEED_SENSORS_FRONT)) msg += "wf:";
 #endif
 #if HAS_SPEED_SENSORS_BACK
-  msg += "wb:";
+  if (part_on(PART_SPEED_SENSORS_BACK)) msg += "wb:";
 #endif
 #if HAS_SPEED_SENSORS_MIDDLE
-  msg += "wm:";
+  if (part_on(PART_SPEED_SENSORS_MIDDLE)) msg += "wm:";
 #endif
 #if HAS_LEDS_FRONT
   msg += "lf:";
@@ -1994,6 +2132,9 @@ void parse_msg() {
       process_wheel_msg();
       break;
 #endif
+    case 'p':
+      process_live_settings_msg();
+      break;
   }
   msg_idx = 0;
   msgPart = HEADER;
