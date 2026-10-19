@@ -15,11 +15,11 @@ const BODY_NAMES = {
 };
 const BOARD_NAMES = { nano: "Arduino Nano", esp32: "ESP32 Dev Module" };
 const MODES = {
-  phone: { name: "With the phone app", text: "The phone drives the robot over USB or Bluetooth." },
-  nophone: { name: "Without a phone", text: "The robot drives by itself and steers around obstacles." },
-  gamepad: { name: "With a gamepad", text: "Drive with a Bluetooth gamepad, no phone needed." },
+  phone: { name: "Phone app", text: "The phone drives the robot over USB or Bluetooth." },
+  gamepad: { name: "Gamepad", text: "Drive with a Bluetooth gamepad, no phone needed." },
+  nophone: { name: "No controller", text: "The robot drives by itself and steers around obstacles." },
 };
-const MODE_SHORT = { phone: "driven by the phone app", nophone: "drives by itself", gamepad: "driven by a gamepad" };
+const MODE_SHORT = { phone: "driven by the phone app", gamepad: "driven by a gamepad", nophone: "drives by itself" };
 
 // Parts in the order of the robot's startup line
 const PARTS = [
@@ -44,8 +44,8 @@ const PIN_SHARING = { HAS_INDICATORS: "rear", HAS_LEDS_BACK: "rear" };
 const BATTERIES = [
   { id: "2s", name: "2S Li-ion", low: 6.8, max: 8.4 },
   { id: "3s", name: "3S Li-ion", low: 10.2, max: 12.6 },
-  { id: "aa", name: "6 × AA", low: 6.0, max: 9.0 },
-  { id: "9v", name: "9 V block", low: 6.0, max: 9.0 },
+  { id: "6aa", name: "6 × AA", low: 6.0, max: 9.0 },
+  { id: "8aa", name: "8 × AA", low: 8.0, max: 12.0 },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -81,6 +81,7 @@ function voltages() {
   if (state.battery === "body") return { low: v.VOLTAGE_LOW, max: v.VOLTAGE_MAX, custom: false };
   if (state.battery === "custom") return { low: state.low ?? v.VOLTAGE_LOW, max: state.max ?? v.VOLTAGE_MAX, custom: true };
   const b = BATTERIES.find((x) => x.id === state.battery);
+  if (!b) return { low: v.VOLTAGE_LOW, max: v.VOLTAGE_MAX, custom: false };
   return { low: b.low, max: b.max, custom: true };
 }
 
@@ -123,10 +124,17 @@ function restore() {
     const saved = JSON.parse(localStorage.getItem("openbot-firmware"));
     const b = saved && data.bodies.find((x) => x.name === saved.body);
     if (b && b.boards[saved.board]) Object.assign(state, saved);
+    if (!["body", "custom", ...BATTERIES.map((x) => x.id)].includes(state.battery)) state.battery = "body";
   } catch (e) {}
 }
 
 // ---------- Rendering ----------
+
+// Show very wide pictures (like a circuit board) whole instead of cropped
+function fitImage(event) {
+  const img = event.target;
+  img.classList.toggle("wide", img.naturalWidth > 2 * img.naturalHeight);
+}
 
 function render() {
   renderBodies();
@@ -141,7 +149,7 @@ function render() {
 function renderBodies() {
   $("bodies").replaceChildren(...data.bodies.map((b) => {
     const tile = el("button", { type: "button", className: "body-tile", role: "radio" },
-      el("img", { src: b.image, alt: "", loading: "lazy" }),
+      el("img", { src: b.image, alt: "", loading: "lazy", onload: fitImage }),
       el("span", { textContent: BODY_NAMES[b.name] || b.name }),
       el("small", { textContent: Object.keys(b.boards).map((x) => BOARD_NAMES[x].replace(" Dev Module", "")).join(" or ") }));
     tile.setAttribute("aria-checked", b.name === state.body);
@@ -274,6 +282,7 @@ function showLines(lines) {
 
 function renderRobot() {
   const b = body();
+  $("robot-image").onload = fitImage;
   $("robot-image").src = b.image;
   $("robot-image").alt = BODY_NAMES[b.name];
   $("robot-title").textContent = BODY_NAMES[b.name] || b.name;
