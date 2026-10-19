@@ -164,6 +164,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
                     switch (msgParts[0]) {
                       case "min":
                         vehicle.setMinMotorVoltage(Float.parseFloat(msgParts[1]));
+                        break;
                       case "low":
                         vehicle.setLowBatteryVoltage(Float.parseFloat(msgParts[1]));
                         break;

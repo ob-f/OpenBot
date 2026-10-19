@@ -187,6 +187,67 @@ Before running the car, we recommend to remove the tires, connect the Arduino to
 
 :warning: WARNING: If you do not have an ultrasonic sensor installed or if it is disabled, the car will just drive forward at _normal_speed_ (75% PWM) and will eventually collide. Even with the sensor installed, the car may collide occasionally due to noisy readings.
 
+### Gamepad control
+
+In no phone mode, you can drive an ESP32 body with a Bluetooth gamepad instead of letting it drive by itself.
+
+#### Setup
+
+1. In the Arduino IDE, add this URL under **Preferences > Additional boards manager URLs**:
+   `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
+2. In the Boards Manager, install **esp32_bluepad32** (4.1.0). It is based on the same esp32 core (2.0.17) as the regular firmware.
+3. Select **ESP32 Dev Module** from the esp32_bluepad32 boards.
+4. Set `NO_PHONE_MODE 1` and `HAS_GAMEPAD 1`, and upload.
+
+The gamepad uses the ESP32's Bluetooth, so the Bluetooth link to the phone is off in this mode. To drive with the phone app, keep `HAS_GAMEPAD 0` and pair the gamepad to the phone instead.
+
+#### Pairing
+
+Power on the robot and put the gamepad in pairing mode. It connects within a few seconds, and from then on it reconnects whenever you turn it on. To pair a different gamepad, turn the connected one off first: only one gamepad drives at a time.
+
+| Gamepad | Pairing mode |
+|---|---|
+| PS5 DualSense | Hold **Create**, then hold **PS** until the light bar blinks. |
+| PS4 DualShock 4 | Hold **Share**, then hold **PS** until the light bar flashes. |
+| Xbox Wireless (model 1708 or newer) | Turn it on, then hold the pair button for 3 s. Update the controller firmware to 5.15 or newer first (e.g. with the Xbox Accessories app). |
+| Switch Pro, Joy-Con, 8BitDo and others | Use the gamepad's Bluetooth pairing mode (see its manual). |
+
+The [Bluepad32 list of supported gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) has more models, including the PS3 DualShock 3, which needs extra setup. With `DEBUG 1`, the Serial Monitor shows the name of each gamepad that connects.
+
+#### Controls
+
+Buttons are named PlayStation / Xbox.
+
+| Control | Action |
+|---|---|
+| **R2 / L2** | Forward / backward (game mode) |
+| **Left stick** | Steer (game mode), drive and steer (joystick mode), or left side (dual mode) |
+| **Right stick** | Right side (dual mode) |
+| **L1** | Next drive mode: game → joystick → dual. The gamepad rumbles once: short for game, longer for joystick, longest for dual. |
+| **D-pad up / R3** | Faster |
+| **D-pad down / L3** | Slower |
+| **Square / X** | Left indicator on or off |
+| **Circle / B** | Right indicator on or off |
+| **Triangle / Y** | Indicators off |
+| **Cross / A** | Lights on or off |
+| **Start** | Explore on or off |
+| **Select / Back** | Obstacle stop on or off |
+
+For Start and Select, a long rumble means on and a short one means off.
+
+**Drive modes.** The gamepad starts in the mode set by `GAMEPAD_DRIVE_MODE` (default: game).
+- **Game:** R2 drives forward, L2 backward, and the left stick steers. Steering is mirrored when reversing, like a car.
+- **Joystick:** the left stick drives and steers. The robot always turns the way the stick points, also when reversing.
+- **Dual:** each stick drives one side, like a tank.
+
+**Speeds.** There are three speeds: slow (50 %), normal (75 %, the start speed) and fast (100 %). The gamepad shows the speed with its player LEDs (one to three) or its light bar (green, orange, red).
+
+**Explore.** Explore is the no phone mode driving described above: the robot drives around by itself and steers around obstacles. It is off when the robot starts; press **Start** to turn it on. While explore is on, moving a stick or trigger takes over. When you let go, the robot stops briefly and explore continues. Explore needs a connected sonar sensor with `HAS_SONAR 1`; without it, the robot just drives straight ahead (see the warning above).
+
+**Obstacle stop.** While you drive with the gamepad, the robot won't drive forward when the sonar sees an obstacle closer than `STOP_DISTANCE`. It is on when the robot starts; press **Select** to turn it off, for example to push something. It only works with a connected sonar sensor and `HAS_SONAR 1`; otherwise the robot never stops for obstacles.
+
+**Safety.** The robot stops when the gamepad disconnects. Most gamepads also send data continuously, and if such a gamepad goes silent for 0.5 s (out of range, battery empty), the robot stops right away instead of waiting for the disconnect.
+
 ## Using other MCUs (requirements)
 
 You can use any other MCU with the following features:
