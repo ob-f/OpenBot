@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenBot Firmware</title>
+  <meta name="description" content="Set up the firmware for your OpenBot: choose your robot and its parts, then flash it from the browser or download the settings file.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="https://www.openbot.org">OpenBot <span>Firmware</span></a>
+    <a class="top-link" href="https://github.com/ob-f/OpenBot/tree/master/firmware">Firmware on GitHub</a>
+  </header>
+
+  <main class="layout">
+    <div class="steps">
+      <div class="intro">
+        <h1>Set up your robot's firmware</h1>
+        <p>Choose your robot and what's built into it. Then flash the firmware straight from this page, or download a settings file for the Arduino IDE.</p>
+      </div>
+
+      <ol class="step-list">
+        <li class="step" id="step-body">
+          <h2>Robot body</h2>
+          <div class="bodies" id="bodies" role="radiogroup" aria-label="Robot body"></div>
+        </li>
+
+        <li class="step" id="step-board">
+          <h2>Board</h2>
+          <div id="board"></div>
+        </li>
+
+        <li class="step" id="step-mode">
+          <h2>How you drive</h2>
+          <div class="modes" id="modes" role="radiogroup" aria-label="How you drive"></div>
+        </li>
+
+        <li class="step" id="step-parts">
+          <h2>Parts</h2>
+          <p class="hint">Your body's standard parts are on. Turn off what you haven't installed, and turn on what you've added.</p>
+          <div id="parts"></div>
+        </li>
+
+        <li class="step" id="step-battery">
+          <h2>Battery</h2>
+          <p class="hint">The app's battery gauge goes from empty to full at these voltages.</p>
+          <div class="batteries" id="batteries" role="radiogroup" aria-label="Battery"></div>
+          <div class="custom-battery" id="custom-battery" hidden>
+            <label>Empty <input type="number" id="volt-low" step="0.1" min="1" max="40"> V</label>
+            <label>Full <input type="number" id="volt-max" step="0.1" min="1" max="40"> V</label>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <aside class="robot" aria-label="Your robot">
+      <div class="robot-card">
+        <img class="robot-image" id="robot-image" alt="">
+        <div class="robot-name">
+          <h2 id="robot-title"></h2>
+          <p id="robot-sub"></p>
+        </div>
+
+        <section class="monitor" aria-label="Serial Monitor">
+          <div class="monitor-bar"><span>Serial Monitor</span><span id="monitor-state">at startup</span></div>
+          <div class="monitor-lines" id="monitor" aria-live="polite"></div>
+          <div class="progress" id="progress" hidden><div id="progress-bar"></div></div>
+        </section>
+
+        <div class="actions">
+          <button class="primary" id="flash" type="button">Flash firmware</button>
+          <p class="note" id="flash-note"></p>
+          <button class="secondary" id="download" type="button">Download settings file</button>
+          <p class="note" id="download-note">For the Arduino IDE: put <code>openbot_settings.h</code> next to <code>openbot.ino</code>, then upload.</p>
+          <button class="link" id="apply" type="button">Apply battery and parts to a flashed robot</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="bottom">
+    <p>Flashing uses Web Serial and works in Chrome or Edge on a computer. The settings file works with any browser.</p>
+  </footer>
+</body>
+</html>
