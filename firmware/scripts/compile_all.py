@@ -68,19 +68,23 @@ def robots(source: str) -> dict[str, list[str]]:
 def check_defaults(source: str) -> list[str]:
     """Differences between the parts table in the settings and the bodies' DEFAULT_ values."""
     lines = source.splitlines()
-    header = next(i for i, line in enumerate(lines) if line.startswith("//") and " DIY " in line and "PCB_V1/V2" in line)
+    header = next(
+        i
+        for i, line in enumerate(lines)
+        if line.startswith("//") and " DIY " in line and "PCB_V1/V2" in line
+    )
     columns = []
     for token in lines[header].lstrip("/ ").split():
         first, *more = token.split("/")
         prefix = first.rsplit("_", 1)[0] + "_"
         columns.append([first] + [prefix + m for m in more])
     table = {}
-    for line in lines[header + 1:]:
+    for line in lines[header + 1 :]:
         m = re.match(r"//\s+(\w+)\s+([01](?:\s+[01])+)\s*$", line)
         if not m:
             break
         table[m.group(1)] = m.group(2).split()
-    body_section = source[source.index("// BODIES"):source.index("// Pin check")]
+    body_section = source[source.index("// BODIES") : source.index("// Pin check")]
     defaults, robot = {}, None
     for line in body_section.splitlines():
         m = re.match(r"#(?:if|elif) \(OPENBOT == (\w+)\)$", line)
@@ -96,8 +100,11 @@ def check_defaults(source: str) -> list[str]:
             for body in bodies:
                 actual = int(part in defaults.get(body, set()))
                 if actual != int(value):
-                    problems.append(f"{part} for {body}: the table says {value}, the body block {actual}")
+                    problems.append(
+                        f"{part} for {body}: the table says {value}, the body block {actual}"
+                    )
     return problems
+
 
 def has_define(source: str, name: str) -> bool:
     return len(re.findall(rf"^#define {name}\s", source, re.MULTILINE)) == 1
@@ -166,7 +173,9 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
     with tempfile.TemporaryDirectory() as tmp:
         sketch_dir = pathlib.Path(tmp) / "openbot"
         shutil.copytree(SKETCH.parent, sketch_dir)
-        (sketch_dir / "openbot_settings.h").unlink(missing_ok=True)  # use the settings in the sketch
+        (sketch_dir / "openbot_settings.h").unlink(
+            missing_ok=True
+        )  # use the settings in the sketch
         sketch = sketch_dir / "openbot.ino"
         sketch.write_text(
             configure(sketch.read_text(encoding="utf-8"), settings), encoding="utf-8"
@@ -229,7 +238,11 @@ def main() -> int:
         problems = check_defaults(source)
         for problem in problems:
             print(f"::error::Parts table in the settings: {problem}")
-        print("Parts table matches the bodies" if not problems else f"{len(problems)} differences")
+        print(
+            "Parts table matches the bodies"
+            if not problems
+            else f"{len(problems)} differences"
+        )
         return 1 if problems else 0
 
     if args.list_robots:
