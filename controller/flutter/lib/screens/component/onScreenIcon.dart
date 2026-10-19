@@ -82,12 +82,10 @@ class OnScreenIconState extends State<OnScreenIcon> {
                 if (widget.peerConnection != null) {
                   List<RTCRtpReceiver> receivers =
                       await widget.peerConnection!.receivers;
-                  RTCRtpReceiver firstReceiver = receivers[0];
-                  if (receivers.isNotEmpty) {
-                    if (speaker) {
-                      firstReceiver.track!.enabled = false;
-                    } else {
-                      firstReceiver.track!.enabled = true;
+                  // Mute only the audio track; the robot also sends video.
+                  for (final receiver in receivers) {
+                    if (receiver.track?.kind == 'audio') {
+                      receiver.track!.enabled = !speaker;
                     }
                   }
                 }
