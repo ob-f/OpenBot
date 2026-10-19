@@ -18,7 +18,7 @@ OpenBot Compact는 **ESP32 DevKit V1 + L298N** 구동을 위한 소형 4륜 [Ope
 | | |
 |---|---|
 | **구동** | 듀얼 샤프트 TT 기어 모터 4개; 왼쪽 쌍과 오른쪽 쌍을 각각 병렬로 L298N 하나에 연결 |
-| **컨트롤러** | ESP32 DevKit V1 (30핀), OpenBot 펌웨어 `DIY_ESP32`; 휴대폰과 블루투스 또는 USB 케이블로 연결 |
+| **컨트롤러** | ESP32 DevKit V1 (30핀), OpenBot 펌웨어 `DIY`; 휴대폰과 블루투스 또는 USB 케이블로 연결 |
 | **센서** | HC-SR04 초음파 (앞쪽), LM393 광학 휠 엔코더 4개, 배터리 전압 |
 | **전원** | 하나를 선택하세요: 덮개 위의 2S 또는 3S 18650 박스, 또는 내부의 소형 LiPo 배터리 ([배터리 옵션](#배터리-옵션) 참고) |
 | **체결 부품** | M3 × 10, M3 × 25 둥근머리 나사, M3 너트, 열압입 인서트 19개만 사용 |
@@ -144,7 +144,7 @@ Bambu Studio에서 **[compact_A1_mini.3mf](cad/compact_A1_mini.3mf)**를 여세�
 | 4 | TT 바퀴 | 지름 약 65 mm | [검색](https://www.amazon.com/s?k=65mm+TT+motor+robot+car+wheels) |
 | 4 | LM393 광학 속도 센서 | 기판 폭 약 14.2 mm, 길이 약 38.1 mm, 3 mm 구멍 1개. 네 개 모두 장착해요. 기본적으로 펌웨어는 앞쪽 두 개를 읽어요. | [검색](https://www.amazon.com/s?k=LM393+optical+speed+sensor+module+encoder+disk) |
 | 4 | 엔코더 디스크 | 출력하지 않을 때만 필요해요. TT 샤프트와 센서 슬롯에 맞아야 해요 | [검색](https://www.amazon.com/s?k=TT+motor+optical+encoder+disk) |
-| 1 | HC-SR04 초음파 센서 | 기판 45.5 × 20.5 mm, 트랜스듀서 간격 25.5 mm (중심 간) | [검색](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
+| 1 | HC-SR04 초음파 센서 | 기판 45.5 × 20.5 mm, 트랜스듀서 간격 25.5 mm (중심 간); 3.3 V 버전(예: HC-SR04P)도 사용할 수 있어요 | [검색](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
 | 1 | 원형 로커 스위치 | 뒤판 구멍에 맞고, 배터리 전압과 모터 전류를 견디는 정격 | [검색](https://www.amazon.com/s?k=20mm+round+rocker+switch+SPST+DC) |
 | 1 | 5 V 컨버터, 2 A 이상, 최대 21 × 43 × 14 mm | 전원 보드 스탠드에 맞아요. 3S에는 LM2596 모듈을 쓸 수 있어요. 2S에는 6 V 입력에서도 5 V를 내는 종류를 고르세요 (예: MP1584 또는 벅-부스트). | [검색](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | 작은 만능기판, 최대 24 × 34 mm | 배터리 분압기와 에코 분압기, 램프 구동 회로; 스탠드 뒷면에 붙여요 | [검색](https://www.amazon.com/s?k=small+prototype+perfboard) |
@@ -256,6 +256,7 @@ ESP32에 인쇄된 GPIO 번호를 사용하세요. 모든 GND는 서로 연결�
 
 - **모터:** 왼쪽 모터 두 개는 병렬로 OUT1/OUT2에 연결하고 + (빨강)는 OUT2, − (검정)는 OUT1에 연결하세요. 오른쪽 모터 두 개는 OUT3/OUT4에 연결하고 + (빨강)는 OUT3, − (검정)는 OUT4에 연결하세요. 양쪽 모터가 대칭으로 장착되어 있어서 이렇게 연결해야 둘 다 앞으로 가요. 그래도 한쪽이 반대로 돌면 그쪽의 모터 전선 두 가닥을 바꾸세요.
 - **엔코더:** LM393 보드에는 5 V가 아니라 **3.3 V**를 공급하세요. 그러면 보드에 있는 풀업 저항이 출력을 ESP32에 안전한 수준으로 유지해요. GPIO34와 GPIO35는 입력 전용이고 내부 풀업이 없어요.
+- **초음파 센서:** 일반 HC-SR04는 5 V가 필요하고 3.3 V에서는 안정적으로 동작하지 않아요. 5 V 컨버터에서 전원을 공급하고 ECHO는 10 k / 20 k 분압기를 거쳐 연결하세요. 5 V 에코 신호가 ESP32를 손상시킬 수 있어요. 또는 3.3 V를 지원하는 버전(예: HC-SR04P, RCWL-1601)을 사용하세요. 3.3 V로 전원을 공급하고 ECHO를 직접 연결하면 돼요.
 - **램프:** 각 램프는 NPN 트랜지스터로 스위칭해요 (베이스 저항 1 k, 베이스-이미터 간 풀다운 100 k). 패널 램프를 ESP32 핀으로 직접 구동하지 마세요.
 
 #### 전원
@@ -271,11 +272,11 @@ ESP32에 인쇄된 GPIO 번호를 사용하세요. 모든 GND는 서로 연결�
 1. 로봇 종류를 설정하고 휴대폰 모드는 켜 두세요:
 
    ```cpp
-   #define OPENBOT DIY_ESP32
+   #define OPENBOT DIY
    #define NO_PHONE_MODE 0
    ```
 
-2. `#elif (OPENBOT == DIY_ESP32)` 블록에서 **인디케이터를 끄세요**. 기본 핀 (5와 18)이 이 구성에서는 초음파 센서 핀이에요:
+2. `OPENBOT == DIY` 블록의 ESP32 부분(`#else  // ESP32` 다음)에서 **인디케이터를 끄세요**. 기본 핀 (5와 18)이 이 구성에서는 초음파 센서 핀이에요:
 
    ```cpp
    #define HAS_INDICATORS 0   // default is 1
@@ -310,7 +311,7 @@ ESP32에 인쇄된 GPIO 번호를 사용하세요. 모든 GND는 서로 연결�
 
 | 보내기 | 예상 결과 |
 |---|---|
-| `f` | `DIY_ESP32`를 알려 주는 기능 문자열 |
+| `f` | `DIY`를 알려 주는 기능 문자열 |
 | *(출력 확인)* | 그럴듯한 배터리 전압과 초음파 거리 |
 | `c60,0`, 그다음 `c0,0` | 왼쪽만 앞으로 돌아요 |
 | `c0,60`, 그다음 `c0,0` | 오른쪽만 앞으로 돌아요 |

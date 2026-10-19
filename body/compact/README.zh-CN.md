@@ -18,7 +18,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | | |
 |---|---|
 | **驱动** | 4 个双轴 TT 减速电机；左侧一对和右侧一对分别并联到一块 L298N |
-| **控制器** | ESP32 DevKit V1（30 针），OpenBot 固件 `DIY_ESP32`；通过蓝牙或 USB 线连接手机 |
+| **控制器** | ESP32 DevKit V1（30 针），OpenBot 固件 `DIY`；通过蓝牙或 USB 线连接手机 |
 | **传感器** | HC-SR04 超声波（前方），4 个 LM393 光电车轮编码器，电池电压 |
 | **供电** | 三选一：顶盖上的 2S 或 3S 18650 电池盒，或车内的小型 LiPo 电池（见[电池方案](#电池方案)） |
 | **紧固件** | 只用 M3 × 10 和 M3 × 25 盘头螺丝、M3 螺母和 19 个热熔螺母 |
@@ -144,7 +144,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | 4 | TT 车轮 | 直径约 65 mm | [搜索](https://www.amazon.com/s?k=65mm+TT+motor+robot+car+wheels) |
 | 4 | LM393 光电测速传感器 | 电路板宽约 14.2 mm、长约 38.1 mm，带一个 3 mm 孔。四个都要安装；固件默认读取前面一对。 | [搜索](https://www.amazon.com/s?k=LM393+optical+speed+sensor+module+encoder+disk) |
 | 4 | 编码器码盘 | 仅在不打印时需要；必须匹配 TT 电机轴和传感器槽 | [搜索](https://www.amazon.com/s?k=TT+motor+optical+encoder+disk) |
-| 1 | HC-SR04 超声波传感器 | 电路板 45.5 × 20.5 mm，两个探头中心距 25.5 mm | [搜索](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
+| 1 | HC-SR04 超声波传感器 | 电路板 45.5 × 20.5 mm，两个探头中心距 25.5 mm；也可使用 3.3 V 版本（如 HC-SR04P） | [搜索](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
 | 1 | 圆形船型开关 | 适合后面板的开孔；额定值满足电池电压和电机电流 | [搜索](https://www.amazon.com/s?k=20mm+round+rocker+switch+SPST+DC) |
 | 1 | 5 V 转换器，≥ 2 A，最大 21 × 43 × 14 mm | 装在电源板支架上。3S 可用 LM2596 模块。2S 请选择输入 6 V 时仍能输出 5 V 的型号（例如 MP1584 或升降压模块）。 | [搜索](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | 小洞洞板，最大 24 × 34 mm | 电池分压和回波分压电路、灯驱动；装在支架背面 | [搜索](https://www.amazon.com/s?k=small+prototype+perfboard) |
@@ -256,6 +256,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 
 - **电机：**将两个左侧电机并联接到 OUT1/OUT2，+（红）接 OUT2，−（黑）接 OUT1。将两个右侧电机接到 OUT3/OUT4，+（红）接 OUT3，−（黑）接 OUT4。两侧电机是镜像安装的，这样两侧都会向前转。如果某一侧仍然转向相反，调换该侧的两根电机线。
 - **编码器：**LM393 电路板用 **3.3 V** 供电，不要用 5 V。这样板载上拉电阻会让输出保持在 ESP32 可安全接受的电平。GPIO34 和 GPIO35 只能作输入，且没有内部上拉。
+- **超声波：**标准 HC-SR04 需要 5 V，在 3.3 V 下无法可靠工作。请由 5 V 转换器供电，并通过 10 k / 20 k 分压器连接 ECHO，因为其 5 V 回波信号可能损坏 ESP32。或者使用支持 3.3 V 的版本（如 HC-SR04P 或 RCWL-1601），由 3.3 V 供电并直接连接 ECHO。
 - **指示灯：**每个灯由一个 NPN 三极管开关（基极电阻 1 k，基极到发射极下拉 100 k）。切勿直接用 ESP32 引脚驱动面板指示灯。
 
 #### 电源
@@ -271,11 +272,11 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 1. 设置机器人类型，并保持手机模式开启：
 
    ```cpp
-   #define OPENBOT DIY_ESP32
+   #define OPENBOT DIY
    #define NO_PHONE_MODE 0
    ```
 
-2. 在 `#elif (OPENBOT == DIY_ESP32)` 代码块中**关闭指示器**。它们的默认引脚（5 和 18）在本方案中是超声波引脚：
+2. 在 `OPENBOT == DIY` 代码块的 ESP32 部分（`#else  // ESP32` 之后）中**关闭指示器**。它们的默认引脚（5 和 18）在本方案中是超声波引脚：
 
    ```cpp
    #define HAS_INDICATORS 0   // default is 1
@@ -310,7 +311,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 
 | 发送 | 预期结果 |
 |---|---|
-| `f` | 返回包含 `DIY_ESP32` 的功能字符串 |
+| `f` | 返回包含 `DIY` 的功能字符串 |
 | *(观察输出)* | 合理的电池电压和超声波距离 |
 | `c60,0`，然后 `c0,0` | 只有左侧向前转动 |
 | `c0,60`，然后 `c0,0` | 只有右侧向前转动 |

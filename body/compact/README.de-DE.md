@@ -18,7 +18,7 @@ OpenBot Compact ist ein kompakter vierrädriger [OpenBot](../../README.de-DE.md)
 | | |
 |---|---|
 | **Antrieb** | 4 × TT-Getriebemotoren mit Doppelwelle; linkes und rechtes Paar jeweils parallel an einem L298N |
-| **Steuerung** | ESP32 DevKit V1 (30 Pins), OpenBot-Firmware `DIY_ESP32`; Verbindung zum Handy über Bluetooth oder USB-Kabel |
+| **Steuerung** | ESP32 DevKit V1 (30 Pins), OpenBot-Firmware `DIY`; Verbindung zum Handy über Bluetooth oder USB-Kabel |
 | **Sensoren** | HC-SR04-Ultraschall (vorne), 4 × optische LM393-Radencoder, Akkuspannung |
 | **Stromversorgung** | Eine Option wählen: 2S- oder 3S-18650-Box auf dem Deckel oder ein kleiner LiPo-Akku im Inneren (siehe [Akku-Optionen](#akku-optionen)) |
 | **Befestigung** | Nur M3 × 10 und M3 × 25 Flachkopfschrauben, M3-Muttern und 19 Gewindeeinsätze |
@@ -144,7 +144,7 @@ Die Links unten führen zu einem Händler oder einer Amazon-US-Suche. Prüfen Si
 | 4 | TT-Räder | ≈ 65 mm Durchmesser | [Suche](https://www.amazon.com/s?k=65mm+TT+motor+robot+car+wheels) |
 | 4 | Optische LM393-Drehzahlsensoren | Platine ≈ 14,2 mm breit und ≈ 38,1 mm lang, mit einem 3-mm-Loch. Alle vier werden montiert; standardmäßig liest die Firmware das vordere Paar. | [Suche](https://www.amazon.com/s?k=LM393+optical+speed+sensor+module+encoder+disk) |
 | 4 | Encoderscheiben | Nur wenn sie nicht gedruckt werden; müssen zur TT-Welle und zum Sensorschlitz passen | [Suche](https://www.amazon.com/s?k=TT+motor+optical+encoder+disk) |
-| 1 | HC-SR04-Ultraschallsensor | Platine 45,5 × 20,5 mm, Wandler 25,5 mm auseinander (Mitte zu Mitte) | [Suche](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
+| 1 | HC-SR04-Ultraschallsensor | Platine 45,5 × 20,5 mm, Wandler 25,5 mm auseinander (Mitte zu Mitte); eine 3,3-V-Version (z. B. HC-SR04P) geht auch | [Suche](https://www.amazon.com/s?k=HC+SR04+ultrasonic+sensor+module) |
 | 1 | Runder Wippschalter | Passt in das Loch der Rückwand; ausgelegt für Akkuspannung und Motorstrom | [Suche](https://www.amazon.com/s?k=20mm+round+rocker+switch+SPST+DC) |
 | 1 | 5-V-Wandler, ≥ 2 A, max. 21 × 43 × 14 mm | Passt auf den Ständer für die Stromplatinen. Für 3S funktioniert ein LM2596-Modul. Für 2S einen Typ wählen, der auch aus 6 V Eingang noch 5 V liefert (z. B. MP1584 oder Buck-Boost). | [Suche](https://www.amazon.com/s?k=5V+buck+converter+2A+module) |
 | 1 | Kleine Lochrasterplatine, max. 24 × 34 mm | Akku- und Echo-Spannungsteiler, Lichttreiber; sitzt auf der Rückseite des Ständers | [Suche](https://www.amazon.com/s?k=small+prototype+perfboard) |
@@ -256,6 +256,7 @@ Verwenden Sie die auf dem ESP32 aufgedruckten GPIO-Nummern. Alle Massen müssen 
 
 - **Motoren:** Schließen Sie beide linken Motoren parallel an OUT1/OUT2 an, + (rot) an OUT2 und − (schwarz) an OUT1. Schließen Sie beide rechten Motoren an OUT3/OUT4 an, + (rot) an OUT3 und − (schwarz) an OUT4. Die beiden Seiten sind gespiegelt, so fahren beide vorwärts. Dreht sich eine Seite trotzdem falsch herum, tauschen Sie die zwei Motorkabel dieser Seite.
 - **Encoder:** Versorgen Sie die LM393-Platinen mit **3,3 V**, nicht mit 5 V. Ihre eingebauten Pull-ups halten die Ausgänge dann auf einem für den ESP32 sicheren Pegel. GPIO34 und GPIO35 sind reine Eingänge und haben keine internen Pull-ups.
+- **Sonar:** Der Standard-HC-SR04 braucht 5 V und arbeitet mit 3,3 V nicht zuverlässig. Versorgen Sie ihn aus dem 5-V-Wandler und schließen Sie ECHO über den 10-k/20-k-Teiler an, denn sein 5-V-Echosignal kann den ESP32 beschädigen. Oder verwenden Sie eine 3,3-V-taugliche Version (z. B. HC-SR04P oder RCWL-1601). Versorgen Sie sie mit 3,3 V und schließen Sie ECHO direkt an.
 - **Leuchten:** Jede Leuchte wird über einen NPN-Transistor geschaltet (1 k Basiswiderstand, 100 k Pull-down von Basis nach Emitter). Treiben Sie eine Einbauleuchte nie direkt von einem ESP32-Pin.
 
 #### Stromversorgung
@@ -271,11 +272,11 @@ Holen Sie die Firmware aus dem [Firmware-Ordner](../../firmware/README.de-DE.md)
 1. Setzen Sie den Robotertyp und lassen Sie den Handy-Modus an:
 
    ```cpp
-   #define OPENBOT DIY_ESP32
+   #define OPENBOT DIY
    #define NO_PHONE_MODE 0
    ```
 
-2. Schalten Sie im Block `#elif (OPENBOT == DIY_ESP32)` **die Indikatoren aus**. Ihre Standard-Pins (5 und 18) sind in diesem Aufbau die Sonar-Pins:
+2. Schalten Sie im ESP32-Teil des Blocks `OPENBOT == DIY` (nach `#else  // ESP32`) **die Indikatoren aus**. Ihre Standard-Pins (5 und 18) sind in diesem Aufbau die Sonar-Pins:
 
    ```cpp
    #define HAS_INDICATORS 0   // default is 1
@@ -310,7 +311,7 @@ Die Motor-Pins sind keine Boot-Pins des ESP32, daher bleiben die Motoren beim Ei
 
 | Senden | Erwartet |
 |---|---|
-| `f` | Eine Feature-Zeichenkette, die `DIY_ESP32` meldet |
+| `f` | Eine Feature-Zeichenkette, die `DIY` meldet |
 | *(Ausgabe beobachten)* | Eine plausible Akkuspannung und Sonar-Entfernung |
 | `c60,0`, dann `c0,0` | Nur die linke Seite dreht sich, vorwärts |
 | `c0,60`, dann `c0,0` | Nur die rechte Seite dreht sich, vorwärts |
