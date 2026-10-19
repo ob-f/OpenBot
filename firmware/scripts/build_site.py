@@ -231,6 +231,17 @@ def site(out: pathlib.Path, builds: pathlib.Path | None) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(WEB, out)
     (out / "img").mkdir(exist_ok=True)
+    # OpenBot branding from the PlayGround: the logo and the Gilroy font
+    shutil.copy(
+        ROOT / "open-code/src/assets/images/icon/open-bot-logo.png",
+        out / "img" / "logo.png",
+    )
+    (out / "fonts").mkdir(exist_ok=True)
+    for weight in ("Regular", "Medium", "SemiBold"):
+        shutil.copy(
+            ROOT / f"open-code/src/assets/font/Gilroy/Gilroy-{weight}.woff",
+            out / "fonts",
+        )
     for path in set(IMAGES.values()):
         shutil.copy(ROOT / path, out / "img" / pathlib.Path(path).name)
     firmware = {}
