@@ -10,6 +10,7 @@ bodies.json, so the page always matches the firmware.
 
 import argparse
 import json
+import os
 import pathlib
 import re
 import shutil
@@ -226,6 +227,10 @@ def build(robot: str, out: pathlib.Path) -> None:
 
 def version() -> str:
     """The commit the site is built from, shown in the page's footer."""
+    if os.environ.get(
+        "SITE_VERSION"
+    ):  # CI: the branch's commit, not a pull request's merge commit
+        return os.environ["SITE_VERSION"][:7]
     result = subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"],
         cwd=ROOT,
