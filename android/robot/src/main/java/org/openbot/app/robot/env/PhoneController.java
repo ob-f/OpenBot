@@ -34,7 +34,7 @@ public class PhoneController {
   private IVideoServer videoServer;
   private View view = null;
   private WebSocket webSocket;
-  // Web mode only: CONNECTED starts WebRTC for browser. Phone/Flutter/gamepad stay off.
+  // On while phone or web control mode is active; CONNECTED only starts video then.
   private boolean webVideoEnabled = false;
 
   public static PhoneController getInstance(Context context) {
@@ -223,7 +223,7 @@ public class PhoneController {
         this::send, error -> Timber.d("Error occurred in BotToControllerEventBus: %s", error));
   }
 
-  // Nearby CONNECTED also fires here; only start camera when web mode set webVideoEnabled.
+  // CONNECTED/DISCONNECTED come from the phone controller socket or the web signaling server.
   private void monitorConnection() {
     ControllerToBotEventBus.subscribe(
         "PhoneController.monitor",
