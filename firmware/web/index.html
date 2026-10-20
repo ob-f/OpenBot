@@ -82,6 +82,23 @@
           <p class="note" id="download-note">For the Arduino IDE: put <code>openbot_settings.h</code> next to <code>openbot.ino</code>, then upload.</p>
           <button class="link" id="apply" type="button">Apply battery and parts to a flashed robot</button>
         </div>
+
+        <details class="usb-help">
+          <summary>Connecting by USB</summary>
+          <ol>
+            <li>Use a USB <strong>data</strong> cable. Many cables only charge; if no port shows up, try another one.</li>
+            <li>Close the Arduino IDE's Serial Monitor and other programs that use the port.</li>
+            <li>Click <em>Flash firmware</em> and choose the board's port, for example <code>COM3</code> on Windows, <code>cu.usbserial-…</code> or <code>cu.wchusbserial…</code> on a Mac, or <code>ttyUSB0</code> on Linux.</li>
+          </ol>
+          <p>If no port shows up, your computer may need a driver for the board's USB chip. It's usually printed on the chip next to the USB socket:</p>
+          <ul>
+            <li><strong>CH340 / CH341</strong> (most Nano clones, many ESP32 boards): <a href="https://www.wch-ic.com/downloads/CH341SER_EXE.html">Windows</a>, <a href="https://github.com/WCHSoftGroup/ch34xser_macos">macOS</a></li>
+            <li><strong>CP2102 / CP2104</strong> (many ESP32 boards): <a href="https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers">Silicon Labs drivers</a></li>
+            <li><strong>FTDI</strong> (original Arduino Nano): <a href="https://ftdichip.com/drivers/vcp-drivers/">FTDI drivers</a></li>
+          </ul>
+          <p>On Linux, no driver is needed, but your user must be allowed to use serial ports: run <code>sudo usermod -aG dialout $USER</code> and log in again.</p>
+          <p>If an ESP32 doesn't connect, hold its <strong>BOOT</strong> button while flashing starts. A Nano with the old bootloader is detected automatically.</p>
+        </details>
       </div>
     </aside>
   </main>

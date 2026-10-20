@@ -296,7 +296,10 @@ function renderRobot() {
   const extras = partsNeedingBuild();
   let flashNote = "";
   let canFlash = true;
-  if (!("serial" in navigator)) {
+  if (!window.isSecureContext) {
+    canFlash = false;
+    flashNote = `Flashing needs a secure page. Open it at https:// or, on your own computer, at http://localhost:${location.port || 80}/firmware/ instead of ${location.host}.`;
+  } else if (!("serial" in navigator)) {
     canFlash = false;
     flashNote = "Flashing needs Chrome or Edge on a computer. You can still download the settings file.";
   } else if (clashes) {
