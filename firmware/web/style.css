@@ -160,8 +160,14 @@ button, input { font: inherit; color: inherit; }
 .note:empty { display: none; }
 
 .help-button { background: none !important; border: 0 !important; color: var(--blue); text-decoration: underline; text-underline-offset: 3px; padding: 2px 0 !important; justify-self: start; font-weight: 500 !important; font-size: 14px; }
-.or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; margin: 6px 0 2px; }
-.or::before, .or::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+.ways { display: flex; margin-bottom: 6px; }
+.ways button { flex: 1; white-space: nowrap; font-size: 14px; padding: 7px 8px; }
+.ways button[aria-selected="true"] { background: var(--blue); color: #fff; }
+.way { display: grid; gap: 8px; }
+.way[hidden] { display: none; }
+.ide-steps { margin: 2px 0 4px; padding-left: 20px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+.ide-steps li { margin-bottom: 4px; }
+.ide-steps a { color: var(--blue); }
 
 /* USB help pop-up */
 .help { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 0; border: 0; border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }

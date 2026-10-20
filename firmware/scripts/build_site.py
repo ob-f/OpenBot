@@ -279,6 +279,18 @@ def site(out: pathlib.Path, builds: pathlib.Path | None) -> None:
         "firmware": firmware,
         "version": version(),
     }
+    # New builds must not come from the browser's cache: version the file names
+    stamp = data["version"] or "dev"
+    index = out / "index.html"
+    html = index.read_text(encoding="utf-8")
+    for name in ("style.css", "app.js"):
+        html = html.replace(f'"{name}"', f'"{name}?v={stamp}"')
+    index.write_text(html, encoding="utf-8")
+    app = out / "app.js"
+    app.write_text(
+        app.read_text(encoding="utf-8").replace('"./avr.js"', f'"./avr.js?v={stamp}"'),
+        encoding="utf-8",
+    )
     (out / "bodies.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
     print(
         f"Site in {out}: {len(data['bodies'])} bodies, {len(firmware)} firmware builds"
