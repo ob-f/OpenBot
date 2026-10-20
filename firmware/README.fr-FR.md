@@ -17,33 +17,80 @@ La tâche principale du MCU est de gérer le contrôle de bas niveau du véhicul
 
 ## Configuration
 
-Tout d'abord, vous devez configurer votre matériel au début du code. Si vous avez fait la construction DIY (en utilisant le pilote de moteur L298N), réglez `OPENBOT DIY`. Si vous avez utilisé le PCB personnalisé, vérifiez la version et réglez soit `OPENBOT PCB_V1` soit `OPENBOT PCB_V2`. Si vous avez un kit OpenBot, réglez `OPENBOT RTR_TT`. Si vous avez adapté un camion RC, réglez `OPENBOT RC_CAR`. Si vous utilisez la version DIY plus petite pour l'éducation, réglez `OPENBOT LITE`. Si vous utilisez le kit OpenBot prêt à l'emploi avec des moteurs 520, réglez `OPENBOT RTR_520`. Si vous avez construit le véhicule tout-terrain, vous devez régler `OPENBOT MTV`.
+Tous les réglages se trouvent dans la section **SETTINGS** en haut de `openbot.ino`. Vous n'avez rien à modifier en dessous.
 
-Le firmware détecte la carte que vous sélectionnez dans l'Arduino IDE. Chaque châssis prend en charge ces cartes ; avec une autre carte, la compilation s'arrête avec une erreur :
+Pour conserver vos réglages lors d'une mise à jour du firmware, copiez les lignes de la section SETTINGS entre `#else` et `#endif` dans un nouveau fichier `openbot_settings.h` à côté de `openbot.ino`, et modifiez-les là. Si `openbot_settings.h` existe, le firmware l'utilise à la place de la section de `openbot.ino`, et git l'ignore, il n'est donc pas poussé par erreur.
 
-| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
-|---|:---:|:---:|
-| `DIY` | ✓ | ✓ |
-| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
-| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+### Corps du robot
+
+Réglez `OPENBOT` sur le corps de votre robot et sélectionnez dans l'IDE Arduino une carte qu'il prend en charge. Le firmware détecte la carte ; avec toute autre carte, la compilation s'arrête avec une erreur.
+
+| Corps | `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|---|:---:|:---:|
+| Montage DIY (pilote de moteurs L298N) | `DIY` | ✓ | ✓ |
+| PCB personnalisé V1 / V2 | `PCB_V1` / `PCB_V2` | ✓ | |
+| Kit Ready-to-Run, moteurs TT | `RTR_TT` | ✓ | |
+| Kit Ready-to-Run, moteurs TT, ESP32 | `RTR_TT2` | | ✓ |
+| Kit Ready-to-Run, moteurs 520 | `RTR_520` | | ✓ |
+| Camion RC | `RC_CAR` | ✓ | |
+| OpenBot Lite | `LITE` | ✓ | |
+| Multi Terrain Vehicle | `MTV` | | ✓ |
 
 `DIY_ESP32` a été remplacé par `DIY` avec une carte ESP32 sélectionnée.
 
-## Bluetooth
+### Conduite
 
-Vous pouvez également faire fonctionner l'OpenBot via Bluetooth, pour cela vous pouvez activer le Bluetooth en réglant `BLUETOOTH 1` (désactiver : 0). Pour que le Bluetooth fonctionne, vous avez besoin d'OpenBot avec des cartes ESP32 comme `RTR_TT2`, `RTR_520`, `MTV` ou `DIY` avec un ESP32.
+Par défaut, vous conduisez le robot avec l'application du téléphone. Pour le [mode sans téléphone](#mode-sans-téléphone), réglez `NO_PHONE_MODE 1` ; avec un ESP32, vous pouvez alors aussi conduire avec une [manette](#contrôle-par-manette) (`HAS_GAMEPAD 1`). `COAST_MODE` détermine si les moteurs roulent en roue libre (1) ou freinent (0) sans commande, et `DEBUG 1` affiche des informations de débogage dans le moniteur série.
 
-## Configuration
+### Composants
 
-Ensuite, vous devez configurer les fonctionnalités que vous souhaitez activer. Les fonctionnalités désactivées ne sont pas compilées pour économiser de la mémoire et accélérer le code. Si un drapeau n'est pas défini, la fonctionnalité sera désactivée. Chaque modèle a des paramètres par défaut que vous devrez peut-être modifier en fonction de votre configuration.
+Chaque corps active les composants qu'il a normalement :
 
-- Activez le diviseur de tension en réglant `HAS_VOLTAGE_DIVIDER 1` (désactiver : 0). Si vous avez un diviseur de tension, vous devez également spécifier le `VOLTAGE_DIVIDER_FACTOR` qui est calculé comme (R1+R2)/R2, `VOLTAGE_MIN` qui est la tension minimale pour entraîner les moteurs, `VOLTAGE_LOW` qui est la tension minimale de la batterie et `VOLTAGE_MAX` qui est la tension maximale de la batterie.
-- Activez les LED indicatrices en réglant `HAS_INDICATORS 1` (désactiver : 0).
-- Activez les capteurs de vitesse avant/arrière en réglant `HAS_SPEED_SENSORS_FRONT 1` / `HAS_SPEED_SENSORS_BACK 1` (désactiver : 0).
-- Activez le capteur ultrasonique en réglant `HAS_SONAR 1` (désactiver : 0). Activez le filtre médian pour les mesures sonar en réglant `USE_MEDIAN 1` (désactiver : 0).
-- Activez le capteur de pare-chocs qui est utilisé pour détecter les collisions en réglant `HAS_BUMPER 1` (désactiver : 0).
-- Activez l'affichage OLED en réglant `HAS_OLED 1` (désactiver : 0).
-- Activez les LED avant/arrière/statut en réglant `HAS_LEDS_FRONT 1` / `HAS_LEDS_BACK 1` / `HAS_LEDS_STATUS 1` (désactiver : 0).
+| `OPENBOT` | Composants activés |
+|---|---|
+| `DIY`, `PCB_V1`, `PCB_V2` | Diviseur de tension, clignotants, sonar, capteurs de vitesse avant |
+| `RTR_TT`, `RTR_TT2`, `RTR_520` | Diviseur de tension, clignotants, sonar, pare-chocs, capteurs de vitesse avant et arrière, LED avant, arrière et d'état |
+| `LITE` | Clignotants |
+| `RC_CAR` | Aucun |
+| `MTV` | Capteurs de vitesse avant, centraux et arrière |
+
+Sur un ESP32, la liaison Bluetooth avec le téléphone est aussi activée.
+
+Dans les réglages, chaque composant prend la valeur par défaut du corps, p. ex. `#define HAS_SONAR DEFAULT_HAS_SONAR`, et un tableau au-dessus indique les valeurs par défaut de chaque corps. Pour changer un composant, réglez-le plutôt sur `1` (activé) ou `0` (désactivé), p. ex. `#define HAS_SONAR 0` si vous n'avez pas installé le capteur à ultrasons. Un composant activé mais non installé ne fait aucun mal, mais l'application affiche des valeurs absurdes, comme une distance sonar de 300 cm.
+
+| Réglage | Composant |
+|---|---|
+| `HAS_VOLTAGE_DIVIDER` | Mesure de la tension de la batterie |
+| `HAS_INDICATORS` | Clignotants |
+| `HAS_SONAR`, `SONAR_MEDIAN` | Capteur à ultrasons, et un filtre médian pour ses mesures |
+| `HAS_BUMPER` | Pare-chocs pour détecter les collisions |
+| `HAS_SPEED_SENSORS_FRONT`, `_BACK`, `_MIDDLE` | Capteurs de vitesse des roues |
+| `HAS_LEDS_FRONT`, `HAS_LEDS_BACK`, `HAS_LEDS_STATUS` | Phares, feux arrière et LED d'état |
+| `HAS_OLED` | Écran OLED |
+| `HAS_BLUETOOTH` | Liaison Bluetooth avec le téléphone (ESP32) |
+
+### Batterie
+
+La jauge de batterie de l'application va de `VOLTAGE_LOW` (vide) à `VOLTAGE_MAX` (pleine). Elles prennent les valeurs par défaut du corps ; pour une autre batterie, réglez-les dans les réglages, par exemple `#define VOLTAGE_LOW 6.8f` :
+
+| Batterie | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+|---|---:|---:|
+| 2S Li-ion / LiPo | 6.8f | 8.4f |
+| 3S Li-ion / LiPo | 10.2f | 12.6f |
+| 6 × AA | 6.0f | 9.0f |
+| 8 × AA | 8.0f | 12.0f |
+
+Si votre diviseur de tension diffère de celui du corps, réglez aussi `VOLTAGE_DIVIDER_FACTOR` sur (R1 + R2) / R2. `VOLTAGE_MIN` est la tension la plus basse à laquelle les moteurs tournent encore ; le firmware ne l'utilise qu'en mode sans téléphone.
+
+### Vérifier la configuration
+
+Au démarrage du robot, le moniteur série (115200 bauds) affiche le corps et les composants activés, par exemple :
+
+```
+OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+```
+
+Si deux composants utilisent la même broche, la compilation s'arrête avec l'erreur "Two parts use the same pin".
 
 ### Dépendances
 
@@ -190,7 +237,7 @@ Avant de continuer, assurez-vous que les pneus sont retirés. Vous aurez besoin 
 
 ### Mode sans téléphone
 
-Avant de tester la voiture avec un smartphone qui a l'application OpenBot installée, vous pouvez également tester la voiture sans téléphone d'abord. Réglez simplement l'option `NO_PHONE_MODE` sur `1`. La voiture roulera maintenant à _vitesse normale_ (75% PWM) et ralentira à mesure qu'elle détecte des obstacles avec le capteur ultrasonique. Une fois qu'elle se rapproche du `TURN_THRESHOLD` (par défaut : 50 cm), elle commencera à tourner dans une direction aléatoire et allumera la LED de ce côté. Si l'espace libre estimé devant la voiture tombe en dessous du `TURN_THRESHOLD`, elle reculera lentement et les deux LED s'allumeront. Notez que la voiture et l'Arduino doivent être alimentés. L'Arduino peut être alimenté en connectant la broche 5V à la sortie 5V du pilote de moteur L298N, ou en connectant le câble USB à une source d'alimentation (par exemple, téléphone).
+Avant de tester la voiture avec un smartphone qui a l'application OpenBot installée, vous pouvez également tester la voiture sans téléphone d'abord. Réglez simplement `NO_PHONE_MODE 1` dans les réglages. La voiture roulera maintenant à _vitesse normale_ (75% PWM) et ralentira à mesure qu'elle détecte des obstacles avec le capteur ultrasonique. Une fois qu'elle se rapproche du `TURN_THRESHOLD` (par défaut : 50 cm), elle commencera à tourner dans une direction aléatoire et allumera la LED de ce côté. Si l'espace libre estimé devant la voiture tombe en dessous du `TURN_THRESHOLD`, elle reculera lentement et les deux LED s'allumeront. Notez que la voiture et l'Arduino doivent être alimentés. L'Arduino peut être alimenté en connectant la broche 5V à la sortie 5V du pilote de moteur L298N, ou en connectant le câble USB à une source d'alimentation (par exemple, téléphone).
 
 Avant de faire rouler la voiture, nous vous recommandons de retirer les pneus, de connecter l'Arduino à un ordinateur et d'observer le moniteur série comme dans la section [Test](#testing). La sortie sur le moniteur série est un peu plus facile à analyser (même que l'OLED) et montre la tension de la batterie, le régime pour les moteurs gauche et droit et l'espace libre estimé devant la voiture. Vous pouvez déplacer un grand objet d'avant en arrière devant le capteur ultrasonique et observer la vitesse des moteurs changer.
 
@@ -206,7 +253,7 @@ En mode sans téléphone, vous pouvez piloter un châssis ESP32 avec une manette
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. Dans le gestionnaire de cartes, installez **esp32_bluepad32** (4.1.0). Il repose sur le même cœur esp32 (2.0.17) que le firmware habituel.
 3. Sélectionnez **ESP32 Dev Module** parmi les cartes esp32_bluepad32.
-4. Réglez `NO_PHONE_MODE 1` et `HAS_GAMEPAD 1`, puis téléversez.
+4. Dans les réglages, réglez `NO_PHONE_MODE 1` et `HAS_GAMEPAD 1`, puis téléversez.
 
 La manette utilise le Bluetooth de l'ESP32 ; la liaison Bluetooth avec le téléphone est donc désactivée dans ce mode. Pour piloter avec l'application du téléphone, laissez `HAS_GAMEPAD 0` et appairez plutôt la manette avec le téléphone.
 

@@ -17,31 +17,80 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
 
 ## 设置
 
-首先，您需要在代码开始时设置硬件配置。如果您进行了DIY构建（使用L298N电机驱动器），请设置`OPENBOT DIY`。如果您使用了定制PCB，请检查版本并设置`OPENBOT PCB_V1`或`OPENBOT PCB_V2`。如果您有OpenBot套件，请设置`OPENBOT RTR_TT`。如果您改装了RC卡车，请设置`OPENBOT RC_CAR`。如果您使用较小的教育版DIY版本，请设置`OPENBOT LITE`。如果您使用带有520电机的OpenBot即插即用套件，请设置`OPENBOT RTR_520`。如果您构建了多地形车辆，请设置`OPENBOT MTV`。固件会识别您在 Arduino IDE 中选择的开发板。各车体支持的开发板如下；选择其他开发板时，编译会报错并停止：
+所有设置都在 `openbot.ino` 顶部的 **SETTINGS** 部分。其下方的内容无需修改。
 
-| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
-|---|:---:|:---:|
-| `DIY` | ✓ | ✓ |
-| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
-| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+为了在更新固件时保留您的设置，请将 SETTINGS 部分中 `#else` 和 `#endif` 之间的行复制到 `openbot.ino` 旁边的新文件 `openbot_settings.h` 中，并在那里修改。如果存在 `openbot_settings.h`，固件会使用它代替 `openbot.ino` 中的部分；git 会忽略该文件，因此不会被误推送。
 
-`DIY_ESP32` 已被选择 ESP32 开发板时的 `DIY` 取代。
+### 机器人车身
 
-## 蓝牙
+将 `OPENBOT` 设置为您的机器人车身，并在 Arduino IDE 中选择它支持的开发板。固件会检测开发板；使用其他开发板时，编译会报错停止。
 
-您也可以通过蓝牙运行OpenBot，为此您可以通过设置`BLUETOOTH 1`（禁用：0）来启用蓝牙。要使蓝牙工作，您需要使用ESP32板的OpenBot，如`RTR_TT2`、`RTR_520`、`MTV` 或使用 ESP32 的 `DIY`。
+| 车身 | `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|---|:---:|:---:|
+| DIY 版本（L298N 电机驱动） | `DIY` | ✓ | ✓ |
+| 定制 PCB V1 / V2 | `PCB_V1` / `PCB_V2` | ✓ | |
+| Ready-to-Run 套件，TT 电机 | `RTR_TT` | ✓ | |
+| Ready-to-Run 套件，TT 电机，ESP32 | `RTR_TT2` | | ✓ |
+| Ready-to-Run 套件，520 电机 | `RTR_520` | | ✓ |
+| RC 卡车 | `RC_CAR` | ✓ | |
+| OpenBot Lite | `LITE` | ✓ | |
+| Multi Terrain Vehicle | `MTV` | | ✓ |
 
-## 配置
+`DIY_ESP32` 已被选择 ESP32 开发板的 `DIY` 取代。
 
-接下来，您需要配置要启用的功能。禁用的功能不会被编译，以节省内存并加快代码速度。如果未定义标志，则功能将被禁用。每个模型都有一些默认设置，您可能需要根据您的配置进行更改。
+### 驾驶
 
-- 通过设置`HAS_VOLTAGE_DIVIDER 1`（禁用：0）启用电压分压器。如果您有电压分压器，您还应该指定`VOLTAGE_DIVIDER_FACTOR`，其计算公式为(R1+R2)/R2，`VOLTAGE_MIN`是驱动电机的最低电压，`VOLTAGE_LOW`是最低电池电压，`VOLTAGE_MAX`是最高电池电压。
-- 通过设置`HAS_INDICATORS 1`（禁用：0）启用指示灯LED。
-- 通过设置`HAS_SPEED_SENSORS_FRONT 1` / `HAS_SPEED_SENSORS_BACK 1`（禁用：0）启用前/后速度传感器。
-- 通过设置`HAS_SONAR 1`（禁用：0）启用超声波传感器。通过设置`USE_MEDIAN 1`（禁用：0）启用声纳测量的中值滤波器。
-- 通过设置`HAS_BUMPER 1`（禁用：0）启用用于检测碰撞的保险杠传感器。
-- 通过设置`HAS_OLED 1`（禁用：0）启用OLED显示屏。
-- 通过设置`HAS_LEDS_FRONT 1` / `HAS_LEDS_BACK 1` / `HAS_LEDS_STATUS 1`（禁用：0）启用前/后/状态LED。
+默认情况下，您通过手机应用驾驶机器人。要使用[无手机模式](#无手机模式)，请设置 `NO_PHONE_MODE 1`；使用 ESP32 时，还可以用[手柄](#手柄控制)驾驶（`HAS_GAMEPAD 1`）。`COAST_MODE` 决定无控制时电机滑行（1）还是刹车（0），`DEBUG 1` 会在串口监视器上输出调试信息。
+
+### 部件
+
+每种车身会开启其通常具备的部件：
+
+| `OPENBOT` | 开启的部件 |
+|---|---|
+| `DIY`, `PCB_V1`, `PCB_V2` | 分压器、转向灯、声纳、前轮速度传感器 |
+| `RTR_TT`, `RTR_TT2`, `RTR_520` | 分压器、转向灯、声纳、保险杠、前后轮速度传感器、前灯、尾灯和状态 LED |
+| `LITE` | 转向灯 |
+| `RC_CAR` | 无 |
+| `MTV` | 前、中、后轮速度传感器 |
+
+在 ESP32 上，与手机的蓝牙连接也会开启。
+
+在设置中，每个部件都设为车身的默认值，例如 `#define HAS_SONAR DEFAULT_HAS_SONAR`，上方的表格列出了每种车身的默认值。要更改某个部件，请将其改为 `1`（开）或 `0`（关），例如未安装超声波传感器时设为 `#define HAS_SONAR 0`。开启但未安装的部件不会造成损害，但应用会显示无意义的读数，例如 300 cm 的声纳距离。
+
+| 设置 | 部件 |
+|---|---|
+| `HAS_VOLTAGE_DIVIDER` | 电池电压测量 |
+| `HAS_INDICATORS` | 转向灯 |
+| `HAS_SONAR`, `SONAR_MEDIAN` | 超声波传感器及其读数的中值滤波 |
+| `HAS_BUMPER` | 用于检测碰撞的保险杠 |
+| `HAS_SPEED_SENSORS_FRONT`, `_BACK`, `_MIDDLE` | 车轮速度传感器 |
+| `HAS_LEDS_FRONT`, `HAS_LEDS_BACK`, `HAS_LEDS_STATUS` | 前灯、尾灯和状态 LED |
+| `HAS_OLED` | OLED 显示屏 |
+| `HAS_BLUETOOTH` | 与手机的蓝牙连接（ESP32） |
+
+### 电池
+
+应用的电量显示范围从 `VOLTAGE_LOW`（空）到 `VOLTAGE_MAX`（满）。它们默认为车身的默认值；使用其他电池时，请在设置中修改，例如 `#define VOLTAGE_LOW 6.8f`：
+
+| 电池 | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+|---|---:|---:|
+| 2S 锂离子 / LiPo | 6.8f | 8.4f |
+| 3S 锂离子 / LiPo | 10.2f | 12.6f |
+| 6 节 AA | 6.0f | 9.0f |
+| 8 节 AA | 8.0f | 12.0f |
+
+如果您的分压器与车身的不同，还需将 `VOLTAGE_DIVIDER_FACTOR` 设置为 (R1 + R2) / R2。`VOLTAGE_MIN` 是电机仍能转动的最低电压；固件仅在无手机模式下使用它。
+
+### 检查配置
+
+机器人启动时，串口监视器（115200 波特）会显示车身和已开启的部件，例如：
+
+```
+OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+```
+
+如果两个部件使用同一个引脚，编译会以错误 "Two parts use the same pin" 停止。
 
 ### 依赖项
 
@@ -188,7 +237,7 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
 
 ### 无手机模式
 
-在使用安装了OpenBot应用程序的智能手机测试汽车之前，您还可以先在没有手机的情况下测试汽车。只需将选项`NO_PHONE_MODE`设置为`1`。汽车现在将以_正常速度_（75% PWM）行驶，并在检测到障碍物时减速。一旦接近`TURN_THRESHOLD`（默认值：50厘米），它将开始向随机方向转弯，并打开该侧的LED。如果汽车前方的估计空闲空间低于`TURN_THRESHOLD`，它将缓慢倒退，并打开两个LED。请注意，汽车和Arduino都需要供电。Arduino可以通过将5V引脚连接到L298N电机驱动器的5V输出来供电，或者通过将USB电缆连接到电源（例如手机）来供电。
+在使用安装了OpenBot应用程序的智能手机测试汽车之前，您还可以先在没有手机的情况下测试汽车。只需在设置中设置 `NO_PHONE_MODE 1`。汽车现在将以_正常速度_（75% PWM）行驶，并在检测到障碍物时减速。一旦接近`TURN_THRESHOLD`（默认值：50厘米），它将开始向随机方向转弯，并打开该侧的LED。如果汽车前方的估计空闲空间低于`TURN_THRESHOLD`，它将缓慢倒退，并打开两个LED。请注意，汽车和Arduino都需要供电。Arduino可以通过将5V引脚连接到L298N电机驱动器的5V输出来供电，或者通过将USB电缆连接到电源（例如手机）来供电。
 
 在运行汽车之前，我们建议移除轮胎，将Arduino连接到计算机，并观察串行监视器，如[测试](#testing)部分所述。串行监视器上的输出更容易解析（与OLED相同），显示电池电压、左电机和右电机的rpm以及汽车前方的估计空闲空间。您可以在超声波传感器前方来回移动一个大物体，并观察电机速度的变化。
 
@@ -204,7 +253,7 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. 在开发板管理器中安装 **esp32_bluepad32**（4.1.0）。它基于与普通固件相同的 esp32 内核（2.0.17）。
 3. 在 esp32_bluepad32 开发板中选择 **ESP32 Dev Module**。
-4. 设置 `NO_PHONE_MODE 1` 和 `HAS_GAMEPAD 1`，然后上传。
+4. 在设置中设置 `NO_PHONE_MODE 1` 和 `HAS_GAMEPAD 1`，然后上传。
 
 手柄使用 ESP32 的蓝牙，因此在此模式下与手机的蓝牙连接会关闭。要用手机应用驾驶，请保持 `HAS_GAMEPAD 0`，并将手柄与手机配对。
 

@@ -17,33 +17,80 @@ MCU의 주요 작업은 차량의 저수준 제어를 처리하고 차량에 장
 
 ## 설정
 
-먼저 코드 시작 부분에서 하드웨어 구성을 설정해야 합니다. DIY 빌드(L298N 모터 드라이버 사용)를 수행한 경우 `OPENBOT DIY`를 설정합니다. 맞춤형 PCB를 사용한 경우 버전을 확인하고 `OPENBOT PCB_V1` 또는 `OPENBOT PCB_V2`를 설정합니다. OpenBot 키트를 보유한 경우 `OPENBOT RTR_TT`를 설정합니다. RC 트럭을 개조한 경우 `OPENBOT RC_CAR`를 설정합니다. 교육용으로 더 작은 DIY 버전을 사용하는 경우 `OPENBOT LITE`를 설정합니다. 520-모터가 장착된 OpenBot Ready-to-Run 키트를 사용하는 경우 `OPENBOT RTR_520`을 설정합니다. 다목적 차량을 제작한 경우 `OPENBOT MTV`를 설정해야 합니다.
+모든 설정은 `openbot.ino` 맨 위의 **SETTINGS** 섹션에 있습니다. 그 아래는 바꿀 필요가 없습니다.
 
-펌웨어는 Arduino IDE에서 선택한 보드를 자동으로 인식합니다. 각 본체가 지원하는 보드는 다음과 같으며, 다른 보드를 선택하면 오류와 함께 빌드가 중단됩니다:
+펌웨어를 업데이트할 때 설정을 유지하려면 SETTINGS 섹션의 `#else`와 `#endif` 사이 줄을 `openbot.ino` 옆의 새 파일 `openbot_settings.h`에 복사하고 거기서 바꾸세요. `openbot_settings.h`가 있으면 펌웨어는 `openbot.ino`의 섹션 대신 이 파일을 사용하며, git이 이 파일을 무시하므로 실수로 푸시되지 않습니다.
 
-| `OPENBOT` | Arduino Nano | ESP32 Dev Module |
-|---|:---:|:---:|
-| `DIY` | ✓ | ✓ |
-| `PCB_V1`, `PCB_V2`, `RTR_TT`, `RC_CAR`, `LITE` | ✓ | |
-| `RTR_TT2`, `RTR_520`, `MTV` | | ✓ |
+### 로봇 바디
+
+`OPENBOT`를 로봇 바디로 설정하고 Arduino IDE에서 해당 바디가 지원하는 보드를 선택하세요. 펌웨어가 보드를 감지하며, 다른 보드에서는 빌드가 오류와 함께 중지됩니다.
+
+| 바디 | `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|---|:---:|:---:|
+| DIY 빌드 (L298N 모터 드라이버) | `DIY` | ✓ | ✓ |
+| 커스텀 PCB V1 / V2 | `PCB_V1` / `PCB_V2` | ✓ | |
+| Ready-to-Run 키트, TT 모터 | `RTR_TT` | ✓ | |
+| Ready-to-Run 키트, TT 모터, ESP32 | `RTR_TT2` | | ✓ |
+| Ready-to-Run 키트, 520 모터 | `RTR_520` | | ✓ |
+| RC 트럭 | `RC_CAR` | ✓ | |
+| OpenBot Lite | `LITE` | ✓ | |
+| Multi Terrain Vehicle | `MTV` | | ✓ |
 
 `DIY_ESP32`는 ESP32 보드를 선택한 `DIY`로 대체되었습니다.
 
-## 블루투스
+### 주행
 
-OpenBot을 블루투스를 통해 실행할 수도 있으며, 이를 위해 `BLUETOOTH 1`을 설정하여 블루투스를 활성화할 수 있습니다(비활성화: 0). 블루투스를 사용하려면 `RTR_TT2`, `RTR_520`, `MTV` 또는 ESP32를 사용하는 `DIY`와 같은 ESP32 보드가 있는 OpenBot이 필요합니다.
+기본적으로 로봇은 휴대폰 앱으로 조종합니다. [No Phone 모드](#no-phone-모드)를 사용하려면 `NO_PHONE_MODE 1`을 설정하세요. ESP32에서는 [게임패드](#게임패드-조종)로도 주행할 수 있습니다 (`HAS_GAMEPAD 1`). `COAST_MODE`는 조종 입력이 없을 때 모터가 관성으로 굴러갈지(1) 브레이크를 걸지(0) 정하며, `DEBUG 1`은 시리얼 모니터에 디버그 출력을 표시합니다.
 
-## 구성
+### 부품
 
-다음으로 활성화하려는 기능을 구성해야 합니다. 비활성화된 기능은 메모리를 절약하고 코드를 더 빠르게 만들기 위해 컴파일되지 않습니다. 플래그가 정의되지 않은 경우 기능이 비활성화됩니다. 각 모델에는 구성에 따라 변경해야 할 수 있는 몇 가지 기본 설정이 있습니다.
+각 바디는 기본으로 갖춘 부품을 켭니다:
 
-- `HAS_VOLTAGE_DIVIDER 1`을 설정하여 전압 분배기를 활성화합니다(비활성화: 0). 전압 분배기가 있는 경우 (R1+R2)/R2로 계산되는 `VOLTAGE_DIVIDER_FACTOR`, 모터를 구동하기 위한 최소 전압인 `VOLTAGE_MIN`, 최소 배터리 전압인 `VOLTAGE_LOW`, 최대 배터리 전압인 `VOLTAGE_MAX`를 지정해야 합니다.
-- `HAS_INDICATORS 1`을 설정하여 표시등 LED를 활성화합니다(비활성화: 0).
-- `HAS_SPEED_SENSORS_FRONT 1` / `HAS_SPEED_SENSORS_BACK 1`을 설정하여 전/후방 속도 센서를 활성화합니다(비활성화: 0).
-- `HAS_SONAR 1`을 설정하여 초음파 센서를 활성화합니다(비활성화: 0). `USE_MEDIAN 1`을 설정하여 초음파 측정을 위한 중앙값 필터를 활성화합니다(비활성화: 0).
-- 충돌을 감지하는 데 사용되는 범퍼 센서를 `HAS_BUMPER 1`로 설정하여 활성화합니다(비활성화: 0).
-- `HAS_OLED 1`을 설정하여 OLED 디스플레이를 활성화합니다(비활성화: 0).
-- `HAS_LEDS_FRONT 1` / `HAS_LEDS_BACK 1` / `HAS_LEDS_STATUS 1`을 설정하여 전/후/상태 LED를 활성화합니다(비활성화: 0).
+| `OPENBOT` | 켜지는 부품 |
+|---|---|
+| `DIY`, `PCB_V1`, `PCB_V2` | 전압 분배기, 방향 지시등, 소나, 앞 속도 센서 |
+| `RTR_TT`, `RTR_TT2`, `RTR_520` | 전압 분배기, 방향 지시등, 소나, 범퍼, 앞뒤 속도 센서, 앞·뒤·상태 LED |
+| `LITE` | 방향 지시등 |
+| `RC_CAR` | 없음 |
+| `MTV` | 앞·중간·뒤 속도 센서 |
+
+ESP32에서는 휴대폰과의 블루투스 연결도 켜집니다.
+
+설정에서 각 부품은 바디의 기본값으로 되어 있으며(예: `#define HAS_SONAR DEFAULT_HAS_SONAR`), 그 위의 표에 바디별 기본값이 나와 있습니다. 부품을 바꾸려면 대신 `1`(켜기) 또는 `0`(끄기)으로 설정하세요. 예를 들어 초음파 센서를 설치하지 않았다면 `#define HAS_SONAR 0`입니다. 켜져 있지만 설치되지 않은 부품은 해가 없지만, 앱에 300 cm 소나 거리처럼 의미 없는 값이 표시됩니다.
+
+| 설정 | 부품 |
+|---|---|
+| `HAS_VOLTAGE_DIVIDER` | 배터리 전압 측정 |
+| `HAS_INDICATORS` | 방향 지시등 |
+| `HAS_SONAR`, `SONAR_MEDIAN` | 초음파 센서와 측정값용 중앙값 필터 |
+| `HAS_BUMPER` | 충돌 감지용 범퍼 |
+| `HAS_SPEED_SENSORS_FRONT`, `_BACK`, `_MIDDLE` | 바퀴 속도 센서 |
+| `HAS_LEDS_FRONT`, `HAS_LEDS_BACK`, `HAS_LEDS_STATUS` | 전조등, 후미등, 상태 LED |
+| `HAS_OLED` | OLED 디스플레이 |
+| `HAS_BLUETOOTH` | 휴대폰과의 블루투스 연결 (ESP32) |
+
+### 배터리
+
+앱의 배터리 표시는 `VOLTAGE_LOW`(빈 상태)에서 `VOLTAGE_MAX`(가득 찬 상태)까지입니다. 바디의 기본값으로 설정되어 있으며, 다른 배터리를 쓴다면 설정에서 바꾸세요. 예: `#define VOLTAGE_LOW 6.8f`
+
+| 배터리 | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+|---|---:|---:|
+| 2S 리튬이온 / LiPo | 6.8f | 8.4f |
+| 3S 리튬이온 / LiPo | 10.2f | 12.6f |
+| AA 6개 | 6.0f | 9.0f |
+| AA 8개 | 8.0f | 12.0f |
+
+전압 분배기가 바디의 것과 다르면 `VOLTAGE_DIVIDER_FACTOR`도 (R1 + R2) / R2로 설정하세요. `VOLTAGE_MIN`은 모터가 아직 회전하는 가장 낮은 전압이며, 펌웨어는 No Phone 모드에서만 사용합니다.
+
+### 구성 확인
+
+로봇이 시작되면 시리얼 모니터(115200 baud)에 바디와 켜진 부품이 표시됩니다. 예:
+
+```
+OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+```
+
+두 부품이 같은 핀을 사용하면 빌드가 "Two parts use the same pin" 오류와 함께 중지됩니다.
 
 ### 종속성
 
@@ -190,7 +237,7 @@ Arduino IDE에 ESP32 보드를 설치하려면 다음 지침을 따르세요:
 
 ### No Phone 모드
 
-OpenBot 애플리케이션이 설치된 스마트폰으로 자동차를 테스트하기 전에 먼저 전화 없이 자동차를 테스트할 수도 있습니다. 옵션 `NO_PHONE_MODE`를 `1`로 설정하기만 하면 됩니다. 이제 자동차는 _일반 속도_ (75% PWM)로 주행하며 초음파 센서로 장애물을 감지하면 속도가 느려집니다. `TURN_THRESHOLD`(기본값: 50cm)에 가까워지면 무작위 방향으로 회전하기 시작하고 해당 측면의 LED가 켜집니다. 자동차 앞의 추정 여유 공간이 `TURN_THRESHOLD`보다 낮아지면 천천히 후진하고 두 LED가 켜집니다. 자동차와 Arduino 모두 전원이 공급되어야 합니다. Arduino는 L298N 모터 드라이버의 5V 출력에 5V 핀을 연결하거나 USB 케이블을 전원 공급원(예: 전화)에 연결하여 전원을 공급할 수 있습니다.
+OpenBot 애플리케이션이 설치된 스마트폰으로 자동차를 테스트하기 전에 먼저 전화 없이 자동차를 테스트할 수도 있습니다. 설정에서 `NO_PHONE_MODE 1`로 설정하기만 하면 됩니다. 이제 자동차는 _일반 속도_ (75% PWM)로 주행하며 초음파 센서로 장애물을 감지하면 속도가 느려집니다. `TURN_THRESHOLD`(기본값: 50cm)에 가까워지면 무작위 방향으로 회전하기 시작하고 해당 측면의 LED가 켜집니다. 자동차 앞의 추정 여유 공간이 `TURN_THRESHOLD`보다 낮아지면 천천히 후진하고 두 LED가 켜집니다. 자동차와 Arduino 모두 전원이 공급되어야 합니다. Arduino는 L298N 모터 드라이버의 5V 출력에 5V 핀을 연결하거나 USB 케이블을 전원 공급원(예: 전화)에 연결하여 전원을 공급할 수 있습니다.
 
 자동차를 실행하기 전에 타이어를 제거하고 Arduino를 컴퓨터에 연결하고 [테스트](#testing) 섹션과 같이 직렬 모니터를 관찰하는 것이 좋습니다. 직렬 모니터의 출력은 약간 더 쉽게 구문 분석할 수 있으며(OLED와 동일) 배터리 전압, 왼쪽 및 오른쪽 모터의 rpm, 자동차 앞의 추정 여유 공간을 보여줍니다. 초음파 센서 앞에서 큰 물체를 앞뒤로 움직이고 모터 속도가 변하는 것을 관찰할 수 있습니다.
 
@@ -206,7 +253,7 @@ No Phone 모드에서는 ESP32 본체가 스스로 주행하게 하는 대신 �
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. 보드 관리자에서 **esp32_bluepad32** (4.1.0)를 설치합니다. 일반 펌웨어와 같은 esp32 코어(2.0.17)를 기반으로 합니다.
 3. esp32_bluepad32 보드 중에서 **ESP32 Dev Module**을 선택합니다.
-4. `NO_PHONE_MODE 1`과 `HAS_GAMEPAD 1`을 설정하고 업로드합니다.
+4. 설정에서 `NO_PHONE_MODE 1`과 `HAS_GAMEPAD 1`을 설정하고 업로드합니다.
 
 게임패드가 ESP32의 블루투스를 사용하므로 이 모드에서는 휴대폰과의 블루투스 연결이 꺼집니다. 휴대폰 앱으로 조종하려면 `HAS_GAMEPAD 0`으로 두고 게임패드를 휴대폰에 페어링하세요.
 
