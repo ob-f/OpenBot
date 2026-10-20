@@ -351,6 +351,7 @@ function download() {
   URL.revokeObjectURL(link.href);
   const board = BOARD_NAMES[state.board];
   showLines([...startupLines(), { text: `Downloaded openbot_settings.h. In the Arduino IDE, select ${board} and upload openbot.ino.`, cls: "ok" }]);
+  $("download-note").textContent = `Saved as openbot_settings.h. Select ${board} in the Arduino IDE.`;
 }
 
 // ---------- Serial: flashing and live settings ----------
@@ -466,7 +467,7 @@ async function applyLive(port) {
 }
 
 async function fetchBytes(file) {
-  const response = await fetch(file);
+  const response = await fetch(file, { cache: "no-cache" });
   if (!response.ok) throw new Error(`Couldn't download ${file}`);
   return new Uint8Array(await response.arrayBuffer());
 }
@@ -553,11 +554,19 @@ async function apply() {
 // ---------- Start ----------
 
 async function start() {
-  data = await (await fetch("bodies.json")).json();
+  data = await (await fetch("bodies.json", { cache: "no-cache" })).json();
   restore();
   if (!Object.keys(state.parts).length) resetParts();
   $("download").onclick = download;
   $("usb-help-open").onclick = () => $("usb-help").showModal();
+  for (const [tab, way] of [["tab-flash", "way-flash"], ["tab-ide", "way-ide"]]) {
+    $(tab).onclick = () => {
+      for (const [t, w] of [["tab-flash", "way-flash"], ["tab-ide", "way-ide"]]) {
+        $(t).setAttribute("aria-selected", t === tab);
+        $(w).hidden = w !== way;
+      }
+    };
+  }
   $("usb-help-close").onclick = () => $("usb-help").close();
   $("usb-help").onclick = (e) => { if (e.target === $("usb-help")) $("usb-help").close(); };
   if (data.version) $("version").textContent = `Version ${data.version}`;

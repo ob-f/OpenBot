@@ -76,14 +76,28 @@
         </section>
 
         <div class="actions">
-          <button class="primary" id="flash" type="button">Flash firmware</button>
-          <p class="note" id="flash-note"></p>
-          <button class="secondary" id="apply" type="button">Update settings only</button>
-          <p class="note">Sets the battery and parts on a robot that already has this firmware, without flashing.</p>
-          <button class="help-button" id="usb-help-open" type="button">USB connection help</button>
-          <div class="or"><span>or with the Arduino IDE</span></div>
-          <button class="secondary" id="download" type="button">Download settings file</button>
-          <p class="note" id="download-note">Put <code>openbot_settings.h</code> next to <code>openbot.ino</code>, then upload with the Arduino IDE.</p>
+          <div class="segmented ways" role="tablist" aria-label="How to get the firmware">
+            <button type="button" role="tab" id="tab-flash" aria-selected="true" aria-controls="way-flash">Flash in browser</button>
+            <button type="button" role="tab" id="tab-ide" aria-selected="false" aria-controls="way-ide">Arduino IDE</button>
+          </div>
+
+          <div class="way" id="way-flash" role="tabpanel" aria-labelledby="tab-flash">
+            <button class="primary" id="flash" type="button">Flash firmware</button>
+            <p class="note" id="flash-note"></p>
+            <button class="secondary" id="apply" type="button">Update settings only</button>
+            <p class="note">Sets the battery and parts on a robot that already has this firmware, without flashing.</p>
+            <button class="help-button" id="usb-help-open" type="button">USB connection help</button>
+          </div>
+
+          <div class="way" id="way-ide" role="tabpanel" aria-labelledby="tab-ide" hidden>
+            <ol class="ide-steps">
+              <li>Get the firmware from the <a href="https://github.com/ob-f/OpenBot/tree/master/firmware">firmware folder</a> and open <code>openbot/openbot.ino</code>.</li>
+              <li>Download the settings file and put it next to <code>openbot.ino</code>.</li>
+              <li>Select your board in the Arduino IDE and upload.</li>
+            </ol>
+            <button class="primary" id="download" type="button">Download settings file</button>
+            <p class="note" id="download-note"></p>
+          </div>
         </div>
       </div>
     </aside>
