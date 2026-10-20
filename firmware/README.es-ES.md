@@ -88,7 +88,10 @@ Al arrancar el robot, el Monitor Serie (115200 baudios) muestra el cuerpo y los 
 
 ```
 OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+OpenBot settings: openbot_settings.h
 ```
+
+La segunda línea indica de dónde vienen los ajustes: `openbot_settings.h`, o `openbot.ino` si no hay archivo de ajustes.
 
 Si dos componentes usan el mismo pin, la compilación se detiene con el error "Two parts use the same pin".
 

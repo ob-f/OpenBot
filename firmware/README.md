@@ -88,7 +88,10 @@ When the robot starts, the Serial Monitor (115200 baud) shows the body and the p
 
 ```
 OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+OpenBot settings: openbot_settings.h
 ```
+
+The second line shows where the settings came from: `openbot_settings.h`, or `openbot.ino` if there is no settings file.
 
 If two parts use the same pin, the build stops with the error "Two parts use the same pin".
 

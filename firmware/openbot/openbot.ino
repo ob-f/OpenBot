@@ -1035,6 +1035,11 @@ void setup() {
   // Serial.setTimeout(10);
   Serial.println('r');
   print_config();
+#if __has_include("openbot_settings.h")
+  Serial.println(F("OpenBot settings: openbot_settings.h"));
+#else
+  Serial.println(F("OpenBot settings: openbot.ino"));
+#endif
 
 #if (HAS_BLUETOOTH)
   String ble_name = "OpenBot: " + robot_type;

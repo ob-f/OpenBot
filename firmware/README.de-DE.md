@@ -88,7 +88,10 @@ Beim Start zeigt der serielle Monitor (115200 Baud) den Körper und die eingesch
 
 ```
 OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+OpenBot settings: openbot_settings.h
 ```
+
+Die zweite Zeile zeigt, woher die Einstellungen kommen: `openbot_settings.h` oder `openbot.ino`, wenn es keine Einstellungsdatei gibt.
 
 Wenn zwei Teile denselben Pin verwenden, bricht der Build mit dem Fehler "Two parts use the same pin" ab.
 

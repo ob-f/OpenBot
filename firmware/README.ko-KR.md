@@ -88,7 +88,10 @@ ESP32에서는 휴대폰과의 블루투스 연결도 켜집니다.
 
 ```
 OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+OpenBot settings: openbot_settings.h
 ```
+
+두 번째 줄은 설정을 어디서 가져왔는지 보여줍니다: `openbot_settings.h`, 또는 설정 파일이 없으면 `openbot.ino`.
 
 두 부품이 같은 핀을 사용하면 빌드가 "Two parts use the same pin" 오류와 함께 중지됩니다.
 

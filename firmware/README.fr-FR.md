@@ -88,7 +88,10 @@ Au démarrage du robot, le moniteur série (115200 bauds) affiche le corps et le
 
 ```
 OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+OpenBot settings: openbot_settings.h
 ```
+
+La deuxième ligne indique d'où viennent les réglages : `openbot_settings.h`, ou `openbot.ino` s'il n'y a pas de fichier de réglages.
 
 Si deux composants utilisent la même broche, la compilation s'arrête avec l'erreur "Two parts use the same pin".
 

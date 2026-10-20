@@ -88,7 +88,10 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
 
 ```
 OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+OpenBot settings: openbot_settings.h
 ```
+
+第二行显示设置的来源：`openbot_settings.h`，如果没有设置文件则为 `openbot.ino`。
 
 如果两个部件使用同一个引脚，编译会以错误 "Two parts use the same pin" 停止。
 
