@@ -312,7 +312,7 @@ function renderRobot() {
     canFlash = false;
     flashNote = "There's no ready-made firmware for this combination yet. Download the settings file instead.";
   } else {
-    flashNote = "Connect the robot's board by USB. You'll choose its port in the next step.";
+    flashNote = "Flashes the firmware and sets your battery and parts. Connect the board by USB; you'll choose its port next.";
   }
   $("flash").disabled = busy || !canFlash;
   $("flash-note").textContent = flashNote;
@@ -453,7 +453,7 @@ async function applyLive(port) {
     const command = `pvlow:${v.low.toFixed(2)}:vmax:${v.max.toFixed(2)}:off:${liveOffMask()}`;
     await reader.send(command);
     const reply = await reader.waitFor((l) => l.startsWith("pboard:"), 3000);
-    if (!reply) throw new Error("The robot didn't answer. Its firmware may be too old for live settings; flash it first.");
+    if (!reply) throw new Error("The robot didn't answer the settings. Its firmware may be older than this page; flash it first.");
     const live = parseLive(reply);
     if (live.board !== state.board) log(`This robot has an ${BOARD_NAMES[live.board]}, not an ${BOARD_NAMES[state.board]}.`, "warn");
     const off = PARTS.filter((p) => boardInfo().parts[p.key]?.live !== null && boardInfo().parts[p.key] && (Number(live.off) >> boardInfo().parts[p.key].live) & 1).map((p) => p.name);
@@ -557,6 +557,10 @@ async function start() {
   restore();
   if (!Object.keys(state.parts).length) resetParts();
   $("download").onclick = download;
+  $("usb-help-open").onclick = () => $("usb-help").showModal();
+  $("usb-help-close").onclick = () => $("usb-help").close();
+  $("usb-help").onclick = (e) => { if (e.target === $("usb-help")) $("usb-help").close(); };
+  if (data.version) $("version").textContent = `Version ${data.version}`;
   $("flash").onclick = flash;
   $("apply").onclick = apply;
   const custom = () => {

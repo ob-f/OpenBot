@@ -224,6 +224,17 @@ def build(robot: str, out: pathlib.Path) -> None:
                     shutil.copy(build_dir / "openbot.ino.bin", target / "app.bin")
 
 
+def version() -> str:
+    """The commit the site is built from, shown in the page's footer."""
+    result = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
 def site(out: pathlib.Path, builds: pathlib.Path | None) -> None:
     source = read_sketch()
     if out.exists():
@@ -266,6 +277,7 @@ def site(out: pathlib.Path, builds: pathlib.Path | None) -> None:
         "bodies": body_info(source),
         "settings": settings_template(source),
         "firmware": firmware,
+        "version": version(),
     }
     (out / "bodies.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
     print(

@@ -78,33 +78,50 @@
         <div class="actions">
           <button class="primary" id="flash" type="button">Flash firmware</button>
           <p class="note" id="flash-note"></p>
+          <button class="secondary" id="apply" type="button">Update settings only</button>
+          <p class="note">Sets the battery and parts on a robot that already has this firmware, without flashing.</p>
+          <button class="help-button" id="usb-help-open" type="button">USB connection help</button>
+          <div class="or"><span>or with the Arduino IDE</span></div>
           <button class="secondary" id="download" type="button">Download settings file</button>
-          <p class="note" id="download-note">For the Arduino IDE: put <code>openbot_settings.h</code> next to <code>openbot.ino</code>, then upload.</p>
-          <button class="link" id="apply" type="button">Apply battery and parts to a flashed robot</button>
+          <p class="note" id="download-note">Put <code>openbot_settings.h</code> next to <code>openbot.ino</code>, then upload with the Arduino IDE.</p>
         </div>
-
-        <details class="usb-help">
-          <summary>Connecting by USB</summary>
-          <ol>
-            <li>Use a USB <strong>data</strong> cable. Many cables only charge; if no port shows up, try another one.</li>
-            <li>Close the Arduino IDE's Serial Monitor and other programs that use the port.</li>
-            <li>Click <em>Flash firmware</em> and choose the board's port, for example <code>COM3</code> on Windows, <code>cu.usbserial-…</code> or <code>cu.wchusbserial…</code> on a Mac, or <code>ttyUSB0</code> on Linux.</li>
-          </ol>
-          <p>If no port shows up, your computer may need a driver for the board's USB chip. It's usually printed on the chip next to the USB socket:</p>
-          <ul>
-            <li><strong>CH340 / CH341</strong> (most Nano clones, many ESP32 boards): <a href="https://www.wch-ic.com/downloads/CH341SER_EXE.html">Windows</a>, <a href="https://github.com/WCHSoftGroup/ch34xser_macos">macOS</a></li>
-            <li><strong>CP2102 / CP2104</strong> (many ESP32 boards): <a href="https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers">Silicon Labs drivers</a></li>
-            <li><strong>FTDI</strong> (original Arduino Nano): <a href="https://ftdichip.com/drivers/vcp-drivers/">FTDI drivers</a></li>
-          </ul>
-          <p>On Linux, no driver is needed, but your user must be allowed to use serial ports: run <code>sudo usermod -aG dialout $USER</code> and log in again.</p>
-          <p>If an ESP32 doesn't connect, hold its <strong>BOOT</strong> button while flashing starts. A Nano with the old bootloader is detected automatically.</p>
-        </details>
       </div>
     </aside>
   </main>
 
+  <dialog class="help" id="usb-help" aria-labelledby="usb-help-title">
+    <div class="help-head">
+      <h2 id="usb-help-title">Connecting your robot by USB</h2>
+      <button class="help-close" id="usb-help-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="help-body">
+      <ol class="help-steps">
+        <li><strong>Use a USB data cable.</strong> Many cables only charge. If no port shows up, try another cable.</li>
+        <li><strong>Close other programs that use the port,</strong> like the Arduino IDE's Serial Monitor.</li>
+        <li><strong>Click Flash firmware and choose the board's port.</strong> It's called something like <code>COM3</code> on Windows, <code>cu.usbserial-…</code> or <code>cu.wchusbserial…</code> on a Mac, and <code>ttyUSB0</code> on Linux.</li>
+      </ol>
+
+      <h3>No port shows up?</h3>
+      <p>Your computer may need a driver for the board's USB chip. The chip's name is printed on it, next to the USB socket.</p>
+      <table class="drivers">
+        <thead><tr><th>USB chip</th><th>Found on</th><th>Driver</th></tr></thead>
+        <tbody>
+          <tr><td>CH340, CH341</td><td>Most Nano clones, many ESP32 boards</td><td><a href="https://www.wch-ic.com/downloads/CH341SER_EXE.html">Windows</a> · <a href="https://github.com/WCHSoftGroup/ch34xser_macos">macOS</a></td></tr>
+          <tr><td>CP2102, CP2104</td><td>Many ESP32 boards</td><td><a href="https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers">Silicon Labs</a></td></tr>
+          <tr><td>FTDI</td><td>Original Arduino Nano</td><td><a href="https://ftdichip.com/drivers/vcp-drivers/">FTDI</a></td></tr>
+        </tbody>
+      </table>
+      <p>On Linux no driver is needed, but your user must be allowed to use serial ports: run <code>sudo usermod -aG dialout $USER</code>, then log out and in again.</p>
+
+      <h3>It doesn't connect?</h3>
+      <p><strong>ESP32:</strong> hold the board's BOOT button while flashing starts, and let go once it writes.</p>
+      <p><strong>Nano:</strong> the page tries the new and the old bootloader by itself. If both fail, press the reset button just after clicking Flash firmware.</p>
+    </div>
+  </dialog>
+
   <footer class="bottom">
     <p>Flashing uses Web Serial and works in Chrome or Edge on a computer. The settings file works with any browser.</p>
+    <p id="version"></p>
   </footer>
 </body>
 </html>
