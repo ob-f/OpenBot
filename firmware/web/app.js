@@ -458,6 +458,8 @@ async function applyLive(port) {
     if (live.board !== state.board) log(`This robot has an ${BOARD_NAMES[live.board]}, not an ${BOARD_NAMES[state.board]}.`, "warn");
     const off = PARTS.filter((p) => boardInfo().parts[p.key]?.live !== null && boardInfo().parts[p.key] && (Number(live.off) >> boardInfo().parts[p.key].live) & 1).map((p) => p.name);
     log(`Battery ${Number(live.vlow).toFixed(1)}–${Number(live.vmax).toFixed(1)} V${off.length ? `, turned off: ${off.join(", ")}` : ""}`, "ok");
+    const now = await reader.waitFor((l) => l.startsWith("OpenBot "), 2000);
+    if (now) log(now);
   } finally {
     await reader.close();
   }

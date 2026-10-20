@@ -1028,6 +1028,7 @@ void process_live_settings_msg() {
   sendData(String("pboard:") + (MCU == NANO ? "nano" : "esp32") + ":have:" + String(PARTS_BUILT) + ":off:" + String(live.parts_off)
            + ":vlow:" + String(live.voltage_low, 2) + ":vmax:" + String(live.voltage_max, 2)
            + ":vmin:" + String(live.voltage_min, 2) + ":vdiv:" + String(live.voltage_divider_factor, 2));
+  print_config();  // the parts that are on now
 }
 
 //------------------------------------------------------//
@@ -1295,6 +1296,12 @@ void loop() {
   update_gamepad();
 #endif
 
+  // Messages from the phone; in no phone mode only the live settings matter,
+  // the controls below overwrite any motor command
+  if (Serial.available() > 0) {
+    on_serial_rx();
+  }
+
 #if (NO_PHONE_MODE)
   if (gamepad_driving) {
 #if (HAS_GAMEPAD)
@@ -1310,10 +1317,7 @@ void loop() {
     ctrl_left = 0;
     ctrl_right = 0;
   }
-#else  // Check for messages from the phone
-  if (Serial.available() > 0) {
-    on_serial_rx();
-  }
+#else
   stop_at_obstacle();
   if ((millis() - heartbeat_time) >= heartbeat_interval) {
     ctrl_left = 0;
