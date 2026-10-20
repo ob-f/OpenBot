@@ -59,7 +59,9 @@ def robots(source: str) -> dict[str, list[str]]:
             continue
         m = re.match(r'#error "(\w+) needs (an Arduino Nano|an ESP32) board', line)
         if m and m.group(1) == robot:
-            result[robot] = [mcu for mcu, name in MCU_NAMES.items() if name == m.group(2)]
+            result[robot] = [
+                mcu for mcu, name in MCU_NAMES.items() if name == m.group(2)
+            ]
     return result
 
 
@@ -74,12 +76,16 @@ def combinations(source: str, robot: str, mcus: list[str]):
             yield from mcu_combinations(source, robot, mcu)
         else:
             # An unsupported board must fail with the body's error
-            yield ("nano" if mcu == "NANO" else "esp32"), {"OPENBOT": robot}, f"{robot} needs {MCU_NAMES[mcus[0]]} board"
+            yield ("nano" if mcu == "NANO" else "esp32"), {
+                "OPENBOT": robot
+            }, f"{robot} needs {MCU_NAMES[mcus[0]]} board"
 
 
 def mcu_combinations(source: str, robot: str, mcu: str):
     gamepad = has_define(source, "HAS_GAMEPAD")
-    for no_phone, debug, pad in itertools.product((0, 1), (0, 1), (0, 1) if gamepad else (0,)):
+    for no_phone, debug, pad in itertools.product(
+        (0, 1), (0, 1), (0, 1) if gamepad else (0,)
+    ):
         settings = {"OPENBOT": robot, "NO_PHONE_MODE": no_phone, "DEBUG": debug}
         if gamepad:
             settings["HAS_GAMEPAD"] = pad
@@ -104,7 +110,9 @@ def configure(source: str, settings: dict) -> str:
         pattern = re.compile(rf"^(#define {re.escape(name)})\s+\S+", re.MULTILINE)
         matches = pattern.findall(source)
         if len(matches) != 1:
-            sys.exit(f"#define {name} found {len(matches)} times in {SKETCH.name}, expected once")
+            sys.exit(
+                f"#define {name} found {len(matches)} times in {SKETCH.name}, expected once"
+            )
         source = pattern.sub(rf"\g<1> {value}", source)
     return source
 
@@ -125,9 +133,19 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
         sketch_dir = pathlib.Path(tmp) / "openbot"
         shutil.copytree(SKETCH.parent, sketch_dir)
         sketch = sketch_dir / "openbot.ino"
-        sketch.write_text(configure(sketch.read_text(encoding="utf-8"), settings), encoding="utf-8")
+        sketch.write_text(
+            configure(sketch.read_text(encoding="utf-8"), settings), encoding="utf-8"
+        )
         result = subprocess.run(
-            ["arduino-cli", "compile", "--fqbn", fqbn, "--warnings", "default", str(sketch_dir)],
+            [
+                "arduino-cli",
+                "compile",
+                "--fqbn",
+                fqbn,
+                "--warnings",
+                "default",
+                str(sketch_dir),
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
@@ -137,21 +155,30 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
         verdict = "ok" if ok else "FAILED"
     else:
         ok = result.returncode != 0 and expect_error in result.stdout
-        verdict = "failed as expected" if ok else f"FAILED (expected error: {expect_error})"
+        verdict = (
+            "failed as expected" if ok else f"FAILED (expected error: {expect_error})"
+        )
     print(f"::group::{verdict:>18} | {fqbn} | {label}", flush=True)
     print(result.stdout)
     print("::endgroup::", flush=True)
     if not ok:
         print(f"::error::{fqbn} {label}: {verdict}", flush=True)
         # Show the first compiler errors as annotations, so they appear without opening the log
-        errors = [line.strip() for line in result.stdout.splitlines() if "error:" in line]
+        errors = [
+            line.strip() for line in result.stdout.splitlines() if "error:" in line
+        ]
         for line in errors[:5]:
-            print(f"::error::{robot_label(settings)}: {line.replace(tmp_prefix(line), '')}", flush=True)
+            print(
+                f"::error::{robot_label(settings)}: {line.replace(tmp_prefix(line), '')}",
+                flush=True,
+            )
     return ok
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--list-robots", action="store_true")
     parser.add_argument("--cores", metavar="ROBOT")
     parser.add_argument("--robot")
@@ -168,7 +195,9 @@ def main() -> int:
         return 0
 
     if args.cores:
-        boards = {board for board, _, _ in combinations(source, args.cores, types[args.cores])}
+        boards = {
+            board for board, _, _ in combinations(source, args.cores, types[args.cores])
+        }
         print(" ".join(sorted(BOARDS[b][0] for b in boards)))
         return 0
 
