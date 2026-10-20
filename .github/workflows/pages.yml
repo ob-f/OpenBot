@@ -94,6 +94,8 @@ jobs:
           path: builds
 
       - name: Assemble
+        env:
+          SITE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           mkdir -p _site
           cp -r .github/pages/. _site/
