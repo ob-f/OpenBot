@@ -45,6 +45,7 @@ npm start
 4. Dans les applications mobiles OpenBot, après vous être connecté, vous pouvez récupérer les fichiers sauvegardés depuis Google Drive et les charger en un seul clic.
 5. Concevez les instructions pour OpenBot sans écrire de code.
 6. Design entièrement réactif optimisé pour la navigation sur mobile et tablette.
+7. Des blocs OpenBot Playground à [explorer](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA).
 
 ### Stockage du Projet
 

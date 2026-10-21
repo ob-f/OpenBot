@@ -73,6 +73,7 @@
   Hier sind einige Beispiele:
     - Blinker: Block, der verwendet wird, um Blinker durch Ein- und Ausschalten zu aktivieren.
     - Helligkeit: Wird verwendet, um die Helligkeit der Heck- und Front-LEDs durch dynamische Werte einzustellen.
+    - [Demo-Video](https://www.youtube.com/watch?v=ICSi-1ip22U&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=3)
 
   HINWEIS: Wenn die Helligkeit auf null gesetzt wird, wird der Helligkeitsmodus ausgeschaltet, und wenn die Helligkeit auf den höchsten Punkt, d.h. 100, gesetzt wird, wird der Helligkeitsmodus eingeschaltet.
 
@@ -99,6 +100,7 @@
 
     - Geschwindigkeit: Hilft Ihnen, den Sound als langsam, mittel und schnell abzuspielen.
     - Modus: Hilft Ihnen, den Sound als dual, Joystick oder Spiel abzuspielen.
+    - [Demo-Video](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=1)
 
 - ### Sensoren:
 
@@ -109,6 +111,7 @@
   Überblick:
     - Telefonsensoren: Helfen, Gyroskop-, Beschleunigungs- und Magnetfeldmessungen an verschiedenen Achsen (3-dimensional) zu messen.
     - Autosensoren: Helfen, verschiedene Messwerte wie Sonar, Geschwindigkeit bereitzustellen. Außerdem wird überprüft, ob der Stoßfänger mit einem Hindernis kollidiert.
+    - [Demo-Video](https://www.youtube.com/watch?v=Ubcb1bTgfuc&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=2)
 
 - ### Bewegung:
 
@@ -120,6 +123,7 @@
 
     - Geschwindigkeit einstellen: Hilft, die Geschwindigkeit als langsam, mittel und schnell einzustellen.
     - Bewegen: Hilft, die Bewegung vorwärts oder rückwärts und links oder rechts mit der erforderlichen Geschwindigkeit zu machen.
+    - [Demo-Video](https://www.youtube.com/watch?v=X7M45-PGOVg&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=4)
 
   Wichtige Punkte:
     - Wenn der linke Geschwindigkeitswert niedriger als der rechte eingestellt ist, bewegt sich der Roboter gegen den Uhrzeigersinn, oder umgekehrt.
@@ -136,6 +140,7 @@
     - ``Objektverfolgung``: Ihre Hauptfunktion besteht darin, Objekte zu erkennen. Dieses KI-Fragment ermöglicht es Ihnen, ein beliebiges Objekt zur Verfolgung auszuwählen. Abhängig von der Leistung Ihres Telefons haben Sie die Flexibilität, ein Objekterkennungsmodell auszuwählen. Standardmäßig ist dieser Block mit dem Modell "MobileNetV1-300" ausgestattet. Zusätzlich haben Sie die Möglichkeit, manuell ein beliebiges Modell hinzuzufügen.
     - ``Autopilot``: Dieses Snippet ist auch über OpenBot Playground verfügbar und nutzt die Datenerfassung, wobei ein vortrainiertes Datenset (ML-Modell CIL-Mobile-Cmd) bereits integriert ist. Anschließend wird das Kamerafragment auf dem Bildschirm angezeigt und die Verfolgung des erfassten Pfades gestartet.
     - ``Punktzielnavigation``: Das Hauptziel dieses Blocks besteht darin, durch Navigation einen bestimmten Punkt zu erreichen. Sie können die Vorwärts- und Links-Werte in einer 3-dimensionalen Ansicht mit den Navigationsmodellen darin konfigurieren. Wenn das Projekt auf einem Telefon ausgeführt wird, wird das Punktnavigationsfragment auf dem Bildschirm mit einer Augmented Reality (AR)-Ansicht angezeigt. Anschließend wird der Roboter die Bewegung initiieren, bis er das Ziel erfolgreich erreicht.
+    - [Demo-Video](https://www.youtube.com/watch?v=MPzbwUoG97Q&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=6)
 
    <p style="color: yellow"> TIPP: Wenn Sie ein externes Modell integriert haben, stellen Sie sicher, dass AutoSync im Playground aktiviert ist. Diese Funktion hilft Ihnen, das neu hinzugefügte Modell im Block anzuzeigen und die Verfügbarkeit und den erfolgreichen Download des Modells in der Roboter-App zu überprüfen.</p>
 

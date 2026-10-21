@@ -45,6 +45,7 @@ npm start
 4. 在 OpenBot 移动应用中，登录后可以从 Google Drive 中检索保存的文件，并一键加载。
 5. 零代码设计 OpenBot 的指令。
 6. 完全响应式设计，优化了移动设备和平板电脑的浏览体验。
+7. 可以[探索](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA)的 OpenBot Playground 积木。
 
 ### 项目存储
 

@@ -46,6 +46,7 @@ npm start
 4. OpenBot 모바일 앱에서 로그인 후, Google Drive에서 저장된 파일을 한 번의 클릭으로 불러올 수 있어요.
 5. 코딩 없이 OpenBot에 대한 명령을 디자인할 수 있어요.
 6. 모바일과 태블릿 브라우징에 최적화된 완전 반응형 디자인이에요.
+7. [살펴볼](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA) 수 있는 OpenBot Playground 블록.
 
 ### 프로젝트 저장소
 
