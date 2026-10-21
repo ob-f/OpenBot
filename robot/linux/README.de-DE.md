@@ -77,7 +77,7 @@ Führen Sie `pytest` im Ordner `tests` aus oder führen Sie die `test_*.py`-Date
 - Generierung von Trainingsdaten über `test_generate_data.py`.
 - Inferenz im Debug-Modus für OpenVino, Tensorflow und Tflite über `test_infer.py`.
     - *Hinweis*: Die Testdaten in logs1 werden mit dem Skript `associate_frames.py` in `OpenBot.policy.openbot` generiert, wobei der Pfad zu den Bildern in `logs1/data/sensor_data/matched_frame_ctrl_cmd_processed.txt` fest codiert ist.
-    - Ersetzen Sie daher bitte den `path_to_openbot` durch den tatsächlichen Pfad zum `OpenBot`-Repository in `test_infer.py`.
+    - `test_infer.py` ersetzt ihn durch den Pfad zu Ihrer Kopie des `OpenBot`-Repositorys.
 - Joystick-Verbindung über `test_joystick.py`
 - Motorverbindung vom seriellen Port zum Arduino über `test_motor.py`.
 - Video-Stream zur Realsense-Kamera über `test_realsense.py`.
@@ -104,7 +104,7 @@ conda create --name openbot python==3.9
 
 Installieren Sie zunächst die Anforderungen von OpenBot.policy über
 ```
-../policy && pip install -r requirements.txt
+cd ../../policy && pip install -r requirements.txt && cd ../robot/linux
 ```
 
 Installieren Sie dann die erforderlichen Module über
