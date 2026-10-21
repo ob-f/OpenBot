@@ -94,8 +94,14 @@
     <string name="selectAll">Select All</string>
     <string name="clearAll">Clear All</string>
     <string name="tracking_lost">Tracking lost.</string>
+    <string name="point_goal_tap_hint">Tap on the floor where you want the robot to go, then press Start.</string>
+    <string name="point_goal_set">Goal set %1$.1f m away. Press Start to drive.</string>
+    <string name="point_goal_not_floor">That\'s not the floor. Tap on the floor where the robot can drive.</string>
+    <string name="point_goal_too_close">Too close. Tap a spot at least %1$.1f m away.</string>
+    <string name="point_goal_watchdog">The robot was stopped because the app stopped responding.</string>
     <string name="no_initial_ar_core_pose">No initial AR Core pose.</string>
     <string name="ar_core_session_paused">AR Core session paused.</string>
+    <string name="start">Start</string>
     <string name="tips_connect_timeout">connect timeout</string>
     <string name="tips_connect_fail">connect fail</string>
     <string name="tips_connection_disconnected">connection has disconnected</string>
@@ -236,11 +242,6 @@
     <string name="tile_model_management">Model Management</string>
     <string name="tile_default_mode">Default</string>
 
-    <string name="set_goal_title">Set Goal</string>
-    <string name="set_goal_message">Mount the phone on the robot and specify a goal. The robot will try to reach the goal after pressing start.</string>
-    <string name="start">Start</string>
-    <string name="forward_hint_m">Forward [m]</string>
-    <string name="left_hint_m">Left [m]</string>
     <string name="log_data">Log Data</string>
     <string name="model_resolution">Model Resolution</string>
     <string name="sensor_data">Sensor Data</string>

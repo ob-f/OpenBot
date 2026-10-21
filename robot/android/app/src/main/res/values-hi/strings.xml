@@ -74,6 +74,11 @@
     <string name="selectAll">सभी चुनें</string>
     <string name="clearAll">सभी साफ़ करें</string>
     <string name="tracking_lost">ट्रैकिंग खो गई।</string>
+    <string name="point_goal_tap_hint">फ़र्श पर वहाँ टैप करें जहाँ रोबोट को जाना है, फिर स्टार्ट दबाएँ।</string>
+    <string name="point_goal_set">लक्ष्य %1$.1f मी दूर सेट हुआ। चलाने के लिए स्टार्ट दबाएँ।</string>
+    <string name="point_goal_not_floor">यह फ़र्श नहीं है। फ़र्श पर वहाँ टैप करें जहाँ रोबोट चल सकता है।</string>
+    <string name="point_goal_too_close">बहुत पास। कम से कम %1$.1f मी दूर की जगह पर टैप करें।</string>
+    <string name="point_goal_watchdog">ऐप ने जवाब देना बंद कर दिया, इसलिए रोबोट रोक दिया गया।</string>
     <string name="no_initial_ar_core_pose">कोई प्रारंभिक AR Core पोज़ नहीं।</string>
     <string name="ar_core_session_paused">AR Core सत्र रोका गया।</string>
     <string name="tips_connect_timeout">कनेक्ट टाइमआउट</string>
@@ -157,11 +162,7 @@
         <item>लोकल सर्वर</item>
     </string-array>
 
-    <string name="set_goal_title">लक्ष्य सेट करें</string>
-    <string name="set_goal_message">फ़ोन को रोबोट पर लगाएं और एक लक्ष्य निर्दिष्ट करें। स्टार्ट दबाने के बाद रोबोट लक्ष्य तक पहुंचने की कोशिश करेगा।</string>
     <string name="start">शुरू करें</string>
-    <string name="forward_hint_m">आगे [मी]</string>
-    <string name="left_hint_m">बाएं [मी]</string>
     <string name="log_data">डेटा लॉग करें</string>
     <string name="model_resolution">मॉडल रिज़ॉल्यूशन</string>
     <string name="sensor_data">सेंसर डेटा</string>

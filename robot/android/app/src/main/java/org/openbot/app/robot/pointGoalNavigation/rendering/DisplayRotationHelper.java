@@ -77,6 +77,11 @@ public final class DisplayRotationHelper implements DisplayListener {
     }
   }
 
+  /** Returns the current display rotation as one of {@code Surface.ROTATION_0/90/180/270}. */
+  public int getRotation() {
+    return display.getRotation();
+  }
+
   @Override
   public void onDisplayAdded(int displayId) {}
 

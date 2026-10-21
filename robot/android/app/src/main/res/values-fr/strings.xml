@@ -74,6 +74,11 @@
     <string name="selectAll">Tout sélectionner</string>
     <string name="clearAll">Tout effacer</string>
     <string name="tracking_lost">Suivi perdu.</string>
+    <string name="point_goal_tap_hint">Touchez le sol à l\'endroit où le robot doit aller, puis appuyez sur Démarrer.</string>
+    <string name="point_goal_set">Objectif placé à %1$.1f m. Appuyez sur Démarrer.</string>
+    <string name="point_goal_not_floor">Ce n\'est pas le sol. Touchez le sol où le robot peut rouler.</string>
+    <string name="point_goal_too_close">Trop proche. Touchez un point à au moins %1$.1f m.</string>
+    <string name="point_goal_watchdog">Le robot a été arrêté car l\'application ne répondait plus.</string>
     <string name="no_initial_ar_core_pose">Aucune pose initiale AR Core.</string>
     <string name="ar_core_session_paused">Session AR Core en pause.</string>
     <string name="tips_connect_timeout">délai de connexion dépassé</string>
@@ -157,11 +162,7 @@
         <item>Serveur local</item>
     </string-array>
 
-    <string name="set_goal_title">Définir un objectif</string>
-    <string name="set_goal_message">Montez le téléphone sur le robot et définissez un objectif. Le robot essaiera d\'atteindre l\'objectif après avoir appuyé sur Démarrer.</string>
     <string name="start">Démarrer</string>
-    <string name="forward_hint_m">Avant [m]</string>
-    <string name="left_hint_m">Gauche [m]</string>
     <string name="log_data">Enregistrer les données</string>
     <string name="model_resolution">Résolution du modèle</string>
     <string name="sensor_data">Données des capteurs</string>

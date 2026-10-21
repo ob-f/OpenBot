@@ -74,6 +74,11 @@
     <string name="selectAll">全选</string>
     <string name="clearAll">全部清除</string>
     <string name="tracking_lost">跟踪丢失。</string>
+    <string name="point_goal_tap_hint">点击地面上希望机器人前往的位置，然后按开始。</string>
+    <string name="point_goal_set">目标已设置在 %1$.1f 米外。按开始出发。</string>
+    <string name="point_goal_not_floor">这不是地面。请点击机器人可以行驶的地面。</string>
+    <string name="point_goal_too_close">太近了。请点击至少 %1$.1f 米外的位置。</string>
+    <string name="point_goal_watchdog">应用无响应，机器人已停止。</string>
     <string name="no_initial_ar_core_pose">没有初始 AR Core 姿态。</string>
     <string name="ar_core_session_paused">AR Core 会话已暂停。</string>
     <string name="tips_connect_timeout">连接超时</string>
@@ -157,11 +162,7 @@
         <item>本地服务器</item>
     </string-array>
 
-    <string name="set_goal_title">设置目标</string>
-    <string name="set_goal_message">将手机安装在机器人上并指定一个目标。按下开始后，机器人将尝试到达该目标。</string>
     <string name="start">开始</string>
-    <string name="forward_hint_m">前进 [米]</string>
-    <string name="left_hint_m">左侧 [米]</string>
     <string name="log_data">记录数据</string>
     <string name="model_resolution">模型分辨率</string>
     <string name="sensor_data">传感器数据</string>

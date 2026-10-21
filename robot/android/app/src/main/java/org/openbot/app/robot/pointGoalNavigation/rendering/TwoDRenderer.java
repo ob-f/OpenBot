@@ -186,12 +186,27 @@ public class TwoDRenderer {
   }
 
   public void updateModelMatrix(float[] modelMatrix, float scaleFactor) {
+    updateModelMatrix(modelMatrix, scaleFactor, 0f);
+  }
+
+  /**
+   * @param rotationDegrees additional in-plane rotation around the quad's own facing axis (Z,
+   *     local to the quad), applied before placing it via {@code modelMatrix}. Used to compensate
+   *     for the marker rendering rotated relative to the visible camera feed in portrait.
+   */
+  public void updateModelMatrix(float[] modelMatrix, float scaleFactor, float rotationDegrees) {
     float[] scaleMatrix = new float[16];
     Matrix.setIdentityM(scaleMatrix, 0);
     scaleMatrix[0] = scaleFactor;
     scaleMatrix[5] = scaleFactor;
     scaleMatrix[10] = scaleFactor;
-    Matrix.multiplyMM(mModelMatrix, 0, modelMatrix, 0, scaleMatrix, 0);
+
+    float[] rotationMatrix = new float[16];
+    Matrix.setRotateM(rotationMatrix, 0, rotationDegrees, 0f, 0f, 1f);
+
+    float[] scaledRotation = new float[16];
+    Matrix.multiplyMM(scaledRotation, 0, scaleMatrix, 0, rotationMatrix, 0);
+    Matrix.multiplyMM(mModelMatrix, 0, modelMatrix, 0, scaledRotation, 0);
   }
 
   public void draw(float[] cameraView, float[] cameraPerspective) {

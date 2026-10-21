@@ -4,11 +4,11 @@ import android.content.Context;
 import android.media.Image;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.util.Size;
-import android.view.ViewGroup;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Camera;
 import com.google.ar.core.CameraConfig;
@@ -18,11 +18,13 @@ import com.google.ar.core.Config.InstantPlacementMode;
 import com.google.ar.core.Config.LightEstimationMode;
 import com.google.ar.core.Config.PlaneFindingMode;
 import com.google.ar.core.Frame;
+import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingFailureReason;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
+import com.google.ar.core.exceptions.NotTrackingException;
 import com.google.ar.core.exceptions.NotYetAvailableException;
 import com.google.ar.core.exceptions.SessionPausedException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
@@ -30,6 +32,8 @@ import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -52,8 +56,7 @@ public class ArCore implements GLSurfaceView.Renderer {
   private Session session;
   private Camera camera;
   private final TwoDRenderer twoDRenderer = new TwoDRenderer();
-  private Pose currentPose;
-  private float gpuTextureAspectRatio = 16.0f / 9.0f;
+  private volatile Pose currentPose;
   private ArCoreListener arCoreListener = null;
   private final float[] anchorMatrix = new float[16];
   private Anchor startAnchor, targetAnchor;
@@ -61,6 +64,21 @@ public class ArCore implements GLSurfaceView.Renderer {
   private GLSurfaceView surfaceView;
   private boolean renderFrame = true;
   private Pose startPose = null, targetPose = null;
+  // Written on the UI thread, consumed on the GL thread.
+  private volatile float[] pendingTap = null;
+  // Floor and wall detection cost CPU, so only the tap-to-goal screen turns them on.
+  private boolean goalPlacementEnabled = false;
+  // The marker quad reaches this far below its center; lift it so the pin tip touches the floor.
+  private static final float MARKER_TIP_OFFSET_M = 0.1f;
+
+  private static final String PREFS = "point_goal_navigation";
+  private static final String PREF_CAMERA_HEIGHT = "camera_height_m";
+  private static final int CALIBRATE_EVERY_FRAMES = 15;
+  // Height of the phone camera above the floor. Distances come from it, so it is re-measured
+  // from ARCore's floor plane whenever one is found and remembered for next time.
+  private float cameraHeightM;
+  private boolean cameraHeightMeasured = false;
+  private int frameCount = 0;
 
   public ArCore(Context context, GLSurfaceView surfaceView, Handler handlerMain) {
     this.appContext = context;
@@ -94,13 +112,16 @@ public class ArCore implements GLSurfaceView.Renderer {
 
   @Override
   public void onSurfaceChanged(GL10 gl, int width, int height) {
+    // The surfaceView is left at its XML match_parent size (full screen) rather than resized to
+    // the camera's native capture aspect ratio - BackgroundRenderer.draw() already renders a
+    // full-viewport quad and relies on Frame#transformCoordinates2d to crop/rotate the camera
+    // texture to fill whatever the real viewport is, which is the standard ARCore pattern.
+    // Shrinking the surface to match the camera's aspect ratio here fought that: it produced
+    // letterboxing and, combined with DisplayRotationHelper/Session#setDisplayGeometry being fed
+    // a viewport that didn't match the true full-screen size, incorrect marker projection too.
+    Timber.d("onSurfaceChanged: gl surface (%d, %d)", width, height);
     displayRotationHelper.onSurfaceChanged(width, height);
     GLES20.glViewport(0, 0, width, height);
-
-    ViewGroup.LayoutParams lp = surfaceView.getLayoutParams();
-    lp.height = height;
-    lp.width = (int) (lp.height * gpuTextureAspectRatio);
-    runOnMainThread(() -> surfaceView.setLayoutParams(lp));
   }
 
   public Pose getStartPose() {
@@ -114,7 +135,7 @@ public class ArCore implements GLSurfaceView.Renderer {
   }
 
   public Pose getTargetPose() {
-    return targetAnchor.getPose();
+    return targetAnchor == null ? null : targetAnchor.getPose();
   }
 
   public void setTargetAnchor(Pose pose) {
@@ -123,6 +144,42 @@ public class ArCore implements GLSurfaceView.Renderer {
 
   public void setTargetAnchorAtCurrentPose() {
     targetAnchor = session.createAnchor(currentPose);
+  }
+
+  /**
+   * Replaces the current target anchor with a plain anchor at its current pose. Anchors created
+   * from a hit result stay attached to their plane and move as ARCore refines it, which would make
+   * the goal drift while driving. A plain {@code session.createAnchor(pose)} anchor stays fixed.
+   */
+  public void freezeTargetAnchor() {
+    if (targetAnchor == null) {
+      Timber.d("freezeTargetAnchor: no target anchor to freeze");
+      return;
+    }
+    Pose frozenPose = targetAnchor.getPose();
+    targetAnchor.detach();
+    targetAnchor = session.createAnchor(frozenPose);
+    Timber.d(
+        "freezeTargetAnchor: frozen at (%.3f, %.3f, %.3f)",
+        frozenPose.tx(), frozenPose.ty(), frozenPose.tz());
+  }
+
+  /**
+   * Requests that the given screen-space tap (in {@link #surfaceView} pixel coordinates) be turned
+   * into a goal pose on the next rendered frame. The actual hit-test runs on the GL thread inside
+   * {@link #onDrawFrame}, since it needs the current frame's {@link Frame} object.
+   */
+  public void requestTapAt(float screenX, float screenY) {
+    pendingTap = new float[] {screenX, screenY};
+  }
+
+  /** Turns on floor/wall detection and depth for tap-to-goal. Call before {@link #resume()}. */
+  public void setGoalPlacementEnabled(boolean enabled) {
+    goalPlacementEnabled = enabled;
+    cameraHeightM =
+        appContext
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getFloat(PREF_CAMERA_HEIGHT, GoalValidator.DEFAULT_CAMERA_HEIGHT_M);
   }
 
   @Override
@@ -201,6 +258,16 @@ public class ArCore implements GLSurfaceView.Renderer {
         targetPose = targetAnchor.getPose();
       }
 
+      if (goalPlacementEnabled && frameCount++ % CALIBRATE_EVERY_FRAMES == 0) {
+        calibrateCameraHeight();
+      }
+
+      float[] tap = pendingTap;
+      if (tap != null) {
+        pendingTap = null;
+        placeGoalFromTap(tap[0], tap[1]);
+      }
+
       // Get image.
       // TODO: If needed, we could possibly implement some performance optimization here:
       // Do we really need to copy here? We could use several cycling textures instead of only
@@ -257,20 +324,151 @@ public class ArCore implements GLSurfaceView.Renderer {
         final float[] colorCorrectionRgba = new float[4];
         frame.getLightEstimate().getColorCorrection(colorCorrectionRgba, 0);
 
-        float translation[] = new float[3];
-        float rotation[] = new float[4];
-        targetAnchor.getPose().getTranslation(translation, 0);
-        currentPose.getRotationQuaternion(rotation, 0);
-
-        Pose rotatedPose = new Pose(translation, rotation);
-        rotatedPose.toMatrix(anchorMatrix, 0);
-
-        float scaleFactor = 1.0f;
-        // Update and draw the model and its shadow.
-        twoDRenderer.updateModelMatrix(anchorMatrix, scaleFactor);
+        // Stand the pin upright in the world (local +y = world up) and turn it about the
+        // vertical axis to face the camera, so it looks right however the phone is mounted:
+        // portrait, landscape or upside down. Its tip sits on the goal spot on the floor.
+        float[] goal = targetAnchor.getPose().getTranslation();
+        float yaw = (float) Math.atan2(currentPose.tx() - goal[0], currentPose.tz() - goal[2]);
+        Pose markerPose =
+            new Pose(
+                new float[] {goal[0], goal[1] + MARKER_TIP_OFFSET_M, goal[2]},
+                new float[] {0f, (float) Math.sin(yaw / 2), 0f, (float) Math.cos(yaw / 2)});
+        markerPose.toMatrix(anchorMatrix, 0);
+        twoDRenderer.updateModelMatrix(anchorMatrix, 1.0f);
         twoDRenderer.draw(viewmtx, projmtx);
       }
     }
+  }
+
+  /**
+   * The goal is where the tap ray meets the floor, with the floor at the known camera height below
+   * the phone. This only needs the camera's orientation (gravity is exact from the IMU), so it's
+   * correct from the first frame. Image depth is not used: a phone standing still on the robot has
+   * no parallax yet, so early depth guesses are off and get corrected as it drives, which made the
+   * goal jump.
+   */
+  private void placeGoalFromTap(float tapX, float tapY) {
+    float[] cameraPos = currentPose.getTranslation();
+    float[][] ray = tapRay(tapX, tapY);
+    float[] goal =
+        ray == null
+            ? null
+            : GoalValidator.intersectFloor(ray[0], ray[1], cameraPos[1] - cameraHeightM);
+
+    GoalValidator.Result result = GoalValidator.validate(cameraPos, goal);
+    Timber.d(
+        "goal tap (%.0f, %.0f): camera=%s height=%.3f (%s) goal=%s -> %s",
+        tapX,
+        tapY,
+        Arrays.toString(cameraPos),
+        cameraHeightM,
+        cameraHeightMeasured ? "measured" : "saved",
+        Arrays.toString(goal),
+        result);
+    if (result != GoalValidator.Result.OK) {
+      notifyRejected(result);
+      return;
+    }
+
+    try {
+      // A plain anchor at a world position stays fixed; it doesn't follow the screen.
+      Anchor newAnchor = session.createAnchor(Pose.makeTranslation(goal[0], goal[1], goal[2]));
+      if (targetAnchor != null) targetAnchor.detach();
+      targetAnchor = newAnchor;
+      targetPose = newAnchor.getPose();
+      float distance = GoalValidator.horizontalDistance(cameraPos, goal);
+      runOnMainThread(
+          () -> {
+            if (arCoreListener != null) arCoreListener.onGoalPlaced(distance);
+          });
+    } catch (NotTrackingException e) {
+      Timber.d(e, "ARCore lost tracking while placing goal anchor.");
+    }
+  }
+
+  /** Measures the camera height from ARCore's floor plane, if it sees one. */
+  private void calibrateCameraHeight() {
+    float cameraY = currentPose.ty();
+    Float floorY = GoalValidator.pickFloorY(collectUpwardPlanes(), cameraY);
+    if (floorY == null) return;
+    float height = cameraY - floorY;
+    // Only heights a phone on the robot can have; not while someone holds it up by hand.
+    if (height < GoalValidator.MIN_MOUNT_HEIGHT_M || height > GoalValidator.MAX_MOUNT_HEIGHT_M) {
+      return;
+    }
+    if (!cameraHeightMeasured || Math.abs(height - cameraHeightM) > 0.005f) {
+      Timber.d("camera height measured: %.3f m", height);
+      appContext
+          .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+          .edit()
+          .putFloat(PREF_CAMERA_HEIGHT, height)
+          .apply();
+    }
+    cameraHeightM = height;
+    cameraHeightMeasured = true;
+  }
+
+  public float getCameraHeight() {
+    return cameraHeightM;
+  }
+
+  /** World-space ray {origin, direction} through a screen pixel. */
+  private float[][] tapRay(float tapX, float tapY) {
+    int width = surfaceView.getWidth();
+    int height = surfaceView.getHeight();
+    if (width == 0 || height == 0) return null;
+
+    float[] projection = new float[16];
+    camera.getProjectionMatrix(projection, 0, 0.1f, 100.0f);
+    float[] view = new float[16];
+    camera.getViewMatrix(view, 0);
+    float[] viewProjection = new float[16];
+    Matrix.multiplyMM(viewProjection, 0, projection, 0, view, 0);
+    float[] inverse = new float[16];
+    if (!Matrix.invertM(inverse, 0, viewProjection, 0)) return null;
+
+    float ndcX = 2f * tapX / width - 1f;
+    float ndcY = 1f - 2f * tapY / height;
+    float[] near = unproject(inverse, ndcX, ndcY, -1f);
+    float[] far = unproject(inverse, ndcX, ndcY, 1f);
+    float[] direction = {far[0] - near[0], far[1] - near[1], far[2] - near[2]};
+    float length =
+        (float)
+            Math.sqrt(
+                direction[0] * direction[0]
+                    + direction[1] * direction[1]
+                    + direction[2] * direction[2]);
+    if (length < 1e-6f) return null;
+    for (int i = 0; i < 3; i++) direction[i] /= length;
+    return new float[][] {near, direction};
+  }
+
+  private static float[] unproject(float[] inverse, float x, float y, float z) {
+    float[] in = {x, y, z, 1f};
+    float[] out = new float[4];
+    Matrix.multiplyMV(out, 0, inverse, 0, in, 0);
+    return new float[] {out[0] / out[3], out[1] / out[3], out[2] / out[3]};
+  }
+
+  private void notifyRejected(GoalValidator.Result result) {
+    runOnMainThread(
+        () -> {
+          if (arCoreListener != null) arCoreListener.onGoalRejected(result);
+        });
+  }
+
+  /** Returns {y, area} for every tracked upward-facing plane that hasn't been merged away. */
+  private List<float[]> collectUpwardPlanes() {
+    List<float[]> planes = new ArrayList<>();
+    for (Plane plane : session.getAllTrackables(Plane.class)) {
+      if (plane.getTrackingState() != TrackingState.TRACKING
+          || plane.getSubsumedBy() != null
+          || plane.getType() != Plane.Type.HORIZONTAL_UPWARD_FACING) {
+        continue;
+      }
+      planes.add(new float[] {plane.getCenterPose().ty(), plane.getExtentX() * plane.getExtentZ()});
+    }
+    return planes;
   }
 
   protected synchronized void runOnMainThread(final Runnable r) {
@@ -317,14 +515,6 @@ public class ArCore implements GLSurfaceView.Renderer {
     } else {
       return false;
     }
-  }
-
-  private void setSurfaceViewAspectRatio(float aspectRatio) {
-    gpuTextureAspectRatio = aspectRatio;
-
-    ViewGroup.LayoutParams lp = surfaceView.getLayoutParams();
-    lp.width = (int) (lp.height * gpuTextureAspectRatio);
-    runOnMainThread(() -> surfaceView.setLayoutParams(lp));
   }
 
   private void setCameraConfig() throws CameraNotAvailableException {
@@ -388,10 +578,6 @@ public class ArCore implements GLSurfaceView.Renderer {
             + ")");
 
     session.setCameraConfig(minCameraConfig);
-    setSurfaceViewAspectRatio(
-        1.0f
-            * minCameraConfig.getTextureSize().getWidth()
-            / minCameraConfig.getTextureSize().getHeight());
   }
 
   private void setConfig() {
@@ -404,6 +590,11 @@ public class ArCore implements GLSurfaceView.Renderer {
             .setLightEstimationMode(LightEstimationMode.DISABLED)
             .setPlaneFindingMode(PlaneFindingMode.DISABLED)
             .setUpdateMode(Config.UpdateMode.BLOCKING);
+
+    if (goalPlacementEnabled) {
+      // Only used to measure the camera height above the floor.
+      config.setPlaneFindingMode(PlaneFindingMode.HORIZONTAL);
+    }
 
     session.configure(config);
   }
