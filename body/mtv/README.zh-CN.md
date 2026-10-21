@@ -424,7 +424,7 @@ MTV 的左腿由以下部分组成：
 
 - 1 x 3D 打印的 <a href="cad/Joints/90deg_Joint.stl">90 度接头</a> (A4)
 - 1 x 3D 打印的 <a href="cad/Joints/End_Joint.stl">端接头</a> (A7)
-- 1 x 3D 打印的 <a href="cad/Joints/BearingCover.stl">轴承盖</a> (A11)
+- 1 x 3D 打印的 <a href="cad/BearingCover/BearingCover.stl">轴承盖</a> (A11)
 - 1 x 3D 打印的 <a href="cad/Joints/100deg_Joint.stl">100 度接头</a> (A5)
 - 2 x 3D 打印的 <a href="cad/Legs/Front_Leg.stl">前腿</a> (A8)
 - 1 x 3D 打印的 <a href="cad/Legs/Mid_Leg.stl">中腿</a> (A9)
@@ -437,7 +437,7 @@ MTV 的右腿由以下部分组成：
 
 - 1 x 3D 打印的 <a href="cad/Joints/90deg_Joint.stl">90 度接头</a> (A4)
 - 1 x 3D 打印的 <a href="cad/Joints/End_Joint.stl">端接头</a> (A7)
-- 1 x 3D 打印的 <a href="cad/Joints/BearingCover.stl">轴承盖</a> (A11)
+- 1 x 3D 打印的 <a href="cad/BearingCover/BearingCover.stl">轴承盖</a> (A11)
 - 1 x 3D 打印的 <a href="cad/Joints/100deg_Joint_Mirror.stl">100 度接头镜像</a> (A6)
 - 2 x 3D 打印的 <a href="cad/Legs/Front_Leg.stl">前腿</a> (A8)
 - 1 x 3D 打印的 <a href="cad/Legs/Mid_Leg.stl">中腿</a> (A9)
@@ -470,7 +470,7 @@ MTV 的右腿由以下部分组成：
 
 主舱由以下部分组成：
 
-- 2 x 3D 打印的 <a href="cad/Joints/BearingCover.stl">轴承盖</a> (A11)
+- 2 x 3D 打印的 <a href="cad/BearingCover/BearingCover.stl">轴承盖</a> (A11)
 - 1 x 3D 打印的 <a href="cad/PhoneMount/Phone_Mount.stl">手机支架平台</a> (A12)
 - 1 x 3D 打印的 <a href="cad/Buffer/Name_Front.stl">前名牌</a> (A13)
 - 1 x 3D 打印的 <a href="cad/Buffer/Name_Back.stl">后名牌</a> (A14)

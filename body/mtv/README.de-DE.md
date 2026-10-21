@@ -429,7 +429,7 @@ Das linke Bein des MTV besteht aus den folgenden Teilen:
 
 - 1 x 3D-gedrucktes <a href="cad/Joints/90deg_Joint.stl">90 Grad Gelenk</a> (A4)
 - 1 x 3D-gedrucktes <a href="cad/Joints/End_Joint.stl">Endgelenk</a> (A7)
-- 1 x 3D-gedrucktes <a href="cad/Joints/BearingCover.stl">Lagerabdeckung</a> (A11)
+- 1 x 3D-gedrucktes <a href="cad/BearingCover/BearingCover.stl">Lagerabdeckung</a> (A11)
 - 1 x 3D-gedrucktes <a href="cad/Joints/100deg_Joint.stl">100 Grad Gelenk</a> (A5)
 - 2 x 3D-gedrucktes <a href="cad/Legs/Front_Leg.stl">Vorderbein</a> (A8)
 - 1 x 3D-gedrucktes <a href="cad/Legs/Mid_Leg.stl">Mittelbein</a> (A9)
@@ -442,7 +442,7 @@ Das rechte Bein des MTV besteht aus den folgenden Teilen:
 
 - 1 x 3D-gedrucktes <a href="cad/Joints/90deg_Joint.stl">90 Grad Gelenk</a> (A4)
 - 1 x 3D-gedrucktes <a href="cad/Joints/End_Joint.stl">Endgelenk</a> (A7)
-- 1 x 3D-gedrucktes <a href="cad/Joints/BearingCover.stl">Lagerabdeckung</a> (A11)
+- 1 x 3D-gedrucktes <a href="cad/BearingCover/BearingCover.stl">Lagerabdeckung</a> (A11)
 - 1 x 3D-gedrucktes <a href="cad/Joints/100deg_Joint_Mirror.stl">100 Grad Gelenk Spiegel</a> (A6)
 - 2 x 3D-gedrucktes <a href="cad/Legs/Front_Leg.stl">Vorderbein</a> (A8)
 - 1 x 3D-gedrucktes <a href="cad/Legs/Mid_Leg.stl">Mittelbein</a> (A9)
@@ -475,7 +475,7 @@ Vervollständigen Sie die Chassismontage, einschließlich der Befestigung des Ka
 
 Das Hauptfach besteht aus den folgenden Teilen:
 
-- 2 x 3D-gedruckte <a href="cad/Joints/BearingCover.stl">Lagerabdeckung</a> (A11)
+- 2 x 3D-gedruckte <a href="cad/BearingCover/BearingCover.stl">Lagerabdeckung</a> (A11)
 - 1 x 3D-gedruckte <a href="cad/PhoneMount/Phone_Mount.stl">Telefonhalterungsplattform</a> (A12)
 - 1 x 3D-gedrucktes <a href="cad/Buffer/Name_Front.stl">Namensschild vorne</a> (A13)
 - 1 x 3D-gedrucktes <a href="cad/Buffer/Name_Back.stl">Namensschild hinten</a> (A14)

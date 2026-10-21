@@ -429,7 +429,7 @@ La jambe gauche du MTV se compose des pièces suivantes :
 
 - 1 x <a href="cad/Joints/90deg_Joint.stl">Joint à 90 degrés</a> imprimé en 3D (A4)
 - 1 x <a href="cad/Joints/End_Joint.stl">Joint de Fin</a> imprimé en 3D (A7)
-- 1 x <a href="cad/Joints/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
+- 1 x <a href="cad/BearingCover/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
 - 1 x <a href="cad/Joints/100deg_Joint.stl">Joint à 100 degrés</a> imprimé en 3D (A5)
 - 2 x <a href="cad/Legs/Front_Leg.stl">Jambe Avant</a> imprimé en 3D (A8)
 - 1 x <a href="cad/Legs/Mid_Leg.stl">Jambe Milieu</a> imprimé en 3D (A9)
@@ -442,7 +442,7 @@ La jambe droite du MTV se compose des pièces suivantes :
 
 - 1 x <a href="cad/Joints/90deg_Joint.stl">Joint à 90 degrés</a> imprimé en 3D (A4)
 - 1 x <a href="cad/Joints/End_Joint.stl">Joint de Fin</a> imprimé en 3D (A7)
-- 1 x <a href="cad/Joints/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
+- 1 x <a href="cad/BearingCover/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
 - 1 x <a href="cad/Joints/100deg_Joint_Mirror.stl">Joint à 100 degrés Miroir</a> imprimé en 3D (A6)
 - 2 x <a href="cad/Legs/Front_Leg.stl">Jambe Avant</a> imprimé en 3D (A8)
 - 1 x <a href="cad/Legs/Mid_Leg.stl">Jambe Milieu</a> imprimé en 3D (A9)
@@ -476,7 +476,7 @@ Complétez l'assemblage du châssis, y compris la fixation du conduit de câble 
 
 Le compartiment principal se compose des pièces suivantes :
 
-- 2 x <a href="cad/Joints/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
+- 2 x <a href="cad/BearingCover/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
 - 1 x <a href="cad/PhoneMount/Phone_Mount.stl">Plateforme de Montage Téléphone</a> imprimé en 3D (A12)
 - 1 x <a href="cad/Buffer/Name_Front.stl">Nom Avant</a> imprimé en 3D (A13)
 - 1 x <a href="cad/Buffer/Name_Back.stl">Nom Arrière</a> imprimé en 3D (A14)
