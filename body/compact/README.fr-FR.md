@@ -394,4 +394,4 @@ Les rendus n'incluent pas le câblage. Les cartes, les supports de piles et la b
 
 ## Ensuite
 
-Installez l'[application OpenBot Robot](../../android/robot/README.fr-FR.md) sur votre téléphone et connectez-la au robot comme décrit à l'[étape 6](#6-configurer-le-firmware-et-test-sur-table).
+Installez l'[application OpenBot Robot](../../robot/android/app/README.fr-FR.md) sur votre téléphone et connectez-la au robot comme décrit à l'[étape 6](#6-configurer-le-firmware-et-test-sur-table).

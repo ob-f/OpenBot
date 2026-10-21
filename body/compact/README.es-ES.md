@@ -394,4 +394,4 @@ Los renders no incluyen el cableado. Las placas, los portapilas y la batería Li
 
 ## Siguiente paso
 
-Instala la [app OpenBot Robot](../../android/robot/README.es-ES.md) en tu teléfono y conéctala al robot como se describe en el [paso 6](#6-configurar-el-firmware-y-prueba-en-banco).
+Instala la [app OpenBot Robot](../../robot/android/app/README.es-ES.md) en tu teléfono y conéctala al robot como se describe en el [paso 6](#6-configurar-el-firmware-y-prueba-en-banco).

@@ -394,4 +394,4 @@ Renders leave out wiring. Boards, battery holders and the LiPo pack are shown as
 
 ## Next
 
-Install the [OpenBot Robot app](../../android/robot/README.md) on your phone and connect to the robot as described in [step 6](#6-configure-firmware-and-bench-test).
+Install the [OpenBot Robot app](../../robot/android/app/README.md) on your phone and connect to the robot as described in [step 6](#6-configure-firmware-and-bench-test).

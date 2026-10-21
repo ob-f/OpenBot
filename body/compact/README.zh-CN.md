@@ -394,4 +394,4 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 
 ## 下一步
 
-在手机上安装 [OpenBot Robot 应用](../../android/robot/README.zh-CN.md)，并按照[第 6 步](#6-配置固件和台架测试)连接机器人。
+在手机上安装 [OpenBot Robot 应用](../../robot/android/app/README.zh-CN.md)，并按照[第 6 步](#6-配置固件和台架测试)连接机器人。

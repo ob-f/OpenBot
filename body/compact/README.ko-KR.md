@@ -394,4 +394,4 @@ ESP32에 인쇄된 GPIO 번호를 사용하세요. 모든 GND는 서로 연결�
 
 ## 다음
 
-휴대폰에 [OpenBot Robot 앱](../../android/robot/README.ko-KR.md)을 설치하고 [6단계](#6-펌웨어-설정과-벤치-테스트)에 설명된 대로 로봇과 연결하세요.
+휴대폰에 [OpenBot Robot 앱](../../robot/android/app/README.ko-KR.md)을 설치하고 [6단계](#6-펌웨어-설정과-벤치-테스트)에 설명된 대로 로봇과 연결하세요.
