@@ -53,6 +53,34 @@ Commencez par installer [Flutter](https://flutter.dev/) sur votre système. Choi
     <img src="../../docs/images/run_editor.jpg" width="50%" />
   </p>
 
+## Compiler une version signée (Android)
+Les compilations de publication (`flutter build apk --release` / `flutter build appbundle --release`) sont signées avec un keystore indiqué dans `android/key.properties`. Ce fichier est **dans .gitignore** et n'est jamais commité : chaque développeur doit créer sa propre copie locale. Les compilations de débogage (`flutter build apk --debug`, `flutter run`) n'en ont pas besoin.
+
+### 1. Générer un keystore (une fois)
+```bash
+keytool -genkey -v -keystore ~/release.keystore -alias upload -keyalg RSA -keysize 2048 -validity 10000
+```
+Conservez le fichier `.keystore`/`.jks` généré et ses mots de passe en lieu sûr, hors du dépôt : si vous le perdez, vous ne pourrez plus publier de mises à jour avec la même signature d'application.
+
+### 2. Créer `android/key.properties`
+`android/app/build.gradle` lit ce fichier dans `controller/flutter/android/key.properties`, créez-le donc à cet endroit avec :
+```properties
+storePassword=<your keystore password>
+keyPassword=<your key password>
+keyAlias=upload
+storeFile=/absolute/path/to/release.keystore
+```
+`storeFile` doit être un chemin absolu (ou un chemin résoluble depuis `controller/flutter/android/`) vers le keystore généré à l'étape 1.
+
+### 3. Compiler
+```bash
+cd controller/flutter
+flutter build appbundle --release   # pour l'envoi sur le Play Store (.aab)
+# ou
+flutter build apk --release         # pour un APK signé et installable
+```
+`app/build.gradle` charge automatiquement `key.properties` s'il existe et l'utilise pour la signature `release` ; si le fichier manque, la configuration de publication n'a pas de valeurs de signature et la signature échoue (les compilations de débogage ne sont pas concernées).
+
 ## Connexion
 
 Le téléphone du contrôleur et celui du robot doivent être sur le même réseau Wi-Fi, ou l'un d'eux doit être connecté au point d'accès de l'autre. Aucun accès à Internet n'est nécessaire.
@@ -120,5 +148,19 @@ Utilisez les boutons `accélérateur` et `frein` pour avancer/reculer.
   à reculer jusqu'à atteindre la vitesse maximale en marche arrière en une seconde. Lorsque nous relâchons le frein, le
   robot s'arrêtera.
 - Le robot est dirigé en inclinant le téléphone contrôleur à gauche ou à droite.
+
+### Paramètres du contrôleur
+
+Voici une image de l'écran `Controller Settings` :
+
+- Choix du contrôleur : passez d'un type de contrôleur à l'autre (par ex. mobile, joystick) avec les icônes.
+ 
+- Serveur : affiche l'état actuel du serveur, avec une liste déroulante pour choisir ou changer de serveur.
+ 
+- Bruit : activez ou désactivez la simulation de bruit avec l'interrupteur.
+
+<p float="left">
+  <img src="../../docs/images/flutter_controller_setting.jpg" width="50%" />
+</p>
 
 Voici une [Vue d'ensemble technique](../../docs/technical/OpenBotController.pdf) de l'application de contrôleur.
