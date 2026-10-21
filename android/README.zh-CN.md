@@ -56,7 +56,7 @@
 
 1. 打开Android Studio并选择*打开现有的Android Studio项目*。
 2. 选择OpenBot/android目录并点击确定。
-3. 如果你想安装[OpenBot应用](app/README.md)，请确保选择*app*配置。如有必要，确认Gradle同步。要手动执行Gradle同步，请点击gradle图标。
+3. 如果你想安装[OpenBot应用](robot/README.md)，请确保选择*robot*配置。如有必要，确认Gradle同步。要手动执行Gradle同步，请点击gradle图标。
   ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. 连接你的Android设备，并确保在[开发者选项](https://developer.android.com/studio/debug/dev-options)中启用USB调试。根据你的开发环境，可能需要[进一步的步骤](https://developer.android.com/studio/run/device)。现在你应该可以在顶部的导航栏中看到你的设备。
   ![Phone](../docs/images/android_studio_bar_phone.jpg)

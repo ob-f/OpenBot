@@ -56,7 +56,7 @@
 
 1. Android Studio를 열고 *기존 Android Studio 프로젝트 열기*를 선택합니다.
 2. OpenBot/android 디렉토리를 선택하고 OK를 클릭합니다.
-3. [OpenBot 앱](app/README.md)을 설치하려면 *app* 구성을 선택합니다. 필요한 경우 Gradle Sync를 확인합니다. 수동으로 Gradle Sync를 수행하려면 gradle 아이콘을 클릭하세요.
+3. [OpenBot 앱](robot/README.md)을 설치하려면 *robot* 구성을 선택합니다. 필요한 경우 Gradle Sync를 확인합니다. 수동으로 Gradle Sync를 수행하려면 gradle 아이콘을 클릭하세요.
    ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. Android 기기를 연결하고 [개발자 옵션](https://developer.android.com/studio/debug/dev-options)에서 USB 디버깅이 활성화되어 있는지 확인합니다. 개발 환경에 따라 [추가 단계](https://developer.android.com/studio/run/device)가 필요할 수 있습니다. 이제 상단 내비게이션 바에서 기기를 확인할 수 있어야 합니다.
    ![전화](../docs/images/android_studio_bar_phone.jpg)

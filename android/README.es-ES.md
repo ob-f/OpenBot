@@ -56,7 +56,7 @@ Alternativamente, puedes descargar los apks desde los assets de cualquier [relea
 
 1. Abre Android Studio y selecciona *Open an existing Android Studio project*.
 2. Selecciona el directorio OpenBot/android y haz clic en OK.
-3. Si deseas instalar la [aplicación OpenBot](app/README.es-ES.md) asegúrate de seleccionar la configuración *app*. Confirma la sincronización de Gradle si es necesario. Para realizar una sincronización de Gradle manualmente, haz clic en el icono de gradle.
+3. Si deseas instalar la [aplicación OpenBot](robot/README.es-ES.md) asegúrate de seleccionar la configuración *robot*. Confirma la sincronización de Gradle si es necesario. Para realizar una sincronización de Gradle manualmente, haz clic en el icono de gradle.
   ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. Conecta tu dispositivo Android y asegúrate de que la depuración USB en las [opciones de desarrollador](https://developer.android.com/studio/debug/dev-options) esté habilitada. Dependiendo de tu entorno de desarrollo, pueden ser necesarios [otros pasos](https://developer.android.com/studio/run/device). Ahora deberías ver tu dispositivo en la barra de navegación superior.
   ![Phone](../docs/images/android_studio_bar_phone.jpg)
