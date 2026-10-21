@@ -394,4 +394,4 @@ Die Renderings zeigen keine Verkabelung. Platinen, Akkuhalter und der LiPo-Akku 
 
 ## Weiter
 
-Installieren Sie die [OpenBot-Robot-App](../../android/robot/README.de-DE.md) auf Ihrem Handy und verbinden Sie sie wie in [Schritt 6](#6-firmware-einrichten-und-testlauf) beschrieben mit dem Roboter.
+Installieren Sie die [OpenBot-Robot-App](../../robot/android/app/README.de-DE.md) auf Ihrem Handy und verbinden Sie sie wie in [Schritt 6](#6-firmware-einrichten-und-testlauf) beschrieben mit dem Roboter.
