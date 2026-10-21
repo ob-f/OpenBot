@@ -394,6 +394,63 @@
 
 如果模型处于活动状态，运行模型的设备旁边将显示推理速度（单位：毫秒）。
 
+### 项目界面
+
+如果您已使用 Google 帐号登录，项目界面会列出您的 OpenBot Playground 项目。您可以运行这些项目来控制 OpenBot，也可以点击右上角的扫描图标扫描它们的二维码。如果未登录，界面会显示 Google 登录按钮，但您仍然可以在不登录的情况下扫描项目二维码。如果登录后界面显示 `Oops, no project found`，请确认该帐号在 Google Drive 中存有项目。
+
+如果列表中没有显示最新的项目，可以在项目界面向下拉动来重新加载。
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen.gif" alt="Project Screen" width="24.7%"/>
+<img src="../../../docs/images/no_projects_found.jpg" alt="No project screen" width="25%"/>
+<img src="../../../docs/images/reload_projects.gif" altq="Reload project screen" width="24.5%"/>
+</p>
+
+- **Google Drive 项目**：要运行 Google Drive 项目，点击该项目并等待读取项目文件。如果顺利读取且没有错误，会弹出一个窗口，显示项目名称以及 `Start` 和 `Cancel` 两个按钮。点击 Start 运行项目，点击 Cancel 取消。如果弹出 `Something went wrong` 的提示，可能是 Google Drive 文件有问题。请向下拉动刷新项目界面后重试。
+
+
+- **二维码扫描**：要扫描 Playground 项目的二维码，点击界面右上角的二维码图标，并允许应用访问相机。扫描后等待读取文件。如果顺利读取且没有错误，会弹出一个窗口，显示项目名称以及 `Start` 和 `Cancel` 两个按钮。点击 Start 运行项目，点击 Cancel 取消。如果弹出 `Something went wrong` 的提示，可能是 Google Drive 文件有问题。请在 Playground 中生成新的二维码后重试。
+
+
+- **运行项目**：如果 OpenBot Playground 项目运行成功，界面会显示代码块名称以及一个停止按钮，可用于停止执行 Playground 积木命令。
+
+
+- **删除项目**：长按要删除的项目，会弹出确认删除的窗口。点击“Yes”即可删除。
+
+<p align="left">
+<img src="../../../docs/images/android_google_drive_projects_execute.gif" alt="Google Drive project execute" width="25%"/>
+<img src="../../../docs/images/android_qr_code_scanning.gif" alt="Qr code scanner project execute" width="25%"/>
+<img src="../../../docs/images/android_delete_project.jpg" alt="Delete Project" width="24.7%"/>
+</p>
+
+### 个人资料界面
+个人资料界面会根据用户是否已登录提供不同的选项。
+如果未登录，会显示 `Google Sign-in` 按钮，提示用户登录 Google 帐号。登录后即可访问个人资料和其他功能。
+如果已登录，`Profile` 标签页中会显示两个按钮：`Edit Profile` 和 `Logout`。
+
+<p align="left">
+<img src="../../../docs/images/android_logged_out_profile_screen.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/android_logged_in_profile_screen.jpg" alt="Logged in profile screen" width="24.9%"/>
+</p>
+
+- **Edit Profile**：点击后会打开一个新界面，用户可以在其中更新个人资料信息，例如姓名和头像。
+
+
+- **Logout**：退出当前帐号并返回登录界面。
+
+  <p align="left">
+  <img src="../../../docs/images/android_edit_profile.jpg" alt="Edit profile screen" width="25%"/>
+  <img src="../../../docs/images/android_logout_dialog_box.jpg" alt="Logout dialog box" width="24.4%"/>
+  </p>
+
+### OpenBot PlayGround 界面
+
+要使用 OpenBot Playground 服务，请点击屏幕顶部工具栏中的 OpenBot Playground 图标。想了解更多关于 OpenBot Playground 的信息，请[点击这里](../../../open-code/README.zh-CN.md)。
+
+<p align="left">
+<img src="../../../docs/images/android_playground_sign-in.gif" alt="openBot playground Sign-in" width="25%"/>
+<img src="../../../docs/images/android_playground_services.gif" alt="openBot playground Services" width="25%"/>
+</p>
+
 ## 添加您自己的片段
 
 请参考[贡献指南](ContributionGuide.md)了解如何向OpenBot应用添加您自己的片段。

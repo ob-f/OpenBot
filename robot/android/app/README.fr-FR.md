@@ -317,6 +317,16 @@ Version réduite de [YoloV4](https://arxiv.org/abs/2004.10934) avec une résolut
 | Xiaomi Mi9            | 6.4 | 9.4 |   -   |
 | Google Pixel 4XL      | 7.7 | 8.3 |  7.6  |
 
+#### EfficientDet-L2-448 - mAP: 34%
+
+[EfficientDet-L2](https://tfhub.dev/tensorflow/lite-model/efficientdet/lite2/detection/metadata/1) avec une résolution d'entrée de 448x448. Remarque : les performances du modèle se dégradent en mode paysage ; il faudra peut-être ajuster le seuil de confiance.
+
+|téléphone/appareil (fps)| CPU | GPU | NNAPI |
+|------------------|-----|-----|-------|
+| Samsung S22 Ultra| 9.8 | 8.4 |  8.2  |
+| Xiaomi Mi9       | 6.4 | 9.4 |   -   |
+| Google Pixel 4XL | 7.7 | 8.3 |  7.6  |
+
 ### Par défaut
 
 La [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivity.java) inclut les fonctionnalités les plus importantes de l'application OpenBot sur un seul écran. Elle affiche l'état de la connexion au véhicule et rapporte les mesures des capteurs du véhicule. Le robot peut être contrôlé par des manettes de jeu BT standard ou un autre smartphone exécutant l'application [controller](../../../controller/flutter/README.fr-FR.md) OpenBot. Nous avons également implémenté un enregistreur de données pour collecter des ensembles de données avec le robot. Actuellement, nous enregistrons les lectures des capteurs suivants : caméra, gyroscope, accéléromètre, magnétomètre, capteur de lumière ambiante et baromètre. En utilisant l'API Android, nous pouvons obtenir les lectures des capteurs suivants : images RGB, vitesse angulaire, accélération linéaire, gravité, intensité du champ magnétique, intensité lumineuse, pression atmosphérique, latitude, longitude, altitude, cap et vitesse. En plus des capteurs du téléphone, nous enregistrons les lectures des capteurs du corps (odométrie des roues, distance des obstacles et tension de la batterie), qui sont transmises via le lien série. Nous enregistrons également et horodatons les signaux de contrôle reçus d'un contrôleur connecté, le cas échéant. Enfin, nous intégrons plusieurs réseaux neuronaux pour le suivi des personnes et la navigation autonome.
@@ -389,6 +399,63 @@ Utilisez le menu déroulant pour sélectionner l'appareil sur lequel le réseau 
 - **NNAPI** : Cela utilisera le [délégué NNAPI de TensorFlow Lite](https://www.tensorflow.org/lite/performance/nnapi). Les smartphones modernes sont souvent équipés d'accélérateurs AI dédiés. L'[API de réseau neuronal](https://developer.android.com/ndk/guides/neuralnetworks) (NNAPI) fournit une accélération pour les modèles TensorFlow Lite sur les appareils Android avec unité de traitement graphique (GPU), processeur de signal numérique (DSP) et unité de traitement neuronal (NPU). Notez que sur certains téléphones plus anciens, cela peut être très lent !
 
 Si un modèle est actif, la vitesse d'inférence en [ms] sera affichée à côté de l'appareil exécutant le modèle.
+
+### Écran Projets
+
+L'écran Projets affiche la liste de vos projets OpenBot Playground si vous êtes connecté avec votre compte Google. Vous pouvez exécuter ces projets pour piloter votre OpenBot, ou scanner leur code QR avec l'icône du scanner en haut à droite. Si vous n'êtes pas connecté, l'écran affiche un bouton de connexion Google, mais vous pouvez quand même scanner le code QR de votre projet. Si le message `Oops, no project found` s'affiche après la connexion, vérifiez que le compte a des projets enregistrés sur Google Drive.
+
+Si vos derniers projets n'apparaissent pas dans la liste, tirez l'écran vers le bas pour les recharger.
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen.gif" alt="Project Screen" width="24.7%"/>
+<img src="../../../docs/images/no_projects_found.jpg" alt="No project screen" width="25%"/>
+<img src="../../../docs/images/reload_projects.gif" altq="Reload project screen" width="24.5%"/>
+</p>
+
+- **Projets Google Drive** : pour exécuter un projet Google Drive, touchez-le et attendez que le fichier du projet soit lu. Si tout se passe bien, une fenêtre apparaît avec le nom du projet et deux boutons : `Start` et `Cancel`. Start exécute le projet, Cancel l'annule. Si le message `Something went wrong` s'affiche, le fichier Google Drive pose probablement problème : rechargez l'écran en le tirant vers le bas et recommencez.
+
+
+- **Scanner de code QR** : pour scanner le code QR d'un projet Playground, touchez l'icône du code QR en haut à droite. Autorisez l'application à utiliser la caméra. Une fois le code scanné, le fichier est lu. Si tout se passe bien, une fenêtre apparaît avec le nom du projet et deux boutons : `Start` et `Cancel`. Start exécute le projet, Cancel l'annule. Si le message `Something went wrong` s'affiche, le fichier Google Drive pose probablement problème : générez un nouveau code QR dans le Playground et recommencez.
+
+
+- **Exécution du projet** : si votre projet s'exécute correctement, l'écran affiche le nom des blocs de code et un bouton d'arrêt pour stopper l'exécution.
+
+
+- **Supprimer un projet** : appuyez longuement sur le projet à supprimer, puis confirmez avec « Yes ».
+
+<p align="left">
+<img src="../../../docs/images/android_google_drive_projects_execute.gif" alt="Google Drive project execute" width="25%"/>
+<img src="../../../docs/images/android_qr_code_scanning.gif" alt="Qr code scanner project execute" width="25%"/>
+<img src="../../../docs/images/android_delete_project.jpg" alt="Delete Project" width="24.7%"/>
+</p>
+
+### Écran Profil
+L'écran Profil propose différentes options selon que vous êtes connecté ou non.
+Si vous n'êtes pas connecté, un bouton `Google Sign-in` vous invite à vous connecter avec votre compte Google. Une fois connecté, vous avez accès à votre profil et aux autres fonctionnalités.
+Si vous êtes connecté, l'onglet `Profile` affiche deux boutons : `Edit Profile` et `Logout`.
+
+<p align="left">
+<img src="../../../docs/images/android_logged_out_profile_screen.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/android_logged_in_profile_screen.jpg" alt="Logged in profile screen" width="24.9%"/>
+</p>
+
+- **Edit Profile** : ouvre un écran où vous pouvez modifier les informations de votre profil, comme votre nom et votre photo.
+
+
+- **Logout** : vous déconnecte de votre compte et vous ramène à l'écran de connexion.
+
+  <p align="left">
+  <img src="../../../docs/images/android_edit_profile.jpg" alt="Edit profile screen" width="25%"/>
+  <img src="../../../docs/images/android_logout_dialog_box.jpg" alt="Logout dialog box" width="24.4%"/>
+  </p>
+
+### Écran OpenBot PlayGround
+
+Pour accéder aux services de l'OpenBot Playground, touchez l'icône OpenBot Playground en haut de l'écran, dans la barre d'outils. Pour en savoir plus sur l'OpenBot Playground, [cliquez ici](../../../open-code/README.fr-FR.md).
+
+<p align="left">
+<img src="../../../docs/images/android_playground_sign-in.gif" alt="openBot playground Sign-in" width="25%"/>
+<img src="../../../docs/images/android_playground_services.gif" alt="openBot playground Services" width="25%"/>
+</p>
 
 ## Ajouter votre propre fragment
 
