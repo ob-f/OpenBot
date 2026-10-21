@@ -332,7 +332,7 @@ Die [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivi
 
 #### USB-Verbindung
 
-Wie im [Einstellungsmenü](#settings-menu) beschrieben.
+Wie im [Einstellungsmenü](#einstellungsmenü) beschrieben.
 
 #### Fahrzeugstatus
 

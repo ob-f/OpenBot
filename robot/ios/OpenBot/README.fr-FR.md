@@ -159,11 +159,11 @@ Interface utilisateur simple pour exécuter des modèles de pilote automatique.
 
 </p>
 
-- **Serveur** : si l'[application web](../../../policy/README.fr-FR.md#web-app) d'entraînement est lancée, vous pouvez la choisir ici et envoyer des modèles de pilote automatique entraînés au robot.
+- **Serveur** : si l'[application web](../../../policy/README.fr-FR.md#application-web) d'entraînement est lancée, vous pouvez la choisir ici et envoyer des modèles de pilote automatique entraînés au robot.
 - **Modèle** : choisissez un modèle entraîné pour le mode pilote automatique.
-- **Appareil** : CPU, GPU ou NNAPI pour l'inférence (plus de détails [ici](#device)).
+- **Appareil** : CPU, GPU ou NNAPI pour l'inférence (plus de détails [ici](../../android/app/README.fr-FR.md#appareil)).
 - **Threads** : nombre de threads à utiliser (ne compte que si l'appareil choisi est le CPU).
-- **Contrôle** : contrôleur, mode de conduite et vitesse règlent le robot comme décrit dans la [section Contrôle](#control).
+- **Contrôle** : contrôleur, mode de conduite et vitesse règlent le robot comme décrit dans la [section Contrôle](#contrôle).
 
 ### Suivi d'Objets
 
@@ -178,9 +178,9 @@ Interface utilisateur simple pour suivre des objets de 80 classes différentes. 
 - **Modèle** : choisissez un détecteur d'objets adapté aux performances de votre téléphone.
 - **Objet** : choisissez l'objet à suivre. Les modèles détectent les 80 [classes d'objets](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/) COCO.
 - **Confiance** : seuil à partir duquel les détections sont acceptées. Augmentez-le en cas de fausses détections, baissez-le si l'objet voulu n'est pas détecté.
-- **Appareil** : CPU, GPU ou NNAPI pour l'inférence (plus de détails [ici](#device)).
+- **Appareil** : CPU, GPU ou NNAPI pour l'inférence (plus de détails [ici](../../android/app/README.fr-FR.md#appareil)).
 - **Threads** : nombre de threads à utiliser (ne compte que si l'appareil choisi est le CPU).
-- **Contrôle** : contrôleur, mode de conduite et vitesse règlent le robot comme décrit dans la [section Contrôle](#control).
+- **Contrôle** : contrôleur, mode de conduite et vitesse règlent le robot comme décrit dans la [section Contrôle](#contrôle).
 
 ### Gestion des Modèles
 

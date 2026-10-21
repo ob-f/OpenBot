@@ -159,15 +159,15 @@ Interfaz de usuario simple para ejecutar modelos de piloto automático.
 
 </p>
 
-- **Servidor**: si tienes en marcha la [aplicación web](../../../policy/README.es-ES.md#web-app) de entrenamiento, puedes elegirla aquí y enviar al robot modelos de piloto automático entrenados.
+- **Servidor**: si tienes en marcha la [aplicación web](../../../policy/README.es-ES.md#aplicación-web) de entrenamiento, puedes elegirla aquí y enviar al robot modelos de piloto automático entrenados.
 - **Modelo**: elige un modelo entrenado para el modo de piloto automático.
-- **Dispositivo**: CPU, GPU o NNAPI para la inferencia (más detalles [aquí](#device)).
+- **Dispositivo**: CPU, GPU o NNAPI para la inferencia (más detalles [aquí](../../android/app/README.es-ES.md#dispositivo)).
 - **Hilos**: número de hilos (solo importa si el dispositivo elegido es la CPU).
 - **Control**: controlador, modo de conducción y velocidad ajustan el robot como se describe en la [sección de control](#control).
 
 ### Seguimiento de Objetos
 
-Interfaz de usuario simple para rastrear objetos de 80 clases diferentes. Una breve descripción de los diferentes modelos de IA para el seguimiento de objetos y los puntos de referencia de rendimiento se pueden encontrar en [Gestión de Modelos](#model-management).
+Interfaz de usuario simple para rastrear objetos de 80 clases diferentes. Una breve descripción de los diferentes modelos de IA para el seguimiento de objetos y los puntos de referencia de rendimiento se pueden encontrar en [Gestión de Modelos](#gestión-de-modelos).
 
 <p align="left">
 <img src="../../../docs/images/ios_object_tracking_screen.jpg" alt="Seguimiento de Objetos" width="50%" />
@@ -178,7 +178,7 @@ Interfaz de usuario simple para rastrear objetos de 80 clases diferentes. Una br
 - **Modelo**: elige un detector de objetos según el rendimiento de tu teléfono.
 - **Objeto**: elige el objeto que quieres seguir. Los modelos detectan las 80 [clases de objetos](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/) de COCO.
 - **Confianza**: umbral para aceptar las detecciones. Súbelo si hay detecciones falsas y bájalo si no se detecta el objeto que buscas.
-- **Dispositivo**: CPU, GPU o NNAPI para la inferencia (más detalles [aquí](#device)).
+- **Dispositivo**: CPU, GPU o NNAPI para la inferencia (más detalles [aquí](../../android/app/README.es-ES.md#dispositivo)).
 - **Hilos**: número de hilos (solo importa si el dispositivo elegido es la CPU).
 - **Control**: controlador, modo de conducción y velocidad ajustan el robot como se describe en la [sección de control](#control).
 

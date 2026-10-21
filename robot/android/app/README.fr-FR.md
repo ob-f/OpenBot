@@ -88,7 +88,7 @@ Le mode libre offre un contrôle simple du robot avec des mises à jour en temps
   Le volant tourne proportionnellement à l'angle de direction.
 - **Vitesse** : Le compteur de vitesse affiche la vitesse du robot.
 - **Sonar** : La distance libre devant le robot en cm.
-- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#control).
+- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#contrôle).
 
 ### Collecte de Données
 
@@ -136,13 +136,13 @@ Interface utilisateur simple pour exécuter des modèles de pilote automatique.
 
 - **Serveur** : Si vous avez l'[application web](../../../policy/README.md#web-app) pour l'entraînement des politiques en cours d'exécution, vous pouvez la sélectionner ici et envoyer des modèles de pilote automatique entraînés au robot.
 - **Modèle** : Choisissez un modèle entraîné à utiliser pour le mode pilote automatique.
-- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#device)).
+- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#appareil)).
 - **Threads** : Nombre de threads à utiliser (fait une différence uniquement lorsque le CPU est sélectionné comme appareil).
-- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#control).
+- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#contrôle).
 
 ### Suivi d'Objets
 
-Interface utilisateur simple pour suivre des objets de 80 classes différentes. Une brève description des différents modèles d'IA pour le suivi d'objets et des benchmarks de performance peut être trouvée dans [Gestion des Modèles](#model-management).
+Interface utilisateur simple pour suivre des objets de 80 classes différentes. Une brève description des différents modèles d'IA pour le suivi d'objets et des benchmarks de performance peut être trouvée dans [Gestion des Modèles](#gestion-des-modèles).
 
 <p align="left">
 <img src="../../../docs/images/screen_object_tracking_1.jpg" alt="Texte alternatif" width="49%" />
@@ -154,9 +154,9 @@ Interface utilisateur simple pour suivre des objets de 80 classes différentes. 
 - **Modèle** : Choisissez un détecteur d'objets en fonction des performances de votre téléphone (voir ci-dessous pour les [résultats des benchmarks](#benchmark)).
 - **Objet** : Choisissez l'objet que vous souhaitez suivre. Les modèles peuvent détecter les 80 [classes d'objets COCO](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/).
 - **Confiance** : Seuil de confiance pour déterminer si les détections sont acceptées. Augmentez si vous obtenez de fausses détections, diminuez si l'objet d'intérêt n'est pas détecté.
-- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#device)).
+- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#appareil)).
 - **Threads** : Nombre de threads à utiliser (fait une différence uniquement lorsque le CPU est sélectionné comme appareil).
-- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#control).
+- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#contrôle).
 
 ### Navigation vers un Point
 
@@ -337,7 +337,7 @@ La [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivit
 
 #### Connexion USB
 
-Identique à celle du [menu des paramètres](#settings-menu).
+Identique à celle du [menu des paramètres](#menu-paramètres).
 
 #### État du véhicule
 

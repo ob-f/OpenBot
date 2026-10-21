@@ -98,7 +98,7 @@ pip install -r requirements.txt
 
 Vous pouvez également installer pydot (`pip install pydot`) et graphviz ([voir les instructions](https://graphviz.gitlab.io/download/)) si vous souhaitez visualiser l'architecture du réseau.
 
-Si vous souhaitez utiliser la [WebApp](#web-app) pour la collecte de données et l'entraînement, vous devez installer les dépendances suivantes en plus. (Sur Mac, le package `brotlipy` est actuellement cassé sur pip, vous devez donc l'installer d'abord en utilisant conda : `conda install brotlipy=0.7`)
+Si vous souhaitez utiliser la [WebApp](#application-web) pour la collecte de données et l'entraînement, vous devez installer les dépendances suivantes en plus. (Sur Mac, le package `brotlipy` est actuellement cassé sur pip, vous devez donc l'installer d'abord en utilisant conda : `conda install brotlipy=0.7`)
 
 ```bash
 pip install -r requirements_web.txt
@@ -144,7 +144,7 @@ Le notebook Jupyter s'attend à un dossier appelé `dataset` dans le même dossi
 
 <img src="../docs/images/folder_structure.png" width="200" alt="structure du dossier" />
 
-Plutôt que de copier tous les fichiers manuellement depuis le téléphone, vous pouvez également télécharger les journaux automatiquement sur un [serveur Python](#web-app) sur votre ordinateur. Dans ce cas, les fichiers zip seront téléchargés et décompressés dans le dossier `dataset/uploaded`. Vous devrez toujours les déplacer dans la structure de dossiers pour l'entraînement. Vous pouvez simplement traiter le dossier `uploaded` comme une session d'enregistrement et le déplacer dans `train_data`. Les enregistrements seront alors reconnus comme des données d'entraînement par le notebook Jupyter. Si vous n'avez pas déjà une session d'enregistrement dans le dossier `test_data`, vous devez également déplacer au moins un enregistrement de `train_data/uploaded` vers `test_data/uploaded`.
+Plutôt que de copier tous les fichiers manuellement depuis le téléphone, vous pouvez également télécharger les journaux automatiquement sur un [serveur Python](#application-web) sur votre ordinateur. Dans ce cas, les fichiers zip seront téléchargés et décompressés dans le dossier `dataset/uploaded`. Vous devrez toujours les déplacer dans la structure de dossiers pour l'entraînement. Vous pouvez simplement traiter le dossier `uploaded` comme une session d'enregistrement et le déplacer dans `train_data`. Les enregistrements seront alors reconnus comme des données d'entraînement par le notebook Jupyter. Si vous n'avez pas déjà une session d'enregistrement dans le dossier `test_data`, vous devez également déplacer au moins un enregistrement de `train_data/uploaded` vers `test_data/uploaded`.
 
 ### Conversion des données (optionnel)
 

@@ -51,7 +51,7 @@ npm start
 
 Dieses Projekt ermöglicht es Benutzern, ihre Daten sowohl lokal als auch auf `Google Drive` zu speichern. Wenn das Projekt erstellt wird, wird es automatisch im `lokalen Speicher` des Geräts des Benutzers gespeichert. Wenn Änderungen am Projekt vorgenommen werden, wird der lokale Speicher in Echtzeit aktualisiert.
 
-Zusätzlich können Benutzer ihr Projekt auf Google Drive hochladen, indem sie auf die [Upload-Schaltfläche](#generate-Code) klicken. Dies ermöglicht es Benutzern, von jedem Gerät mit Internetzugang auf ihr Projekt zuzugreifen, was die Arbeit an dem Projekt von verschiedenen Standorten aus erleichtert.
+Zusätzlich können Benutzer ihr Projekt auf Google Drive hochladen, indem sie auf die [Upload-Schaltfläche](#code-generieren) klicken. Dies ermöglicht es Benutzern, von jedem Gerät mit Internetzugang auf ihr Projekt zuzugreifen, was die Arbeit an dem Projekt von verschiedenen Standorten aus erleichtert.
 
 - #### Lokaler Speicher
   Der lokale Speicher ist eine integrierte Webtechnologie, die es Webanwendungen ermöglicht, Daten lokal im Browser des Benutzers zu speichern. Das bedeutet, dass das Projekt auf dem Gerät des Benutzers gespeichert wird und ohne Internetverbindung zugänglich ist.
@@ -63,7 +63,7 @@ Zusätzlich können Benutzer ihr Projekt auf Google Drive hochladen, indem sie a
 
   In diesem Projekt können Benutzer ihr Projekt auf Google Drive hochladen, indem sie auf das Upload-Symbol klicken, wenn sie auf der Website angemeldet sind. Das Projekt wird dann im Google Drive-Konto des Benutzers gespeichert, was bedeutet, dass es von jedem Gerät mit Internetzugang zugänglich ist.
 
-  Um auf ihr Projekt von Google Drive zuzugreifen, können Benutzer sich einfach in ihr Google-Konto einloggen und zu [meine Projekte](#project-section) navigieren, wo alle ihre gespeicherten Projekte angezeigt werden.
+  Um auf ihr Projekt von Google Drive zuzugreifen, können Benutzer sich einfach in ihr Google-Konto einloggen und zu [meine Projekte](#projektabschnitt) navigieren, wo alle ihre gespeicherten Projekte angezeigt werden.
 
 ## OpenBot Playground Bildschirme
 
@@ -72,16 +72,16 @@ Zusätzlich können Benutzer ihr Projekt auf Google Drive hochladen, indem sie a
 Der `OpenBot Playground` beginnt mit der Startseite, die die folgenden Komponenten enthält:
 
 - [Header](#header): Der Header enthält die folgenden zwei Abschnitte: Thema ändern und Benutzer anmelden.
-- [Karussell](#Carousal): Der Inhalt des Karussells erklärt, wie der Playground funktioniert.
-- [Projektabschnitt](#project-section): Der Projektabschnitt enthält eine Liste der Projekte und eine Schaltfläche zum Erstellen eines neuen Projekts.
+- [Karussell](#karussell): Der Inhalt des Karussells erklärt, wie der Playground funktioniert.
+- [Projektabschnitt](#projektabschnitt): Der Projektabschnitt enthält eine Liste der Projekte und eine Schaltfläche zum Erstellen eines neuen Projekts.
 
 ### Playground-Seite
 
 Die `Playground`-Seite ist ein Hauptmerkmal der `OpenBot Playground`-Plattform, die eine Vielzahl von Codierungsblöcken bietet, mit denen Benutzer verschiedene Arten von Funktionen erstellen können, wie z.B. Steuerung, Schleifen, Bewegung, Operatoren, Sensoren und vieles mehr.
 
 - [Header](#header): Der Header enthält den Projektnamen, das Hilfezentrum, AutoSync, das Thema ändern und den Benutzeranmeldeabschnitt.
-- [Arbeitsbereich](#workSpace): Bereich, in dem Benutzer die Codierungsblöcke ziehen und ablegen können, um ihren Code zu generieren, der sowohl in JavaScript als auch in Python umgewandelt werden kann.
-- [Playground-Bottom-Bar](#Playground-Bottom-Bar): Die untere Leiste enthält Schaltflächen zum Generieren von Code, Hochladen des Projekts in Drive, Vergrößern und Verkleinern von Blöcken, Hinzufügen von Modellen sowie Rückgängig- und Wiederherstellen-Funktionen im Arbeitsbereich.
+- [Arbeitsbereich](#arbeitsbereich): Bereich, in dem Benutzer die Codierungsblöcke ziehen und ablegen können, um ihren Code zu generieren, der sowohl in JavaScript als auch in Python umgewandelt werden kann.
+- [Playground-Bottom-Bar](#playground-bottom-bar): Die untere Leiste enthält Schaltflächen zum Generieren von Code, Hochladen des Projekts in Drive, Vergrößern und Verkleinern von Blöcken, Hinzufügen von Modellen sowie Rückgängig- und Wiederherstellen-Funktionen im Arbeitsbereich.
 
 ### Header
 
@@ -204,4 +204,4 @@ Um Code zu generieren, können Benutzer Codierungsblöcke in den Arbeitsbereich 
 
 ## Nächstes (optional)
 
-Fehlerbehebung bei der Firebase-Authentifizierung [Firebase](src/services/README.de-DE.md#troubleshooting)
+Fehlerbehebung bei der Firebase-Authentifizierung [Firebase](src/services/README.de-DE.md#fehlerbehebung)

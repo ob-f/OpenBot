@@ -157,9 +157,9 @@ Einfache Benutzeroberfläche zum Ausführen von Autopilot-Modellen.
 
 - **Server**: Wenn die [Web-App](../../../policy/README.de-DE.md#web-app) für das Training läuft, können Sie sie hier auswählen und trainierte Autopilot-Modelle an den Roboter senden.
 - **Modell**: Wählen Sie ein trainiertes Modell für den Autopilot-Modus.
-- **Gerät**: CPU, GPU oder NNAPI für die Inferenz (mehr dazu [hier](#device)).
+- **Gerät**: CPU, GPU oder NNAPI für die Inferenz (mehr dazu [hier](../../android/app/README.de-DE.md#gerät)).
 - **Threads**: Anzahl der Threads (wirkt sich nur aus, wenn als Gerät die CPU gewählt ist).
-- **Steuerung**: Controller, Fahrmodus und Geschwindigkeit stellen den Roboter ein, wie im [Abschnitt Steuerung](#control) beschrieben.
+- **Steuerung**: Controller, Fahrmodus und Geschwindigkeit stellen den Roboter ein, wie im [Abschnitt Steuerung](#steuerung) beschrieben.
 
 ### Objektverfolgung
 
@@ -174,9 +174,9 @@ Einfache Benutzeroberfläche zur Verfolgung von Objekten aus 80 verschiedenen Kl
 - **Modell**: Wählen Sie einen Objektdetektor passend zur Leistung Ihres Telefons.
 - **Objekt**: Wählen Sie das Objekt, das Sie verfolgen möchten. Die Modelle erkennen die 80 COCO-[Objektklassen](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/).
 - **Konfidenz**: Schwellwert, ab dem Erkennungen akzeptiert werden. Erhöhen Sie ihn bei Fehlerkennungen, verringern Sie ihn, wenn das gesuchte Objekt nicht erkannt wird.
-- **Gerät**: CPU, GPU oder NNAPI für die Inferenz (mehr dazu [hier](#device)).
+- **Gerät**: CPU, GPU oder NNAPI für die Inferenz (mehr dazu [hier](../../android/app/README.de-DE.md#gerät)).
 - **Threads**: Anzahl der Threads (wirkt sich nur aus, wenn als Gerät die CPU gewählt ist).
-- **Steuerung**: Controller, Fahrmodus und Geschwindigkeit stellen den Roboter ein, wie im [Abschnitt Steuerung](#control) beschrieben.
+- **Steuerung**: Controller, Fahrmodus und Geschwindigkeit stellen den Roboter ein, wie im [Abschnitt Steuerung](#steuerung) beschrieben.
 
 ### Modellverwaltung
 

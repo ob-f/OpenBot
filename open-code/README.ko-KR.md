@@ -86,7 +86,7 @@ npm start
 
 - [헤더](#헤더): 헤더에는 프로젝트 이름, 도움말 센터, 자동 동기화, 테마 변경, 사용자 로그인 섹션이 있어요.
 - [워크스페이스](#워크스페이스): 사용자가 코딩 블록을 드래그 앤 드롭하여 코드를 생성할 수 있는 공간이에요. 생성된 코드는 JavaScript와 Python으로 변환할 수 있어요.
-- [Playground 하단 바](#Playground-하단-바): 하단 바에는 코드 생성, 프로젝트 업로드, 블록 확대/축소, 모델 추가, 워크스페이스에서 변경 사항 되돌리기 및 다시 실행 버튼이
+- [Playground 하단 바](#playground-하단-바): 하단 바에는 코드 생성, 프로젝트 업로드, 블록 확대/축소, 모델 추가, 워크스페이스에서 변경 사항 되돌리기 및 다시 실행 버튼이
   있어요.
 
 ### 헤더
@@ -220,5 +220,5 @@ Playground 화면이 열려요. 만약 이미 다른 프로젝트에 할당된 �
 
 ## 다음 (선택 사항)
 
-Firebase 인증 문제 해결 [Firebase](src/services/README.ko-KR.md#troubleshooting)
+Firebase 인증 문제 해결 [Firebase](src/services/README.ko-KR.md#문제-해결)
 
