@@ -61,8 +61,8 @@ OpenBot RC 트럭을 만들기 위해서는 아래의 부품들을 프린트해�
 위의 모든 부품은 **최소 260mm x 220mm** 크기의 빌드 플레이트가 필요해요. 이는 ```main_frame```의 크기와 일치해요.
 
 많은 일반적인 3D 프린터는 빌드 용량이 더 작아서(보통 220mm x 220mm), 이를 해결할 수 있는 두 가지 방법이 있어요.
-1. 첫 번째 방법은 ```main_frame```을 45도 각도로 기울여서 추가적인 서포트 재료를 사용해 프린트하는 방법이에요.
-2. 두 번째 방법은 원래의 ```main_frame``` 부품을 수정하는 방법이에요. [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) 같은 CAD 소프트웨어를 사용하여 원본 파일을 자르고, 이를 두 개 또는 세 개의 더 작은 부품으로 나누어 프린트할 수 있어요. 이렇게 하면 **220mm x 220mm** 크기의 빌드 플레이트에 맞출 수 있고, 프린트한 후에 이들을 결합할 수 있어요.  
+첫 번째 방법은 ```main_frame```을 45도 각도로 기울여서 추가적인 서포트 재료를 사용해 프린트하는 방법이에요.
+두 번째 방법은 원래의 ```main_frame``` 부품을 수정하는 방법이에요. 이런 CAD 수정에는 [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview)을 추천해요(Fusion 360은 1년 무료 교육용 라이선스를 제공해요). 이를 위해 [STEP](/body/cad/rc_truck_body/main_frame.step) 파일을 제공하니, 원본 파일을 두 개 또는 세 개의 더 작은 부품으로 잘라 프린트할 수 있어요. 이렇게 하면 **220mm x 220mm** 크기의 빌드 플레이트에 맞출 수 있고, 프린트한 후에 이들을 결합할 수 있어요.  
    추후에는 이와 같은 **모듈형 버전의 ```main_frame```**을 제공할 수도 있어요. 그 외 모든 부품은 **최소 220mm x 60mm** 크기의 빌드 플레이트가 필요합니다.
 
 **Ultimaker S5**에서 프린트한 결과는 아래와 같은 설정으로 좋았어요:
@@ -86,9 +86,9 @@ OpenBot RC 트럭을 만들기 위해서는 아래의 부품들을 프린트해�
   <img src="/docs/images/3d_print_rc_3.png" width="32%" />
 </p>
 
-### Assembly
+## 조립
 
-OpenBot RC-Truck을 구축하는 방법은 일반적인 OpenBot처럼 DIY 방식으로 진행할 수도 있지만, **OpenBot [커스텀 PCB](/body/pcb)**를 사용하는 방법을 추천합니다. 이 옵션은 보다 깔끔한 빌드를 원하거나 여러 개의 OpenBot RC-Truck을 만들 계획이 있다면 이상적입니다. 커스텀 PCB를 사용하면 하나의 PCB로 여러 OpenBot 바디 간에 부품을 쉽게 교체하고 사용할 수 있는 장점도 있습니다.
+OpenBot RC-Truck은 일반적인 OpenBot처럼 DIY 방식으로 만들 수도 있지만(OpenBot의 DIY 부품과 안내는 [여기](/body/README.ko-KR.md) 참고), **OpenBot [커스텀 PCB](/body/pcb)**를 사용하는 방법을 추천합니다. 이 옵션은 보다 깔끔한 빌드를 원하거나 여러 개의 OpenBot RC-Truck을 만들 계획이 있다면 이상적입니다. [커스텀 PCB](/body/pcb)를 사용하면 하나의 PCB로 여러 OpenBot 바디 간에 부품을 쉽게 교체하고 사용할 수 있는 장점도 있습니다.
 
 ### 자재 목록 (Bill of Materials)
 

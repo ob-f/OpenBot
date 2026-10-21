@@ -97,9 +97,9 @@ conda install cudatoolkit=11.3 cudnn=8.2 -y
 pip install -r requirements.txt
 ```
 
-네트워크 아키텍처를 시각화하려면 pip install pydot와 graphviz(설치 안내)도 설치할 수 있어요.
+네트워크 아키텍처를 시각화하려면 `pip install pydot`와 graphviz([설치 안내](https://graphviz.gitlab.io/download/))도 설치할 수 있어요.
 
-데이터 수집 및 학습을 위한 웹앱을 사용하려면 아래 추가 의존성을 설치해야 해요. (Mac에서는 brotlipy 패키지가 현재 pip에서 깨져 있어요. 먼저 conda로 설치해야 해요: conda install brotlipy=0.7)
+데이터 수집 및 학습을 위한 [웹앱](#웹-앱)을 사용하려면 아래 추가 의존성을 설치해야 해요. (Mac에서는 `brotlipy` 패키지가 현재 pip에서 깨져 있어요. 먼저 conda로 설치해야 해요: `conda install brotlipy=0.7`)
 
 ```bash
 pip install -r requirements_web.txt
