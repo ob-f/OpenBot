@@ -97,7 +97,7 @@ Si dos componentes usan el mismo pin, la compilación se detiene con el error "T
 
 ### Dependencias
 
-Si has habilitado los sensores de velocidad o el sensor ultrasónico, necesitas instalar la biblioteca [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt). El Arduino Nano solo tiene dos pines de interrupción externa (D2 y D3) y D3 es también uno de los seis pines que soportan PWM. Afortunadamente, también tiene tres interrupciones de puerto que cubren todos los pines en el Arduino. Esta biblioteca analiza estas interrupciones de puerto permitiendo que todos los pines del Arduino se usen como interrupciones.
+En el Arduino Nano, los sensores de velocidad y el sensor ultrasónico necesitan la biblioteca [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt); la mayoría de los cuerpos los tienen activados por defecto. El Arduino Nano solo tiene dos pines de interrupción externa (D2 y D3) y D3 es también uno de los seis pines que soportan PWM. Afortunadamente, también tiene tres interrupciones de puerto que cubren todos los pines en el Arduino. Esta biblioteca analiza estas interrupciones de puerto permitiendo que todos los pines del Arduino se usen como interrupciones.
 
 Si has habilitado el OLED, necesitas instalar las bibliotecas [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306) y [Adafruit_GFX Library](https://github.com/adafruit/Adafruit-GFX-Library).
 

@@ -97,7 +97,7 @@ OpenBot settings: openbot_settings.h
 
 ### 依赖项
 
-如果您启用了速度传感器或超声波传感器，则需要安装[PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt)库。Arduino Nano只有两个外部中断引脚（D2和D3），而D3也是仅有的六个支持PWM的引脚之一。幸运的是，它还有三个端口中断，覆盖了Arduino上的所有引脚。此库解析这些端口中断，使Arduino的所有引脚都可以用作中断。
+在 Arduino Nano 上，速度传感器和超声波传感器需要[PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt)库；大多数车身默认开启它们。Arduino Nano只有两个外部中断引脚（D2和D3），而D3也是仅有的六个支持PWM的引脚之一。幸运的是，它还有三个端口中断，覆盖了Arduino上的所有引脚。此库解析这些端口中断，使Arduino的所有引脚都可以用作中断。
 
 如果您启用了OLED，则需要安装[Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306)和[Adafruit_GFX Library](https://github.com/adafruit/Adafruit-GFX-Library)库。
 

@@ -97,7 +97,7 @@ Si deux composants utilisent la même broche, la compilation s'arrête avec l'er
 
 ### Dépendances
 
-Si vous avez activé les capteurs de vitesse ou le capteur ultrasonique, vous devez installer la bibliothèque [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt). L'Arduino Nano n'a que deux broches d'interruption externes (D2 et D3) et D3 est également l'une des six broches qui supportent le PWM. Heureusement, il dispose également de trois interruptions de port qui couvrent toutes les broches de l'Arduino. Cette bibliothèque analyse ces interruptions de port permettant à toutes les broches de l'Arduino d'être utilisées comme interruptions.
+Sur l'Arduino Nano, les capteurs de vitesse et le capteur à ultrasons ont besoin de la bibliothèque [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) ; la plupart des corps les activent par défaut. L'Arduino Nano n'a que deux broches d'interruption externes (D2 et D3) et D3 est également l'une des six broches qui supportent le PWM. Heureusement, il dispose également de trois interruptions de port qui couvrent toutes les broches de l'Arduino. Cette bibliothèque analyse ces interruptions de port permettant à toutes les broches de l'Arduino d'être utilisées comme interruptions.
 
 Si vous avez activé l'OLED, vous devez installer les bibliothèques [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306) et [Adafruit_GFX Library](https://github.com/adafruit/Adafruit-GFX-Library).
 

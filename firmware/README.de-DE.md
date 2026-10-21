@@ -97,7 +97,7 @@ Wenn zwei Teile denselben Pin verwenden, bricht der Build mit dem Fehler "Two pa
 
 ### Abhängigkeiten
 
-Wenn Sie die Geschwindigkeitsmesser oder den Ultraschallsensor aktiviert haben, müssen Sie die [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) Bibliothek installieren. Der Arduino Nano hat nur zwei externe Interrupt-Pins (D2 und D3) und D3 ist auch einer von nur sechs Pins, die PWM unterstützen. Glücklicherweise hat er auch drei Port-Interrupts, die alle Pins auf dem Arduino abdecken. Diese Bibliothek analysiert diese Port-Interrupts und ermöglicht es, alle Pins des Arduino als Interrupts zu verwenden.
+Auf dem Arduino Nano brauchen die Geschwindigkeitssensoren und der Ultraschallsensor die [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) Bibliothek; die meisten Körper haben sie standardmäßig eingeschaltet. Der Arduino Nano hat nur zwei externe Interrupt-Pins (D2 und D3) und D3 ist auch einer von nur sechs Pins, die PWM unterstützen. Glücklicherweise hat er auch drei Port-Interrupts, die alle Pins auf dem Arduino abdecken. Diese Bibliothek analysiert diese Port-Interrupts und ermöglicht es, alle Pins des Arduino als Interrupts zu verwenden.
 
 Wenn Sie das OLED aktiviert haben, müssen Sie die Bibliotheken [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306) und [Adafruit_GFX Library](https://github.com/adafruit/Adafruit-GFX-Library) installieren.
 

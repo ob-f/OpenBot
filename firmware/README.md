@@ -97,7 +97,7 @@ If two parts use the same pin, the build stops with the error "Two parts use the
 
 ### Dependencies
 
-If you have enabled the speed sensors or the ultrasonic sensor, you need to install the [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) library. The Arduino Nano only has two external interrupt pins (D2 and D3) and D3 is also one of only six pins that support PWM. Fortunately, it also has three port interrupts that cover all pins on the Arduino. This library parses these port interrupts allowing all pins of the Arduino to be used as interrupts.
+On the Arduino Nano, the speed sensors and the ultrasonic sensor need the [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) library; most bodies have them on by default. The Arduino Nano only has two external interrupt pins (D2 and D3) and D3 is also one of only six pins that support PWM. Fortunately, it also has three port interrupts that cover all pins on the Arduino. This library parses these port interrupts allowing all pins of the Arduino to be used as interrupts.
 
 If you have enabled the OLED, you need to install the libraries [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306) and [Adafruit_GFX Library](https://github.com/adafruit/Adafruit-GFX-Library).
 

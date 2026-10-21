@@ -140,6 +140,14 @@ def mcu_combinations(source: str, robot: str, mcu: str):
         elif pad and mcu == "NANO":
             error = ERR_GAMEPAD_NANO
         yield board, settings, error
+    # Parts turned off: the speed sensors still need their interrupts without the sonar
+    board = "nano" if mcu == "NANO" else "esp32"
+    yield board, {
+        "OPENBOT": robot,
+        "NO_PHONE_MODE": 0,
+        "DEBUG": 0,
+        "HAS_SONAR": 0,
+    }, None
     if gamepad and mcu == "ESP32":
         # The Bluepad32 board package without a gamepad has no BLE phone link
         settings = {"OPENBOT": robot, "NO_PHONE_MODE": 0, "DEBUG": 0, "HAS_GAMEPAD": 0}

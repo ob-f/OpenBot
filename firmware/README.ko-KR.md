@@ -97,7 +97,7 @@ OpenBot settings: openbot_settings.h
 
 ### 종속성
 
-속도 센서 또는 초음파 센서를 활성화한 경우 [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) 라이브러리를 설치해야 합니다. Arduino Nano에는 두 개의 외부 인터럽트 핀(D2 및 D3)만 있으며 D3는 PWM을 지원하는 6개 핀 중 하나이기도 합니다. 다행히도 Arduino의 모든 핀을 커버하는 세 개의 포트 인터럽트가 있습니다. 이 라이브러리는 이러한 포트 인터럽트를 구문 분석하여 Arduino의 모든 핀을 인터럽트로 사용할 수 있도록 합니다.
+Arduino Nano에서 속도 센서와 초음파 센서에는 [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) 라이브러리가 필요합니다. 대부분의 바디는 기본적으로 이들을 켜 둡니다. Arduino Nano에는 두 개의 외부 인터럽트 핀(D2 및 D3)만 있으며 D3는 PWM을 지원하는 6개 핀 중 하나이기도 합니다. 다행히도 Arduino의 모든 핀을 커버하는 세 개의 포트 인터럽트가 있습니다. 이 라이브러리는 이러한 포트 인터럽트를 구문 분석하여 Arduino의 모든 핀을 인터럽트로 사용할 수 있도록 합니다.
 
 OLED를 활성화한 경우 [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306) 및 [Adafruit_GFX Library](https://github.com/adafruit/Adafruit-GFX-Library) 라이브러리를 설치해야 합니다.
 

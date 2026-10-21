@@ -768,10 +768,11 @@ uint16_t gamepad_misc = 0;
 bool gamepad_obstacle_stop = true;
 #endif
 
-#if (HAS_SONAR)
-#if (MCU == NANO)
+#if (MCU == NANO && (HAS_SONAR || HAS_SPEED_SENSORS_FRONT || HAS_SPEED_SENSORS_BACK || HAS_SPEED_SENSORS_MIDDLE))
 #include "PinChangeInterrupt.h"
 #endif
+
+#if (HAS_SONAR)
 // Sonar sensor
 const float US_TO_CM = 0.01715;               //cm/uS -> (343 * 100 / 1000000) / 2;
 const unsigned int MAX_SONAR_DISTANCE = 300;  //cm
