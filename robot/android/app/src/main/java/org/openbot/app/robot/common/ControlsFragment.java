@@ -51,7 +51,6 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
   protected Animation startAnimation;
   protected SharedPreferencesManager preferencesManager;
   protected PhoneController phoneController;
-  protected Enums.DriveMode currentDriveMode = Enums.DriveMode.GAME;
 
   protected AudioPlayer audioPlayer;
 
@@ -365,7 +364,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
             isLoggingEnabledForStatus(),
             vehicle.isNoiseEnabled(),
             isNetworkModeEnabled(),
-            currentDriveMode.toString(),
+            vehicle.getDriveMode().toString(),
             vehicle.getIndicator()));
   }
 
