@@ -273,6 +273,8 @@ OpenBot settings: openbot_settings.h
 
 [Bluepad32 支持的手柄列表](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) 中有更多型号，包括需要额外设置的 PS3 DualShock 3。设置 `DEBUG 1` 后，串口监视器会显示每个连接的手柄名称。
 
+如果之前已配对的手柄没有接管控制，例如 PS4 或 PS5 手柄的灯条一直是蓝色，没有变成绿色、橙色或红色，请让手柄重新进入配对模式并重启机器人。
+
 #### 操作
 
 按键按 PlayStation / Xbox 标注。

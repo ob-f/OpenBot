@@ -273,6 +273,8 @@ Schalten Sie den Roboter ein und versetzen Sie das Gamepad in den Kopplungsmodus
 
 Die [Bluepad32-Liste unterstützter Gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) enthält weitere Modelle, darunter den PS3 DualShock 3, der zusätzliche Einrichtung braucht. Mit `DEBUG 1` zeigt der serielle Monitor den Namen jedes Gamepads an, das sich verbindet.
 
+Wenn ein bereits gekoppeltes Gamepad die Steuerung nicht übernimmt, zum Beispiel ein PS4- oder PS5-Controller, dessen Lichtleiste blau bleibt, statt grün, orange oder rot zu werden, versetzen Sie es erneut in den Kopplungsmodus und starten Sie den Roboter neu.
+
 #### Bedienung
 
 Tasten sind als PlayStation / Xbox angegeben.

@@ -273,6 +273,8 @@ Power on the robot and put the gamepad in pairing mode. It connects within a few
 
 The [Bluepad32 list of supported gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) has more models, including the PS3 DualShock 3, which needs extra setup. With `DEBUG 1`, the Serial Monitor shows the name of each gamepad that connects.
 
+If a gamepad that was paired before doesn't take over, for example a PS4 or PS5 controller whose light bar stays blue instead of turning green, orange or red, put it in pairing mode again and restart the robot.
+
 #### Controls
 
 Buttons are named PlayStation / Xbox.

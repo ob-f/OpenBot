@@ -273,6 +273,8 @@ Allumez le robot et mettez la manette en mode d'appairage. Elle se connecte en q
 
 La [liste des manettes prises en charge par Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) contient d'autres modèles, dont la DualShock 3 de la PS3, qui demande une configuration supplémentaire. Avec `DEBUG 1`, le moniteur série affiche le nom de chaque manette qui se connecte.
 
+Si une manette déjà appairée ne prend pas le contrôle, par exemple une manette PS4 ou PS5 dont la barre lumineuse reste bleue au lieu de passer au vert, à l'orange ou au rouge, remettez-la en mode d'appairage et redémarrez le robot.
+
 #### Commandes
 
 Les boutons sont indiqués PlayStation / Xbox.

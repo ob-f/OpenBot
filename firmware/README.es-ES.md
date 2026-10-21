@@ -273,6 +273,8 @@ Enciende el robot y pon el gamepad en modo de emparejamiento. Se conecta en poco
 
 La [lista de gamepads compatibles de Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) incluye más modelos, entre ellos el PS3 DualShock 3, que necesita configuración adicional. Con `DEBUG 1`, el monitor serie muestra el nombre de cada gamepad que se conecta.
 
+Si un gamepad que ya estaba emparejado no toma el control, por ejemplo un mando de PS4 o PS5 cuya barra de luz se queda en azul en lugar de ponerse verde, naranja o roja, ponlo de nuevo en modo de emparejamiento y reinicia el robot.
+
 #### Controles
 
 Los botones se indican como PlayStation / Xbox.
