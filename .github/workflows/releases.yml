@@ -110,6 +110,7 @@ jobs:
       - name: Build Release Apk
         run: |
           flutter build apk --release \
+            --target-platform android-arm,android-arm64 \
             --build-name=${{ steps.version.outputs.build_name }} \
             --build-number=${{ steps.version.outputs.build_number }}
       - name: Upload release APK
