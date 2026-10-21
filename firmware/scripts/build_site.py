@@ -23,11 +23,11 @@ from compile_all import BOARDS, SKETCH, configure, read_sketch, robots
 ROOT = SKETCH.parents[2]
 WEB = SKETCH.parents[1] / "web"
 IMAGES = {
-    "DIY": "android/robot/src/main/res/drawable-hdpi/diy.gif",
+    "DIY": "robot/android/app/src/main/res/drawable-hdpi/diy.gif",
     "PCB_V1": "docs/images/pcb_3d_v1.png",
     "PCB_V2": "docs/images/pcb_3d_v2.png",
     "RTR_TT": "docs/images/RTR_TT.jpg",
-    "RTR_TT2": "android/robot/src/main/res/drawable-hdpi/rtr_tt.gif",
+    "RTR_TT2": "robot/android/app/src/main/res/drawable-hdpi/rtr_tt.gif",
     "RTR_520": "docs/images/RTR_520.jpg",
     "RC_CAR": "docs/images/add_covers_2.JPG",
     "LITE": "docs/images/openbot_lite.jpg",
