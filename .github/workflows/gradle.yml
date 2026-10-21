@@ -43,8 +43,3 @@ jobs:
         with:
           name: robot-debug.apk
           path: android/robot/build/outputs/apk/debug/robot-debug.apk
-      - name: Upload Controller App
-        uses: actions/upload-artifact@v4
-        with:
-          name: controller-debug.apk
-          path: android/controller/build/outputs/apk/debug/controller-debug.apk

@@ -14,7 +14,7 @@
 Cliquez sur les liens ci-dessous pour en savoir plus sur les fonctionnalités des applications.
 
 - [Application Robot](robot/README.md)
-- [Application Contrôleur](controller/README.md)
+- [Application Contrôleur](../controller/flutter/README.fr-FR.md) (Flutter)
 
 ## Installer les applications
 
@@ -40,7 +40,7 @@ Le moyen le plus simple d'obtenir l'une des applications est de la télécharger
 
 Alternativement, vous pouvez télécharger les fichiers apk depuis les assets de n'importe quelle [release](https://github.com/ob-f/OpenBot/releases). Si vous souhaitez obtenir la dernière version de l'application à partir de la branche master, vous pouvez également la télécharger depuis les artefacts de build [ici](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22). Notez qu'elle peut ne pas être stable. Si vous souhaitez apporter des modifications à l'application plus tard, suivez les étapes ci-dessous pour compiler l'application et la déployer sur votre téléphone.
 
-> **Remarque :** Le fichier `Controller-<version>.apk` publié avec chaque release est désormais construit à partir de l'[application Flutter Controller](../controller/flutter/README.fr-FR.md) et non plus de l'ancienne application de contrôle Android de ce dossier. Le contrôleur Flutter utilise un identifiant de package différent (`org.openbot.app.controller` au lieu de `org.openbot.controller`) ; il ne mettra donc **pas** à jour une installation existante de l'ancien contrôleur. Si l'ancien contrôleur est déjà installé, installez le nouveau séparément ; vous pourrez ensuite désinstaller l'ancienne application.
+> **Remarque :** L'application de contrôle est l'[application Flutter Controller](../controller/flutter/README.fr-FR.md) ; l'ancienne application de contrôle Android qui se trouvait dans ce dossier a été supprimée. Le contrôleur Flutter utilise un identifiant de package différent (`org.openbot.app.controller` au lieu de `org.openbot.controller`) ; il ne mettra donc **pas** à jour une installation existante de l'ancien contrôleur. Si l'ancien contrôleur est encore installé, installez le nouveau séparément et désinstallez l'ancienne application.
 
 ## Compiler les applications
 
@@ -56,7 +56,7 @@ Alternativement, vous pouvez télécharger les fichiers apk depuis les assets de
 
 1. Ouvrez Android Studio et sélectionnez *Ouvrir un projet Android Studio existant*.
 2. Sélectionnez le répertoire OpenBot/android et cliquez sur OK.
-3. Si vous souhaitez installer l'[application OpenBot](app/README.md), assurez-vous de sélectionner la configuration *app*. Si vous souhaitez installer l'[application Contrôleur](controller/README.md), sélectionnez la configuration *controller*. Confirmez la synchronisation Gradle si nécessaire. Pour effectuer une synchronisation Gradle manuellement, cliquez sur l'icône Gradle.
+3. Si vous souhaitez installer l'[application OpenBot](robot/README.md), assurez-vous de sélectionner la configuration *robot*. Confirmez la synchronisation Gradle si nécessaire. Pour effectuer une synchronisation Gradle manuellement, cliquez sur l'icône Gradle.
   ![Synchronisation Gradle](../docs/images/android_studio_bar_gradle.jpg)
 4. Connectez votre appareil Android et assurez-vous que le débogage USB dans les [options développeur](https://developer.android.com/studio/debug/dev-options) est activé. Selon votre environnement de développement, [d'autres étapes](https://developer.android.com/studio/run/device) peuvent être nécessaires. Vous devriez maintenant voir votre appareil dans la barre de navigation en haut.
   ![Téléphone](../docs/images/android_studio_bar_phone.jpg)

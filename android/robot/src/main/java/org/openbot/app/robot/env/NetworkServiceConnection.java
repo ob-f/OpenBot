@@ -9,6 +9,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -41,6 +43,8 @@ public class NetworkServiceConnection implements ILocalConnection {
   private SocketHandler socketHandler;
   private BlockingQueue<String> messageQueue = new ArrayBlockingQueue<>(25);
   private boolean stopped = true;
+  private static final long RETRY_DELAY_MS = 2000;
+  private final Handler retryHandler = new Handler(Looper.getMainLooper());
 
   @Override
   public void init(Context context) {
@@ -168,16 +172,17 @@ public class NetworkServiceConnection implements ILocalConnection {
       @Override
       public void onStartDiscoveryFailed(String serviceType, int errorCode) {
         e(TAG, "Discovery failed: Error code: %s", errorCode);
-        mNsdManager.stopServiceDiscovery(this);
-
-        // re-try connecting
-        runConnection();
+        // The failed listener is already unregistered; try again after a short pause
+        retryHandler.postDelayed(
+            () -> {
+              if (!stopped) runConnection();
+            },
+            RETRY_DELAY_MS);
       }
 
       @Override
       public void onStopDiscoveryFailed(String serviceType, int errorCode) {
         e("Discovery failed: Error code:%s", errorCode);
-        mNsdManager.stopServiceDiscovery(this);
       }
     };
   }

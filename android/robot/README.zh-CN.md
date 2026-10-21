@@ -323,7 +323,7 @@
 
 ### 默认
 
-[DefaultActivity](src/main/java/org/openbot/original/DefaultActivity.java) 包含了OpenBot应用的所有重要功能，集成在一个屏幕上。它显示与车辆的连接状态，并报告来自车辆传感器的测量值。机器人可以通过标准的蓝牙游戏控制器或运行OpenBot [控制器应用](../controller)的另一部智能手机进行控制。我们还实现了一个数据记录器，用于收集机器人的数据集。目前，我们记录以下传感器的读数：相机、陀螺仪、加速度计、磁力计、环境光传感器和气压计。通过Android API，我们能够获得以下传感器读数：RGB图像、角速度、线性加速度、重力、磁场强度、光强度、大气压力、纬度、经度、高度、方位和速度。除了手机传感器外，我们还记录通过串行链接传输的车身传感器读数（车轮里程计、障碍物距离和电池电压）。如果连接了控制器，我们还会记录和时间戳控制信号。最后，我们集成了几种用于跟随人和自主导航的神经网络。
+[DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivity.java) 包含了OpenBot应用的所有重要功能，集成在一个屏幕上。它显示与车辆的连接状态，并报告来自车辆传感器的测量值。机器人可以通过标准的蓝牙游戏控制器或运行OpenBot [控制器应用](../../controller/flutter/README.zh-CN.md)的另一部智能手机进行控制。我们还实现了一个数据记录器，用于收集机器人的数据集。目前，我们记录以下传感器的读数：相机、陀螺仪、加速度计、磁力计、环境光传感器和气压计。通过Android API，我们能够获得以下传感器读数：RGB图像、角速度、线性加速度、重力、磁场强度、光强度、大气压力、纬度、经度、高度、方位和速度。除了手机传感器外，我们还记录通过串行链接传输的车身传感器读数（车轮里程计、障碍物距离和电池电压）。如果连接了控制器，我们还会记录和时间戳控制信号。最后，我们集成了几种用于跟随人和自主导航的神经网络。
 
 <p align="left">
   <img src="../../docs/images/screen_default.jpg" alt="App GUI" width="50%"/>
@@ -400,7 +400,7 @@
 
 ## 代码结构
 
-[TensorFlow Lite对象检测Android演示](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android)被用作集成TFLite模型和获取相机视频流的起点。[DefaultActivity](src/main/java/org/openbot/original/DefaultActivity.java)运行主线程，并继承自[CameraActivity](src/main/java/org/openbot/original/CameraActivity.java)以管理相机和UI。[SensorService](src/main/java/org/openbot/logging/SensorService.java)读取所有其他手机传感器并记录它们。[ServerCommunication](src/main/java/org/openbot/server/ServerCommunication.java)和[NsdService](src/main/java/org/openbot/server/NsdService.java)与具有React前端的本地[Python服务器](../../policy/README.md#web-app)建立连接。如果您收集数据，它可以自动上传以进行可视化、训练ML模型并将训练好的模型下载到机器人。[env](src/main/java/org/openbot/env)文件夹包含实用类，如[Vehicle](src/main/java/org/openbot/vehicle/Vehicle.java)接口、[GameController](src/main/java/org/openbot/env/GameController.java)接口、[PhoneController](src/main/java/org/openbot/env/PhoneController.java)接口和用于声音反馈的[AudioPlayer](src/main/java/org/openbot/env/AudioPlayer)。[tflite](src/main/java/org/openbot/tflite)文件夹包含[Autopilot](src/main/java/org/openbot/tflite/Autopilot.java)和[Detector](src/main/java/org/openbot/tflite/Detector.java)网络的模型定义。
+[TensorFlow Lite对象检测Android演示](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android)被用作集成TFLite模型和获取相机视频流的起点。[DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivity.java)运行主线程，并继承自[CameraActivity](src/main/java/org/openbot/app/robot/original/CameraActivity.java)以管理相机和UI。[SensorService](src/main/java/org/openbot/app/robot/logging/SensorService.java)读取所有其他手机传感器并记录它们。[ServerCommunication](src/main/java/org/openbot/app/robot/server/ServerCommunication.java)和[NsdService](src/main/java/org/openbot/app/robot/server/NsdService.java)与具有React前端的本地[Python服务器](../../policy/README.md#web-app)建立连接。如果您收集数据，它可以自动上传以进行可视化、训练ML模型并将训练好的模型下载到机器人。[env](src/main/java/org/openbot/app/robot/env)文件夹包含实用类，如[Vehicle](src/main/java/org/openbot/app/robot/vehicle/Vehicle.java)接口、[GameController](src/main/java/org/openbot/app/robot/env/GameController.java)接口、[PhoneController](src/main/java/org/openbot/app/robot/env/PhoneController.java)接口和用于声音反馈的[AudioPlayer](src/main/java/org/openbot/app/robot/env/AudioPlayer.java)。[tflite](src/main/java/org/openbot/app/robot/tflite)文件夹包含[Autopilot](src/main/java/org/openbot/app/robot/tflite/Autopilot.java)和[Detector](src/main/java/org/openbot/app/robot/tflite/Detector.java)网络的模型定义。
 
 ## 下一步（可选）
 

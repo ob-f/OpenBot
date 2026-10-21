@@ -15,7 +15,7 @@ Esta aplicación de control sirve como un `control remoto` para el vehículo [Op
 
 En Android, descarga `Controller-<version>.apk` de los assets del [release](https://github.com/ob-f/OpenBot/releases) más reciente e [instálalo](https://www.lifewire.com/install-apk-on-android-4177185) en tu teléfono.
 
-> **Nota para usuarios actuales:** Esta aplicación sustituye a la antigua [aplicación de control para Android](../../android/controller/README.es-ES.md) como el APK de control que se publica con cada release. Como las dos aplicaciones usan IDs de paquete distintos (`org.openbot.app.controller` frente a `org.openbot.controller`), instalar este APK no actualizará la aplicación antigua, sino que se instalará como una aplicación aparte junto a ella. Puedes desinstalar el controlador antiguo cuando hayas hecho el cambio.
+> **Nota para usuarios actuales:** Esta aplicación sustituye a la antigua aplicación de control para Android como el APK de control que se publica con cada release. Como las dos aplicaciones usan IDs de paquete distintos (`org.openbot.app.controller` frente a `org.openbot.controller`), instalar este APK no actualizará la aplicación antigua, sino que se instalará como una aplicación aparte junto a ella. Puedes desinstalar el controlador antiguo cuando hayas hecho el cambio.
 
 ## Comenzando
 Comienza instalando [Flutter](https://flutter.dev/) en tu sistema. Elige la descarga adecuada para tu sistema operativo, que incluye opciones para Windows, macOS, Linux y ChromeOS. Sigue la guía oficial de instalación de Flutter para obtener instrucciones detalladas: [Guía de Instalación de Flutter](https://docs.flutter.dev/get-started/install)
@@ -54,6 +54,8 @@ Comienza instalando [Flutter](https://flutter.dev/) en tu sistema. Elige la desc
   </p>
 
 ## Conexión 
+
+El teléfono del controlador y el del robot deben estar en la misma red Wi-Fi, o uno de ellos debe estar conectado al punto de acceso del otro. No se necesita acceso a internet.
 
 Cuando se inicia la aplicación de control, intenta conectarse inmediatamente al robot y muestra la siguiente pantalla:
 

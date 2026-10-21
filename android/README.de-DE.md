@@ -14,7 +14,7 @@
 Klicken Sie auf die untenstehenden Links, um mehr über die Funktionen der Apps zu erfahren.
 
 - [Robot App](robot/README.md)
-- [Controller App](controller/README.md)
+- [Controller App](../controller/flutter/README.de-DE.md) (Flutter)
 
 ## Installation der Apps
 
@@ -40,7 +40,7 @@ Der einfachste Weg, eine der Apps zu erhalten, ist, sie direkt auf das Telefon h
 
 Alternativ können Sie die APKs aus den Assets einer beliebigen [Veröffentlichung](https://github.com/ob-f/OpenBot/releases) herunterladen. Wenn Sie die neueste App aus dem Master-Branch möchten, können Sie sie auch aus den Build-Artefakten [hier](https://github.com/ob-f/OpenBot/actions?query=workflow%3A%22Java+CI+with+Gradle%22) herunterladen. Beachten Sie, dass sie möglicherweise nicht stabil ist. Wenn Sie später Änderungen an der App vornehmen möchten, folgen Sie den untenstehenden Schritten, um die App zu kompilieren und auf Ihrem Telefon zu installieren.
 
-> **Hinweis:** Das Release-Asset `Controller-<version>.apk` wird jetzt aus der [Flutter-Controller-App](../controller/flutter/README.de-DE.md) gebaut und nicht mehr aus der alten Android-Controller-App in diesem Ordner. Der Flutter-Controller verwendet eine andere Paket-ID (`org.openbot.app.controller` statt `org.openbot.controller`) und aktualisiert daher eine bestehende Installation des alten Controllers **nicht**. Wenn Sie den alten Controller bereits installiert haben, installieren Sie den neuen Controller separat; die alte App können Sie danach deinstallieren.
+> **Hinweis:** Die Controller-App ist die [Flutter-Controller-App](../controller/flutter/README.de-DE.md); die alte Android-Controller-App, die sich früher in diesem Ordner befand, wurde entfernt. Der Flutter-Controller verwendet eine andere Paket-ID (`org.openbot.app.controller` statt `org.openbot.controller`) und aktualisiert daher eine bestehende Installation des alten Controllers **nicht**. Wenn Sie den alten Controller noch installiert haben, installieren Sie den neuen Controller separat und deinstallieren Sie die alte App.
 
 ## Apps bauen
 
@@ -56,7 +56,7 @@ Alternativ können Sie die APKs aus den Assets einer beliebigen [Veröffentlichu
 
 1. Öffnen Sie Android Studio und wählen Sie *Ein bestehendes Android Studio-Projekt öffnen*.
 2. Wählen Sie das Verzeichnis OpenBot/android und klicken Sie auf OK.
-3. Wenn Sie die [OpenBot-App](app/README.md) installieren möchten, stellen Sie sicher, dass die *app*-Konfiguration ausgewählt ist. Wenn Sie die [Controller-App](controller/README.md) installieren möchten, wählen Sie die *controller*-Konfiguration. Bestätigen Sie den Gradle-Sync, falls erforderlich. Um einen Gradle-Sync manuell durchzuführen, klicken Sie auf das Gradle-Symbol.
+3. Wenn Sie die [OpenBot-App](robot/README.md) installieren möchten, stellen Sie sicher, dass die *robot*-Konfiguration ausgewählt ist. Bestätigen Sie den Gradle-Sync, falls erforderlich. Um einen Gradle-Sync manuell durchzuführen, klicken Sie auf das Gradle-Symbol.
   ![Gradle Sync](../docs/images/android_studio_bar_gradle.jpg)
 4. Verbinden Sie Ihr Android-Gerät und stellen Sie sicher, dass USB-Debugging in den [Entwickleroptionen](https://developer.android.com/studio/debug/dev-options) aktiviert ist. Abhängig von Ihrer Entwicklungsumgebung könnten [weitere Schritte](https://developer.android.com/studio/run/device) erforderlich sein. Sie sollten Ihr Gerät jetzt in der Navigationsleiste oben sehen.
   ![Phone](../docs/images/android_studio_bar_phone.jpg)

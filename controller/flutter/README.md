@@ -15,7 +15,7 @@ This Controller app serves as a `remote controller` for the [OpenBot](https://ww
 
 On Android, download `Controller-<version>.apk` from the assets of the latest [release](https://github.com/ob-f/OpenBot/releases) and [install](https://www.lifewire.com/install-apk-on-android-4177185) it on your phone.
 
-> **Note for existing users:** This app replaces the legacy [Android controller app](../../android/controller/README.md) as the controller APK published with each release. Because the two apps use different package IDs (`org.openbot.app.controller` vs. `org.openbot.controller`), installing this APK will not update the legacy app; it is installed as a separate app alongside it. You can uninstall the legacy controller once you have switched.
+> **Note for existing users:** This app replaces the legacy Android controller app as the controller APK published with each release. Because the two apps use different package IDs (`org.openbot.app.controller` vs. `org.openbot.controller`), installing this APK will not update the legacy app; it is installed as a separate app alongside it. You can uninstall the legacy controller once you have switched.
 
 ## Getting Started
 Begin by installing [Flutter](https://flutter.dev/) on your system. Choose the appropriate download for your operating system, which includes options for Windows, macOS, Linux, and ChromeOS. Follow the official Flutter installation guide for detailed instructions: [Flutter Installation Guide](https://docs.flutter.dev/get-started/install)
@@ -82,6 +82,8 @@ flutter build apk --release         # for a signed installable APK
 `app/build.gradle` loads `key.properties` automatically if present and wires it into the `release` signing config; if the file is missing, the release build config falls back to null signing values and the build will fail signing (debug builds are unaffected).
 
 ## Connection
+
+The controller and robot phones must be on the same Wi-Fi network, or one phone must be connected to the other's hotspot. No internet access is needed.
 
 When the controller app is started, it immediately tries to connect to the robot and shows the following screen:
 

@@ -29,7 +29,7 @@ Remerciements spéciaux à Ivo Zivkov [izivkov@gmail.com](mailto:izivkov@gmail.c
 
 ## [Application de Contrôleur Flutter](flutter)
 
-Cette application de contrôle sert de télécommande pour le véhicule OpenBot, similaire à une manette BT (par exemple, PS3/4 ou Xbox). Elle fonctionne sur un autre appareil Android/iOS et prend en charge la diffusion en direct de vidéo/audio en plus du contrôle.
+Cette application de contrôle sert de télécommande pour le véhicule OpenBot, similaire à une manette BT (par exemple, PS3/4 ou Xbox). Elle fonctionne sur un autre appareil Android/iOS et prend en charge la diffusion en direct de vidéo/audio en plus du contrôle. Les deux téléphones doivent être sur le même réseau Wi-Fi, ou l'un d'eux doit être connecté au point d'accès de l'autre.
 
 ## [Contrôleur Serveur Web](web-server)
 

@@ -15,7 +15,7 @@
 
 Android에서는 최신 [릴리스](https://github.com/ob-f/OpenBot/releases)의 에셋에서 `Controller-<version>.apk`를 다운로드하여 휴대폰에 [설치](https://www.lifewire.com/install-apk-on-android-4177185)하세요.
 
-> **기존 사용자 참고:** 이 앱은 각 릴리스와 함께 배포되는 컨트롤러 APK로서 기존 [Android 컨트롤러 앱](../../android/controller/README.ko-KR.md)을 대체합니다. 두 앱은 서로 다른 패키지 ID(`org.openbot.app.controller`와 `org.openbot.controller`)를 사용하므로, 이 APK를 설치해도 기존 앱이 업데이트되지 않고 별도의 앱으로 함께 설치됩니다. 새 앱으로 전환한 후에는 기존 컨트롤러를 삭제해도 됩니다.
+> **기존 사용자 참고:** 이 앱은 각 릴리스와 함께 배포되는 컨트롤러 APK로서 기존 Android 컨트롤러 앱을 대체합니다. 두 앱은 서로 다른 패키지 ID(`org.openbot.app.controller`와 `org.openbot.controller`)를 사용하므로, 이 APK를 설치해도 기존 앱이 업데이트되지 않고 별도의 앱으로 함께 설치됩니다. 새 앱으로 전환한 후에는 기존 컨트롤러를 삭제해도 됩니다.
 
 ## 시작하기
 먼저 시스템에 [Flutter](https://flutter.dev/)를 설치하세요. 운영 체제에 맞는 다운로드 옵션을 선택하고, Windows, macOS, Linux, ChromeOS를 포함한 모든 플랫폼에 대한 설치 방법은 공식 Flutter 설치 가이드에서 확인할 수 있습니다: [Flutter 설치 가이드](https://docs.flutter.dev/get-started/install)
@@ -55,6 +55,8 @@ Android에서는 최신 [릴리스](https://github.com/ob-f/OpenBot/releases)의
   </p>
 
 ## 연결
+
+컨트롤러 휴대폰과 로봇 휴대폰은 같은 Wi-Fi 네트워크에 연결되어 있거나, 한 휴대폰이 다른 휴대폰의 핫스팟에 연결되어 있어야 합니다. 인터넷 연결은 필요하지 않습니다.
 
 컨트롤러 앱이 시작되면, 즉시 로봇에 연결을 시도하고 다음과 같은 화면을 표시합니다:
 

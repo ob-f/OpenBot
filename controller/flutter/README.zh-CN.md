@@ -15,7 +15,7 @@
 
 在 Android 上，从最新[版本](https://github.com/ob-f/OpenBot/releases)的资源中下载 `Controller-<version>.apk`，然后在手机上[安装](https://www.lifewire.com/install-apk-on-android-4177185)。
 
-> **现有用户注意：** 此应用取代旧版 [Android 控制器应用](../../android/controller/README.zh-CN.md)，成为每个版本发布的控制器 APK。由于两个应用使用不同的包 ID（`org.openbot.app.controller` 与 `org.openbot.controller`），安装此 APK 不会更新旧版应用，而是作为单独的应用与其并存。切换完成后，你可以卸载旧版控制器。
+> **现有用户注意：** 此应用取代旧版 Android 控制器应用，成为每个版本发布的控制器 APK。由于两个应用使用不同的包 ID（`org.openbot.app.controller` 与 `org.openbot.controller`），安装此 APK 不会更新旧版应用，而是作为单独的应用与其并存。切换完成后，你可以卸载旧版控制器。
 
 ## 入门指南
 首先在你的系统上安装 [Flutter](https://flutter.dev/)。选择适合你操作系统的下载选项，包括 Windows、macOS、Linux 和 ChromeOS。请按照官方 Flutter 安装指南进行详细安装：[Flutter 安装指南](https://docs.flutter.dev/get-started/install)
@@ -54,6 +54,8 @@
   </p>
 
 ## 连接
+
+控制器手机和机器人手机必须连接到同一 Wi-Fi 网络，或其中一部手机连接到另一部手机的热点。无需互联网连接。
 
 启动控制器应用程序时，它会立即尝试连接到机器人并显示以下屏幕：
 
