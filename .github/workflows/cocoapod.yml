@@ -7,12 +7,12 @@ on:
   push:
     branches: [ master ]
     paths:
-    - 'ios/OpenBot/**'
+    - 'robot/ios/OpenBot/**'
     - '.github/workflows/cocoapod.yml'
   pull_request:
     branches: [ master ]
     paths:
-    - 'ios/OpenBot/**'
+    - 'robot/ios/OpenBot/**'
     - '.github/workflows/cocoapod.yml'
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ios/OpenBot
+        working-directory: robot/ios/OpenBot
 
     steps:
       - name: Checkout Repository

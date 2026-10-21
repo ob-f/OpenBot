@@ -270,4 +270,4 @@ Sie können jede andere MCU mit den folgenden Funktionen verwenden:
 
 ## Weiter
 
-Kompilieren und ausführen der [Android App](../android/README.de-DE.md)
+Kompilieren und ausführen der [Android App](../robot/android/README.de-DE.md)

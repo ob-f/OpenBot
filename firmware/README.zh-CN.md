@@ -268,4 +268,4 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
 
 ## 下一步
 
-编译并运行[Android应用程序](../android/README.zh-CN.md)
+编译并运行[Android应用程序](../robot/android/README.zh-CN.md)

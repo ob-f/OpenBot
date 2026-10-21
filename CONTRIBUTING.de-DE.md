@@ -51,7 +51,7 @@
 
 ### Java
 
-Wir verwenden ein Gradle-Skript zur Formatierung von Java-Code. Stellen Sie sicher, dass Sie sich im Verzeichnis `android` befinden.
+Wir verwenden ein Gradle-Skript zur Formatierung von Java-Code. Stellen Sie sicher, dass Sie sich im Verzeichnis `robot/android` befinden.
 
 Sie können Ihren Code überprüfen mit:
 
