@@ -14,6 +14,8 @@
 1. **安全性：** 请确保您在安全的环境中操作。请记住，您的手机可能会在碰撞中受损！在使用自动控制（例如跟随人或驾驶策略）时需要特别小心。请确保您始终连接了游戏控制器，并熟悉按键映射，以便随时停止车辆。使用风险自负！
 2. **应用程序正在开发中：** 该应用程序正在开发中，可能会根据您的手机型号和操作系统版本出现崩溃或意外行为。请确保在没有连接车轮的情况下测试所有功能。使用风险自负！
 
+3. **该应用即将在 `App Store` 上`推出`。**
+
 ## 应用程序界面
 
 ### 主菜单
@@ -115,6 +117,8 @@
 
 - **模型分辨率：** 用于切换保存用于训练不同模型的图像分辨率。
 
+- **服务器**：服务器功能正在开发中。
+
 - **记录收集的数据：** 数据收集过程可以从屏幕或远程控制，例如通过蓝牙控制器进行控制。使用蓝牙控制器时，您可以：
 
     - 按下**A按钮**以**开始**数据收集过程
@@ -155,6 +159,12 @@
 
 </p>
 
+- **服务器**：如果正在运行用于策略训练的 [Web 应用](../../../policy/README.zh-CN.md#web-app)，可以在此选择它，并将训练好的自动驾驶模型发送给机器人。
+- **模型**：选择用于自动驾驶模式的训练模型。
+- **设备**：使用 CPU、GPU 或 NNAPI 进行推理（详见[此处](#device)）。
+- **线程**：使用的线程数（仅在选择 CPU 作为设备时有效）。
+- **控制**：控制器、驾驶模式和速度用于设置机器人，详见[控制部分](#control)。
+
 ### 物体跟踪
 
 用于跟踪80种不同类别物体的简单UI。有关物体跟踪的不同AI模型和性能基准的简短描述可以在[模型管理](#model-management)中找到。
@@ -162,6 +172,15 @@
 <p align="left">
 <img src="../../../docs/images/ios_object_tracking_screen.jpg" alt="物体跟踪" width="50%" />
 </p>
+
+- **动态速度**：在“自动模式”下，机器人越接近被跟踪的物体，速度越低。
+  速度根据边界框的面积缩放（横屏效果最好）。
+- **模型**：根据手机性能选择物体检测器。
+- **物体**：选择要跟踪的物体。模型可以检测 80 种 COCO [物体类别](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/)。
+- **置信度**：决定是否接受检测结果的阈值。出现误检时调高，检测不到目标物体时调低。
+- **设备**：使用 CPU、GPU 或 NNAPI 进行推理（详见[此处](#device)）。
+- **线程**：使用的线程数（仅在选择 CPU 作为设备时有效）。
+- **控制**：控制器、驾驶模式和速度用于设置机器人，详见[控制部分](#control)。
 
 ### 模型管理
 
@@ -171,6 +190,87 @@
 <img src="../../../docs/images/ios_screen_model_management.gif" alt="模型管理" width="25%" />
 </p>
 
+### 导航
+
+在 `Point Goal Navigation` 界面中，可以用 3D 空间中向前和向左的值为机器人设置导航目标。在应用中点击相应按钮即可进入此界面。
+
+点击后会弹出一个窗口，其中有 `Forward` 和 `Left` 两个输入框。在其中输入数值即可设置目标位置。弹窗中还有两个按钮：`Cancel` 和 `Start`。
+
+- `Cancel` 按钮：返回主界面并取消导航。
+
+
+- `Start` 按钮：根据输入的向前和向左的值在 3D 空间中创建一个点，并开始导航。机器人会朝目标位置移动，并根据需要调整轨迹和速度以到达目的地。
+
+机器人成功到达目标位置后，会显示一条提示消息，机器人随即停止。
+
+此功能使用 Apple 为增强现实应用开发的框架 `ARKit`。需要兼容 ARKit 的设备才能使用。
+
+<p align="left">
+<img src="../../../docs/images/ios_set_navigation_screen.jpg" alt="Model Management" width="25%" />
+<img src="../../../docs/images/ios_navigation_screen.jpg" alt="Model Management" width="25%" />
+</p>
+
+
+### 项目界面
+
+如果您已使用 Google 帐号登录，项目界面会列出您的 OpenBot Playground 项目。您可以运行这些项目来控制 OpenBot，也可以点击右上角的扫描图标扫描它们的二维码。如果未登录，界面会显示 Google 登录按钮，但您仍然可以在不登录的情况下扫描项目二维码。如果登录后界面显示 `Oops, no project found`，请确认该帐号在 Google Drive 中存有项目。
+
+如果列表中没有显示最新的项目，可以在项目界面向下拉动来重新加载。
+
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen_ios.gif" alt="Project Screen" width="25%"/>
+<img src="../../../docs/images/no_projects_found_ios.jpg" alt="No project screen" style="padding-left: 0.3%" width="26.5%"/>
+<img src="../../../docs/images/reload_projects_ios.gif" alt="Reload project screen" width="25%"/>
+</p>
+
+- **Google Drive 项目**：要运行 Google Drive 项目，点击该项目并等待读取项目文件。如果顺利读取且没有错误，会弹出一个窗口，显示项目名称以及 `Start` 和 `Cancel` 两个按钮。点击 Start 运行项目，点击 Cancel 取消。如果弹出 `Something went wrong` 的提示，可能是 Google Drive 文件有问题。请向下拉动刷新项目界面后重试。
+
+
+- **二维码扫描**：要扫描 Playground 项目的二维码，点击界面右上角的二维码图标，并允许应用访问相机。扫描后等待读取文件。如果顺利读取且没有错误，会弹出一个窗口，显示项目名称以及 `Start` 和 `Cancel` 两个按钮。点击 Start 运行项目，点击 Cancel 取消。如果弹出 `Something went wrong` 的提示，可能是 Google Drive 文件有问题。请在 Playground 中生成新的二维码后重试。
+
+
+- **运行项目**：如果 OpenBot Playground 项目运行成功，界面会显示代码块名称以及一个停止按钮，可用于停止执行 Playground 积木命令。
+
+
+- **删除项目**：长按要删除的项目，会弹出确认删除的窗口。点击“Yes”即可删除。
+
+<p align="left">
+<img src="../../../docs/images/google_drive_projects_execute_ios.gif" alt="Google Drive project execute" width="25%" />
+<img src="../../../docs/images/ios_qr_scan.gif" alt="Qr code scanner project execute" width="25%" />
+<img src="../../../docs/images/delete_project_ios.jpg" alt="Delete project popup" style="padding-right: 1.2%" width="26%" />
+</p>
+
+
+### 个人资料界面
+个人资料界面会根据用户是否已登录提供不同的选项。
+如果未登录，会显示 `Google Sign-in` 按钮，提示用户登录 Google 帐号。登录后即可访问个人资料和其他功能。
+如果已登录，`Profile` 标签页中会显示两个按钮：`Edit Profile` 和 `Logout`。
+
+<p align="left">
+<img src="../../../docs/images/logged_out_profile_screen_ios.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/logged_in_profile_screen_ios.jpg" alt="Logged in profile screen" width="25%"/>
+</p>
+
+- **Edit Profile**：点击后会打开一个新界面，用户可以在其中更新个人资料信息，例如姓名和头像。
+
+
+- **Logout**：退出当前帐号并返回登录界面。
+
+<p align="left">
+<img src="../../../docs/images/ios_edit_profile_screen.jpg" alt="Edit profile screen" width="25%"/>
+<img src="../../../docs/images/logout_dialog_box_ios.jpg" alt="Logout dialog box" width="25%"/>
+</p>
+
+
+### OpenBot PlayGround 界面
+
+要使用 OpenBot Playground 服务，请点击项目界面工具栏顶部的 OpenBot Playground 图标。想了解更多关于 OpenBot Playground 的信息，请[点击这里](../../../open-code/README.zh-CN.md)。
+
+<p align="left">
+<img src="../../../docs/images/playground_services_ios.gif" alt="Playground Services" width="25%" />
+<img src="../../../docs/images/playground_sign-in_ios.gif" alt="Playground sign-in" width="25%" />
+</p>
+
 ## 代码结构
 
 [TensorFlow Lite 物体检测 iOS 示例](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/ios)被用作集成TFLite模型和获取相机视频流的起点。[tflite](OpenBot/tflite)文件夹包含[自动驾驶](OpenBot/tflite/Autopilot.swift)和[检测器](OpenBot/tflite/Detector.swift)网络的模型定义。
@@ -178,3 +278,5 @@
 ## 下一步（可选）
 
 训练您自己的[驾驶策略](../../../policy/README.md)
+
+Firebase 身份验证 [Firebase](../OpenBot/OpenBot/Authentication/README.zh-CN.md)

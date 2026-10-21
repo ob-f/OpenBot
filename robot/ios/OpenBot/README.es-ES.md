@@ -14,6 +14,8 @@
 1. **Seguridad:** Asegúrate siempre de operar en un entorno seguro. Ten en cuenta que tu teléfono podría dañarse en una colisión. Se requiere un cuidado especial al usar el control automatizado (por ejemplo, seguimiento de personas o política de conducción). Asegúrate de tener siempre un controlador de juego conectado y estar familiarizado con la asignación de teclas para poder detener el vehículo en cualquier momento. ¡Usa bajo tu propio riesgo!
 2. **Aplicación en desarrollo:** La aplicación está en desarrollo y puede fallar o mostrar un comportamiento inesperado dependiendo del modelo de tu teléfono y la versión del sistema operativo. Asegúrate de probar todas las funcionalidades sin las ruedas conectadas. ¡Usa bajo tu propio riesgo!
 
+3. **La aplicación estará `disponible` pronto en la `App Store`.**
+
 ## Pantallas de la Aplicación
 
 ### Menú Principal
@@ -115,6 +117,8 @@ Interfaz de usuario simple para la recolección de conjuntos de datos.
 
 - **Resolución del Modelo**: Se utiliza para cambiar entre resoluciones de imágenes guardadas para entrenar diferentes modelos.
 
+- **Servidor**: la función de servidor está en desarrollo.
+
 - **Registrar Datos Recogidos**: el proceso de recolección de datos se puede controlar desde la pantalla o de forma remota, por ejemplo, desde un controlador Bluetooth. Al usar un controlador Bluetooth, puedes:
 
     - presionar el **botón A** para **iniciar** el proceso de recolección de datos
@@ -155,6 +159,12 @@ Interfaz de usuario simple para ejecutar modelos de piloto automático.
 
 </p>
 
+- **Servidor**: si tienes en marcha la [aplicación web](../../../policy/README.es-ES.md#web-app) de entrenamiento, puedes elegirla aquí y enviar al robot modelos de piloto automático entrenados.
+- **Modelo**: elige un modelo entrenado para el modo de piloto automático.
+- **Dispositivo**: CPU, GPU o NNAPI para la inferencia (más detalles [aquí](#device)).
+- **Hilos**: número de hilos (solo importa si el dispositivo elegido es la CPU).
+- **Control**: controlador, modo de conducción y velocidad ajustan el robot como se describe en la [sección de control](#control).
+
 ### Seguimiento de Objetos
 
 Interfaz de usuario simple para rastrear objetos de 80 clases diferentes. Una breve descripción de los diferentes modelos de IA para el seguimiento de objetos y los puntos de referencia de rendimiento se pueden encontrar en [Gestión de Modelos](#model-management).
@@ -162,6 +172,15 @@ Interfaz de usuario simple para rastrear objetos de 80 clases diferentes. Una br
 <p align="left">
 <img src="../../../docs/images/ios_object_tracking_screen.jpg" alt="Seguimiento de Objetos" width="50%" />
 </p>
+
+- **Velocidad dinámica**: reduce la velocidad del robot en «modo automático» a medida que se acerca al objeto seguido.
+  La velocidad depende del área del recuadro de detección (funciona mejor en horizontal).
+- **Modelo**: elige un detector de objetos según el rendimiento de tu teléfono.
+- **Objeto**: elige el objeto que quieres seguir. Los modelos detectan las 80 [clases de objetos](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/) de COCO.
+- **Confianza**: umbral para aceptar las detecciones. Súbelo si hay detecciones falsas y bájalo si no se detecta el objeto que buscas.
+- **Dispositivo**: CPU, GPU o NNAPI para la inferencia (más detalles [aquí](#device)).
+- **Hilos**: número de hilos (solo importa si el dispositivo elegido es la CPU).
+- **Control**: controlador, modo de conducción y velocidad ajustan el robot como se describe en la [sección de control](#control).
 
 ### Gestión de Modelos
 
@@ -171,6 +190,87 @@ Todos los modelos están cuantizados para un mejor rendimiento en dispositivos i
 <img src="../../../docs/images/ios_screen_model_management.gif" alt="Gestión de Modelos" width="25%" />
 </p>
 
+### Navegación
+
+La pantalla `Point Goal Navigation` permite fijar un destino al que irá el robot, con valores hacia delante y hacia la izquierda en el espacio 3D. Para abrirla, toca el botón correspondiente en la aplicación.
+
+Aparece una ventana con dos campos, `Forward` y `Left`. Escribe en ellos los valores del destino. La ventana también tiene dos botones: `Cancel` y `Start`.
+
+- Botón `Cancel`: vuelve a la pantalla de inicio y cancela la navegación.
+
+
+- Botón `Start`: crea un punto en el espacio 3D con los valores introducidos e inicia la navegación. El robot avanza hacia el destino y ajusta su trayectoria y velocidad para llegar.
+
+Si el robot llega al destino, aparece un mensaje que lo indica y el robot se detiene.
+
+Esta función usa `ARKit`, el framework de realidad aumentada de Apple. Necesitas un dispositivo compatible con ARKit.
+
+<p align="left">
+<img src="../../../docs/images/ios_set_navigation_screen.jpg" alt="Model Management" width="25%" />
+<img src="../../../docs/images/ios_navigation_screen.jpg" alt="Model Management" width="25%" />
+</p>
+
+
+### Pantalla de proyectos
+
+La pantalla de proyectos muestra tus proyectos de OpenBot Playground si has iniciado sesión con tu cuenta de Google. Puedes ejecutarlos para controlar tu OpenBot o escanear sus códigos QR con el icono del escáner arriba a la derecha. Si no has iniciado sesión, la pantalla muestra un botón para iniciar sesión con Google, pero aun así puedes escanear el código QR de tu proyecto. Si aparece `Oops, no project found` después de iniciar sesión, comprueba que la cuenta tiene proyectos guardados en Google Drive.
+
+Si tus últimos proyectos no aparecen en la lista, desliza la pantalla hacia abajo para recargarlos.
+
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen_ios.gif" alt="Project Screen" width="25%"/>
+<img src="../../../docs/images/no_projects_found_ios.jpg" alt="No project screen" style="padding-left: 0.3%" width="26.5%"/>
+<img src="../../../docs/images/reload_projects_ios.gif" alt="Reload project screen" width="25%"/>
+</p>
+
+- **Proyectos de Google Drive**: para ejecutar un proyecto de Google Drive, tócalo y espera a que se lea el archivo del proyecto. Si todo va bien, aparece una ventana con el nombre del proyecto y dos botones: `Start` y `Cancel`. Start ejecuta el proyecto y Cancel lo cancela. Si aparece el mensaje `Something went wrong`, probablemente hay un problema con el archivo de Google Drive: recarga la pantalla deslizándola hacia abajo y vuelve a intentarlo.
+
+
+- **Escáner de códigos QR**: para escanear el código QR de un proyecto de Playground, toca el icono del código QR arriba a la derecha. Permite que la aplicación use la cámara. Después de escanear el código, se lee el archivo. Si todo va bien, aparece una ventana con el nombre del proyecto y dos botones: `Start` y `Cancel`. Start ejecuta el proyecto y Cancel lo cancela. Si aparece el mensaje `Something went wrong`, probablemente hay un problema con el archivo de Google Drive: genera un nuevo código QR en Playground y vuelve a intentarlo.
+
+
+- **Ejecución del proyecto**: si el proyecto se ejecuta correctamente, la pantalla muestra los nombres de los bloques de código y un botón para detener la ejecución.
+
+
+- **Borrar un proyecto**: mantén pulsado el proyecto que quieres borrar y confirma con «Yes».
+
+<p align="left">
+<img src="../../../docs/images/google_drive_projects_execute_ios.gif" alt="Google Drive project execute" width="25%" />
+<img src="../../../docs/images/ios_qr_scan.gif" alt="Qr code scanner project execute" width="25%" />
+<img src="../../../docs/images/delete_project_ios.jpg" alt="Delete project popup" style="padding-right: 1.2%" width="26%" />
+</p>
+
+
+### Pantalla de perfil
+La pantalla de perfil ofrece distintas opciones según hayas iniciado sesión o no.
+Si no has iniciado sesión, aparece un botón `Google Sign-in` para iniciar sesión con tu cuenta de Google. Una vez dentro, tendrás acceso a tu perfil y a las demás funciones.
+Si has iniciado sesión, la pestaña `Profile` muestra dos botones: `Edit Profile` y `Logout`.
+
+<p align="left">
+<img src="../../../docs/images/logged_out_profile_screen_ios.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/logged_in_profile_screen_ios.jpg" alt="Logged in profile screen" width="25%"/>
+</p>
+
+- **Edit Profile**: abre una pantalla donde puedes cambiar los datos de tu perfil, como tu nombre y tu foto.
+
+
+- **Logout**: cierra la sesión de tu cuenta y vuelve a la pantalla de inicio de sesión.
+
+<p align="left">
+<img src="../../../docs/images/ios_edit_profile_screen.jpg" alt="Edit profile screen" width="25%"/>
+<img src="../../../docs/images/logout_dialog_box_ios.jpg" alt="Logout dialog box" width="25%"/>
+</p>
+
+
+### Pantalla de OpenBot PlayGround
+
+Para acceder a los servicios de OpenBot Playground, toca el icono de OpenBot Playground arriba, en la barra de herramientas de la pantalla de proyectos. Para saber más sobre OpenBot Playground, [haz clic aquí](../../../open-code/README.es-ES.md).
+
+<p align="left">
+<img src="../../../docs/images/playground_services_ios.gif" alt="Playground Services" width="25%" />
+<img src="../../../docs/images/playground_sign-in_ios.gif" alt="Playground sign-in" width="25%" />
+</p>
+
 ## Estructura del Código
 
 El [TensorFlow Lite Object Detection iOS Demo](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/ios) se utilizó como punto de partida para integrar modelos TFLite y obtener la transmisión de la cámara. La carpeta [tflite](OpenBot/tflite) contiene las definiciones de los modelos para las redes de [Piloto Automático](OpenBot/tflite/Autopilot.swift) y [Detector](OpenBot/tflite/Detector.swift).
@@ -178,3 +278,5 @@ El [TensorFlow Lite Object Detection iOS Demo](https://github.com/tensorflow/exa
 ## Siguiente (opcional)
 
 Entrena tu propia [Política de Conducción](../../../policy/README.es-ES.md)
+
+Autenticación de Firebase [Firebase](../OpenBot/OpenBot/Authentication/README.es-ES.md)
