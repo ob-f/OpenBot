@@ -16,7 +16,7 @@ jobs:
       RELEASE_TAG: ${{ github.event.release.tag_name }}
     defaults:
       run:
-        working-directory: android
+        working-directory: robot/android
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,12 +32,12 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
           cache-dependency-path: |
-            android/**/*.gradle*
-            android/gradle/wrapper/gradle-wrapper.properties
+            robot/android/**/*.gradle*
+            robot/android/gradle/wrapper/gradle-wrapper.properties
       - name: Add google-services.json
         run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > robot/google-services.json
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > robot/src/main/assets/google-services.json
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > app/google-services.json
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > app/src/main/assets/google-services.json
       - name: Decode Release Keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
@@ -58,7 +58,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(printf '%s' "$RELEASE_TAG" | sed 's/[^-a-zA-Z0-9.]/_/g; s/^v//')
-          cp robot/build/outputs/apk/release/robot-release.apk "OpenBot-${version}.apk"
+          cp app/build/outputs/apk/release/robot-release.apk "OpenBot-${version}.apk"
           gh release upload "$RELEASE_TAG" "OpenBot-${version}.apk" \
             --clobber --repo "$GITHUB_REPOSITORY"
 

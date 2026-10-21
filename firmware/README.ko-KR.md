@@ -270,4 +270,4 @@ Start와 Select는 긴 진동이 켜짐, 짧은 진동이 꺼짐을 뜻합니다
 
 ## 다음
 
-[Android 앱](../android/README.ko-KR.md)을 컴파일하고 실행하세요.
+[Android 앱](../robot/android/README.ko-KR.md)을 컴파일하고 실행하세요.

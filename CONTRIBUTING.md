@@ -51,7 +51,7 @@
 
 ### Java
 
-We use a gradle script for formatting java code. Make sure you are in the `android` directory.
+We use a gradle script for formatting java code. Make sure you are in the `robot/android` directory.
 
 You can check your code with:
 

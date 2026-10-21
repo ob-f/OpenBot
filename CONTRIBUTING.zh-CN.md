@@ -51,7 +51,7 @@
 
 ### Java
 
-我们使用gradle脚本来格式化Java代码。确保您在`android`目录中。
+我们使用gradle脚本来格式化Java代码。确保您在`robot/android`目录中。
 
 您可以使用以下命令检查您的代码：
 

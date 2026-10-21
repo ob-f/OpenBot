@@ -25,4 +25,4 @@ controller/flutter/android/build
 kotlin-profile
 native
 jdks
-/android/FakeDependency.jar
+/robot/android/FakeDependency.jar

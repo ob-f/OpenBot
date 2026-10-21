@@ -7,12 +7,12 @@ on:
   push:
     branches: [ master ]
     paths:
-    - 'android/**'
+    - 'robot/android/**'
     - '.github/workflows/gradle.yml'
   pull_request:
     branches: [ master ]
     paths:
-    - 'android/**'
+    - 'robot/android/**'
     - '.github/workflows/gradle.yml'
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
           run:
-            working-directory: android
+            working-directory: robot/android
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: robot-debug.apk
-          path: android/robot/build/outputs/apk/debug/robot-debug.apk
+          path: robot/android/app/build/outputs/apk/debug/robot-debug.apk

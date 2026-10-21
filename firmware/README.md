@@ -271,4 +271,4 @@ You can use any other MCU with the following features:
 
 ## Next
 
-Compile and run the [Android App](../android/README.md)
+Compile and run the [Android App](../robot/android/README.md)
