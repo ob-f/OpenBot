@@ -21,13 +21,11 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
-
 import org.openbot.app.robot.googleServices.GoogleServices;
 import org.openbot.app.robot.projects.GoogleSignInCallback;
 import org.openbot.app.robot.tflite.Model;
 
 public class FileUtils {
-
 
   public static void copyFile(InputStream inputFile, String name, String outputPath) {
 
@@ -80,7 +78,7 @@ public class FileUtils {
     JsonElement jsonElement;
     Type listType = new TypeToken<List<Model>>() {}.getType();
     boolean fileExists = checkFileExistence(activity, configFile);
-    System.out.println("fileExist::::"+fileExists);
+    System.out.println("fileExist::::" + fileExists);
     if (fileExists) {
       try {
         jsonElement =
@@ -111,29 +109,26 @@ public class FileUtils {
     return gson.fromJson(jsonElement, listType);
   }
 
-  public static boolean updateModelConfig(Activity activity, Context context , List<Model> modelList, boolean isDrive) {
+  public static boolean updateModelConfig(
+      Activity activity, Context context, List<Model> modelList, boolean isDrive) {
     String configFile = "config.json";
-     GoogleServices googleServices= new GoogleServices(activity, context, new GoogleSignInCallback() {
-      @Override
-      public void onSignInSuccess(FirebaseUser account) {
+    GoogleServices googleServices =
+        new GoogleServices(
+            activity,
+            context,
+            new GoogleSignInCallback() {
+              @Override
+              public void onSignInSuccess(FirebaseUser account) {}
 
-      }
+              @Override
+              public void onSignInFailed(Exception exception) {}
 
-      @Override
-      public void onSignInFailed(Exception exception) {
+              @Override
+              public void onSignOutSuccess() {}
 
-      }
-
-      @Override
-      public void onSignOutSuccess() {
-
-      }
-
-      @Override
-      public void onSignOutFailed(Exception exception) {
-
-      }
-    });
+              @Override
+              public void onSignOutFailed(Exception exception) {}
+            });
     try {
       Gson gson = new GsonBuilder().setPrettyPrinting().create();
       Writer writer = new FileWriter(activity.getFilesDir() + File.separator + configFile);

@@ -84,8 +84,7 @@ public class DetectorYoloV4 extends Detector {
     Object[] inputArray = {imgData};
     try {
       tflite.runForMultipleInputsOutputs(inputArray, outputMap);
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       System.out.println("Error Occurred: " + e);
     }
   }
@@ -140,7 +139,8 @@ public class DetectorYoloV4 extends Detector {
    * @return An ArrayList of ArrayLists containing Recognition results for both classes.
    */
   @Override
-  protected ArrayList<ArrayList<Recognition>> getMultipleRecognitions(String classNameFirst, String classNameSecond) {
+  protected ArrayList<ArrayList<Recognition>> getMultipleRecognitions(
+      String classNameFirst, String classNameSecond) {
     // Show the best detections.
     // after scaling them back to the input size.
     final ArrayList<ArrayList<Recognition>> allRecognitions = new ArrayList<>(getNumDetections());
@@ -163,15 +163,19 @@ public class DetectorYoloV4 extends Detector {
       final float w = outputLocations[0][i][2];
       final float h = outputLocations[0][i][3];
       final RectF detection =
-              new RectF(
-                      Math.max(0, xPos - w / 2),
-                      Math.max(0, yPos - h / 2),
-                      Math.min(getImageSizeX() - 1, xPos + w / 2),
-                      Math.min(getImageSizeY() - 1, yPos + h / 2));
+          new RectF(
+              Math.max(0, xPos - w / 2),
+              Math.max(0, yPos - h / 2),
+              Math.min(getImageSizeX() - 1, xPos + w / 2),
+              Math.min(getImageSizeY() - 1, yPos + h / 2));
       if (classId > -1 && labels.get(classId).contentEquals(classNameFirst)) {
-        allRecognitions.get(0).add(new Recognition("" + i, labels.get(classId), score, detection, classId));
+        allRecognitions
+            .get(0)
+            .add(new Recognition("" + i, labels.get(classId), score, detection, classId));
       } else if (classId > -1 && labels.get(classId).contentEquals(classNameSecond)) {
-        allRecognitions.get(1).add(new Recognition("" + i, labels.get(classId), score, detection, classId));
+        allRecognitions
+            .get(1)
+            .add(new Recognition("" + i, labels.get(classId), score, detection, classId));
       }
     }
     return multipleNMS(allRecognitions);
@@ -199,11 +203,11 @@ public class DetectorYoloV4 extends Detector {
       final float w = outputLocations[0][i][2];
       final float h = outputLocations[0][i][3];
       final RectF detection =
-              new RectF(
-                      Math.max(0, xPos - w / 2),
-                      Math.max(0, yPos - h / 2),
-                      Math.min(getImageSizeX() - 1, xPos + w / 2),
-                      Math.min(getImageSizeY() - 1, yPos + h / 2));
+          new RectF(
+              Math.max(0, xPos - w / 2),
+              Math.max(0, yPos - h / 2),
+              Math.min(getImageSizeX() - 1, xPos + w / 2),
+              Math.min(getImageSizeY() - 1, yPos + h / 2));
       recognitions.add(new Recognition("" + i, labels.get(classId), score, detection, classId));
     }
     return nms(recognitions);

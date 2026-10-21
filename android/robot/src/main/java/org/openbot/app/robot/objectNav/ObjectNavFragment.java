@@ -99,10 +99,8 @@ public class ObjectNavFragment extends CameraFragment {
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-    BotToControllerEventBus.emitEvent(
-        ConnectionUtils.createStatus("FRAGMENT_TYPE", "CLOSE"));
+    BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("FRAGMENT_TYPE", "CLOSE"));
   }
-
 
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -281,7 +279,7 @@ public class ObjectNavFragment extends CameraFragment {
           if (tracker != null) {
             tracker.draw(canvas);
           }
-          //tracker.drawDebug(canvas);
+          // tracker.drawDebug(canvas);
         });
     tracker.setFrameConfiguration(
         getMaxAnalyseImageSize().getWidth(),
@@ -409,7 +407,6 @@ public class ObjectNavFragment extends CameraFragment {
         binding.controllerContainer.controlInfo.setText(
             String.format(Locale.US, "%.0f,%.0f", vehicle.getLeftSpeed(), vehicle.getRightSpeed()));
         break;
-
     }
   }
 

@@ -118,7 +118,7 @@ public class ProjectsFragment extends Fragment {
     int numColumns = screenWidth / itemWidth;
     binding.projectsRv.setLayoutManager(new GridLayoutManager(requireActivity(), numColumns));
     driveRes.put(R.layout.projects_list_view, new int[] {R.id.project_name, R.id.project_date});
-//    System.out.println("msg"+R.layout.projects_list_view+" "+R.id.project_name);
+    //    System.out.println("msg"+R.layout.projects_list_view+" "+R.id.project_name);
     setScanDeviceAdapter(
         new DriveProjectsAdapter(requireActivity(), googleServices.projectsList, driveRes),
         (itemView, position) ->
@@ -131,7 +131,7 @@ public class ProjectsFragment extends Fragment {
                 googleServices.projectsList.get(position).getProjectId())));
     binding.projectsLoader.setVisibility(View.VISIBLE);
     googleServices.accessDriveFiles(adapter, binding);
-    System.out.println("print"+googleServices.projectsList);
+    System.out.println("print" + googleServices.projectsList);
     binding.projectsRv.setAdapter(adapter);
   }
 

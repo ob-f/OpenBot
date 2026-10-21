@@ -20,9 +20,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import org.openbot.app.robot.databinding.FragmentPlaygroundBinding;
-import org.openbot.app.robot.utils.FileUtils;
-
-import java.io.File;
 
 public class PlayGroundViewFragment extends Fragment {
   private FragmentPlaygroundBinding binding;
@@ -49,7 +46,7 @@ public class PlayGroundViewFragment extends Fragment {
     playgroundView.setWebViewClient(new WebViewClient());
     playgroundView.setWebChromeClient(new MyWebChromeClient());
     webSettings.setUserAgentString(
-            "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36");
+        "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36");
     playgroundView.loadUrl("https://www.openbot.itinker.io");
   }
 

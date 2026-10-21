@@ -51,6 +51,7 @@ public class SharedPreferencesManager {
             .getApplicationContext()
             .getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
   }
+
   public int getBaudrate() {
     return preferences.getInt(BAUD_RATE, DEFAULT_BAUD_RATE);
   }

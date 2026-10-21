@@ -174,10 +174,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             if (nearby.isChecked())
               PermissionUtils.startInstalledAppDetailsActivity(requireActivity());
             else {
-              if (PermissionUtils.shouldAskForPermission(requireActivity(), PERMISSION_BLUETOOTH_SCAN)
+              if (PermissionUtils.shouldAskForPermission(
+                      requireActivity(), PERMISSION_BLUETOOTH_SCAN)
                   || PermissionUtils.shouldAskForPermission(
                       requireActivity(), PERMISSION_BLUETOOTH_CONNECT)) {
-                PermissionUtils.markedPermissionAsAsked(requireActivity(), PERMISSION_BLUETOOTH_SCAN);
+                PermissionUtils.markedPermissionAsAsked(
+                    requireActivity(), PERMISSION_BLUETOOTH_SCAN);
                 PermissionUtils.markedPermissionAsAsked(
                     requireActivity(), PERMISSION_BLUETOOTH_CONNECT);
                 requestPermissionLauncher.launch(

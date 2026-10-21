@@ -643,7 +643,7 @@ public abstract class CameraActivity extends AppCompatActivity
     if (modelAdapter != null && modelAdapter.getPosition(model) == -1) {
       modelAdapter.add(model);
       masterList.add(item);
-      FileUtils.updateModelConfig(this, context,masterList, false);
+      FileUtils.updateModelConfig(this, context, masterList, false);
     } else {
       if (model.equals(modelSpinner.getSelectedItem())) {
         setModel(item);

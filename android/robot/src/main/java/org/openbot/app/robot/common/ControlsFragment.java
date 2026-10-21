@@ -1,7 +1,6 @@
 package org.openbot.app.robot.common;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -357,8 +356,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
 
   private void applyDriveCommand(JSONObject driveValue) {
     vehicle.setControl(
-        new Control(
-            (float) driveValue.optDouble("l", 0), (float) driveValue.optDouble("r", 0)));
+        new Control((float) driveValue.optDouble("l", 0), (float) driveValue.optDouble("r", 0)));
   }
 
   private void sendConnectedStatus() {
@@ -576,7 +574,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
     if (modelAdapter != null && modelAdapter.getPosition(model) == -1) {
       modelAdapter.add(model);
       masterList.add(item);
-      FileUtils.updateModelConfig(requireActivity(), requireContext(),masterList,false);
+      FileUtils.updateModelConfig(requireActivity(), requireContext(), masterList, false);
     } else {
       if (model.equals(modelSpinner.getSelectedItem())) {
         setModel(item);

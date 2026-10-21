@@ -1,7 +1,5 @@
 package org.openbot.app.robot.projects;
 
-import static org.webrtc.ContextUtils.getApplicationContext;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -11,7 +9,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.speech.tts.TextToSpeech;
 import android.webkit.JavascriptInterface;
-
 import com.google.ar.core.Pose;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.NotTrackingException;
@@ -19,13 +16,11 @@ import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-
 import org.openbot.app.robot.databinding.FragmentBlocklyExecutingBinding;
 import org.openbot.app.robot.env.AudioPlayer;
 import org.openbot.app.robot.env.SharedPreferencesManager;
@@ -55,10 +50,7 @@ public class BotFunctions implements SensorEventListener {
   private final float[] magneticFieldValues = new float[3]; // Array to store magnetic values
   TextToSpeech tts;
 
-  /**
-   * get vehicle and audioPlayer in parameters to control openBot commands.
-   *
-   */
+  /** get vehicle and audioPlayer in parameters to control openBot commands. */
   public BotFunctions(
       Vehicle getVehicle,
       AudioPlayer getAudioPlayer,
@@ -149,17 +141,14 @@ public class BotFunctions implements SensorEventListener {
   @JavascriptInterface
   public void disableAI() {
     mActivity.runOnUiThread(() -> binding.jsCommand.setText("Stop AI"));
-//    BlocklyExecutingFragment.tracker = null;
+    //    BlocklyExecutingFragment.tracker = null;
     BlocklyExecutingFragment.isFollow = false;
     BlocklyExecutingFragment.isAutopilot = false;
     BlocklyExecutingFragment.isFollowMultipleObject = false;
     BlocklyExecutingFragment.isStartDetectorAutoPilot = false;
   }
 
-  /**
-   * openBot Sensor functions
-   *
-   */
+  /** openBot Sensor functions */
   @JavascriptInterface
   public float sonarReading() {
     return vehicle.getSonarReading();
@@ -327,11 +316,11 @@ public class BotFunctions implements SensorEventListener {
     vehicle.setIndicator(-1);
   }
 
-@JavascriptInterface
-public void ledBrightness(float value) {
-  mActivity.runOnUiThread(() -> binding.jsCommand.setText("Led Brightness " + value));
-  vehicle.sendLightIntensity(value / 100, value / 100);
-}
+  @JavascriptInterface
+  public void ledBrightness(float value) {
+    mActivity.runOnUiThread(() -> binding.jsCommand.setText("Led Brightness " + value));
+    vehicle.sendLightIntensity(value / 100, value / 100);
+  }
 
   @JavascriptInterface
   public void toggleLed(String value) {
@@ -369,6 +358,7 @@ public void ledBrightness(float value) {
       sharedPreferencesManager.setDriveMode(2);
     }
   }
+
   @JavascriptInterface
   public void setSpeed(String speed) {
     if (Objects.equals(speed, "slow")) {
@@ -401,21 +391,25 @@ public void ledBrightness(float value) {
 
   @JavascriptInterface
   public void follow(String object, String modelName) {
-    mActivity.runOnUiThread(() -> {
-      binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
-      binding.jsCommand.setText("Follow " + object + " using " + modelName);
-    });
+    mActivity.runOnUiThread(
+        () -> {
+          binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
+          binding.jsCommand.setText("Follow " + object + " using " + modelName);
+        });
     BlocklyExecutingFragment.detectorModelName = modelName;
     BlocklyExecutingFragment.classType = object;
     BlocklyExecutingFragment.isFollow = true;
   }
 
   @JavascriptInterface
-  public void enableMultipleDetection(String startObject, String modelName, String stopObject, String task) {
-    mActivity.runOnUiThread(() -> {
-      binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
-      binding.jsCommand.setText("Follow " + startObject + " using " + modelName + "stop when see " + stopObject);
-    });
+  public void enableMultipleDetection(
+      String startObject, String modelName, String stopObject, String task) {
+    mActivity.runOnUiThread(
+        () -> {
+          binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
+          binding.jsCommand.setText(
+              "Follow " + startObject + " using " + modelName + "stop when see " + stopObject);
+        });
     BlocklyExecutingFragment.detectorModelName = modelName;
     BlocklyExecutingFragment.startObject = startObject;
     BlocklyExecutingFragment.stopObject = stopObject;
@@ -425,21 +419,23 @@ public void ledBrightness(float value) {
 
   @JavascriptInterface
   public void enableAutopilot(String modelName) {
-    mActivity.runOnUiThread(() -> {
-      binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
-      binding.jsCommand.setText("Start Autopilot using " + modelName);
-
-    });
+    mActivity.runOnUiThread(
+        () -> {
+          binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
+          binding.jsCommand.setText("Start Autopilot using " + modelName);
+        });
     BlocklyExecutingFragment.autoPilotModelName = modelName;
     BlocklyExecutingFragment.isAutopilot = true;
   }
 
   @JavascriptInterface
-  public void enableMultipleAI(String autoPilotModel, String task, String classType, String detectorModel){
-    mActivity.runOnUiThread(() -> {
-      binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
-      binding.jsCommand.setText("Start Autopilot with Object Tracking.");
-    });
+  public void enableMultipleAI(
+      String autoPilotModel, String task, String classType, String detectorModel) {
+    mActivity.runOnUiThread(
+        () -> {
+          binding.blocklyLayout.setBackgroundColor(Color.TRANSPARENT);
+          binding.jsCommand.setText("Start Autopilot with Object Tracking.");
+        });
     BlocklyExecutingFragment.autoPilotModelName = autoPilotModel;
     BlocklyExecutingFragment.detectorModelName = detectorModel;
     BlocklyExecutingFragment.classType = classType;
@@ -473,115 +469,121 @@ public void ledBrightness(float value) {
 
   @JavascriptInterface
   public void playSound(String classType) {
-    mActivity.runOnUiThread(() -> {
-      binding.jsCommand.setText("Playing input sound.");
-    });
-    tts = new TextToSpeech(mContext, new TextToSpeech.OnInitListener() {
-      @Override
-      public void onInit(int i) {
-        if(i == TextToSpeech.SUCCESS){
-          tts.setLanguage(Locale.US);
-          tts.setSpeechRate(1.0f);
-          tts.speak(classType,TextToSpeech.QUEUE_ADD,null);
-        }
-      }
-    });
+    mActivity.runOnUiThread(
+        () -> {
+          binding.jsCommand.setText("Playing input sound.");
+        });
+    tts =
+        new TextToSpeech(
+            mContext,
+            new TextToSpeech.OnInitListener() {
+              @Override
+              public void onInit(int i) {
+                if (i == TextToSpeech.SUCCESS) {
+                  tts.setLanguage(Locale.US);
+                  tts.setSpeechRate(1.0f);
+                  tts.speak(classType, TextToSpeech.QUEUE_ADD, null);
+                }
+              }
+            });
   }
 
   @JavascriptInterface
   public void displayString(String text) {
-    mActivity.runOnUiThread(() -> {
-      binding.jsCommand.setText(text);
-    });
+    mActivity.runOnUiThread(
+        () -> {
+          binding.jsCommand.setText(text);
+        });
   }
 
   @JavascriptInterface
   public void displaySensorData(String sensorType) {
-      String type = "";
-      String finalText = "";
-      String prefix = "Android.";
-      if (sensorType.startsWith(prefix)) {
-        finalText = sensorType.substring(prefix.length());
-      }
-    switch (finalText.trim()){
-        case "sonarReading()" :
-            System.out.println("in sonar");
-            type = "sonar : " + vehicle.getSonarReading();
-            break;
-        case "speedReading()" :
-            type = "speed : " + (vehicle.getLeftWheelRpm() + vehicle.getRightWheelRpm()) / 2;
-            break;
-        case "voltageDividerReading()" :
-            type = "voltage : " + vehicle.getBatteryVoltage();
-            break;
-        case "frontWheelReading()" :
-            type = "frontWheel : " + vehicle.isHasWheelOdometryFront();
-            break;
-        case "backWheelReading()" :
-            type = "backWheel : " + vehicle.isHasWheelOdometryBack();
-            break;
-        case "gyroscopeReadingX()" :
-            sensorManager.registerListener(
-                    this, gyroscopeSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "gyroscopeX : " + gyroscopeValues[0];
-            break;
-        case "gyroscopeReadingY()" :
-            sensorManager.registerListener(
-                    this, gyroscopeSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "gyroscopeY : " + gyroscopeValues[1];
-            break;
-        case "gyroscopeReadingZ()" :
-            sensorManager.registerListener(
-                    this, gyroscopeSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "gyroscopeZ : " + gyroscopeValues[2];
-            break;
-        case "accelerationReadingX" :
-            sensorManager.registerListener(
-                    this, accelerometerSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "accelerationX : " + accelerometerValues[0];
-            break;
-        case "accelerationReadingY" :
-            sensorManager.registerListener(
-                    this, accelerometerSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "accelerationY : " + accelerometerValues[1];
-            break;
-        case "accelerationReadingZ" :
-            sensorManager.registerListener(
-                    this, accelerometerSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "accelerationZ : " + accelerometerValues[2];
-            break;
-        case "magneticReadingX" :
-            sensorManager.registerListener(
-                    this, magneticSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "magneticX : " + magneticFieldValues[0];
-            break;
-        case "magneticReadingY" :
-            sensorManager.registerListener(
-                    this, magneticSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "magneticY : " + magneticFieldValues[1];
-            break;
-        case "magneticReadingZ" :
-            sensorManager.registerListener(
-                    this, magneticSensor, sharedPreferencesManager.getDelay() * 1000);
-            type = "magneticZ : " + magneticFieldValues[2];
-            break;
-        default:
-            break;
-      }
+    String type = "";
+    String finalText = "";
+    String prefix = "Android.";
+    if (sensorType.startsWith(prefix)) {
+      finalText = sensorType.substring(prefix.length());
+    }
+    switch (finalText.trim()) {
+      case "sonarReading()":
+        System.out.println("in sonar");
+        type = "sonar : " + vehicle.getSonarReading();
+        break;
+      case "speedReading()":
+        type = "speed : " + (vehicle.getLeftWheelRpm() + vehicle.getRightWheelRpm()) / 2;
+        break;
+      case "voltageDividerReading()":
+        type = "voltage : " + vehicle.getBatteryVoltage();
+        break;
+      case "frontWheelReading()":
+        type = "frontWheel : " + vehicle.isHasWheelOdometryFront();
+        break;
+      case "backWheelReading()":
+        type = "backWheel : " + vehicle.isHasWheelOdometryBack();
+        break;
+      case "gyroscopeReadingX()":
+        sensorManager.registerListener(
+            this, gyroscopeSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "gyroscopeX : " + gyroscopeValues[0];
+        break;
+      case "gyroscopeReadingY()":
+        sensorManager.registerListener(
+            this, gyroscopeSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "gyroscopeY : " + gyroscopeValues[1];
+        break;
+      case "gyroscopeReadingZ()":
+        sensorManager.registerListener(
+            this, gyroscopeSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "gyroscopeZ : " + gyroscopeValues[2];
+        break;
+      case "accelerationReadingX":
+        sensorManager.registerListener(
+            this, accelerometerSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "accelerationX : " + accelerometerValues[0];
+        break;
+      case "accelerationReadingY":
+        sensorManager.registerListener(
+            this, accelerometerSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "accelerationY : " + accelerometerValues[1];
+        break;
+      case "accelerationReadingZ":
+        sensorManager.registerListener(
+            this, accelerometerSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "accelerationZ : " + accelerometerValues[2];
+        break;
+      case "magneticReadingX":
+        sensorManager.registerListener(
+            this, magneticSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "magneticX : " + magneticFieldValues[0];
+        break;
+      case "magneticReadingY":
+        sensorManager.registerListener(
+            this, magneticSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "magneticY : " + magneticFieldValues[1];
+        break;
+      case "magneticReadingZ":
+        sensorManager.registerListener(
+            this, magneticSensor, sharedPreferencesManager.getDelay() * 1000);
+        type = "magneticZ : " + magneticFieldValues[2];
+        break;
+      default:
+        break;
+    }
     String finalType = type;
-    mActivity.runOnUiThread(() -> {
-      binding.jsCommand.setText(finalType);
-    });
+    mActivity.runOnUiThread(
+        () -> {
+          binding.jsCommand.setText(finalType);
+        });
   }
 
-
-    @JavascriptInterface
+  @JavascriptInterface
   public void reachPosition(int x, int y) {
     Timber.tag("Ai Blocks").i(x + ", " + y);
   }
 
   /**
    * Get phone sensors value.
+   *
    * @param event the {@link android.hardware.SensorEvent SensorEvent}.
    */
   @Override
@@ -617,8 +619,9 @@ public void ledBrightness(float value) {
   public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
   /**
-   * Starts the process of driving towards a goal point using ARCore and navigation
-   * for the Blockly block code(start point goal navigation) command.
+   * Starts the process of driving towards a goal point using ARCore and navigation for the Blockly
+   * block code(start point goal navigation) command.
+   *
    * @param goalX The x-coordinate of the goal point.
    * @param goalZ The z-coordinate of the goal point.
    */
@@ -628,9 +631,7 @@ public void ledBrightness(float value) {
     while (arCore.getStartPose() == null) startDriving(goalX, goalZ);
   }
 
-  /**
-   * Sets up ARCore for usage.
-   */
+  /** Sets up ARCore for usage. */
   private void setupArCore() {
     try {
       arCore.resume();
@@ -648,8 +649,9 @@ public void ledBrightness(float value) {
       e.printStackTrace();
     }
 
-//    showInfoDialog(
-//            "ARCore failure. Make sure that your device is compatible and the ARCore SDK is installed.");
+    //    showInfoDialog(
+    //            "ARCore failure. Make sure that your device is compatible and the ARCore SDK is
+    // installed.");
   }
 
   /**
@@ -665,30 +667,31 @@ public void ledBrightness(float value) {
       arCore.setStartAnchorAtCurrentPose();
       Pose startPose = arCore.getStartPose();
       if (startPose == null) {
-//        showInfoDialog(getString(R.string.no_initial_ar_core_pose));
+        //        showInfoDialog(getString(R.string.no_initial_ar_core_pose));
         return;
       }
       arCore.setTargetAnchor(startPose.compose(Pose.makeTranslation(goalX, 0.0f, goalZ)));
     } catch (NotTrackingException e) {
       e.printStackTrace();
-//      showInfoDialog(getString(R.string.tracking_lost));
+      //      showInfoDialog(getString(R.string.tracking_lost));
       return;
     }
     Model model =
-            new Model(
-                    0,
-                    Model.CLASS.NAVIGATION,
-                    Model.TYPE.GOALNAV,
-                    "navigation.tflite",
-                    Model.PATH_TYPE.ASSET,
-                    "networks/navigation.tflite",
-                    "160x90");
+        new Model(
+            0,
+            Model.CLASS.NAVIGATION,
+            Model.TYPE.GOALNAV,
+            "navigation.tflite",
+            Model.PATH_TYPE.ASSET,
+            "networks/navigation.tflite",
+            "160x90");
 
     try {
-      BlocklyExecutingFragment.navigationPolicy = new Navigation(mActivity, model, Network.Device.CPU, 1);
+      BlocklyExecutingFragment.navigationPolicy =
+          new Navigation(mActivity, model, Network.Device.CPU, 1);
     } catch (IOException e) {
       e.printStackTrace();
-//      showInfoDialog("Navigation policy could not be initialized.");
+      //      showInfoDialog("Navigation policy could not be initialized.");
       return;
     }
     BlocklyExecutingFragment.isRunning = true;

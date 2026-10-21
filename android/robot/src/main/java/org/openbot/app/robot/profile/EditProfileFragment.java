@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-
 import org.openbot.app.robot.R;
 import org.openbot.app.robot.databinding.FragmentEditProfileBinding;
 
@@ -55,7 +54,7 @@ public class EditProfileFragment extends Fragment {
   private FirebaseFirestore db = FirebaseFirestore.getInstance();
   private final Map<String, Object> userDOB = new HashMap<>();
 
-    @Override
+  @Override
   public View onCreateView(
       @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     // Inflate the FragmentEditProfile layout.
@@ -91,7 +90,6 @@ public class EditProfileFragment extends Fragment {
       setProfileDetails();
     }
 
-
     binding.dateOfBirth.setOnClickListener(
         v -> {
           // current year,date and months
@@ -104,22 +102,24 @@ public class EditProfileFragment extends Fragment {
                   // on below line we are passing context.
                   requireContext(),
                   (view1, getYear, monthOfYear, dayOfMonth) -> {
+                    binding.dateOfBirth.setText(
+                        dayOfMonth + "-" + (monthOfYear + 1) + "-" + getYear);
 
-                    binding.dateOfBirth.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + getYear);
-
-                      Calendar calendar = Calendar.getInstance();
-                      calendar.set(getYear, monthOfYear, dayOfMonth, 0, 0, 0);
-                      calendar.set(Calendar.MILLISECOND, 0);
-                      // Convert the selected date to a Timestamp
-                      Timestamp dobTimestamp = new Timestamp(calendar.getTime());
-                      userDOB.put("dob", dobTimestamp);
-                  }, year, month, day);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(getYear, monthOfYear, dayOfMonth, 0, 0, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+                    // Convert the selected date to a Timestamp
+                    Timestamp dobTimestamp = new Timestamp(calendar.getTime());
+                    userDOB.put("dob", dobTimestamp);
+                  },
+                  year,
+                  month,
+                  day);
 
           // Set the maximum date to today's date
           datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
           datePickerDialog.show();
         });
-
 
     // Attach the firstNameTextWatcher to the firstName EditText to listen for text changes.
     binding.firstName.addTextChangedListener(firstNameTextWatcher);
@@ -213,8 +213,8 @@ public class EditProfileFragment extends Fragment {
     startLoader(true);
     if (userDOB.get("dob") != null) {
       db.collection("users")
-              .document(user.getUid()) // Replace with your user's unique ID
-              .set(userDOB);
+          .document(user.getUid()) // Replace with your user's unique ID
+          .set(userDOB);
     }
     if (imageUri != null && !userName.isBlank()) {
       try {
@@ -317,30 +317,35 @@ public class EditProfileFragment extends Fragment {
     binding.emailAddress.setText(user.getEmail());
   }
 
-  private void setDOB(){
+  private void setDOB() {
     DocumentReference userRef = db.collection("users").document(user.getUid());
-    userRef.get().addOnSuccessListener(documentSnapshot -> {
-      if (documentSnapshot.exists()) {
-        // Retrieve the date of birth as a Timestamp
-        Timestamp dobTimestamp = documentSnapshot.getTimestamp("dob");
+    userRef
+        .get()
+        .addOnSuccessListener(
+            documentSnapshot -> {
+              if (documentSnapshot.exists()) {
+                // Retrieve the date of birth as a Timestamp
+                Timestamp dobTimestamp = documentSnapshot.getTimestamp("dob");
 
-        if (dobTimestamp != null) {
-          // Format the Timestamp as a string
-          SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
-          dateFormat.setTimeZone(TimeZone.getDefault());
-          binding.dateOfBirth.setText(dateFormat.format(dobTimestamp.toDate()));
-          // Update the TextView with the formatted date of birth
-//            dobTextView.setText(formattedDOB);
-        } else {
-          // Handle the case where dobTimestamp is null
-        }
-      } else {
-        // Handle the case where the user document does not exist
-      }
-    }).addOnFailureListener(e -> {
-      // Handle any errors here
-      System.out.println("Error: " + e.getMessage());
-    });
+                if (dobTimestamp != null) {
+                  // Format the Timestamp as a string
+                  SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                  dateFormat.setTimeZone(TimeZone.getDefault());
+                  binding.dateOfBirth.setText(dateFormat.format(dobTimestamp.toDate()));
+                  // Update the TextView with the formatted date of birth
+                  //            dobTextView.setText(formattedDOB);
+                } else {
+                  // Handle the case where dobTimestamp is null
+                }
+              } else {
+                // Handle the case where the user document does not exist
+              }
+            })
+        .addOnFailureListener(
+            e -> {
+              // Handle any errors here
+              System.out.println("Error: " + e.getMessage());
+            });
   }
 
   /**

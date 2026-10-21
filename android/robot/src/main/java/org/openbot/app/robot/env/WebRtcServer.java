@@ -22,8 +22,8 @@ import java.util.function.BooleanSupplier;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.app.robot.utils.AndGate;
-import org.openbot.app.robot.utils.Constants;
 import org.openbot.app.robot.utils.ConnectionUtils;
+import org.openbot.app.robot.utils.Constants;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
@@ -210,8 +210,8 @@ public class WebRtcServer implements IVideoServer {
 
   /**
    * Called on the main thread when a CameraFragment binds or releases the camera preview.
-   * switchCamera flips the preview between front and back camera and returns true if it is now
-   * on the front camera; it is used for SWITCH_CAMERA while the preview owns the camera.
+   * switchCamera flips the preview between front and back camera and returns true if it is now on
+   * the front camera; it is used for SWITCH_CAMERA while the preview owns the camera.
    */
   public static void setLocalPreviewActive(
       Object owner, boolean active, BooleanSupplier switchCamera) {
@@ -371,10 +371,7 @@ public class WebRtcServer implements IVideoServer {
         error -> {
           Log.d(null, "Error occurred in monitorCameraControlEvents: " + error);
         },
-        event ->
-            event.has("command")
-                && ("SWITCH_CAMERA".equals(event.getString("command")))
-        );
+        event -> event.has("command") && ("SWITCH_CAMERA".equals(event.getString("command"))));
   }
 
   private void handleSwitchCamera() {
@@ -740,6 +737,7 @@ public class WebRtcServer implements IVideoServer {
 
     return factory.createPeerConnection(rtcConfig, pcConstraints, pcObserver);
   }
+
   private void sendMessage(JSONObject message) {
     BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("WEB_RTC_EVENT", message));
   }
@@ -777,7 +775,7 @@ public class WebRtcServer implements IVideoServer {
     // run before any class that calls into native code (e.g. DefaultVideoEncoderFactory's
     // SoftwareVideoEncoderFactory) is constructed, or it fails with UnsatisfiedLinkError.
     PeerConnectionFactory.InitializationOptions initializationOptions =
-            PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions();
+        PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions();
     PeerConnectionFactory.initialize(initializationOptions);
 
     VideoEncoderFactory encoderFactory =
