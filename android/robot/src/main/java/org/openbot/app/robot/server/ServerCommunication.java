@@ -212,8 +212,8 @@ public class ServerCommunication {
       Timber.e("File not found: %s", file.getAbsolutePath());
       return;
     }
-    Timber.e("Url is" + serverUrl + "/upload" );
-    Timber.e("paramerter is ->" + params );
+    Timber.e("Url is" + serverUrl + "/upload");
+    Timber.e("paramerter is ->" + params);
     client.post(context, serverUrl + "/upload", params, new UploadResponseHandler(file));
   }
 
@@ -261,4 +261,3 @@ public class ServerCommunication {
     }
   }
 }
-

@@ -26,7 +26,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -209,7 +208,7 @@ public abstract class Detector extends Network {
 
     startTime = SystemClock.elapsedRealtime();
     List<Recognition> recognitions;
-    if (className == null){
+    if (className == null) {
       recognitions = getAllRecognition();
     } else recognitions = getRecognitions(className);
     endTime = SystemClock.elapsedRealtime();
@@ -218,7 +217,8 @@ public abstract class Detector extends Network {
   }
 
   /**
-   * Recognizes multiple objects in the given Bitmap using the model for (detect multiple object) blockly command.
+   * Recognizes multiple objects in the given Bitmap using the model for (detect multiple object)
+   * blockly command.
    *
    * @param bitmap The input Bitmap for object recognition.
    * @param classNameFirst The first class name for start vehicle recognition.
@@ -226,8 +226,9 @@ public abstract class Detector extends Network {
    * @return An ArrayList of ArrayLists containing Recognition results for both classes.
    * @throws IllegalArgumentException if an error occurs during recognition.
    */
-  public ArrayList<ArrayList<Recognition>> recognizeMultipleImage(final Bitmap bitmap, String classNameFirst, String classNameSecond)
-          throws IllegalArgumentException {
+  public ArrayList<ArrayList<Recognition>> recognizeMultipleImage(
+      final Bitmap bitmap, String classNameFirst, String classNameSecond)
+      throws IllegalArgumentException {
     // Log this method so that it can be analyzed with systrace.
     Trace.beginSection("recognizeImage");
 
@@ -255,7 +256,8 @@ public abstract class Detector extends Network {
     Trace.endSection(); // "recognizeImage"
 
     startTime = SystemClock.elapsedRealtime();
-    ArrayList<ArrayList<Recognition>> recognitions = getMultipleRecognitions(classNameFirst, classNameSecond);
+    ArrayList<ArrayList<Recognition>> recognitions =
+        getMultipleRecognitions(classNameFirst, classNameSecond);
     endTime = SystemClock.elapsedRealtime();
     Timber.v("Timecost for postprocessing: %s", (endTime - startTime));
 
@@ -318,15 +320,15 @@ public abstract class Detector extends Network {
     multipleNMSList.add(new ArrayList<>());
     multipleNMSList.add(new ArrayList<>());
     PriorityQueue<Recognition> pq =
-            new PriorityQueue<Recognition> (
-                    50,
-                    new Comparator<Recognition>() {
-                      @Override
-                      public int compare(final Recognition lhs, final Recognition rhs) {
-                        // Intentionally reversed to put high confidence at the head of the queue.
-                        return Float.compare(rhs.getConfidence(), lhs.getConfidence());
-                      }
-                    });
+        new PriorityQueue<Recognition>(
+            50,
+            new Comparator<Recognition>() {
+              @Override
+              public int compare(final Recognition lhs, final Recognition rhs) {
+                // Intentionally reversed to put high confidence at the head of the queue.
+                return Float.compare(rhs.getConfidence(), lhs.getConfidence());
+              }
+            });
     for (int k = 0; k < labels.size(); k++) {
       // 1. Find max confidence per class
       for (int i = 0; i < list.size(); ++i) {
@@ -346,7 +348,7 @@ public abstract class Detector extends Network {
       Recognition[] detections = pq.toArray(a);
       Recognition startMax = detections[0];
       multipleNMSList.get(0).add(startMax);
-      if(detections.length > 1) {
+      if (detections.length > 1) {
         Recognition stopMax = detections[1];
         multipleNMSList.get(1).add(stopMax);
       }
@@ -446,6 +448,9 @@ public abstract class Detector extends Network {
    * @return
    */
   protected abstract List<Recognition> getRecognitions(String className);
-  protected abstract ArrayList<ArrayList<Recognition>> getMultipleRecognitions(String classNameFirst, String classNameSecond);
+
+  protected abstract ArrayList<ArrayList<Recognition>> getMultipleRecognitions(
+      String classNameFirst, String classNameSecond);
+
   protected abstract List<Recognition> getAllRecognition();
 }

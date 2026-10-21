@@ -76,8 +76,8 @@ public class PermissionUtils {
   }
 
   /**
-   * "Nearby devices" permission (Bluetooth scan/connect). Always true below API 31, where
-   * Bluetooth access is covered by the normal, auto-granted legacy BLUETOOTH permissions.
+   * "Nearby devices" permission (Bluetooth scan/connect). Always true below API 31, where Bluetooth
+   * access is covered by the normal, auto-granted legacy BLUETOOTH permissions.
    */
   public static boolean hasNearbyPermission(Activity activity) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true;

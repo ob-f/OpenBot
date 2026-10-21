@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
 /** The model. */
 public class Model {
 
-
   public Model(
       Integer id,
       CLASS classType,
@@ -64,7 +63,10 @@ public class Model {
     return Size.parseSize(inputSize);
   }
 
-  public TYPE getType(){ return type; }
+  public TYPE getType() {
+    return type;
+  }
+
   public void setPath(String path) {
     this.path = path;
   }

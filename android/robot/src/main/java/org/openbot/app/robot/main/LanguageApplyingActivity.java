@@ -10,12 +10,12 @@ import org.openbot.app.robot.utils.LocaleUtils;
 /**
  * Branded loading screen shown as its own window while the app locale changes.
  *
- * <p>AppCompatDelegate.setApplicationLocales() recreates every tracked AppCompatActivity to
- * apply the new locale, which causes a black flash on the activity being recreated in place.
- * This screen sits on top of MainActivity in a separate window while that recreation happens
- * underneath, then fades itself out once it's done -- turning the unavoidable recreate into a
- * transition we control instead of a raw flash. It deliberately extends plain Activity, not
- * AppCompatActivity, so it isn't itself swept up in that recreation.
+ * <p>AppCompatDelegate.setApplicationLocales() recreates every tracked AppCompatActivity to apply
+ * the new locale, which causes a black flash on the activity being recreated in place. This screen
+ * sits on top of MainActivity in a separate window while that recreation happens underneath, then
+ * fades itself out once it's done -- turning the unavoidable recreate into a transition we control
+ * instead of a raw flash. It deliberately extends plain Activity, not AppCompatActivity, so it
+ * isn't itself swept up in that recreation.
  */
 public class LanguageApplyingActivity extends Activity {
 

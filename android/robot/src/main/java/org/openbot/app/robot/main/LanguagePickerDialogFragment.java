@@ -56,8 +56,7 @@ public class LanguagePickerDialogFragment extends DialogFragment {
       Intent intent = new Intent(requireActivity(), LanguageApplyingActivity.class);
       intent.putExtra(LanguageApplyingActivity.EXTRA_LANGUAGE_TAG, pendingTag);
       requireActivity().startActivity(intent);
-      requireActivity()
-          .overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+      requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
   }
 

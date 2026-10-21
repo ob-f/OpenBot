@@ -28,13 +28,11 @@ import androidx.camera.core.ImageProxy;
 import androidx.navigation.Navigation;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.auth.FirebaseUser;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 import org.openbot.app.robot.R;
@@ -115,27 +113,23 @@ public class LoggerFragment extends CameraFragment {
     setSpeedMode(Enums.SpeedMode.getByID(preferencesManager.getSpeedMode()));
     setControlMode(Enums.ControlMode.getByID(preferencesManager.getControlMode()));
     setDriveMode(Enums.DriveMode.getByID(preferencesManager.getDriveMode()));
-    googleServices = new GoogleServices(requireActivity(), requireContext(), new GoogleSignInCallback() {
-      @Override
-      public void onSignInSuccess(FirebaseUser account) {
+    googleServices =
+        new GoogleServices(
+            requireActivity(),
+            requireContext(),
+            new GoogleSignInCallback() {
+              @Override
+              public void onSignInSuccess(FirebaseUser account) {}
 
-      }
+              @Override
+              public void onSignInFailed(Exception exception) {}
 
-      @Override
-      public void onSignInFailed(Exception exception) {
+              @Override
+              public void onSignOutSuccess() {}
 
-      }
-
-      @Override
-      public void onSignOutSuccess() {
-
-      }
-
-      @Override
-      public void onSignOutFailed(Exception exception) {
-
-      }
-    });
+              @Override
+              public void onSignOutFailed(Exception exception) {}
+            });
 
     String connectionType = vehicle.getConnectionType();
     if (connectionType != null && connectionType.equals("USB")) {
@@ -178,26 +172,27 @@ public class LoggerFragment extends CameraFragment {
     initArraySpinner(binding.saveAs, R.array.save_data);
     initArraySpinner(binding.resolutionSpinner, R.array.preview_resolutions);
 
-    binding.saveAs.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+    binding.saveAs.setOnItemSelectedListener(
+        new AdapterView.OnItemSelectedListener() {
 
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        switch (position) {
-          case 0:
-            saveAs = "Local";
-            break;
-          case 1:
-            saveAs = "GoogleDrive";
-            break;
-          case 2:
-            saveAs = "Server";
-            break;
-        }
-      }
+          @Override
+          public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            switch (position) {
+              case 0:
+                saveAs = "Local";
+                break;
+              case 1:
+                saveAs = "GoogleDrive";
+                break;
+              case 2:
+                saveAs = "Server";
+                break;
+            }
+          }
 
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {}
-    });
+          @Override
+          public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
     binding.resolutionSpinner.setOnItemSelectedListener(
         new AdapterView.OnItemSelectedListener() {
@@ -299,8 +294,7 @@ public class LoggerFragment extends CameraFragment {
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-    BotToControllerEventBus.emitEvent(
-        ConnectionUtils.createStatus("FRAGMENT_TYPE", "CLOSE"));
+    BotToControllerEventBus.emitEvent(ConnectionUtils.createStatus("FRAGMENT_TYPE", "CLOSE"));
   }
 
   protected synchronized void runInBackground(final Runnable r) {
@@ -397,15 +391,17 @@ public class LoggerFragment extends CameraFragment {
     requireActivity().stopService(intentSensorService);
 
     // Pack and upload the collected data
-    runInBackground(() -> {
+    runInBackground(
+        () -> {
           try {
             File folder = new File(logFolder);
             switch (saveAs) {
-              case "Local" :
-              case "Server" :
+              case "Local":
+              case "Server":
                 if (!isCancel) serverCommunication.upload(zip(folder));
                 break;
-              case "GoogleDrive" : googleServices.uploadLogData(zip(folder));
+              case "GoogleDrive":
+                googleServices.uploadLogData(zip(folder));
                 break;
             }
             TimeUnit.MILLISECONDS.sleep(500);

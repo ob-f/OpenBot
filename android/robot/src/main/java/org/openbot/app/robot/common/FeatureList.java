@@ -111,8 +111,7 @@ public class FeatureList {
 
     subCategories = new ArrayList<>();
     subCategories.add(
-        new SubCategory(
-            DEFAULT, R.string.tile_default_mode, R.drawable.ic_legacy_car, "#F86363"));
+        new SubCategory(DEFAULT, R.string.tile_default_mode, R.drawable.ic_legacy_car, "#F86363"));
     categories.add(new Category(LEGACY, R.string.tile_legacy, subCategories));
 
     /*

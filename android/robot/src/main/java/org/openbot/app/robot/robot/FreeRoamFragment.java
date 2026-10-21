@@ -48,8 +48,7 @@ public class FreeRoamFragment extends ControlsFragment {
     phoneController = PhoneController.getInstance(requireContext());
 
     BotToControllerEventBus.emitEvent(
-        ConnectionUtils.createStatus(
-            "FRAGMENT_TYPE", Enums.FragmentType.FREEROAM.getFragment()));
+        ConnectionUtils.createStatus("FRAGMENT_TYPE", Enums.FragmentType.FREEROAM.getFragment()));
     if (vehicle == null) {
       mViewModel
           .getVehicle()

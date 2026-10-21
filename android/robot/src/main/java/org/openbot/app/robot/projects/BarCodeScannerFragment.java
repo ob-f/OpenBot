@@ -17,20 +17,18 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openbot.app.robot.R;
 import org.openbot.app.robot.common.CameraFragment;
 import org.openbot.app.robot.databinding.FragmentBarCodeScannerBinding;
 import org.openbot.app.robot.utils.BotFunctionUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 
 public class BarCodeScannerFragment extends CameraFragment {
 
@@ -218,6 +216,7 @@ public class BarCodeScannerFragment extends CameraFragment {
 
   /**
    * function to read google-services json file
+   *
    * @return
    */
   private String readJsonFile() {
@@ -226,7 +225,7 @@ public class BarCodeScannerFragment extends CameraFragment {
       // Open the file using an InputStream
       InputStream inputStream = requireContext().getAssets().open("google-services.json");
 
-      System.out.println("is:::"+inputStream);
+      System.out.println("is:::" + inputStream);
 
       // Read the InputStream into a StringBuilder
       StringBuilder stringBuilder = new StringBuilder();
@@ -250,6 +249,7 @@ public class BarCodeScannerFragment extends CameraFragment {
 
   /**
    * function to get API key from json
+   *
    * @return
    */
   private String getCurrentKeyFromJson() {
@@ -279,7 +279,6 @@ public class BarCodeScannerFragment extends CameraFragment {
     return currentKey;
   }
 
-
   /**
    * To read google drive file contents using file id, Call a new instance of the ReadFileTask with
    * the given file ID and a callback to handle success/failure.
@@ -290,7 +289,7 @@ public class BarCodeScannerFragment extends CameraFragment {
   private void readFileFromDrive(String fileId) throws IOException {
     String APIkey = getCurrentKeyFromJson();
     URL fileUrl =
-            new URL("https://www.googleapis.com/drive/v3/files/"+fileId+"?alt=media&key="+APIkey);
+        new URL("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media&key=" + APIkey);
     new ReadFileTask(
             fileUrl,
             new ReadFileCallback() {

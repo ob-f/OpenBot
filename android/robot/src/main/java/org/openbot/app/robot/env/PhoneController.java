@@ -8,22 +8,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
 import androidx.annotation.NonNull;
-
 import com.google.firebase.auth.FirebaseAuth;
-
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.app.robot.R;
 import org.openbot.app.robot.customview.AutoFitSurfaceGlView;
 import org.openbot.app.robot.customview.WebRTCSurfaceView;
 import org.openbot.app.robot.utils.CameraUtils;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
 import timber.log.Timber;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -143,28 +139,31 @@ public class PhoneController {
     OkHttpClient client = new OkHttpClient();
     Request request = new Request.Builder().url(serverUrl).build();
 
-    WebSocketListener webSocketListener = new WebSocketListener() {
-      @Override
-      public void onOpen(WebSocket webSocket, @NonNull okhttp3.Response response) {
-        PhoneController.this.webSocket = webSocket;
-        ControllerToBotEventBus.emitEvent("{command: \"CONNECTED\"}");
-        sendRoomId(webSocket);
-      }
+    WebSocketListener webSocketListener =
+        new WebSocketListener() {
+          @Override
+          public void onOpen(WebSocket webSocket, @NonNull okhttp3.Response response) {
+            PhoneController.this.webSocket = webSocket;
+            ControllerToBotEventBus.emitEvent("{command: \"CONNECTED\"}");
+            sendRoomId(webSocket);
+          }
 
-      @Override
-      public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-        if (text.contains(REQUEST_ROOM_ID)) {
-          sendRoomId(webSocket);
-          return;
-        }
-        ControllerToBotEventBus.emitEvent(text);
-      }
+          @Override
+          public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
+            if (text.contains(REQUEST_ROOM_ID)) {
+              sendRoomId(webSocket);
+              return;
+            }
+            ControllerToBotEventBus.emitEvent(text);
+          }
 
-      @Override
-      public void onFailure(@NonNull WebSocket webSocket, Throwable t, okhttp3.Response response) {
-        Timber.e(t, "Web signaling WebSocket failed (check web_signaling_server URL and Wi-Fi)");
-      }
-    };
+          @Override
+          public void onFailure(
+              @NonNull WebSocket webSocket, Throwable t, okhttp3.Response response) {
+            Timber.e(
+                t, "Web signaling WebSocket failed (check web_signaling_server URL and Wi-Fi)");
+          }
+        };
 
     webSocket = client.newWebSocket(request, webSocketListener);
   }
