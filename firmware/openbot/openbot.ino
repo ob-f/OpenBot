@@ -789,7 +789,7 @@ unsigned long start_time;
 unsigned long echo_time = 0;
 #if (SONAR_MEDIAN)
 const unsigned int distance_array_sz = 3;
-unsigned int distance_array[distance_array_sz] = {};
+int distance_array[distance_array_sz] = {};
 unsigned int distance_counter = 0;
 #endif
 #else
