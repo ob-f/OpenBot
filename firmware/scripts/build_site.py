@@ -44,9 +44,9 @@ PARTS = {
     "HAS_SPEED_SENSORS_FRONT": (["PIN_SPEED_LF", "PIN_SPEED_RF"], 4),
     "HAS_SPEED_SENSORS_BACK": (["PIN_SPEED_LB", "PIN_SPEED_RB"], 5),
     "HAS_SPEED_SENSORS_MIDDLE": (["PIN_SPEED_LM", "PIN_SPEED_RM"], 6),
-    "HAS_LEDS_FRONT": (["PIN_LED_LF", "PIN_LED_RF"], None),
-    "HAS_LEDS_BACK": (["PIN_LED_LB", "PIN_LED_RB"], None),
-    "HAS_LEDS_STATUS": (["PIN_LED_Y", "PIN_LED_G", "PIN_LED_B"], None),
+    "HAS_LEDS_FRONT": (["PIN_LED_LF", "PIN_LED_RF"], 7),
+    "HAS_LEDS_BACK": (["PIN_LED_LB", "PIN_LED_RB"], 8),
+    "HAS_LEDS_STATUS": (["PIN_LED_Y", "PIN_LED_G", "PIN_LED_B"], 9),
     "HAS_OLED": ([], None),
     "HAS_BLUETOOTH": ([], None),
 }

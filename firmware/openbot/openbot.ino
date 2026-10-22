@@ -916,6 +916,9 @@ const uint8_t PART_BUMPER = 3;
 const uint8_t PART_SPEED_SENSORS_FRONT = 4;
 const uint8_t PART_SPEED_SENSORS_BACK = 5;
 const uint8_t PART_SPEED_SENSORS_MIDDLE = 6;
+const uint8_t PART_LEDS_FRONT = 7;
+const uint8_t PART_LEDS_BACK = 8;
+const uint8_t PART_LEDS_STATUS = 9;
 
 // The parts in this firmware
 const uint16_t PARTS_BUILT = 0
@@ -939,6 +942,15 @@ const uint16_t PARTS_BUILT = 0
 #endif
 #if (HAS_SPEED_SENSORS_MIDDLE)
   | bit(PART_SPEED_SENSORS_MIDDLE)
+#endif
+#if (HAS_LEDS_FRONT)
+  | bit(PART_LEDS_FRONT)
+#endif
+#if (HAS_LEDS_BACK)
+  | bit(PART_LEDS_BACK)
+#endif
+#if (HAS_LEDS_STATUS)
+  | bit(PART_LEDS_STATUS)
 #endif
   ;
 
@@ -1024,6 +1036,16 @@ void process_live_settings_msg() {
   }
 #if (NO_PHONE_MODE)
   ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
+#endif
+#if (HAS_LEDS_FRONT || HAS_LEDS_BACK)
+  update_light();
+#endif
+#if (HAS_LEDS_STATUS)
+  if (!part_on(PART_LEDS_STATUS)) {
+    digitalWrite(PIN_LED_Y, LOW);
+    digitalWrite(PIN_LED_G, LOW);
+    digitalWrite(PIN_LED_B, LOW);
+  }
 #endif
   sendData(String("pboard:") + (MCU == NANO ? "nano" : "esp32") + ":have:" + String(PARTS_BUILT) + ":off:" + String(live.parts_off)
            + ":vlow:" + String(live.voltage_low, 2) + ":vmax:" + String(live.voltage_max, 2)
@@ -1244,13 +1266,13 @@ void print_config() {
   if (part_on(PART_SPEED_SENSORS_MIDDLE)) print_item(F("speed sensors middle"), first);
 #endif
 #if (HAS_LEDS_FRONT)
-  print_item(F("front lights"), first);
+  if (part_on(PART_LEDS_FRONT)) print_item(F("front lights"), first);
 #endif
 #if (HAS_LEDS_BACK)
-  print_item(F("rear lights"), first);
+  if (part_on(PART_LEDS_BACK)) print_item(F("rear lights"), first);
 #endif
 #if (HAS_LEDS_STATUS)
-  print_item(F("status LEDs"), first);
+  if (part_on(PART_LEDS_STATUS)) print_item(F("status LEDs"), first);
 #endif
 #if (HAS_OLED)
   print_item(F("OLED"), first);
@@ -1978,6 +2000,9 @@ void process_notification_msg() {
   char led = tmp[0];
   tmp = strtok(NULL, ",:");  // continues where the previous call left off
   int state = atoi(tmp);     // convert to int
+  if (!part_on(PART_LEDS_STATUS)) {
+    state = LOW;  // turned off in the live settings
+  }
   switch (led) {
     case 'y':
       digitalWrite(PIN_LED_Y, state);
@@ -2051,13 +2076,13 @@ void process_feature_msg() {
   if (part_on(PART_SPEED_SENSORS_MIDDLE)) msg += "wm:";
 #endif
 #if HAS_LEDS_FRONT
-  msg += "lf:";
+  if (part_on(PART_LEDS_FRONT)) msg += "lf:";
 #endif
 #if HAS_LEDS_BACK
-  msg += "lb:";
+  if (part_on(PART_LEDS_BACK)) msg += "lb:";
 #endif
 #if HAS_LEDS_STATUS
-  msg += "ls:";
+  if (part_on(PART_LEDS_STATUS)) msg += "ls:";
 #endif
   sendData(msg);
 }
@@ -2252,7 +2277,7 @@ void update_indicator() {
     digitalWrite(PIN_LED_LI, !digitalRead(PIN_LED_LI));
   } else {
 #if (HAS_LEDS_BACK)
-    digitalWrite(PIN_LED_LI, PIN_LED_LI == PIN_LED_LB ? light_back : LOW);
+    digitalWrite(PIN_LED_LI, PIN_LED_LI == PIN_LED_LB && part_on(PART_LEDS_BACK) ? light_back : LOW);
 #else
     digitalWrite(PIN_LED_LI, LOW);
 #endif
@@ -2267,7 +2292,7 @@ void update_indicator() {
     digitalWrite(PIN_LED_RI, !digitalRead(PIN_LED_RI));
   } else {
 #if (HAS_LEDS_BACK)
-    digitalWrite(PIN_LED_RI, PIN_LED_RI == PIN_LED_RB ? light_back : LOW);
+    digitalWrite(PIN_LED_RI, PIN_LED_RI == PIN_LED_RB && part_on(PART_LEDS_BACK) ? light_back : LOW);
 #else
     digitalWrite(PIN_LED_RI, LOW);
 #endif
@@ -2282,22 +2307,24 @@ void update_indicator() {
 #if (HAS_LEDS_FRONT || HAS_LEDS_BACK)
 void update_light() {
 #if (HAS_LEDS_FRONT)
+  int front = part_on(PART_LEDS_FRONT) ? light_front : 0;
 #if (MCU == ESP32)
-  analogWrite(CH_LED_LF, light_front);
-  analogWrite(CH_LED_RF, light_front);
+  analogWrite(CH_LED_LF, front);
+  analogWrite(CH_LED_RF, front);
 #else
-  analogWrite(PIN_LED_LF, light_front);
-  analogWrite(PIN_LED_RF, light_front);
+  analogWrite(PIN_LED_LF, front);
+  analogWrite(PIN_LED_RF, front);
 #endif
 #endif
 
 #if (HAS_LEDS_BACK)
+  int back = part_on(PART_LEDS_BACK) ? light_back : 0;
 #if (MCU == ESP32)
-  analogWrite(CH_LED_LB, light_back);
-  analogWrite(CH_LED_RB, light_back);
+  analogWrite(CH_LED_LB, back);
+  analogWrite(CH_LED_RB, back);
 #else
-  analogWrite(PIN_LED_LB, light_back);
-  analogWrite(PIN_LED_RB, light_back);
+  analogWrite(PIN_LED_LB, back);
+  analogWrite(PIN_LED_RB, back);
 #endif
 #endif
 }
