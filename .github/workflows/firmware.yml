@@ -1,47 +1,48 @@
 name: Firmware
 
+# Compiles the firmware for every body and setting, builds the ready-made firmware and
+# the setup page for tools.openbot.org (start page in .github/pages, setup page at /firmware).
+# Pull requests upload the site as the "github-pages" artifact to try it; master also publishes it.
+
 on:
   push:
     branches: [ master ]
     paths:
       - 'firmware/**'
+      - '!firmware/**/*.md'
+      - '.github/pages/**'
       - '.github/workflows/firmware.yml'
   pull_request:
     branches: [ master ]
     paths:
       - 'firmware/**'
+      - '!firmware/**/*.md'
+      - '.github/pages/**'
       - '.github/workflows/firmware.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: firmware-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  robots:
-    name: List robot types
+  firmware:
+    name: Firmware
     runs-on: ubuntu-latest
-    outputs:
-      robots: ${{ steps.list.outputs.robots }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Check the parts table
         run: python3 firmware/scripts/compile_all.py --check-defaults
-      - id: list
-        run: echo "robots=$(python3 firmware/scripts/compile_all.py --list-robots)" >> "$GITHUB_OUTPUT"
-
-  compile:
-    name: ${{ matrix.robot }}
-    needs: robots
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        robot: ${{ fromJSON(needs.robots.outputs.robots) }}
-    steps:
-      - uses: actions/checkout@v4
 
       - uses: arduino/setup-arduino-cli@v2
 
       - name: Find cores
         id: cores
-        run: echo "cores=$(python3 firmware/scripts/compile_all.py --cores ${{ matrix.robot }})" >> "$GITHUB_OUTPUT"
+        run: echo "cores=$(python3 firmware/scripts/compile_all.py --cores all)" >> "$GITHUB_OUTPUT"
 
       - name: Cache Arduino cores
         uses: actions/cache@v4
@@ -61,5 +62,35 @@ jobs:
           for core in ${{ steps.cores.outputs.cores }}; do arduino-cli core install "$core"; done
           arduino-cli lib install PinChangeInterrupt "Adafruit SSD1306" "Adafruit GFX Library" Servo
 
-      - name: Compile all combinations
-        run: python3 firmware/scripts/compile_all.py --robot ${{ matrix.robot }}
+      - name: Compile all bodies and settings
+        run: python3 firmware/scripts/compile_all.py
+
+      - name: Build the ready-made firmware
+        run: python3 firmware/scripts/build_site.py --build all --out builds
+
+      - name: Assemble the site
+        env:
+          SITE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p _site
+          cp -r .github/pages/. _site/
+          python3 firmware/scripts/build_site.py --site _site/firmware --builds builds
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Publish on GitHub Pages
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: firmware
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

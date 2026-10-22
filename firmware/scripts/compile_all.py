@@ -18,6 +18,9 @@ settings would be ambiguous.
 """
 
 import argparse
+import concurrent.futures
+import os
+import threading
 import itertools
 import json
 import pathlib
@@ -176,6 +179,9 @@ def tmp_prefix(line: str) -> str:
     return m.group(1) if m else ""
 
 
+PRINT_LOCK = threading.Lock()
+
+
 def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
     label = " ".join(f"{k}={v}" for k, v in settings.items())
     with tempfile.TemporaryDirectory() as tmp:
@@ -210,21 +216,36 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
         verdict = (
             "failed as expected" if ok else f"FAILED (expected error: {expect_error})"
         )
+    with PRINT_LOCK:
+        report(fqbn, label, verdict, ok, result.stdout, settings)
+    return ok
+
+
+def report(fqbn, label, verdict, ok, output, settings):
     print(f"::group::{verdict:>18} | {fqbn} | {label}", flush=True)
-    print(result.stdout)
+    print(output)
     print("::endgroup::", flush=True)
     if not ok:
         print(f"::error::{fqbn} {label}: {verdict}", flush=True)
         # Show the first compiler errors as annotations, so they appear without opening the log
-        errors = [
-            line.strip() for line in result.stdout.splitlines() if "error:" in line
-        ]
+        errors = [line.strip() for line in output.splitlines() if "error:" in line]
         for line in errors[:5]:
             print(
                 f"::error::{robot_label(settings)}: {line.replace(tmp_prefix(line), '')}",
                 flush=True,
             )
-    return ok
+
+
+def compile_many(jobs: list, workers: int) -> list:
+    """Compile in parallel; the first build of each board runs alone to fill the core cache."""
+    first, rest, seen = [], [], set()
+    for job in jobs:
+        (rest if job[0] in seen else first).append(job)
+        seen.add(job[0])
+    results = [compile_one(*job) for job in first]
+    with concurrent.futures.ThreadPoolExecutor(workers) as pool:
+        results += list(pool.map(lambda job: compile_one(*job), rest))
+    return results
 
 
 def main() -> int:
@@ -233,7 +254,8 @@ def main() -> int:
     )
     parser.add_argument("--list-robots", action="store_true")
     parser.add_argument("--check-defaults", action="store_true")
-    parser.add_argument("--cores", metavar="ROBOT")
+    parser.add_argument("--cores", metavar="ROBOT", help="a body, or all")
+    parser.add_argument("--jobs", type=int, default=os.cpu_count() or 2)
     parser.add_argument("--robot")
     parser.add_argument("--fqbn")
     parser.add_argument("--set", action="append", default=[], metavar="NAME=VALUE")
@@ -258,8 +280,11 @@ def main() -> int:
         return 0
 
     if args.cores:
+        selected = list(types) if args.cores == "all" else [args.cores]
         boards = {
-            board for board, _, _ in combinations(source, args.cores, types[args.cores])
+            board
+            for robot in selected
+            for board, _, _ in combinations(source, robot, types[robot])
         }
         print(" ".join(sorted(BOARDS[b][0] for b in boards)))
         return 0
@@ -277,10 +302,12 @@ def main() -> int:
     for robot in selected:
         if robot not in types:
             sys.exit(f"Unknown robot {robot!r}, known: {', '.join(types)}")
-    results = []
-    for robot in selected:
-        for board, settings, error in combinations(source, robot, types[robot]):
-            results.append(compile_one(BOARDS[board][1], settings, error))
+    jobs = [
+        (BOARDS[board][1], settings, error)
+        for robot in selected
+        for board, settings, error in combinations(source, robot, types[robot])
+    ]
+    results = compile_many(jobs, args.jobs)
     failed = results.count(False)
     print(f"{len(results) - failed}/{len(results)} combinations as expected")
     return 1 if failed else 0
