@@ -30,7 +30,73 @@
 // ---------------------------------------------------------------------------
 
 //------------------------------------------------------//
-// DEFINITIONS - DO NOT CHANGE!
+// SETTINGS - set these for your robot
+//------------------------------------------------------//
+// To keep your settings across firmware updates, copy this section (between
+// #else and #endif) into a new file openbot_settings.h next to openbot.ino. If that
+// file exists, it is used instead, and git ignores it.
+#if __has_include("openbot_settings.h")
+#include "openbot_settings.h"
+#ifndef OPENBOT
+#error "openbot_settings.h must set OPENBOT."
+#endif
+#else
+
+// 1. Robot body
+//    Arduino Nano: DIY, PCB_V1, PCB_V2, RTR_TT, RC_CAR, LITE
+//    ESP32:        DIY, RTR_TT2, RTR_520, MTV
+#define OPENBOT DIY
+
+// 2. Driving
+#define NO_PHONE_MODE 0  // drive without a phone; needs a sonar, else it drives straight ahead!
+#define HAS_GAMEPAD 0    // Bluetooth gamepad in no phone mode (ESP32, esp32_bluepad32 board package)
+#define GAMEPAD_DRIVE_MODE GAMEPAD_GAME  // GAMEPAD_GAME, GAMEPAD_JOYSTICK, GAMEPAD_DUAL
+#define COAST_MODE 1     // with no control, the motors coast (1) or brake (0)
+#define DEBUG 0          // debug output on the Serial Monitor (1,0)
+
+// 3. Parts: set 1 (on) or 0 (off) if your robot differs from the standard body.
+//    DEFAULT_... keeps the body's default; the table shows the defaults.
+//
+//                              DIY  PCB_V1/V2  RTR_TT  RTR_TT2/520  LITE  RC_CAR  MTV
+//   HAS_VOLTAGE_DIVIDER         1       1        1          1        0      0      0
+//   HAS_INDICATORS              1       1        1          1        1      0      0
+//   HAS_SONAR                   1       1        1          1        0      0      0
+//   SONAR_MEDIAN                0       0        0          0        0      0      0
+//   HAS_BUMPER                  0       0        1          1        0      0      0
+//   HAS_SPEED_SENSORS_FRONT     1       1        1          1        0      0      1
+//   HAS_SPEED_SENSORS_BACK      0       0        1          1        0      0      1
+//   HAS_SPEED_SENSORS_MIDDLE    0       0        0          0        0      0      1
+//   HAS_LEDS_FRONT              0       0        1          1        0      0      0
+//   HAS_LEDS_BACK               0       0        1          1        0      0      0
+//   HAS_LEDS_STATUS             0       0        1          1        0      0      0
+//   HAS_OLED                    0       0        0          0        0      0      0
+//   HAS_BLUETOOTH             on for the ESP32 bodies (link to the phone)
+
+#define HAS_VOLTAGE_DIVIDER DEFAULT_HAS_VOLTAGE_DIVIDER
+#define HAS_INDICATORS DEFAULT_HAS_INDICATORS
+#define HAS_SONAR DEFAULT_HAS_SONAR
+#define SONAR_MEDIAN DEFAULT_SONAR_MEDIAN
+#define HAS_BUMPER DEFAULT_HAS_BUMPER
+#define HAS_SPEED_SENSORS_FRONT DEFAULT_HAS_SPEED_SENSORS_FRONT
+#define HAS_SPEED_SENSORS_BACK DEFAULT_HAS_SPEED_SENSORS_BACK
+#define HAS_SPEED_SENSORS_MIDDLE DEFAULT_HAS_SPEED_SENSORS_MIDDLE
+#define HAS_LEDS_FRONT DEFAULT_HAS_LEDS_FRONT
+#define HAS_LEDS_BACK DEFAULT_HAS_LEDS_BACK
+#define HAS_LEDS_STATUS DEFAULT_HAS_LEDS_STATUS
+#define HAS_OLED DEFAULT_HAS_OLED
+#define HAS_BLUETOOTH DEFAULT_HAS_BLUETOOTH
+
+// 4. Battery: empty / full voltage of the app's battery gauge, or the body's default
+//    Body defaults: 9.0 / 12.6, RC_CAR 6.4 / 8.4, LITE 4.5 / 5.0, MTV 20.0 / 24.0
+//    Other batteries, e.g.: 2S 6.8f / 8.4f, 6 x AA 6.0f / 9.0f, 8 x AA 8.0f / 12.0f
+#define VOLTAGE_LOW DEFAULT_VOLTAGE_LOW
+#define VOLTAGE_MAX DEFAULT_VOLTAGE_MAX
+#define VOLTAGE_MIN DEFAULT_VOLTAGE_MIN  // lowest voltage at which the motors turn (no phone mode)
+#define VOLTAGE_DIVIDER_FACTOR DEFAULT_VOLTAGE_DIVIDER_FACTOR  // (R1 + R2) / R2
+#endif
+
+//------------------------------------------------------//
+// DEFINITIONS - no need to change anything below
 //------------------------------------------------------//
 
 //MCUs
@@ -63,58 +129,14 @@
 #define GAMEPAD_JOYSTICK 1
 #define GAMEPAD_DUAL 2
 
-//------------------------------------------------------//
-// SETUP - Choose your body
-//------------------------------------------------------//
-
-// Setup the OpenBot body (DIY, PCB_V1, PCB_V2, RTR_TT, RC_CAR, LITE, RTR_TT2, RTR_520, MTV)
-// and select a board it supports (see above)
-#define OPENBOT DIY
+boolean coast_mode = COAST_MODE;
 
 //------------------------------------------------------//
-// SETTINGS - Global settings
+// BODIES - default parts and pins of each body
 //------------------------------------------------------//
-
-// Enable/Disable no phone mode (1,0)
-// In no phone mode:
-// - the motors will turn at 75% speed
-// - the speed will be reduced if an obstacle is detected by the sonar sensor
-// - the car will turn, if an obstacle is detected within TURN_DISTANCE
-// WARNING: If the sonar sensor is not setup, the car will go full speed forward!
-#define NO_PHONE_MODE 0
-
-// Enable/Disable Bluetooth gamepad in no phone mode (1,0)
-// ESP32 bodies only; needs the esp32_bluepad32 board package. See the firmware README.
-#define HAS_GAMEPAD 0
-
-// Drive mode the gamepad starts in (GAMEPAD_GAME, GAMEPAD_JOYSTICK, GAMEPAD_DUAL)
-#define GAMEPAD_DRIVE_MODE GAMEPAD_GAME
-
-// Enable/Disable debug print (1,0)
-#define DEBUG 0
-
-// Enable/Disable coast mode (1,0)
-// When no control is applied, the robot will either coast (1) or actively stop (0)
-boolean coast_mode = 1;
-
-//------------------------------------------------------//
-// CONFIG - update if you have built the DIY version
-//------------------------------------------------------//
-// HAS_VOLTAGE_DIVIDER                  Enable/Disable voltage divider (1,0)
-// VOLTAGE_DIVIDER_FACTOR               The voltage divider factor is computed as (R1+R2)/R2
-// HAS_INDICATORS                       Enable/Disable indicators (1,0)
-// HAS_SONAR                            Enable/Disable sonar (1,0)
-// SONAR_MEDIAN                         Enable/Disable median filter for sonar measurements (1,0)
-// HAS_BUMPER                           Enable/Disable bumper (1,0)
-// HAS_SPEED_SENSORS_FRONT              Enable/Disable front speed sensors (1,0)
-// HAS_SPEED_SENSORS_BACK               Enable/Disable back speed sensors (1,0)
-// HAS_SPEED_SENSORS_MIDDLE             Enable/Disable middle speed sensors (1,0)
-// HAS_OLED                             Enable/Disable OLED display (1,0)
-// HAS_LEDS_FRONT                       Enable/Disable front LEDs
-// HAS_LEDS_BACK                        Enable/Disable back LEDs
-// HAS_LEDS_STATUS                      Enable/Disable status LEDs
-// HAS_BLUETOOTH                        Enable/Disable bluetooth connectivity (1,0)
-// NOTE: HAS_BLUETOOTH will only work with an ESP32 board (RTR_TT2, RTR_520, MTV, DIY with ESP32)
+// Each body sets DEFAULT_<part> for the parts it has (parts without one are off),
+// and its battery defaults. The settings at the top use them. Keep the parts table
+// there in sync with the bodies (CI checks it).
 
 // PIN_TRIGGER                          Arduino pin tied to trigger pin on ultrasonic sensor.
 // PIN_ECHO                             Arduino pin tied to echo pin on ultrasonic sensor.
@@ -133,18 +155,16 @@ boolean coast_mode = 1;
 //-------------------------DIY--------------------------//
 #if (OPENBOT == DIY)
 const String robot_type = "DIY";
+#define DEFAULT_HAS_VOLTAGE_DIVIDER 1
+#define DEFAULT_HAS_INDICATORS 1
+#define DEFAULT_HAS_SONAR 1
+#define DEFAULT_HAS_SPEED_SENSORS_FRONT 1
+#define DEFAULT_VOLTAGE_LOW 9.0f
+#define DEFAULT_VOLTAGE_MAX 12.6f
 #if (MCU == NANO)
-#define HAS_VOLTAGE_DIVIDER 0
-const float VOLTAGE_DIVIDER_FACTOR = (20 + 10) / 10;
-const float VOLTAGE_MIN = 2.5f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
+#define DEFAULT_VOLTAGE_MIN 2.5f
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((20 + 10) / 10)
 const float ADC_FACTOR = 5.0 / 1023;
-#define HAS_INDICATORS 0
-#define HAS_SONAR 0
-#define SONAR_MEDIAN 0
-#define HAS_SPEED_SENSORS_FRONT 0
-#define HAS_OLED 0
 const int PIN_PWM_L1 = 5;
 const int PIN_PWM_L2 = 6;
 const int PIN_PWM_R1 = 9;
@@ -159,7 +179,9 @@ const int PIN_LED_RI = 7;
 
 #else  // ESP32
 #include <esp_wifi.h>
-#define HAS_BLUETOOTH 1
+#define DEFAULT_HAS_BLUETOOTH 1
+#define DEFAULT_VOLTAGE_MIN 6.0f
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((30 + 10) / 10)
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
 #define detachPinChangeInterrupt detachInterrupt
@@ -168,16 +190,7 @@ const int PIN_LED_RI = 7;
 #define PIN_PWM_L2 CH_PWM_L2
 #define PIN_PWM_R1 CH_PWM_R1
 #define PIN_PWM_R2 CH_PWM_R2
-#define HAS_VOLTAGE_DIVIDER 1
-const float VOLTAGE_DIVIDER_FACTOR = (30 + 10) / 10;
-const float VOLTAGE_MIN = 6.0f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
 const float ADC_FACTOR = 3.3 / 4095;
-#define HAS_INDICATORS 1
-#define HAS_SONAR 1
-#define SONAR_MEDIAN 0
-#define HAS_SPEED_SENSORS_FRONT 1
 //PWM properties
 const int FREQ = 5000;
 const int RES = 8;
@@ -205,10 +218,10 @@ const int PIN_SPEED_RB = 23;
 const int PIN_VIN = 4;
 const int PIN_TRIGGER = 5;
 const int PIN_ECHO = 18;
-const int PIN_LED_LI = 5;
-const int PIN_LED_RI = 18;
-const int PIN_LED_LB = 5;
-const int PIN_LED_RB = 18;
+const int PIN_LED_LI = 16;  // the indicators blink the rear lights
+const int PIN_LED_RI = 17;
+const int PIN_LED_LB = 16;
+const int PIN_LED_RB = 17;
 const int PIN_LED_LF = 19;
 const int PIN_LED_RF = 21;
 const int PIN_LED_Y = 14;
@@ -222,17 +235,15 @@ const String robot_type = "PCB_V1";
 #if (MCU != NANO)
 #error "PCB_V1 needs an Arduino Nano board."
 #endif
-#define HAS_VOLTAGE_DIVIDER 1
-const float VOLTAGE_DIVIDER_FACTOR = (100 + 33) / 33;
-const float VOLTAGE_MIN = 2.5f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
+#define DEFAULT_HAS_VOLTAGE_DIVIDER 1
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((100 + 33) / 33)
+#define DEFAULT_VOLTAGE_MIN 2.5f
+#define DEFAULT_VOLTAGE_LOW 9.0f
+#define DEFAULT_VOLTAGE_MAX 12.6f
 const float ADC_FACTOR = 5.0 / 1023;
-#define HAS_INDICATORS 1
-#define HAS_SONAR 1
-#define SONAR_MEDIAN 0
-#define HAS_SPEED_SENSORS_FRONT 1
-#define HAS_OLED 0
+#define DEFAULT_HAS_INDICATORS 1
+#define DEFAULT_HAS_SONAR 1
+#define DEFAULT_HAS_SPEED_SENSORS_FRONT 1
 const int PIN_PWM_L1 = 9;
 const int PIN_PWM_L2 = 10;
 const int PIN_PWM_R1 = 5;
@@ -251,17 +262,15 @@ const String robot_type = "PCB_V2";
 #if (MCU != NANO)
 #error "PCB_V2 needs an Arduino Nano board."
 #endif
-#define HAS_VOLTAGE_DIVIDER 1
-const float VOLTAGE_DIVIDER_FACTOR = (20 + 10) / 10;
-const float VOLTAGE_MIN = 2.5f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
+#define DEFAULT_HAS_VOLTAGE_DIVIDER 1
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((20 + 10) / 10)
+#define DEFAULT_VOLTAGE_MIN 2.5f
+#define DEFAULT_VOLTAGE_LOW 9.0f
+#define DEFAULT_VOLTAGE_MAX 12.6f
 const float ADC_FACTOR = 5.0 / 1023;
-#define HAS_INDICATORS 1
-#define HAS_SONAR 1
-#define SONAR_MEDIAN 0
-#define HAS_SPEED_SENSORS_FRONT 1
-#define HAS_OLED 0
+#define DEFAULT_HAS_INDICATORS 1
+#define DEFAULT_HAS_SONAR 1
+#define DEFAULT_HAS_SPEED_SENSORS_FRONT 1
 const int PIN_PWM_L1 = 9;
 const int PIN_PWM_L2 = 10;
 const int PIN_PWM_R1 = 5;
@@ -280,21 +289,20 @@ const String robot_type = "RTR_TT";
 #if (MCU != NANO)
 #error "RTR_TT needs an Arduino Nano board."
 #endif
-#define HAS_VOLTAGE_DIVIDER 1
-const float VOLTAGE_DIVIDER_FACTOR = (30 + 10) / 10;
-const float VOLTAGE_MIN = 2.5f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
+#define DEFAULT_HAS_VOLTAGE_DIVIDER 1
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((30 + 10) / 10)
+#define DEFAULT_VOLTAGE_MIN 2.5f
+#define DEFAULT_VOLTAGE_LOW 9.0f
+#define DEFAULT_VOLTAGE_MAX 12.6f
 const float ADC_FACTOR = 5.0 / 1023;
-#define HAS_INDICATORS 1
-#define HAS_SONAR 1
-#define SONAR_MEDIAN 0
-#define HAS_BUMPER 1
-#define HAS_SPEED_SENSORS_FRONT 1
-#define HAS_SPEED_SENSORS_BACK 1
-#define HAS_LEDS_FRONT 1
-#define HAS_LEDS_BACK 1
-#define HAS_LEDS_STATUS 1
+#define DEFAULT_HAS_INDICATORS 1
+#define DEFAULT_HAS_SONAR 1
+#define DEFAULT_HAS_BUMPER 1
+#define DEFAULT_HAS_SPEED_SENSORS_FRONT 1
+#define DEFAULT_HAS_SPEED_SENSORS_BACK 1
+#define DEFAULT_HAS_LEDS_FRONT 1
+#define DEFAULT_HAS_LEDS_BACK 1
+#define DEFAULT_HAS_LEDS_STATUS 1
 const int PIN_PWM_L1 = 10;
 const int PIN_PWM_L2 = 9;
 const int PIN_PWM_R1 = 6;
@@ -336,15 +344,11 @@ const String robot_type = "RC_CAR";
 #include <Servo.h>
 Servo ESC;
 Servo SERVO;
-#define HAS_VOLTAGE_DIVIDER 0
-const float VOLTAGE_DIVIDER_FACTOR = (20 + 10) / 10;
-const float VOLTAGE_MIN = 0.0f;
-const float VOLTAGE_LOW = 6.4f;
-const float VOLTAGE_MAX = 8.4f;
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((20 + 10) / 10)
+#define DEFAULT_VOLTAGE_MIN 0.0f
+#define DEFAULT_VOLTAGE_LOW 6.4f
+#define DEFAULT_VOLTAGE_MAX 8.4f
 const float ADC_FACTOR = 5.0 / 1023;
-#define HAS_INDICATORS 0
-#define HAS_SONAR 0
-#define SONAR_MEDIAN 0
 const int PIN_PWM_T = A0;
 const int PIN_PWM_S = A1;
 const int PIN_VIN = A7;
@@ -359,10 +363,10 @@ const String robot_type = "LITE";
 #if (MCU != NANO)
 #error "LITE needs an Arduino Nano board."
 #endif
-const float VOLTAGE_MIN = 2.5f;
-const float VOLTAGE_LOW = 4.5f;
-const float VOLTAGE_MAX = 5.0f;
-#define HAS_INDICATORS 1
+#define DEFAULT_VOLTAGE_MIN 2.5f
+#define DEFAULT_VOLTAGE_LOW 4.5f
+#define DEFAULT_VOLTAGE_MAX 5.0f
+#define DEFAULT_HAS_INDICATORS 1
 const int PIN_PWM_L1 = 5;
 const int PIN_PWM_L2 = 6;
 const int PIN_PWM_R1 = 9;
@@ -377,7 +381,7 @@ const String robot_type = "RTR_TT2";
 #error "RTR_TT2 needs an ESP32 board."
 #endif
 #include <esp_wifi.h>
-#define HAS_BLUETOOTH 1
+#define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
 #define detachPinChangeInterrupt detachInterrupt
@@ -386,21 +390,20 @@ const String robot_type = "RTR_TT2";
 #define PIN_PWM_L2 CH_PWM_L2
 #define PIN_PWM_R1 CH_PWM_R1
 #define PIN_PWM_R2 CH_PWM_R2
-#define HAS_VOLTAGE_DIVIDER 1
-const float VOLTAGE_DIVIDER_FACTOR = (30 + 10) / 10;
-const float VOLTAGE_MIN = 6.0f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
+#define DEFAULT_HAS_VOLTAGE_DIVIDER 1
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((30 + 10) / 10)
+#define DEFAULT_VOLTAGE_MIN 6.0f
+#define DEFAULT_VOLTAGE_LOW 9.0f
+#define DEFAULT_VOLTAGE_MAX 12.6f
 const float ADC_FACTOR = 3.3 / 4095;
-#define HAS_INDICATORS 1
-#define HAS_SONAR 1
-#define SONAR_MEDIAN 0
-#define HAS_BUMPER 1
-#define HAS_SPEED_SENSORS_FRONT 1
-#define HAS_SPEED_SENSORS_BACK 1
-#define HAS_LEDS_FRONT 1
-#define HAS_LEDS_BACK 1
-#define HAS_LEDS_STATUS 1
+#define DEFAULT_HAS_INDICATORS 1
+#define DEFAULT_HAS_SONAR 1
+#define DEFAULT_HAS_BUMPER 1
+#define DEFAULT_HAS_SPEED_SENSORS_FRONT 1
+#define DEFAULT_HAS_SPEED_SENSORS_BACK 1
+#define DEFAULT_HAS_LEDS_FRONT 1
+#define DEFAULT_HAS_LEDS_BACK 1
+#define DEFAULT_HAS_LEDS_STATUS 1
 //PWM properties
 const int FREQ = 5000;
 const int RES = 8;
@@ -455,7 +458,7 @@ const String robot_type = "RTR_520";
 #error "RTR_520 needs an ESP32 board."
 #endif
 #include <esp_wifi.h>
-#define HAS_BLUETOOTH 1
+#define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
 #define detachPinChangeInterrupt detachInterrupt
@@ -464,21 +467,20 @@ const String robot_type = "RTR_520";
 #define PIN_PWM_L2 CH_PWM_L2
 #define PIN_PWM_R1 CH_PWM_R1
 #define PIN_PWM_R2 CH_PWM_R2
-#define HAS_VOLTAGE_DIVIDER 1
-const float VOLTAGE_DIVIDER_FACTOR = (30 + 10) / 10;
-const float VOLTAGE_MIN = 6.0f;
-const float VOLTAGE_LOW = 9.0f;
-const float VOLTAGE_MAX = 12.6f;
+#define DEFAULT_HAS_VOLTAGE_DIVIDER 1
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((30 + 10) / 10)
+#define DEFAULT_VOLTAGE_MIN 6.0f
+#define DEFAULT_VOLTAGE_LOW 9.0f
+#define DEFAULT_VOLTAGE_MAX 12.6f
 const float ADC_FACTOR = 3.3 / 4095;
-#define HAS_INDICATORS 1
-#define HAS_SONAR 1
-#define SONAR_MEDIAN 0
-#define HAS_BUMPER 1
-#define HAS_SPEED_SENSORS_FRONT 1
-#define HAS_SPEED_SENSORS_BACK 1
-#define HAS_LEDS_FRONT 1
-#define HAS_LEDS_BACK 1
-#define HAS_LEDS_STATUS 1
+#define DEFAULT_HAS_INDICATORS 1
+#define DEFAULT_HAS_SONAR 1
+#define DEFAULT_HAS_BUMPER 1
+#define DEFAULT_HAS_SPEED_SENSORS_FRONT 1
+#define DEFAULT_HAS_SPEED_SENSORS_BACK 1
+#define DEFAULT_HAS_LEDS_FRONT 1
+#define DEFAULT_HAS_LEDS_BACK 1
+#define DEFAULT_HAS_LEDS_STATUS 1
 //PWM properties
 const int FREQ = 5000;
 const int RES = 8;
@@ -533,25 +535,17 @@ const String robot_type = "MTV";
 #error "MTV needs an ESP32 board."
 #endif
 #include <esp_wifi.h>
-#define HAS_BLUETOOTH 1
+#define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
 #define detachPinChangeInterrupt detachInterrupt
 #define digitalPinToPinChangeInterrupt digitalPinToInterrupt
-#define HAS_VOLTAGE_DIVIDER 0
-const float VOLTAGE_MIN = 17.0f;
-const float VOLTAGE_LOW = 20.0f;
-const float VOLTAGE_MAX = 24.0f;
-#define HAS_SPEED_SENSORS_FRONT 1
-#define HAS_SPEED_SENSORS_BACK 1
-#define HAS_SPEED_SENSORS_MIDDLE 1
-#define HAS_INDICATORS 0
-#define HAS_SONAR 0
-#define SONAR_MEDIAN 0
-#define HAS_BUMPER 0
-#define HAS_LEDS_FRONT 0
-#define HAS_LEDS_BACK 0
-#define HAS_LEDS_STATUS 0
+#define DEFAULT_VOLTAGE_MIN 17.0f
+#define DEFAULT_VOLTAGE_LOW 20.0f
+#define DEFAULT_VOLTAGE_MAX 24.0f
+#define DEFAULT_HAS_SPEED_SENSORS_FRONT 1
+#define DEFAULT_HAS_SPEED_SENSORS_BACK 1
+#define DEFAULT_HAS_SPEED_SENSORS_MIDDLE 1
 const int PIN_PWM_R = 19;
 const int PIN_DIR_R = 18;
 const int PIN_PWM_L = 33;
@@ -573,6 +567,74 @@ const int RHS_PWM_OUT = 1;
 
 #endif
 //------------------------------------------------------//
+
+#if (NO_PHONE_MODE && !HAS_SONAR)
+#warning "No phone mode without a sonar: the robot drives straight ahead."
+#endif
+
+//------------------------------------------------------//
+// Pin check: two parts must not use the same pin
+//------------------------------------------------------//
+struct PinUse {
+  int pin;
+  char part;
+};
+constexpr PinUse PIN_USES[] = {
+#if (OPENBOT == RC_CAR)
+  { PIN_PWM_T, 'M' }, { PIN_PWM_S, 'M' },
+#elif (OPENBOT == MTV)
+  { PIN_PWM_L, 'M' }, { PIN_PWM_R, 'M' }, { PIN_DIR_L, 'M' }, { PIN_DIR_R, 'M' },
+#elif (MCU == NANO)
+  { PIN_PWM_L1, 'M' }, { PIN_PWM_L2, 'M' }, { PIN_PWM_R1, 'M' }, { PIN_PWM_R2, 'M' },
+#else
+  { PIN_PWM_LF1, 'M' }, { PIN_PWM_LF2, 'M' }, { PIN_PWM_LB1, 'M' }, { PIN_PWM_LB2, 'M' },
+  { PIN_PWM_RF1, 'M' }, { PIN_PWM_RF2, 'M' }, { PIN_PWM_RB1, 'M' }, { PIN_PWM_RB2, 'M' },
+#endif
+#if (HAS_SONAR)
+  { PIN_TRIGGER, 'S' }, { PIN_ECHO, 'S' },
+#endif
+#if (HAS_INDICATORS)  // may share the pins of the rear lights
+  { PIN_LED_LI, 'R' }, { PIN_LED_RI, 'R' },
+#endif
+#if (HAS_LEDS_BACK)
+  { PIN_LED_LB, 'R' }, { PIN_LED_RB, 'R' },
+#endif
+#if (HAS_LEDS_FRONT)
+  { PIN_LED_LF, 'F' }, { PIN_LED_RF, 'F' },
+#endif
+#if (HAS_LEDS_STATUS)
+  { PIN_LED_Y, 'L' }, { PIN_LED_G, 'L' }, { PIN_LED_B, 'L' },
+#endif
+#if (HAS_VOLTAGE_DIVIDER)
+  { PIN_VIN, 'V' },
+#endif
+#if (HAS_BUMPER)
+  { PIN_BUMPER, 'B' },
+#endif
+#if (HAS_SPEED_SENSORS_FRONT)
+  { PIN_SPEED_LF, 'W' }, { PIN_SPEED_RF, 'W' },
+#endif
+#if (HAS_SPEED_SENSORS_BACK)
+  { PIN_SPEED_LB, 'W' }, { PIN_SPEED_RB, 'W' },
+#endif
+#if (HAS_SPEED_SENSORS_MIDDLE)
+  { PIN_SPEED_LM, 'W' }, { PIN_SPEED_RM, 'W' },
+#endif
+#if (HAS_OLED)
+  { SDA, 'O' }, { SCL, 'O' },
+#endif
+  { -1, 0 }  // end
+};
+struct PinCheck {
+  static constexpr int count = sizeof(PIN_USES) / sizeof(PIN_USES[0]) - 1;
+  static constexpr bool clash(int i, int j) {
+    return j < count && ((PIN_USES[i].pin == PIN_USES[j].pin && PIN_USES[i].part != PIN_USES[j].part) || clash(i, j + 1));
+  }
+  static constexpr bool any(int i) {
+    return i < count && (clash(i, i + 1) || any(i + 1));
+  }
+};
+static_assert(!PinCheck::any(0), "Two parts use the same pin. Check the pins of your body, or turn a part off in the settings.");
 
 #if (HAS_GAMEPAD)
 #if (!NO_PHONE_MODE)
@@ -706,10 +768,11 @@ uint16_t gamepad_misc = 0;
 bool gamepad_obstacle_stop = true;
 #endif
 
-#if (HAS_SONAR)
-#if (MCU == NANO)
+#if (MCU == NANO && (HAS_SONAR || HAS_SPEED_SENSORS_FRONT || HAS_SPEED_SENSORS_BACK || HAS_SPEED_SENSORS_MIDDLE))
 #include "PinChangeInterrupt.h"
 #endif
+
+#if (HAS_SONAR)
 // Sonar sensor
 const float US_TO_CM = 0.01715;               //cm/uS -> (343 * 100 / 1000000) / 2;
 const unsigned int MAX_SONAR_DISTANCE = 300;  //cm
@@ -912,7 +975,11 @@ void setup() {
   digitalWrite(PIN_LED_RI, LOW);
 #endif
 #if (HAS_SONAR)
+#if (MCU == ESP32)
+  pinMode(PIN_ECHO, INPUT_PULLDOWN);  // a missing sonar reads no echo
+#else
   pinMode(PIN_ECHO, INPUT);
+#endif
   pinMode(PIN_TRIGGER, OUTPUT);
 #endif
 #if (HAS_VOLTAGE_DIVIDER)
@@ -968,6 +1035,12 @@ void setup() {
   // SERIAL_8N1 - 8 data bits, no parity, 1 stop bit
   // Serial.setTimeout(10);
   Serial.println('r');
+  print_config();
+#if __has_include("openbot_settings.h")
+  Serial.println(F("OpenBot settings: openbot_settings.h"));
+#else
+  Serial.println(F("OpenBot settings: openbot.ino"));
+#endif
 
 #if (HAS_BLUETOOTH)
   String ble_name = "OpenBot: " + robot_type;
@@ -998,6 +1071,69 @@ void setup() {
 #if DEBUG
   Serial.println("Waiting for a gamepad...");
 #endif
+#endif
+}
+
+// Print the body, its parts and the mode on the Serial Monitor
+void print_item(const __FlashStringHelper *item, bool &first) {
+  Serial.print(first ? F(" ") : F(", "));
+  Serial.print(item);
+  first = false;
+}
+
+void print_config() {
+  bool first = true;
+  Serial.print(F("OpenBot "));
+  Serial.print(robot_type);
+  Serial.print(MCU == NANO ? F(" (Nano):") : F(" (ESP32):"));
+#if (HAS_VOLTAGE_DIVIDER)
+  print_item(F("voltage"), first);
+#endif
+#if (HAS_INDICATORS)
+  print_item(F("indicators"), first);
+#endif
+#if (HAS_SONAR)
+  print_item(F("sonar"), first);
+#endif
+#if (HAS_BUMPER)
+  print_item(F("bumper"), first);
+#endif
+#if (HAS_SPEED_SENSORS_FRONT)
+  print_item(F("speed sensors front"), first);
+#endif
+#if (HAS_SPEED_SENSORS_BACK)
+  print_item(F("speed sensors back"), first);
+#endif
+#if (HAS_SPEED_SENSORS_MIDDLE)
+  print_item(F("speed sensors middle"), first);
+#endif
+#if (HAS_LEDS_FRONT)
+  print_item(F("front lights"), first);
+#endif
+#if (HAS_LEDS_BACK)
+  print_item(F("rear lights"), first);
+#endif
+#if (HAS_LEDS_STATUS)
+  print_item(F("status LEDs"), first);
+#endif
+#if (HAS_OLED)
+  print_item(F("OLED"), first);
+#endif
+#if (HAS_BLUETOOTH)
+  print_item(F("Bluetooth"), first);
+#endif
+#if (NO_PHONE_MODE)
+  print_item(F("no phone mode"), first);
+#endif
+#if (HAS_GAMEPAD)
+  print_item(F("gamepad"), first);
+#endif
+  if (first) {
+    Serial.print(F(" none"));
+  }
+  Serial.println();
+#if (NO_PHONE_MODE && !HAS_SONAR)
+  Serial.println(F("OpenBot warning: no sonar, so the robot drives straight ahead"));
 #endif
 }
 
@@ -1965,8 +2101,8 @@ void send_wheel_reading(long duration) {
 
 void update_indicator() {
   if (indicator_left > 0) {
-#if (MCU == ESP32 && PIN_LED_LI == PIN_LED_LB)
-    ledcDetachPin(PIN_LED_LB);
+#if (MCU == ESP32 && HAS_LEDS_BACK)
+    if (PIN_LED_LI == PIN_LED_LB) ledcDetachPin(PIN_LED_LB);
 #endif
     digitalWrite(PIN_LED_LI, !digitalRead(PIN_LED_LI));
   } else {
@@ -1975,13 +2111,13 @@ void update_indicator() {
 #else
     digitalWrite(PIN_LED_LI, LOW);
 #endif
-#if (MCU == ESP32 && PIN_LED_LI == PIN_LED_LB)
-    ledcAttachPin(PIN_LED_LB, CH_LED_LB);
+#if (MCU == ESP32 && HAS_LEDS_BACK)
+    if (PIN_LED_LI == PIN_LED_LB) ledcAttachPin(PIN_LED_LB, CH_LED_LB);
 #endif
   }
   if (indicator_right > 0) {
-#if (MCU == ESP32 && PIN_LED_RI == PIN_LED_RB)
-    ledcDetachPin(PIN_LED_RB);
+#if (MCU == ESP32 && HAS_LEDS_BACK)
+    if (PIN_LED_RI == PIN_LED_RB) ledcDetachPin(PIN_LED_RB);
 #endif
     digitalWrite(PIN_LED_RI, !digitalRead(PIN_LED_RI));
   } else {
@@ -1990,8 +2126,8 @@ void update_indicator() {
 #else
     digitalWrite(PIN_LED_RI, LOW);
 #endif
-#if (MCU == ESP32 && PIN_LED_RI == PIN_LED_RB)
-    ledcAttachPin(PIN_LED_RB, CH_LED_RB);
+#if (MCU == ESP32 && HAS_LEDS_BACK)
+    if (PIN_LED_RI == PIN_LED_RB) ledcAttachPin(PIN_LED_RB, CH_LED_RB);
 #endif
   }
 }

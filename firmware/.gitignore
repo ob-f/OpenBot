@@ -1,0 +1,3 @@
+# Your own firmware settings, see README.md
+openbot/openbot_settings.h
+__pycache__/
