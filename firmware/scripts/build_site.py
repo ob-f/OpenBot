@@ -39,7 +39,7 @@ PARTS = {
     "HAS_VOLTAGE_DIVIDER": (["PIN_VIN"], 0),
     "HAS_INDICATORS": (["PIN_LED_LI", "PIN_LED_RI"], 1),
     "HAS_SONAR": (["PIN_TRIGGER", "PIN_ECHO"], 2),
-    "SONAR_MEDIAN": (["PIN_TRIGGER"], None),
+    "SONAR_MEDIAN": (["PIN_TRIGGER"], 11),
     "HAS_BUMPER": (["PIN_BUMPER"], 3),
     "HAS_SPEED_SENSORS_FRONT": (["PIN_SPEED_LF", "PIN_SPEED_RF"], 4),
     "HAS_SPEED_SENSORS_BACK": (["PIN_SPEED_LB", "PIN_SPEED_RB"], 5),
@@ -47,7 +47,7 @@ PARTS = {
     "HAS_LEDS_FRONT": (["PIN_LED_LF", "PIN_LED_RF"], 7),
     "HAS_LEDS_BACK": (["PIN_LED_LB", "PIN_LED_RB"], 8),
     "HAS_LEDS_STATUS": (["PIN_LED_Y", "PIN_LED_G", "PIN_LED_B"], 9),
-    "HAS_OLED": ([], None),
+    "HAS_OLED": ([], 10),
     "HAS_BLUETOOTH": ([], None),
 }
 MCU_BOARD = {"NANO": "nano", "ESP32": "esp32"}

@@ -919,6 +919,8 @@ const uint8_t PART_SPEED_SENSORS_MIDDLE = 6;
 const uint8_t PART_LEDS_FRONT = 7;
 const uint8_t PART_LEDS_BACK = 8;
 const uint8_t PART_LEDS_STATUS = 9;
+const uint8_t PART_OLED = 10;
+const uint8_t PART_SONAR_MEDIAN = 11;
 
 // The parts in this firmware
 const uint16_t PARTS_BUILT = 0
@@ -951,6 +953,12 @@ const uint16_t PARTS_BUILT = 0
 #endif
 #if (HAS_LEDS_STATUS)
   | bit(PART_LEDS_STATUS)
+#endif
+#if (HAS_OLED)
+  | bit(PART_OLED)
+#endif
+#if (HAS_SONAR && SONAR_MEDIAN)
+  | bit(PART_SONAR_MEDIAN)
 #endif
   ;
 
@@ -1275,7 +1283,7 @@ void print_config() {
   if (part_on(PART_LEDS_STATUS)) print_item(F("status LEDs"), first);
 #endif
 #if (HAS_OLED)
-  print_item(F("OLED"), first);
+  if (part_on(PART_OLED)) print_item(F("OLED"), first);
 #endif
 #if (HAS_BLUETOOTH)
   print_item(F("Bluetooth"), first);
@@ -2225,12 +2233,12 @@ void display_vehicle_data() {
   Serial.println("------------------");
 #endif
 #if HAS_OLED
-  // Set display information
-  drawString(
-    voltage_str,
-    left_rpm_str,
-    right_rpm_str,
-    distance_str);
+  // Set display information; a blank display when turned off live
+  if (part_on(PART_OLED)) {
+    drawString(voltage_str, left_rpm_str, right_rpm_str, distance_str);
+  } else {
+    drawString("", "", "", "");
+  }
 #endif
 }
 
@@ -2368,12 +2376,14 @@ void send_ping() {
 
 void update_distance_estimate() {
 #if SONAR_MEDIAN
-  distance_array[distance_counter % distance_array_sz] = distance;
-  distance_counter++;
-  distance_estimate = get_median(distance_array, distance_array_sz);
-#else
-  distance_estimate = distance;
+  if (part_on(PART_SONAR_MEDIAN)) {
+    distance_array[distance_counter % distance_array_sz] = distance;
+    distance_counter++;
+    distance_estimate = get_median(distance_array, distance_array_sz);
+    return;
+  }
 #endif
+  distance_estimate = distance;
 }
 
 #endif

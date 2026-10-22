@@ -155,6 +155,9 @@ button, input { font: inherit; color: inherit; }
 .secondary { background: var(--panel); color: var(--blue); border: 1px solid var(--blue); }
 .secondary:hover:not(:disabled) { background: var(--blue-wash); }
 .actions button:disabled { opacity: 0.45; cursor: not-allowed; }
+.actions button.blocked { opacity: 0.45; cursor: not-allowed; }
+.secondary.blocked:hover { background: var(--panel); }
+.note.warn { color: var(--red); }
 .link { background: none; border: 0; color: var(--blue); text-decoration: underline; text-underline-offset: 3px; padding: 4px 0 !important; justify-self: start; font-weight: 500 !important; font-size: 14px; }
 .note { color: var(--muted); font-size: 13px; line-height: 1.45; margin: -2px 0 8px; }
 .note:empty { display: none; }
