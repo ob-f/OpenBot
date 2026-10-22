@@ -279,6 +279,12 @@ def build(robot: str, out: pathlib.Path, jobs: int) -> None:
         print(f"::group::{name} ({fqbn})\n{output}\n::endgroup::", flush=True)
         if code:
             print(f"::error::{name}: build failed", flush=True)
+            # The first compiler errors as annotations, readable without the log
+            errors = [line.strip() for line in output.splitlines() if "error:" in line]
+            for line in errors[:5]:
+                print(
+                    f"::error::{name}: {re.sub(r'^.*/openbot/', '', line)}", flush=True
+                )
             failed.append(name)
     print(f"{len(results) - len(failed)}/{len(results)} ready-made firmware built")
     if failed:
