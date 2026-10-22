@@ -116,6 +116,50 @@ function liveOffMask() {
   return mask;
 }
 
+// The robot this page last flashed or read: its body, board and the parts in its firmware
+let robot = null;
+
+function loadRobot() {
+  try { robot = JSON.parse(localStorage.getItem("openbot-robot")); } catch (e) { robot = null; }
+}
+
+function saveRobot(info) {
+  robot = info;
+  try { localStorage.setItem("openbot-robot", JSON.stringify(info)); } catch (e) {}
+}
+
+// Parts in the ready-made firmware for the current body and board
+function builtInMask() {
+  let mask = 0;
+  for (const part of Object.values(boardInfo().parts)) {
+    if (part.live !== null && part.default) mask |= 1 << part.live;
+  }
+  return mask;
+}
+
+// Parts turned on here that the given firmware doesn't have
+function missingFrom(have) {
+  return Object.entries(boardInfo().parts)
+    .filter(([key, part]) => part.live !== null && partOn(key) && !((have >> part.live) & 1))
+    .map(([key]) => PARTS.find((p) => p.key === key).name);
+}
+
+function addMessage(names) {
+  return `The firmware on your robot doesn't include ${names.join(", ")}. Use Flash firmware to add ${names.length > 1 ? "them" : "it"}.`;
+}
+
+// Why Update settings only can't do what is selected ("" if it can)
+function applyBlocker(clashes, extras) {
+  if (!("serial" in navigator)) return "Updating the settings needs Chrome or Edge on a computer.";
+  if (clashes) return "Two parts use the same pin. Turn one of them off.";
+  if (extras.length) return `${extras.join(", ")} can only be changed with the Arduino IDE.`;
+  if (robot && robot.body === state.body && robot.board === state.board) {
+    const missing = missingFrom(robot.have);
+    if (missing.length) return addMessage(missing);
+  }
+  return "";
+}
+
 function save() {
   try { localStorage.setItem("openbot-firmware", JSON.stringify(state)); } catch (e) {}
 }
@@ -318,7 +362,15 @@ function renderRobot() {
   $("flash").disabled = busy || !canFlash;
   $("flash-note").textContent = flashNote;
   $("download").disabled = busy || clashes;
-  $("apply").disabled = busy || !("serial" in navigator) || clashes || extras.length > 0;
+  // Blocked, not disabled, so a click or hover can show why
+  const why = applyBlocker(clashes, extras);
+  const apply = $("apply");
+  apply.disabled = busy;
+  apply.classList.toggle("blocked", !!why);
+  apply.setAttribute("aria-disabled", why ? "true" : "false");
+  apply.title = why;
+  apply.dataset.why = why;
+  if (!why) $("apply-why").textContent = "";
 }
 
 // ---------- Settings file ----------
@@ -451,11 +503,21 @@ async function applyLive(port) {
     if (!startup) throw new Error("The robot didn't start up. Is the OpenBot firmware on it?");
     log(startup);
     await sleep(300);
+    await reader.send("p");
+    const info = await reader.waitFor((l) => l.startsWith("pboard:"), 3000);
+    if (!info) throw new Error("The robot didn't answer the settings. Its firmware may be older than this page; flash it first.");
+    const found = parseLive(info);
+    const type = (startup.match(/^OpenBot (\S+) \(/) || [])[1];
+    saveRobot({ body: type in BODY_NAMES ? type : state.body, board: found.board, have: Number(found.have) });
+    if (found.board === state.board) {
+      const missing = missingFrom(Number(found.have));
+      if (missing.length) throw new Error(addMessage(missing));
+    }
     const v = voltages();
     const command = `pvlow:${v.low.toFixed(2)}:vmax:${v.max.toFixed(2)}:off:${liveOffMask()}`;
     await reader.send(command);
     const reply = await reader.waitFor((l) => l.startsWith("pboard:"), 3000);
-    if (!reply) throw new Error("The robot didn't answer the settings. Its firmware may be older than this page; flash it first.");
+    if (!reply) throw new Error("The robot didn't answer the settings.");
     const live = parseLive(reply);
     if (live.board !== state.board) log(`This robot has an ${BOARD_NAMES[live.board]}, not an ${BOARD_NAMES[state.board]}.`, "warn");
     const off = PARTS.filter((p) => boardInfo().parts[p.key]?.live !== null && boardInfo().parts[p.key] && (Number(live.off) >> boardInfo().parts[p.key].live) & 1).map((p) => p.name);
@@ -539,6 +601,7 @@ async function flash() {
     }
     progress(null);
     log("Firmware flashed", "ok");
+    saveRobot({ body: state.body, board: state.board, have: builtInMask() });
     $("monitor-state").textContent = "applying settings";
     await sleep(500);
     await applyLive(port);
@@ -546,6 +609,11 @@ async function flash() {
 }
 
 async function apply() {
+  const why = $("apply").dataset.why;
+  if (why) {
+    $("apply-why").textContent = why;
+    return;
+  }
   await run(async (port) => {
     $("monitor-state").textContent = "applying settings";
     await applyLive(port);
@@ -557,6 +625,7 @@ async function apply() {
 async function start() {
   data = await (await fetch("bodies.json", { cache: "no-cache" })).json();
   restore();
+  loadRobot();
   if (!Object.keys(state.parts).length) resetParts();
   $("download").onclick = download;
   $("usb-help-open").onclick = () => $("usb-help").showModal();
