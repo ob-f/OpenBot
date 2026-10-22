@@ -17,40 +17,51 @@ Für größere Bestellungen kontaktieren Sie uns bitte per E-Mail.
 
 ## Eigenbau
 
-Sie können einen beliebigen Roboterkörper mit Rädern um einen Mikrocontroller wie den Arduino Nano herum bauen, um ihn mit der OpenBot-Software zu verwenden. Wir haben einen [3D-gedruckten Körper](diy) für einen Roboter mit Rädern entworfen, der auf kostengünstiger, leicht verfügbarer Hobby-Hardware basiert. [OpenBot Lite](lite) ist eine kleinere und vereinfachte Variante der OpenBot DIY-Version, die für Bildungszwecke entwickelt wurde. Selbst wenn Sie ihn nicht bauen möchten, könnten Sie die [Schritt-für-Schritt-Videoanleitungen](lite/#step-by-step-video-guides) hilfreich finden. Wir haben auch einen [3D-gedruckten Körper](rc_truck) für kommerziell erhältliche 1:16 RC-Trucks (wie [diesen](https://www.amazon.de/dp/B00M3J7DJW)) entworfen. Zudem bieten wir Baupläne für ein [Multi-Terrain-Fahrzeug](mtv) an, das als Allzweckplattform für Outdoor-Projekte mit dem OpenBot-Framework dient.
+Sie können einen beliebigen Roboterkörper mit Rädern um einen Mikrocontroller wie den Arduino Nano herum bauen, um ihn mit der OpenBot-Software zu verwenden. Wir haben einen [3D-gedruckten Körper](diy) für einen Roboter mit Rädern entworfen, der auf kostengünstiger, leicht verfügbarer Hobby-Hardware basiert. [OpenBot Lite](lite) ist eine kleinere und vereinfachte Variante der OpenBot DIY-Version, die für Bildungszwecke entwickelt wurde. Selbst wenn Sie ihn nicht bauen möchten, könnten Sie die [Schritt-für-Schritt-Videoanleitungen](lite/#step-by-step-video-guides) hilfreich finden. [OpenBot Compact](compact) ist ein kompakter 3D-gedruckter Körper für einen ESP32 mit L298N-Motortreiber; er hat einen lego-kompatiblen Deckel, und alle Teile passen auf einen 180-mm-Drucker. Wir haben auch einen [3D-gedruckten Körper](rc_truck) für kommerziell erhältliche 1:16 RC-Trucks (wie [diesen](https://www.amazon.de/dp/B00M3J7DJW)) entworfen. Zudem bieten wir Baupläne für ein [Multi-Terrain-Fahrzeug](mtv) an, das als Allzweckplattform für Outdoor-Projekte mit dem OpenBot-Framework dient.
 
 Im Folgenden finden Sie einige Beispiele mit Bauanleitungen und weiteren Details:
 
 <table style="width:100%;border:none;text-align:center">
   <tr>
-  <td>  <a href="diy">
-    <img  alt="DIY" src="../docs/images/assembly.gif" />
+  <td width="33%">
+  <a href="diy">
+    <img alt="DIY" src="../docs/images/assembly.gif" />
   </a>
   </td>
-  <td>
+  <td width="33%">
   <a href="lite">
     <img alt="Lite" src="../docs/images/openbot_lite.jpg" />
   </a>
   </td>
-  <td>
-  <a href="rc_truck">
-    <img  alt="RC Truck" src="../docs/images/add_covers_2.JPG" />
-  </a>
-  </td>
-  <td>
-  <a href="mtv">
-    <img alt="Multi-Terrain Vehicle" src="../docs/images/MTV/MTV.jpg" />
-  </a>
-  </td>
-  <td>
-  <a href="rtr">
-    <img alt="RTR" src="../docs/images/rtr_tt_assembly.gif" />
+  <td width="33%">
+  <a href="compact">
+    <img alt="Compact" src="../docs/images/compact/compact.jpg" />
   </a>
   </td>
   </tr>
   <tr>
     <td><a href="diy"> DIY </a></td>
     <td><a href="lite"> Lite </a></td>
+    <td><a href="compact"> Compact </a></td>
+  </tr>
+  <tr>
+  <td width="33%">
+  <a href="rc_truck">
+    <img alt="RC Truck" src="../docs/images/add_covers_2.JPG" />
+  </a>
+  </td>
+  <td width="33%">
+  <a href="mtv">
+    <img alt="Multi-Terrain Vehicle" src="../docs/images/MTV/MTV.jpg" />
+  </a>
+  </td>
+  <td width="33%">
+  <a href="rtr">
+    <img alt="RTR" src="../docs/images/rtr_tt_assembly.gif" />
+  </a>
+  </td>
+  </tr>
+  <tr>
     <td><a href="rc_truck"> RC Truck </a></td>
     <td><a href="mtv"> Multi-Terrain Vehicle </a></td>
     <td><a href="rtr"> RTR </a></td>

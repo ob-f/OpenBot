@@ -49,6 +49,8 @@ OpenBot RC 트럭을 만들기 위해서는 아래의 부품들을 프린트해�
 3) ```phone_mount_bottom``` ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 4) ```phone_mount_top``` ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+휴대폰을 위쪽으로 최대 30°까지 기울이려면 `phone_mount_bottom` 대신 [body/phone_mount](../phone_mount/README.ko-KR.md)의 각도 조절 버전을 출력하세요.
+
 \[xN\]은 해당 부품을 몇 개 프린트해야 하는지를 나타내며, 필요한 수만큼 프린트하면 돼요.
 
 아래 부품들은 선택 사항이지만, OpenBot RC 트럭을 더 컴팩트하고 미적으로 보기 좋게 만들기 위해 추천됩니다.
