@@ -100,10 +100,11 @@ function pinClashes() {
   return clashes;
 }
 
-// Parts turned on that the ready-made firmware doesn't have
+// Parts the ready-made firmware can't match: turned on but not built in,
+// or turned off but not switchable on a flashed robot
 function partsNeedingBuild() {
   return Object.entries(boardInfo().parts)
-    .filter(([key, part]) => partOn(key) && !part.default && !(key === "HAS_BLUETOOTH"))
+    .filter(([key, part]) => key !== "HAS_BLUETOOTH" && ((partOn(key) && !part.default) || (!partOn(key) && part.default && part.live === null)))
     .map(([key]) => PARTS.find((p) => p.key === key).name);
 }
 
@@ -307,7 +308,7 @@ function renderRobot() {
     flashNote = "Two parts use the same pin. Turn one of them off.";
   } else if (extras.length) {
     canFlash = false;
-    flashNote = `The ready-made firmware doesn't include: ${extras.join(", ")}. Download the settings file and upload it with the Arduino IDE.`;
+    flashNote = `${extras.join(", ")} can only be changed with the Arduino IDE. Download the settings file and upload it there.`;
   } else if (!data.firmware[firmwareKey()]) {
     canFlash = false;
     flashNote = "There's no ready-made firmware for this combination yet. Download the settings file instead.";
@@ -317,7 +318,7 @@ function renderRobot() {
   $("flash").disabled = busy || !canFlash;
   $("flash-note").textContent = flashNote;
   $("download").disabled = busy || clashes;
-  $("apply").disabled = busy || !("serial" in navigator) || clashes;
+  $("apply").disabled = busy || !("serial" in navigator) || clashes || extras.length > 0;
 }
 
 // ---------- Settings file ----------
