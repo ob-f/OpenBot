@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenBot Firmware</title>
+  <meta name="description" content="Set up the firmware for your OpenBot: choose your robot and its parts, then flash it from the browser or download the settings file.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="../"><img src="img/logo.png" alt=""><span>OpenBot<br>Firmware</span></a>
+      <a class="top-link" href="https://github.com/ob-f/OpenBot/tree/master/firmware">GitHub</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <div class="steps">
+      <div class="intro">
+        <h1>Set up your robot's firmware</h1>
+        <p>Choose your robot and what's built into it. Then flash the firmware straight from this page, or download a settings file for the Arduino IDE.</p>
+      </div>
+
+      <ol class="step-list">
+        <li class="step" id="step-body">
+          <h2>Robot body</h2>
+          <div class="bodies" id="bodies" role="radiogroup" aria-label="Robot body"></div>
+        </li>
+
+        <li class="step" id="step-board">
+          <h2>Board</h2>
+          <div id="board"></div>
+        </li>
+
+        <li class="step" id="step-mode">
+          <h2>How you drive</h2>
+          <div class="modes" id="modes" role="radiogroup" aria-label="How you drive"></div>
+        </li>
+
+        <li class="step" id="step-parts">
+          <h2>Parts</h2>
+          <p class="hint">Your body's standard parts are on. Turn off what you haven't installed, and turn on what you've added.</p>
+          <div id="parts"></div>
+        </li>
+
+        <li class="step" id="step-battery">
+          <h2>Battery</h2>
+          <p class="hint">The app's battery gauge goes from empty to full at these voltages.</p>
+          <div class="batteries" id="batteries" role="radiogroup" aria-label="Battery"></div>
+          <div class="custom-battery" id="custom-battery" hidden>
+            <label>Empty <input type="number" id="volt-low" step="0.1" min="1" max="40"> V</label>
+            <label>Full <input type="number" id="volt-max" step="0.1" min="1" max="40"> V</label>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <aside class="robot" aria-label="Your robot">
+      <div class="robot-card">
+        <img class="robot-image" id="robot-image" alt="">
+        <div class="robot-name">
+          <h2 id="robot-title"></h2>
+          <p id="robot-sub"></p>
+        </div>
+
+        <section class="monitor" aria-label="Serial Monitor">
+          <div class="monitor-bar"><span>Serial Monitor</span><span id="monitor-state">at startup</span></div>
+          <div class="monitor-lines" id="monitor" aria-live="polite"></div>
+          <div class="progress" id="progress" hidden><div id="progress-bar"></div></div>
+        </section>
+
+        <div class="actions">
+          <div class="segmented ways" role="tablist" aria-label="How to get the firmware">
+            <button type="button" role="tab" id="tab-flash" aria-selected="true" aria-controls="way-flash">Flash in browser</button>
+            <button type="button" role="tab" id="tab-ide" aria-selected="false" aria-controls="way-ide">Arduino IDE</button>
+          </div>
+
+          <div class="way" id="way-flash" role="tabpanel" aria-labelledby="tab-flash">
+            <button class="primary" id="flash" type="button">Flash firmware</button>
+            <p class="note" id="flash-note"></p>
+            <button class="secondary" id="apply" type="button">Update settings only</button>
+            <p class="note warn" id="apply-why" role="status"></p>
+            <p class="note">Sets the battery, the parts and phone or no phone mode on a robot that already has this firmware, without flashing.</p>
+            <button class="help-button" id="usb-help-open" type="button">USB connection help</button>
+          </div>
+
+          <div class="way" id="way-ide" role="tabpanel" aria-labelledby="tab-ide" hidden>
+            <ol class="ide-steps">
+              <li>Get the firmware from the <a href="https://github.com/ob-f/OpenBot/tree/master/firmware">firmware folder</a> and open <code>openbot/openbot.ino</code>.</li>
+              <li>Download the settings file and put it next to <code>openbot.ino</code>.</li>
+              <li>Select your board in the Arduino IDE and upload.</li>
+            </ol>
+            <button class="primary" id="download" type="button">Download settings file</button>
+            <p class="note" id="download-note"></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <dialog class="help" id="usb-help" aria-labelledby="usb-help-title">
+    <div class="help-head">
+      <h2 id="usb-help-title">Connecting your robot by USB</h2>
+      <button class="help-close" id="usb-help-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="help-body">
+      <ol class="help-steps">
+        <li><strong>Use a USB data cable.</strong> Many cables only charge. If no port shows up, try another cable.</li>
+        <li><strong>Close other programs that use the port,</strong> like the Arduino IDE's Serial Monitor.</li>
+        <li><strong>Click Flash firmware and choose the board's port.</strong> It's called something like <code>COM3</code> on Windows, <code>cu.usbserial-…</code> or <code>cu.wchusbserial…</code> on a Mac, and <code>ttyUSB0</code> on Linux.</li>
+      </ol>
+
+      <h3>No port shows up?</h3>
+      <p>Your computer may need a driver for the board's USB chip. The chip's name is printed on it, next to the USB socket.</p>
+      <table class="drivers">
+        <thead><tr><th>USB chip</th><th>Found on</th><th>Driver</th></tr></thead>
+        <tbody>
+          <tr><td>CH340, CH341</td><td>Most Nano clones, many ESP32 boards</td><td><a href="https://www.wch-ic.com/downloads/CH341SER_EXE.html">Windows</a> · <a href="https://github.com/WCHSoftGroup/ch34xser_macos">macOS</a></td></tr>
+          <tr><td>CP2102, CP2104</td><td>Many ESP32 boards</td><td><a href="https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers">Silicon Labs</a></td></tr>
+          <tr><td>FTDI</td><td>Original Arduino Nano</td><td><a href="https://ftdichip.com/drivers/vcp-drivers/">FTDI</a></td></tr>
+        </tbody>
+      </table>
+      <p>On Linux no driver is needed, but your user must be allowed to use serial ports: run <code>sudo usermod -aG dialout $USER</code>, then log out and in again.</p>
+
+      <h3>It doesn't connect?</h3>
+      <p><strong>ESP32:</strong> hold the board's BOOT button while flashing starts, and let go once it writes.</p>
+      <p><strong>Nano:</strong> the page tries the new and the old bootloader by itself. If both fail, press the reset button just after clicking Flash firmware.</p>
+    </div>
+  </dialog>
+
+  <footer class="bottom">
+    <p>Flashing uses Web Serial and works in Chrome or Edge on a computer. The settings file works with any browser.</p>
+    <p id="version"></p>
+  </footer>
+</body>
+</html>
