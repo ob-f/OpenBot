@@ -9,6 +9,7 @@ bodies.json, so the page always matches the firmware.
 """
 
 import argparse
+import concurrent.futures
 import json
 import os
 import pathlib
@@ -47,10 +48,17 @@ PARTS = {
     "HAS_LEDS_FRONT": (["PIN_LED_LF", "PIN_LED_RF"], 7),
     "HAS_LEDS_BACK": (["PIN_LED_LB", "PIN_LED_RB"], 8),
     "HAS_LEDS_STATUS": (["PIN_LED_Y", "PIN_LED_G", "PIN_LED_B"], 9),
-    "HAS_OLED": ([], 10),
+    "HAS_OLED": (["PIN_SDA", "PIN_SCL"], 10),
     "HAS_BLUETOOTH": ([], None),
 }
 MCU_BOARD = {"NANO": "nano", "ESP32": "esp32"}
+# Default I2C pins of the OLED display
+I2C_PINS = {
+    "nano": {"PIN_SDA": "A4", "PIN_SCL": "A5"},
+    "esp32": {"PIN_SDA": "21", "PIN_SCL": "22"},
+}
+# Parts that may share pins: the indicators blink the rear lights, the median filter smooths the sonar
+SHARED = {"HAS_LEDS_BACK": "HAS_INDICATORS", "SONAR_MEDIAN": "HAS_SONAR"}
 # ESP32 flash layout of the esp32 board package 2.0.17 (default partitions)
 ESP32_IMAGES = [
     ("bootloader.bin", 0x1000),
@@ -61,15 +69,38 @@ ESP32_IMAGES = [
 
 
 def modes(board: str) -> list[str]:
-    return ["phone", "nophone", "gamepad"] if board == "esp32" else ["phone", "nophone"]
+    """Ready-made builds per board; phone and no phone mode switch in the live settings."""
+    return ["phone", "gamepad"] if board == "esp32" else ["phone"]
 
 
 def mode_settings(mode: str) -> dict:
     return {
-        "NO_PHONE_MODE": int(mode != "phone"),
+        "NO_PHONE_MODE": int(mode == "gamepad"),
         "HAS_GAMEPAD": int(mode == "gamepad"),
         "DEBUG": 0,
     }
+
+
+def built_in(parts: dict, motor_pins: set, board: str) -> set:
+    """Parts in the ready-made firmware: the standard parts, and on the ESP32 every other
+    part whose pins are free (turned off until the user turns it on)."""
+    chosen = {k for k, p in parts.items() if p["default"]}
+    if board != "esp32":
+        return chosen
+    used = set(motor_pins)
+    for k in chosen:
+        used |= set(parts[k]["pins"])
+    for k, p in parts.items():
+        if k in chosen:
+            continue
+        shares = SHARED.get(k)
+        if shares and shares not in chosen:
+            continue
+        free = set(p["pins"]) - (set(parts[shares]["pins"]) if shares else set())
+        if not free & used:
+            chosen.add(k)
+            used |= set(p["pins"])
+    return chosen
 
 
 def body_blocks(source: str) -> dict[str, str]:
@@ -113,6 +144,8 @@ def body_info(source: str) -> list[dict]:
                 m.group(1): m.group(2)
                 for m in re.finditer(r"^const int (PIN_\w+) = (\w+);", text, re.M)
             }
+            pins = {**I2C_PINS[board], **pins}
+            motor_pins = {v for k, v in pins.items() if re.match(r"PIN_(PWM|DIR)_", k)}
             defaults = {
                 m.group(1): 1
                 for m in re.finditer(
@@ -136,6 +169,9 @@ def body_info(source: str) -> list[dict]:
                     "pins": [pins[p] for p in needs],
                     "live": live_bit,
                 }
+            builtin = built_in(parts, motor_pins, board)
+            for part, info in parts.items():
+                info["builtin"] = int(part in builtin)
             entry["boards"][board] = {
                 "parts": parts,
                 "voltages": {
@@ -143,7 +179,9 @@ def body_info(source: str) -> list[dict]:
                     for k, v in voltages.items()
                     if k != "VOLTAGE_DIVIDER_FACTOR"
                 },
-                "modes": modes(board),
+                # driving modes the page offers (phone and no phone share a build)
+                "modes": ["phone", "nophone"]
+                + (["gamepad"] if board == "esp32" else []),
             }
         bodies.append(entry)
     return bodies
@@ -169,60 +207,82 @@ def core_file(name: str) -> pathlib.Path:
     return found[0]
 
 
-def build(robot: str, out: pathlib.Path) -> None:
+def variants(robot: str | None) -> list[tuple]:
+    """(name, robot, board, mode, settings) of each ready-made firmware."""
     source = read_sketch()
-    mcus = robots(source)[robot]
-    for mcu in mcus:
-        board = MCU_BOARD[mcu]
-        for mode in modes(board):
-            name = f"{robot.lower()}-{board}-{mode}"
-            fqbn = BOARDS["bluepad32" if mode == "gamepad" else board][1]
-            target = out / name
-            target.mkdir(parents=True, exist_ok=True)
-            with tempfile.TemporaryDirectory() as tmp:
-                sketch_dir = pathlib.Path(tmp) / "openbot"
-                shutil.copytree(SKETCH.parent, sketch_dir)
-                (sketch_dir / "openbot_settings.h").unlink(missing_ok=True)
-                sketch = sketch_dir / "openbot.ino"
-                settings = {"OPENBOT": robot, **mode_settings(mode)}
-                sketch.write_text(
-                    configure(sketch.read_text(encoding="utf-8"), settings),
-                    encoding="utf-8",
-                )
-                build_dir = pathlib.Path(tmp) / "build"
-                result = subprocess.run(
-                    [
-                        "arduino-cli",
-                        "compile",
-                        "--fqbn",
-                        fqbn,
-                        "--output-dir",
-                        str(build_dir),
-                        str(sketch_dir),
-                    ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                )
-                print(
-                    f"::group::{name} ({fqbn})\n{result.stdout}\n::endgroup::",
-                    flush=True,
-                )
-                if result.returncode:
-                    sys.exit(f"::error::{name}: build failed")
-                if board == "nano":
-                    shutil.copy(build_dir / "openbot.ino.hex", target / "firmware.hex")
-                else:
-                    shutil.copy(
-                        build_dir / "openbot.ino.bootloader.bin",
-                        target / "bootloader.bin",
-                    )
-                    shutil.copy(
-                        build_dir / "openbot.ino.partitions.bin",
-                        target / "partitions.bin",
-                    )
-                    shutil.copy(core_file("boot_app0.bin"), target / "boot_app0.bin")
-                    shutil.copy(build_dir / "openbot.ino.bin", target / "app.bin")
+    info = {b["name"]: b for b in body_info(source)}
+    out = []
+    for body, mcus in robots(source).items():
+        if robot not in (None, "all", body):
+            continue
+        for mcu in mcus:
+            board = MCU_BOARD[mcu]
+            parts = info[body]["boards"][board]["parts"]
+            extras = {
+                k: 1
+                for k, p in parts.items()
+                if p["builtin"] and not p["default"] and k != "HAS_BLUETOOTH"
+            }
+            for mode in modes(board):
+                settings = {"OPENBOT": body, **mode_settings(mode), **extras}
+                out.append((f"{body.lower()}-{board}-{mode}", board, mode, settings))
+    return out
+
+
+def build_one(name: str, board: str, mode: str, settings: dict, out: pathlib.Path):
+    fqbn = BOARDS["bluepad32" if mode == "gamepad" else board][1]
+    target = out / name
+    target.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        sketch_dir = pathlib.Path(tmp) / "openbot"
+        shutil.copytree(SKETCH.parent, sketch_dir)
+        (sketch_dir / "openbot_settings.h").unlink(missing_ok=True)
+        sketch = sketch_dir / "openbot.ino"
+        text = configure(sketch.read_text(encoding="utf-8"), settings)
+        # Ready-made firmware: extra parts start turned off (see reset_live_settings)
+        sketch.write_text("#define READY_MADE 1\n" + text, encoding="utf-8")
+        build_dir = pathlib.Path(tmp) / "build"
+        result = subprocess.run(
+            ["arduino-cli", "compile", "--fqbn", fqbn, "--output-dir", str(build_dir)]
+            + [str(sketch_dir)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.returncode == 0:
+            if board == "nano":
+                shutil.copy(build_dir / "openbot.ino.hex", target / "firmware.hex")
+            else:
+                for src, dst in [
+                    ("openbot.ino.bootloader.bin", "bootloader.bin"),
+                    ("openbot.ino.partitions.bin", "partitions.bin"),
+                    ("openbot.ino.bin", "app.bin"),
+                ]:
+                    shutil.copy(build_dir / src, target / dst)
+                shutil.copy(core_file("boot_app0.bin"), target / "boot_app0.bin")
+        return name, fqbn, result.returncode, result.stdout
+
+
+def build(robot: str, out: pathlib.Path, jobs: int) -> None:
+    """Build in parallel; the first build of each board runs alone to fill the core cache."""
+    todo = variants(robot)
+    first, rest, seen = [], [], set()
+    for v in todo:
+        key = (v[1], v[2] == "gamepad")
+        (rest if key in seen else first).append(v)
+        seen.add(key)
+    results = [build_one(*v, out) for v in first]
+    with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
+        results += list(pool.map(lambda v: build_one(*v, out), rest))
+    failed = []
+    for name, fqbn, code, output in results:
+        print(f"::group::{name} ({fqbn})\n{output}\n::endgroup::", flush=True)
+        if code:
+            print(f"::error::{name}: build failed", flush=True)
+            failed.append(name)
+    print(f"{len(results) - len(failed)}/{len(results)} ready-made firmware built")
+    if failed:
+        sys.exit(f"{len(failed)} builds failed: {', '.join(sorted(failed))}")
 
 
 def version() -> str:
@@ -306,13 +366,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--build", metavar="ROBOT")
+    parser.add_argument("--build", metavar="ROBOT", help="a body, or all")
+    parser.add_argument("--jobs", type=int, default=os.cpu_count() or 2)
     parser.add_argument("--out", type=pathlib.Path)
     parser.add_argument("--site", type=pathlib.Path)
     parser.add_argument("--builds", type=pathlib.Path)
     args = parser.parse_args()
     if args.build:
-        build(args.build, args.out)
+        build(args.build, args.out, args.jobs)
     elif args.site:
         site(args.site, args.builds)
     else:

@@ -63,7 +63,8 @@ let busy = false;
 
 const body = () => data.bodies.find((b) => b.name === state.body);
 const boardInfo = () => body().boards[state.board];
-const firmwareKey = () => `${state.body.toLowerCase()}-${state.board}-${state.mode}`;
+// Phone and no phone mode share a build and switch in the live settings; the gamepad has its own
+const firmwareKey = () => `${state.body.toLowerCase()}-${state.board}-${state.mode === "gamepad" ? "gamepad" : "phone"}`;
 
 function resetParts() {
   state.parts = {};
@@ -104,14 +105,14 @@ function pinClashes() {
 // or turned off but not switchable on a flashed robot
 function partsNeedingBuild() {
   return Object.entries(boardInfo().parts)
-    .filter(([key, part]) => key !== "HAS_BLUETOOTH" && ((partOn(key) && !part.default) || (!partOn(key) && part.default && part.live === null)))
+    .filter(([key, part]) => key !== "HAS_BLUETOOTH" && ((partOn(key) && !part.builtin) || (!partOn(key) && part.default && part.live === null)))
     .map(([key]) => PARTS.find((p) => p.key === key).name);
 }
 
 function liveOffMask() {
   let mask = 0;
   for (const [key, part] of Object.entries(boardInfo().parts)) {
-    if (part.live !== null && part.default && !partOn(key)) mask |= 1 << part.live;
+    if (part.live !== null && !partOn(key)) mask |= 1 << part.live;
   }
   return mask;
 }
@@ -132,7 +133,7 @@ function saveRobot(info) {
 function builtInMask() {
   let mask = 0;
   for (const part of Object.values(boardInfo().parts)) {
-    if (part.live !== null && part.default) mask |= 1 << part.live;
+    if (part.live !== null && part.builtin) mask |= 1 << part.live;
   }
   return mask;
 }
@@ -154,6 +155,9 @@ function applyBlocker(clashes, extras) {
   if (clashes) return "Two parts use the same pin. Turn one of them off.";
   if (extras.length) return `${extras.join(", ")} can only be changed with the Arduino IDE.`;
   if (robot && robot.body === state.body && robot.board === state.board) {
+    if (robot.gamepad !== undefined && robot.gamepad !== (state.mode === "gamepad")) {
+      return state.mode === "gamepad" ? "The gamepad needs its own firmware. Use Flash firmware." : "Your robot has the gamepad firmware. Use Flash firmware to drive with the phone app or without a controller.";
+    }
     const missing = missingFrom(robot.have);
     if (missing.length) return addMessage(missing);
   }
@@ -508,19 +512,23 @@ async function applyLive(port) {
     if (!info) throw new Error("The robot didn't answer the settings. Its firmware may be older than this page; flash it first.");
     const found = parseLive(info);
     const type = (startup.match(/^OpenBot (\S+) \(/) || [])[1];
-    saveRobot({ body: type in BODY_NAMES ? type : state.body, board: found.board, have: Number(found.have) });
+    saveRobot({ body: type in BODY_NAMES ? type : state.body, board: found.board, have: Number(found.have), gamepad: / gamepad$|gamepad,/.test(startup) });
+    if (found.board === state.board && robot.gamepad !== (state.mode === "gamepad")) {
+      throw new Error(state.mode === "gamepad" ? "This robot doesn't have the gamepad firmware. Use Flash firmware." : "This robot has the gamepad firmware. Use Flash firmware to drive with the phone app or without a controller.");
+    }
     if (found.board === state.board) {
       const missing = missingFrom(Number(found.have));
       if (missing.length) throw new Error(addMessage(missing));
     }
     const v = voltages();
-    const command = `pvlow:${v.low.toFixed(2)}:vmax:${v.max.toFixed(2)}:off:${liveOffMask()}`;
+    const command = `pvlow:${v.low.toFixed(2)}:vmax:${v.max.toFixed(2)}:off:${liveOffMask()}:nophone:${state.mode === "phone" ? 0 : 1}`;
     await reader.send(command);
     const reply = await reader.waitFor((l) => l.startsWith("pboard:"), 3000);
     if (!reply) throw new Error("The robot didn't answer the settings.");
     const live = parseLive(reply);
     if (live.board !== state.board) log(`This robot has an ${BOARD_NAMES[live.board]}, not an ${BOARD_NAMES[state.board]}.`, "warn");
-    const off = PARTS.filter((p) => boardInfo().parts[p.key]?.live !== null && boardInfo().parts[p.key] && (Number(live.off) >> boardInfo().parts[p.key].live) & 1).map((p) => p.name);
+    // Standard parts of the body that are turned off (the startup line lists the parts that are on)
+    const off = PARTS.filter((p) => boardInfo().parts[p.key]?.default && boardInfo().parts[p.key].live !== null && (Number(live.off) >> boardInfo().parts[p.key].live) & 1).map((p) => p.name);
     log(`Battery ${Number(live.vlow).toFixed(1)}–${Number(live.vmax).toFixed(1)} V${off.length ? `, turned off: ${off.join(", ")}` : ""}`, "ok");
     const now = await reader.waitFor((l) => l.startsWith("OpenBot "), 2000);
     if (now) log(now);
@@ -601,7 +609,7 @@ async function flash() {
     }
     progress(null);
     log("Firmware flashed", "ok");
-    saveRobot({ body: state.body, board: state.board, have: builtInMask() });
+    saveRobot({ body: state.body, board: state.board, have: builtInMask(), gamepad: state.mode === "gamepad" });
     $("monitor-state").textContent = "applying settings";
     await sleep(500);
     await applyLive(port);

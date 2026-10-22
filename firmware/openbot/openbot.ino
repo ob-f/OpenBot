@@ -211,9 +211,10 @@ const int PIN_PWM_RF1 = 25;
 const int PIN_PWM_RF2 = 26;
 const int PIN_PWM_RB1 = 25;
 const int PIN_PWM_RB2 = 26;
+// GPIO 21/22 are kept free for an OLED display (I2C)
 const int PIN_SPEED_LF = 35;
 const int PIN_SPEED_LB = 34;
-const int PIN_SPEED_RF = 22;
+const int PIN_SPEED_RF = 39;
 const int PIN_SPEED_RB = 23;
 const int PIN_VIN = 4;
 const int PIN_TRIGGER = 5;
@@ -223,7 +224,7 @@ const int PIN_LED_RI = 17;
 const int PIN_LED_LB = 16;
 const int PIN_LED_RB = 17;
 const int PIN_LED_LF = 19;
-const int PIN_LED_RF = 21;
+const int PIN_LED_RF = 12;  // must stay low while the ESP32 starts (a transistor stage does that)
 const int PIN_LED_Y = 14;
 const int PIN_LED_G = 27;
 const int PIN_LED_B = 13;
@@ -738,7 +739,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 //------------------------------------------------------//
 // INITIALIZATION
 //------------------------------------------------------//
-#if (NO_PHONE_MODE)
+// No phone mode (switchable in the live settings)
 unsigned long turn_direction_time = 0;
 unsigned long turn_direction_interval = 5000;
 unsigned int turn_direction = 0;
@@ -746,7 +747,6 @@ int ctrl_max = 192;
 int ctrl_slow = 96;
 int ctrl_min = (int)255.0 * VOLTAGE_MIN / VOLTAGE_MAX;
 bool explore_enabled = !HAS_GAMEPAD;
-#endif
 
 #if (HAS_GAMEPAD)
 const int GAMEPAD_SPEEDS[] = { 128, 192, 255 };  // slow, normal, fast
@@ -778,12 +778,8 @@ const float US_TO_CM = 0.01715;               //cm/uS -> (343 * 100 / 1000000) /
 const unsigned int MAX_SONAR_DISTANCE = 300;  //cm
 const unsigned long MAX_SONAR_TIME = (long)MAX_SONAR_DISTANCE * 2 * 10 / 343 + 1;
 const unsigned int STOP_DISTANCE = 10;  //cm
-#if (NO_PHONE_MODE)
-const unsigned int TURN_DISTANCE = 50;
-unsigned long sonar_interval = 100;
-#else
-unsigned long sonar_interval = 1000;
-#endif
+const unsigned int TURN_DISTANCE = 50;  // no phone mode
+unsigned long sonar_interval = 1000;    // 100 ms in no phone mode
 unsigned long sonar_time = 0;
 boolean sonar_sent = false;
 boolean ping_success = false;
@@ -962,6 +958,46 @@ const uint16_t PARTS_BUILT = 0
 #endif
   ;
 
+// The body's standard parts
+const uint16_t PARTS_STANDARD = 0
+#if (DEFAULT_HAS_VOLTAGE_DIVIDER)
+  | bit(PART_VOLTAGE_DIVIDER)
+#endif
+#if (DEFAULT_HAS_INDICATORS)
+  | bit(PART_INDICATORS)
+#endif
+#if (DEFAULT_HAS_SONAR)
+  | bit(PART_SONAR)
+#endif
+#if (DEFAULT_HAS_BUMPER)
+  | bit(PART_BUMPER)
+#endif
+#if (DEFAULT_HAS_SPEED_SENSORS_FRONT)
+  | bit(PART_SPEED_SENSORS_FRONT)
+#endif
+#if (DEFAULT_HAS_SPEED_SENSORS_BACK)
+  | bit(PART_SPEED_SENSORS_BACK)
+#endif
+#if (DEFAULT_HAS_SPEED_SENSORS_MIDDLE)
+  | bit(PART_SPEED_SENSORS_MIDDLE)
+#endif
+#if (DEFAULT_HAS_LEDS_FRONT)
+  | bit(PART_LEDS_FRONT)
+#endif
+#if (DEFAULT_HAS_LEDS_BACK)
+  | bit(PART_LEDS_BACK)
+#endif
+#if (DEFAULT_HAS_LEDS_STATUS)
+  | bit(PART_LEDS_STATUS)
+#endif
+#if (DEFAULT_HAS_OLED)
+  | bit(PART_OLED)
+#endif
+#if (DEFAULT_SONAR_MEDIAN)
+  | bit(PART_SONAR_MEDIAN)
+#endif
+  ;
+
 struct LiveSettings {
   uint32_t firmware_id;  // the firmware's defaults; saved settings of other firmware are ignored
   uint16_t parts_off;    // bit per part
@@ -969,13 +1005,14 @@ struct LiveSettings {
   float voltage_low;
   float voltage_max;
   float voltage_divider_factor;
+  uint8_t no_phone;  // no phone mode
 };
 LiveSettings live;
 
 uint32_t firmware_id() {
   // Changes when the body, the parts or the battery defaults change
   float defaults[] = { VOLTAGE_MIN, VOLTAGE_LOW, VOLTAGE_MAX, DEFAULT_VOLTAGE_DIVIDER_FACTOR };
-  uint32_t id = 2166136261UL ^ (OPENBOT * 31 + PARTS_BUILT);
+  uint32_t id = 2166136261UL ^ (OPENBOT * 31 + PARTS_BUILT) ^ ((uint32_t)sizeof(LiveSettings) << 24);
   const uint8_t *bytes = (const uint8_t *)defaults;
   for (unsigned int i = 0; i < sizeof(defaults); i++) {
     id = (id ^ bytes[i]) * 16777619UL;
@@ -986,6 +1023,11 @@ uint32_t firmware_id() {
 void reset_live_settings() {
   live.firmware_id = firmware_id();
   live.parts_off = 0;
+#ifdef READY_MADE
+  // Ready-made firmware has every part built in; only the body's standard parts start on
+  live.parts_off = PARTS_BUILT & ~PARTS_STANDARD;
+#endif
+  live.no_phone = NO_PHONE_MODE;
   live.voltage_min = VOLTAGE_MIN;
   live.voltage_low = VOLTAGE_LOW;
   live.voltage_max = VOLTAGE_MAX;
@@ -1000,6 +1042,21 @@ void load_live_settings() {
   if (live.firmware_id != firmware_id()) {
     reset_live_settings();
   }
+  apply_live_settings();
+}
+
+// Settings that take effect beyond a single reading
+void apply_live_settings() {
+#if (HAS_GAMEPAD)
+  live.no_phone = 1;  // the gamepad drives in no phone mode
+#endif
+#if (HAS_SONAR)
+  sonar_interval = live.no_phone ? 100 : 1000;
+  if (!part_on(PART_SONAR)) {
+    distance_estimate = -1;  // turned off live: nothing in front
+  }
+#endif
+  ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
 }
 
 void save_live_settings() {
@@ -1037,14 +1094,14 @@ void process_live_settings_msg() {
         live.voltage_min = number;
       } else if (number > 0 && strcmp(key, "vdiv") == 0) {
         live.voltage_divider_factor = number;
+      } else if (strcmp(key, "nophone") == 0) {
+        live.no_phone = atoi(value) != 0;
       }
       key = strtok(NULL, ":");
     }
     save_live_settings();
   }
-#if (NO_PHONE_MODE)
-  ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
-#endif
+  apply_live_settings();
 #if (HAS_LEDS_FRONT || HAS_LEDS_BACK)
   update_light();
 #endif
@@ -1057,7 +1114,8 @@ void process_live_settings_msg() {
 #endif
   sendData(String("pboard:") + (MCU == NANO ? "nano" : "esp32") + ":have:" + String(PARTS_BUILT) + ":off:" + String(live.parts_off)
            + ":vlow:" + String(live.voltage_low, 2) + ":vmax:" + String(live.voltage_max, 2)
-           + ":vmin:" + String(live.voltage_min, 2) + ":vdiv:" + String(live.voltage_divider_factor, 2));
+           + ":vmin:" + String(live.voltage_min, 2) + ":vdiv:" + String(live.voltage_divider_factor, 2)
+           + ":nophone:" + String(live.no_phone));
   print_config();  // the parts that are on now
 }
 
@@ -1198,9 +1256,6 @@ void setup() {
   // Serial.setTimeout(10);
   Serial.println('r');
   load_live_settings();
-#if (NO_PHONE_MODE)
-  ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
-#endif
   print_config();
 #if __has_include("openbot_settings.h")
   Serial.println(F("OpenBot settings: openbot_settings.h"));
@@ -1288,9 +1343,7 @@ void print_config() {
 #if (HAS_BLUETOOTH)
   print_item(F("Bluetooth"), first);
 #endif
-#if (NO_PHONE_MODE)
-  print_item(F("no phone mode"), first);
-#endif
+  if (live.no_phone) print_item(F("no phone mode"), first);
 #if (HAS_GAMEPAD)
   print_item(F("gamepad"), first);
 #endif
@@ -1298,9 +1351,9 @@ void print_config() {
     Serial.print(F(" none"));
   }
   Serial.println();
-#if (NO_PHONE_MODE && !HAS_SONAR)
-  Serial.println(F("OpenBot warning: no sonar, so the robot drives straight ahead"));
-#endif
+  if (live.no_phone && !part_on(PART_SONAR)) {
+    Serial.println(F("OpenBot warning: no sonar, so the robot drives straight ahead"));
+  }
 }
 
 //------------------------------------------------------//
@@ -1332,28 +1385,28 @@ void loop() {
     on_serial_rx();
   }
 
-#if (NO_PHONE_MODE)
-  if (gamepad_driving) {
+  if (live.no_phone) {
+    if (gamepad_driving) {
 #if (HAS_GAMEPAD)
-    ctrl_left = gamepad_left;
-    ctrl_right = gamepad_right;
-    if (gamepad_obstacle_stop) {
-      stop_at_obstacle();
+      ctrl_left = gamepad_left;
+      ctrl_right = gamepad_right;
+      if (gamepad_obstacle_stop) {
+        stop_at_obstacle();
+      }
+#endif
+    } else if (explore_enabled) {
+      update_explore();
+    } else {
+      ctrl_left = 0;
+      ctrl_right = 0;
     }
-#endif
-  } else if (explore_enabled) {
-    update_explore();
   } else {
-    ctrl_left = 0;
-    ctrl_right = 0;
+    stop_at_obstacle();
+    if ((millis() - heartbeat_time) >= heartbeat_interval) {
+      ctrl_left = 0;
+      ctrl_right = 0;
+    }
   }
-#else
-  stop_at_obstacle();
-  if ((millis() - heartbeat_time) >= heartbeat_interval) {
-    ctrl_left = 0;
-    ctrl_right = 0;
-  }
-#endif
 
 #if HAS_BUMPER
   if (part_on(PART_BUMPER) && analogRead(PIN_BUMPER) > BUMPER_NOISE && !bumper_event) {
@@ -1463,8 +1516,7 @@ float get_voltage() {
 
 #endif
 
-#if (NO_PHONE_MODE)
-// Drive forward and avoid obstacles with the sonar sensor
+// Drive forward and avoid obstacles with the sonar sensor (no phone mode)
 void update_explore() {
   if ((millis() - turn_direction_time) >= turn_direction_interval) {
     turn_direction_time = millis();
@@ -1508,7 +1560,6 @@ void update_explore() {
   ctrl_left = ctrl_left > 0 ? max(ctrl_min, min(ctrl_left, ctrl_max)) : min(-ctrl_min, max(ctrl_left, -ctrl_max));
   ctrl_right = ctrl_right > 0 ? max(ctrl_min, min(ctrl_right, ctrl_max)) : min(-ctrl_min, max(ctrl_right, -ctrl_max));
 }
-#endif
 
 void update_vehicle() {
 #if (OPENBOT == RC_CAR)
