@@ -190,6 +190,12 @@
 
 /* Point Goal Navigation */
 "goalReachedMessage" = "लक्ष्य तक पहुँच गए";
+"pointGoalTapHint" = "फ़र्श पर वहाँ टैप करें जहाँ रोबोट को जाना है, फिर स्टार्ट दबाएँ।";
+"pointGoalSet" = "लक्ष्य %.1f मी दूर सेट हुआ। चलाने के लिए स्टार्ट दबाएँ।";
+"pointGoalNotFloor" = "यह फ़र्श नहीं है। फ़र्श पर वहाँ टैप करें जहाँ रोबोट चल सकता है।";
+"pointGoalTooClose" = "बहुत पास। कम से कम %.1f मी दूर की जगह पर टैप करें।";
+"pointGoalWatchdog" = "ऐप ने जवाब देना बंद कर दिया, इसलिए रोबोट रोक दिया गया।";
+"pointGoalTrackingLost" = "ट्रैकिंग खो गई। रोबोट रोक दिया गया।";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "सभी";

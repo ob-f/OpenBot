@@ -190,6 +190,12 @@
 
 /* Point Goal Navigation */
 "goalReachedMessage" = "Ziel erreicht";
+"pointGoalTapHint" = "Tippen Sie auf den Boden, wohin der Roboter fahren soll, und drücken Sie dann Start.";
+"pointGoalSet" = "Ziel in %.1f m Entfernung gesetzt. Drücken Sie Start.";
+"pointGoalNotFloor" = "Das ist nicht der Boden. Tippen Sie auf den Boden, auf dem der Roboter fahren kann.";
+"pointGoalTooClose" = "Zu nah. Tippen Sie auf eine Stelle, die mindestens %.1f m entfernt ist.";
+"pointGoalWatchdog" = "Der Roboter wurde angehalten, weil die App nicht mehr reagiert hat.";
+"pointGoalTrackingLost" = "Tracking verloren. Der Roboter wurde angehalten.";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "Alle";

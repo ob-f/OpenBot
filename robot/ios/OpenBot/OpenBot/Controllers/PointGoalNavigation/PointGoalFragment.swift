@@ -8,415 +8,431 @@ import SceneKit
 import ARKit
 import simd
 
-class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
+/// Point goal navigation: tap a spot on the floor, press Start, and the robot drives there.
+class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     var sceneView: ARSCNView!
-    private var startingPoint = SCNNode()
-    private var endingPoint: SCNNode!
-    private var distanceInput: UITextField!
-    private var setGoalRect = UIView()
-    private var setGoalText = UILabel()
-    private var setGoalHeading = UILabel()
-    private var forwardLabel = UILabel()
-    private var leftLabel = UILabel()
-    private var forwardInput = UITextField()
-    private var leftInput = UITextField()
-    private var distance: Float = 0
-    private var forward: Float = 0
-    private var left: Float = 0
-    private var isReached: Bool = false
-    var marker = SCNNode()
-    let infoMessageRect = UIView()
     var navigation: Navigation?
-    let numberOfThreads = 1
-    private var isInferenceQueueBusy = false
-    private let inferenceQueue = DispatchQueue(label: "openbot.navigation.inferencequeue")
-    private var isNavQueueBusy = false
-    private let navQueue = DispatchQueue(label: "openbot.navigation.navqueue")
-    private var result: Control?
     let bluetooth = bluetoothDataController.shared
-    var tempPixelBuffer: CVPixelBuffer!
     let blueDress = try! YCbCrImageBufferConverter()
-    var vehicleControl = Control()
 
-    /// function called after view of point goal navigation is called
+    private let startButton = UIButton(type: .system)
+    private let stopButton = UIButton(type: .system)
+    private let hintLabel = ToastLabel()
+    private var hintHideWork: DispatchWorkItem?
+    private var goalNode: SCNNode?
+
+    // Main thread state.
+    private var isRunning = false
+    private var lastNavUpdate: TimeInterval = 0
+    private var safetyTimer: Timer?
+    private var runGeneration = 0
+    private var lastControl: Control?
+    private var cameraHeight: Float = PointGoalFragment.savedCameraHeight()
+    private var cameraHeightMeasured = false
+
+    // Shared with the render thread and the navigation queue.
+    private let shared = SharedState()
+    private let navQueue = DispatchQueue(label: "openbot.navigation.navqueue")
+    private var lastCalibration: TimeInterval = 0
+
+    private static let cameraHeightKey = "pointGoalCameraHeight"
+    // ARKit calls back every frame (~16 ms); this long without a navigation step means it's stuck.
+    private static let watchdogTimeout: TimeInterval = 0.7
+    private static let safetyTick: TimeInterval = 0.25
+    // The firmware stops the motors by itself if no heartbeat arrives within this time.
+    private static let heartbeatTimeoutMs = 750
+    // Resend the stop once in case the first command got lost over Bluetooth.
+    private static let stopResendDelay: TimeInterval = 0.1
+
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView = ARSCNView(frame: view.bounds)
-        sceneView.debugOptions = []
-        setupNavigationBarItem()
-        view.addSubview(sceneView)
-        let scene = SCNScene()
-        sceneView.scene = scene
+        sceneView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        sceneView.scene = SCNScene()
         sceneView.delegate = self
-        sceneView.showsStatistics = true
-        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints, ARSCNDebugOptions.showWorldOrigin]
-        let configuration = ARWorldTrackingConfiguration()
-        sceneView.session.run(configuration)
-        createSetGoalRect()
-        createReachMessage()
-        let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
-        view.addGestureRecognizer(tap)
+        view.addSubview(sceneView)
+        setupNavigationBarItem()
+        setupButtons()
+        setupHintLabel()
+
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        sceneView.addGestureRecognizer(tap)
+
+        // Leaving the app (home button, call, app switcher) must never leave the robot driving.
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+
         navigation = Navigation(model: Model.fromModelItem(item: Common.returnNavigationModel()), device: RuntimeDevice.CPU, numThreads: 1)
+        showHint(Strings.pointGoalTapHint)
     }
 
-    /// function will called after point goal navigation will disappear. This method will stop the ARkit
-    ///
-    /// - Parameter animated:
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let configuration = ARWorldTrackingConfiguration()
+        // Only used to measure the camera height above the floor.
+        configuration.planeDetection = [.horizontal]
+        sceneView.session.run(configuration)
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        stopDriving()
         sceneView.session.pause()
-        sendControl(control: Control());
     }
 
-    /***
-     Function will call when we change the orientation of our phone
-     - Parameters:
-       - size:
-       - coordinator:
-     */
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        if currentOrientation == .portrait {
-            sceneView.frame.size = CGSize(width: width, height: height);
-            setGoalRect.frame.origin = CGPoint(x: 30, y: height / 2 - 200);
-            infoMessageRect.frame.origin = CGPoint(x: 30, y: height / 2 - 100);
-        } else {
-            sceneView.frame.size = CGSize(width: height, height: width);
-            setGoalRect.frame.origin = CGPoint(x: height / 2 - setGoalRect.frame.height / 2, y: width / 2 - setGoalRect.frame.width / 2)
-            infoMessageRect.frame.origin = CGPoint(x: height / 2 - width / 2 + 30, y: width / 2 - 100);
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    // MARK: - UI
+
+    private func setupButtons() {
+        configure(button: startButton, symbol: "play.fill", color: .systemGreen, label: Strings.startLabel)
+        startButton.addTarget(self, action: #selector(startPressed), for: .touchUpInside)
+        configure(button: stopButton, symbol: "stop.fill", color: .systemRed, label: Strings.stopLabel)
+        // Stop on finger down, not on release, so the robot stops the moment the button is touched.
+        stopButton.addTarget(self, action: #selector(stopPressed), for: .touchDown)
+
+        for button in [startButton, stopButton] {
+            button.isHidden = true
+            view.addSubview(button)
+            button.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                button.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
+                button.widthAnchor.constraint(equalToConstant: 64),
+                button.heightAnchor.constraint(equalToConstant: 64),
+            ])
         }
     }
 
-    /// function to create the UI of point goal navigation. This function will called all the method that create different UI
-    func createSetGoalRect() {
-        if currentOrientation == .portrait {
-            setGoalRect.frame = CGRect(x: 30, y: height / 2 - 200, width: width - 60, height: 300);
-        } else {
-            setGoalRect.frame = CGRect(x: height / 2 - width / 2 + 30, y: width / 2 - 150, width: width - 60, height: 300);
+    private func configure(button: UIButton, symbol: String, color: UIColor, label: String) {
+        button.setImage(UIImage(systemName: symbol), for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = color
+        button.layer.cornerRadius = 32
+        button.accessibilityLabel = label
+    }
+
+    private func setupHintLabel() {
+        hintLabel.textInsets = UIEdgeInsets(top: 10, left: 14, bottom: 10, right: 14)
+        hintLabel.numberOfLines = 0
+        hintLabel.textAlignment = .center
+        hintLabel.textColor = .white
+        hintLabel.font = UIFont.systemFont(ofSize: 15)
+        hintLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        hintLabel.layer.cornerRadius = 10
+        hintLabel.clipsToBounds = true
+        hintLabel.alpha = 0
+        view.addSubview(hintLabel)
+        hintLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hintLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            hintLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            hintLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 16),
+            hintLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16),
+        ])
+    }
+
+    private func showHint(_ text: String) {
+        hintHideWork?.cancel()
+        hintLabel.text = text
+        UIView.animate(withDuration: 0.2) { self.hintLabel.alpha = 1 }
+        let work = DispatchWorkItem { [weak self] in
+            UIView.animate(withDuration: 0.3) { self?.hintLabel.alpha = 0 }
         }
-        setGoalRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white
-        setGoalRect.layer.cornerRadius = 10
-        view.addSubview(setGoalRect)
-        createSetGoalHeading()
-        createSetGoalText()
-        createForwardLeftLabels()
-        createInputBoxes()
-        createButtons()
+        hintHideWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4, execute: work)
     }
 
-    /// function to create message rect of point goal navigation
-    func createReachMessage() {
-        if currentOrientation == .portrait {
-            infoMessageRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 200);
-        } else {
-            infoMessageRect.frame = CGRect(x: height / 2 - width / 2 + 30, y: width / 2 - 100, width: width - 60, height: 200);
-        }
-        infoMessageRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white
-        let infoText = createLabel(text: Strings.info, fontSize: 18)
-        infoMessageRect.addSubview(infoText)
-        infoText.translatesAutoresizingMaskIntoConstraints = false
-        infoText.leadingAnchor.constraint(equalTo: infoMessageRect.leadingAnchor, constant: 30).isActive = true
-        infoText.topAnchor.constraint(equalTo: infoMessageRect.topAnchor, constant: 30).isActive = true
-        let goalReachedText = createLabel(text: Strings.goalReachedMessage, fontSize: 16)
-        infoMessageRect.addSubview(goalReachedText)
-        goalReachedText.translatesAutoresizingMaskIntoConstraints = false
-        goalReachedText.leadingAnchor.constraint(equalTo: infoText.leadingAnchor, constant: 0).isActive = true
-        goalReachedText.topAnchor.constraint(equalTo: infoText.bottomAnchor, constant: 30).isActive = true
+    // MARK: - Setting the goal
 
-        let stopButton = createLabelButtons(title: Strings.stopLabel, selector: #selector(stop(_:)))
-        infoMessageRect.addSubview(stopButton)
-        stopButton.translatesAutoresizingMaskIntoConstraints = false
-        stopButton.leadingAnchor.constraint(equalTo: infoMessageRect.leadingAnchor, constant: width / 2 - 30).isActive = true
-        stopButton.bottomAnchor.constraint(equalTo: infoMessageRect.topAnchor, constant: infoMessageRect.frame.height - 30).isActive = true
-
-        let restartButton = createLabelButtons(title: Strings.restart, selector: #selector(restart(_:)))
-        infoMessageRect.addSubview(restartButton)
-        restartButton.translatesAutoresizingMaskIntoConstraints = false
-        restartButton.trailingAnchor.constraint(equalTo: infoMessageRect.trailingAnchor, constant: -30).isActive = true
-        restartButton.bottomAnchor.constraint(equalTo: stopButton.bottomAnchor, constant: 0).isActive = true
-    }
-
-    /// function to create text inside the previous rect
-    func createSetGoalText() {
-        setGoalText = createLabel(text: Strings.setGoalText, fontSize: 16)
-        setGoalRect.addSubview(setGoalText)
-        setGoalText.numberOfLines = 0
-        setGoalText.translatesAutoresizingMaskIntoConstraints = false
-        setGoalText.leadingAnchor.constraint(equalTo: setGoalHeading.leadingAnchor, constant: 0).isActive = true
-        setGoalText.topAnchor.constraint(equalTo: setGoalHeading.bottomAnchor, constant: 30).isActive = true
-    }
-
-    /// function to create Set Goal heading
-    func createSetGoalHeading() {
-        setGoalHeading = createLabel(text: Strings.setGoal, fontSize: 18)
-        setGoalRect.addSubview(setGoalHeading)
-        setGoalHeading.translatesAutoresizingMaskIntoConstraints = false
-        setGoalHeading.leadingAnchor.constraint(equalTo: setGoalRect.leadingAnchor, constant: 30).isActive = true
-        setGoalHeading.topAnchor.constraint(equalTo: setGoalRect.topAnchor, constant: 30).isActive = true
-    }
-
-    /// function to create forward and left text on Set goal rect
-    func createForwardLeftLabels() {
-        forwardLabel = createLabel(text: Strings.forward + Strings.meter, fontSize: 14)
-        setGoalRect.addSubview(forwardLabel)
-        forwardLabel.translatesAutoresizingMaskIntoConstraints = false
-        forwardLabel.leadingAnchor.constraint(equalTo: setGoalRect.leadingAnchor, constant: width / 2 - 100).isActive = true
-        forwardLabel.topAnchor.constraint(equalTo: setGoalText.bottomAnchor, constant: 20).isActive = true
-        leftLabel = createLabel(text: Strings.left + Strings.meter, fontSize: 14)
-        setGoalRect.addSubview(leftLabel)
-        leftLabel.translatesAutoresizingMaskIntoConstraints = false
-        leftLabel.leadingAnchor.constraint(equalTo: setGoalRect.leadingAnchor, constant: width / 2).isActive = true
-        leftLabel.topAnchor.constraint(equalTo: forwardLabel.topAnchor, constant: 0).isActive = true
-    }
-
-    /// function to create input boxes for left and forward inputs
-    func createInputBoxes() {
-        forwardInput = createTextField()
-        forwardInput.delegate = self
-        setGoalRect.addSubview(forwardInput)
-        forwardInput.translatesAutoresizingMaskIntoConstraints = false
-        forwardInput.leadingAnchor.constraint(equalTo: setGoalRect.leadingAnchor, constant: width / 2 - 100).isActive = true
-        forwardInput.topAnchor.constraint(equalTo: forwardLabel.bottomAnchor, constant: 20).isActive = true
-        forwardInput.widthAnchor.constraint(equalToConstant: 75).isActive = true
-        forwardInput.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
-        leftInput = createTextField()
-        leftInput.delegate = self
-        setGoalRect.addSubview(leftInput)
-        leftInput.translatesAutoresizingMaskIntoConstraints = false
-        leftInput.leadingAnchor.constraint(equalTo: leftLabel.leadingAnchor, constant: 0).isActive = true
-        leftInput.topAnchor.constraint(equalTo: leftLabel.bottomAnchor, constant: 20).isActive = true
-        leftInput.widthAnchor.constraint(equalToConstant: 70).isActive = true
-        leftInput.heightAnchor.constraint(equalToConstant: 30).isActive = true
-    }
-
-    /// function to create cancel and start buttons
-    func createButtons() {
-        let cancelButton = createLabelButtons(title: Strings.canceled, selector: #selector(cancelFun(_:)))
-        setGoalRect.addSubview(cancelButton)
-        cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.leadingAnchor.constraint(equalTo: setGoalText.leadingAnchor, constant: 0).isActive = true
-        cancelButton.bottomAnchor.constraint(equalTo: setGoalRect.bottomAnchor, constant: -15).isActive = true
-        let startButton = createLabelButtons(title: Strings.startLabel, selector: #selector(doneFun(_:)))
-        setGoalRect.addSubview(startButton)
-        startButton.translatesAutoresizingMaskIntoConstraints = false
-        startButton.bottomAnchor.constraint(equalTo: setGoalRect.bottomAnchor, constant: -15).isActive = true
-        startButton.trailingAnchor.constraint(equalTo: setGoalRect.trailingAnchor, constant: -30).isActive = true
-    }
-
-    /// function to create text on rect
-    ///
-    /// - Parameters:
-    ///   - text: text
-    ///   - fontSize: font size of text
-    ///   - textColor: font color of text
-    /// - Returns: UILabel
-    func createLabel(text: String, fontSize: CGFloat) -> UILabel {
-        let label = UILabel()
-        label.text = text
-        label.textColor = Colors.textColor
-        label.font = label.font.withSize(fontSize)
-        return label
-    }
-
-    /// create Cancel and start button
-    ///
-    /// - Parameters:
-    ///   - title: title of button ie. CANCEL or START
-    ///   - selector: function that will invoke after tapping on button
-    /// - Returns: UIButton
-    func createLabelButtons(title: String, selector: Selector) -> UIButton {
-        let button = UIButton()
-        button.setTitleColor(Colors.title, for: .normal)
-        button.frame.size = CGSize(width: 100, height: 40)
-        button.setTitle(title, for: .normal)
-        button.addTarget(self, action: selector, for: .touchUpInside)
-        return button
-    }
-
-    /// function to create input field for forward and left
-    ///
-    /// - Returns:
-    func createTextField() -> UITextField {
-        let textField = UITextField()
-        textField.frame.size.width = 100
-        textField.layer.borderWidth = 1
-        textField.layer.cornerRadius = 8
-        textField.layer.masksToBounds = true
-        textField.keyboardType = .numbersAndPunctuation
-        textField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white
-        return textField
-    }
-
-    /// function executed when tapping on DONE button. It will set a reference position and start the point goal navigation.
-    ///
-    /// - Parameter sender:
-    @objc func doneFun(_ sender: UIView) {
-        setGoalRect.removeFromSuperview()
-        isReached = false
-        let forwardDistance = (forwardInput.text == nil ? 0 : Float(forwardInput.text ?? "0")) ?? 0
-        let LeftDistance = (leftInput.text == nil ? 0 : Float(leftInput.text ?? "0")) ?? 0
-        let camera = sceneView.pointOfView!
-        let cameraTransform = camera.transform
-        _ = SCNVector3(-cameraTransform.m31, -cameraTransform.m32, -cameraTransform.m33)
-        let markerInCameraFrame = SCNVector3(Float(-LeftDistance), 0.0, Float(-forwardDistance))
-        let markerInWorldFrame = markerInCameraFrame.transformed(by: cameraTransform)
-        marker = SCNNode(geometry: SCNPlane(width: 0.1, height: 0.1))
-        marker.position = markerInWorldFrame
-        let imageMaterial = SCNMaterial()
-        imageMaterial.diffuse.contents = Images.gmapMarker
-        marker.geometry?.firstMaterial = imageMaterial
-        sceneView.scene.rootNode.addChildNode(marker)
-        startingPoint.position = sceneView.pointOfView?.position ?? camera.position
-        endingPoint = marker
-        calculateRoute()
-    }
-
-    /// function called after tapping on STOP button.This function will remove the point goal navigation view and return back to homepage
-    ///
-    /// - Parameter sender:
-    @objc func stop(_ sender: UIView) {
-        _ = navigationController?.popViewController(animated: true)
-    }
-
-    /// function to restart the point goal navigation
-    ///
-    /// - Parameter sender:
-    @objc func restart(_ sender: UIView) {
-        infoMessageRect.removeFromSuperview()
-        view.addSubview(setGoalRect)
-
-    }
-
-    /// function to add two SCNVector3 vector
-    ///
-    /// - Parameters:
-    ///   - vector1: first vector
-    ///   - vector2: second vector
-    /// - Returns: resultant vector of vector1 + vector2
-    func addVectors(_ vector1: SCNVector3, _ vector2: SCNVector3) -> SCNVector3 {
-        SCNVector3(vector1.x + vector2.x, vector1.y + vector2.y, vector1.z + vector2.z)
-    }
-
-    /// delegate revoke when SceneKit node corresponding to a new AR anchor has been added to the scene.
-    ///
-    /// - Parameters:
-    ///   - renderer: SCNSceneRenderer,
-    ///   - scene:
-    ///   - time:
-    func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
-        guard let currentFrame = sceneView.session.currentFrame else {
+    /// The goal is where the tap ray meets the floor, with the floor at the known camera height
+    /// below the phone. This only needs the camera's orientation (gravity is exact from the IMU), so
+    /// it's correct from the first frame; image depth would be guessed until the robot moves.
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        guard !isRunning, let camera = sceneView.pointOfView else {
             return
         }
-        let pixelBuffer = currentFrame.capturedImage
-        if sceneView.pointOfView?.position != nil {
-            processPixelBuffer(pixelBuffer, sceneView.pointOfView!)
-            tempPixelBuffer = pixelBuffer
-        }
-    }
+        let point = gesture.location(in: sceneView)
+        let near = sceneView.unprojectPoint(SCNVector3(Float(point.x), Float(point.y), 0))
+        let far = sceneView.unprojectPoint(SCNVector3(Float(point.x), Float(point.y), 1))
+        let origin = near.simdVector
+        let direction = simd_normalize(far.simdVector - near.simdVector)
+        let cameraPosition = camera.presentation.simdWorldPosition
 
-    /// function to process the buffer and send buffer to navigation.tflite to give result
-    ///
-    /// - Parameters:
-    ///   - pixelBuffer: pixelBuffer from camera
-    ///   - position: position of camera
-    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer, _ currentPosition: SCNNode) {
-        guard !isNavQueueBusy else {
-            return
-        }
-        if endingPoint == nil {
-            return
-        }
-        navQueue.async { [self] in
-            isNavQueueBusy = true
-            let startPose = Pose(tx: currentPosition.position.x, ty: currentPosition.position.y, tz: currentPosition.position.z, qx: currentPosition.orientation.x, qy: currentPosition.orientation.y, qz: currentPosition.orientation.z, qw: currentPosition.orientation.w)
-            let endPose = Pose(tx: endingPoint.position.x, ty: endingPoint.position.y, tz: endingPoint.position.z, qx: endingPoint.orientation.x, qy: endingPoint.orientation.y, qz: endingPoint.orientation.z, qw: endingPoint.orientation.w)
-            let yaw = computeDeltaYaw(pose: startPose, goalPose: endPose)
-            print("startPose ===== \(startPose.qx) , endPose ======> \(endPose.qx) , yaw ====> \(yaw)")
-            let converted = try! blueDress.convertToBGRA(imageBuffer: pixelBuffer)
+        let goal = PointGoalMath.intersectFloor(origin: origin, direction: direction, floorY: cameraPosition.y - cameraHeight)
+        let result = PointGoalMath.validate(camera: cameraPosition, goal: goal)
+        print("goal tap \(point): camera=\(cameraPosition) height=\(cameraHeight) (\(cameraHeightMeasured ? "measured" : "saved")) goal=\(String(describing: goal)) -> \(result)")
 
-            let refCon = NSMutableData()
-            var timingInfo: CMSampleTimingInfo = .invalid
-            var formatDescription: CMVideoFormatDescription? = nil
-            CMVideoFormatDescriptionCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: converted, formatDescriptionOut: &formatDescription)
-
-            var output: CMSampleBuffer? = nil
-            let status = CMSampleBufferCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: converted, dataReady: true, makeDataReadyCallback: nil, refcon: refCon.mutableBytes, formatDescription: formatDescription!, sampleTiming: &timingInfo, sampleBufferOut: &output)
-
-            // extract the image buffer from the sample buffer
-            let pixelBufferBGRA: CVPixelBuffer? = CMSampleBufferGetImageBuffer(output!)
-
-            self.result = self.navigation?.recognizeImage(pixelBuffer: pixelBufferBGRA!, goalDistance: distance, goalSin: sin(yaw), goalCos: cos(yaw))
-            guard let controlResult = self.result else {
+        switch result {
+        case .notFloor:
+            showHint(Strings.pointGoalNotFloor)
+        case .tooClose:
+            showHint(String(format: Strings.pointGoalTooClose, PointGoalMath.minGoalDistance))
+        case .ok:
+            guard let goal = goal else {
                 return
             }
-
-            if self.isReached {
-                self.sendControl(control: Control())
-            } else {
-                self.sendControl(control: controlResult)
-            }
-
-            isNavQueueBusy = false
+            placeGoal(at: goal)
+            let distance = PointGoalMath.horizontalDistance(cameraPosition, goal)
+            showHint(String(format: Strings.pointGoalSet, distance))
+            startButton.isHidden = false
         }
     }
 
-    /// delegate revoke when SceneKit node corresponding to a new AR anchor has been added to the scene.
-    ///
-    /// - Parameters:
-    ///   - renderer:
-    ///   - time:
-    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        guard let camera = sceneView.pointOfView else {
+    private func placeGoal(at position: simd_float3) {
+        goalNode?.removeFromParentNode()
+        let plane = SCNPlane(width: CGFloat(PointGoalMath.markerSize), height: CGFloat(PointGoalMath.markerSize))
+        let material = SCNMaterial()
+        material.diffuse.contents = Images.gmapMarker
+        material.isDoubleSided = true
+        plane.firstMaterial = material
+        let node = SCNNode(geometry: plane)
+        // Lift the pin so its tip, not its center, sits on the goal spot.
+        node.simdWorldPosition = position + simd_float3(0, PointGoalMath.markerSize / 2, 0)
+        // Upright in the world and turned toward the camera, however the phone is mounted.
+        let billboard = SCNBillboardConstraint()
+        billboard.freeAxes = .Y
+        node.constraints = [billboard]
+        sceneView.scene.rootNode.addChildNode(node)
+        goalNode = node
+        shared.goal = position
+    }
+
+    private func removeGoal() {
+        goalNode?.removeFromParentNode()
+        goalNode = nil
+        shared.goal = nil
+    }
+
+    // MARK: - Driving
+
+    @objc private func startPressed() {
+        guard !isRunning, shared.goal != nil else {
             return
         }
-        checkCameraPosition(position: camera.presentation.simdPosition)
+        isRunning = true
+        runGeneration += 1
+        shared.startRun(generation: runGeneration)
+        lastNavUpdate = Date.timeIntervalSinceReferenceDate
+        lastControl = nil
+        startButton.isHidden = true
+        stopButton.isHidden = false
+
+        // Heartbeats and the watchdog run on the main thread on purpose: if the main thread hangs, the
+        // heartbeats stop too and the firmware stops the motors by itself.
+        safetyTimer = Timer.scheduledTimer(withTimeInterval: PointGoalFragment.safetyTick, repeats: true) { [weak self] _ in
+            self?.safetyTick()
+        }
+        bluetooth.sendData(payload: "h\(PointGoalFragment.heartbeatTimeoutMs)\n")
     }
 
-    // Define a distance threshold for triggering the event
-    let distanceThreshold: Float = 0.15 // adjust this value as needed
+    @objc private func stopPressed() {
+        guard isRunning else {
+            return
+        }
+        print("nav: stopped by user")
+        stopDriving()
+        showHint(Strings.pointGoalTapHint)
+    }
 
-    /// function to check openBot is reached at point or not
-    ///
-    /// - Parameter position: position of camera
-    func checkCameraPosition(position: simd_float3) {
-        if endingPoint != nil && isReached != true {
-            distance = simd_distance(position, endingPoint.simdPosition)
-            if distance <= distanceThreshold {
-                DispatchQueue.main.async {
-                    self.view.addSubview(self.infoMessageRect)
-                    self.isReached = true
-                    self.marker.removeFromParentNode()
+    @objc private func appWillResignActive() {
+        stopDriving()
+    }
+
+    private func safetyTick() {
+        guard isRunning else {
+            return
+        }
+        let silent = Date.timeIntervalSinceReferenceDate - lastNavUpdate
+        if silent > PointGoalFragment.watchdogTimeout {
+            print("nav: no update for \(silent) s, stopping robot")
+            stopDriving()
+            showHint(Strings.pointGoalWatchdog)
+            return
+        }
+        bluetooth.sendData(payload: "h\(PointGoalFragment.heartbeatTimeoutMs)\n")
+    }
+
+    /// Stops the motors first, then cleans up. Safe to call when not driving.
+    private func stopDriving() {
+        let wasRunning = isRunning
+        isRunning = false
+        shared.stopRun()
+        sendControl(Control(), force: true)
+        if wasRunning {
+            DispatchQueue.main.asyncAfter(deadline: .now() + PointGoalFragment.stopResendDelay) { [weak self] in
+                guard let self = self, !self.isRunning else {
+                    return
                 }
+                self.sendControl(Control(), force: true)
+                // Back to the firmware default (no heartbeat timeout) so other screens, which don't
+                // send heartbeats, keep working.
+                self.bluetooth.sendData(payload: "h-1\n")
+            }
+        }
+        safetyTimer?.invalidate()
+        safetyTimer = nil
+        stopButton.isHidden = true
+        startButton.isHidden = true
+        removeGoal()
+    }
+
+    private func onNavigationStep(generation: Int, outcome: NavigationOutcome) {
+        guard isRunning, generation == runGeneration else {
+            return
+        }
+        lastNavUpdate = Date.timeIntervalSinceReferenceDate
+        switch outcome {
+        case .drive(let control):
+            sendControl(control, force: false)
+        case .arrived(let distance):
+            print("nav: goal reached at distance=\(distance)")
+            stopDriving()
+            showHint(Strings.goalReachedMessage)
+        case .trackingLost:
+            print("nav: tracking lost, stopping")
+            stopDriving()
+            showHint(Strings.pointGoalTrackingLost)
+        case .skipped:
+            break
+        }
+    }
+
+    private func sendControl(_ control: Control, force: Bool) {
+        if !force, let last = lastControl, last.getLeft() == control.getLeft(), last.getRight() == control.getRight() {
+            return
+        }
+        lastControl = control
+        let left = Int((control.getLeft() * gameController.selectedSpeedMode.rawValue).rounded())
+        let right = Int((control.getRight() * gameController.selectedSpeedMode.rawValue).rounded())
+        bluetooth.sendData(payload: "c\(left),\(right)\n")
+        NotificationCenter.default.post(name: .updateSpeedLabel, object: "\(left),\(right)")
+        NotificationCenter.default.post(name: .updateRpmLabel, object: String(Int(control.getLeft())) + "," + String(Int(control.getRight())))
+    }
+
+    // MARK: - ARKit callbacks (render thread)
+
+    func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
+        guard let frame = sceneView.session.currentFrame, let camera = sceneView.pointOfView?.presentation else {
+            return
+        }
+        // Skip while the previous frame is still being processed; driving on old frames is late anyway
+        // and a backlog would delay the Stop button.
+        guard let run = shared.beginStep() else {
+            return
+        }
+        let generation = run.generation
+        let goal = run.goal
+        if case .normal = frame.camera.trackingState {
+        } else {
+            shared.endStep()
+            DispatchQueue.main.async { [weak self] in
+                self?.onNavigationStep(generation: generation, outcome: .trackingLost)
+            }
+            return
+        }
+
+        let position = camera.simdWorldPosition
+        let orientation = camera.simdWorldOrientation
+        let pixelBuffer = frame.capturedImage
+        navQueue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            let outcome = self.navigationStep(pixelBuffer: pixelBuffer, position: position, orientation: orientation, goal: goal)
+            self.shared.endStep()
+            DispatchQueue.main.async {
+                self.onNavigationStep(generation: generation, outcome: outcome)
             }
         }
     }
 
-    /// function to cancel the point goal navigation and return to home
-    ///
-    /// - Parameter sender:
-    @objc func cancelFun(_ sender: UIView) {
-        _ = navigationController?.popViewController(animated: true)
+    /// Runs on the navigation queue.
+    private func navigationStep(pixelBuffer: CVPixelBuffer, position: simd_float3, orientation: simd_quatf, goal: simd_float3) -> NavigationOutcome {
+        let robotPose = Pose(tx: position.x, ty: position.y, tz: position.z, qx: orientation.imag.x, qy: orientation.imag.y, qz: orientation.imag.z, qw: orientation.real)
+        let goalPose = Pose(tx: goal.x, ty: goal.y, tz: goal.z, qx: 0, qy: 0, qz: 0, qw: 1)
+        let distance = PointGoalMath.horizontalDistance(position, goal)
+        let yaw = computeDeltaYaw(pose: robotPose, goalPose: goalPose)
+
+        if shared.hasArrived(distance: distance, deltaYaw: yaw) {
+            return .arrived(distance: distance)
+        }
+        guard let bgra = convertToBGRA(pixelBuffer), let control = navigation?.recognizeImage(pixelBuffer: bgra, goalDistance: distance, goalSin: sin(yaw), goalCos: cos(yaw)) else {
+            return .skipped
+        }
+        print("nav: distance=\(distance) deltaYaw=\(yaw) control=(\(control.getLeft()), \(control.getRight()))")
+        return .drive(control)
     }
 
-    /// function to calculate the route to the point
-    func calculateRoute() {
-        _ = simd_distance(startingPoint.simdPosition, endingPoint.simdPosition)
-        _ = simd_normalize(endingPoint.simdPosition - startingPoint.simdPosition)
+    private func convertToBGRA(_ pixelBuffer: CVPixelBuffer) -> CVPixelBuffer? {
+        guard let converted = try? blueDress.convertToBGRA(imageBuffer: pixelBuffer) else {
+            return nil
+        }
+        let refCon = NSMutableData()
+        var timingInfo: CMSampleTimingInfo = .invalid
+        var formatDescription: CMVideoFormatDescription? = nil
+        CMVideoFormatDescriptionCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: converted, formatDescriptionOut: &formatDescription)
+        guard let format = formatDescription else {
+            return nil
+        }
+        var output: CMSampleBuffer? = nil
+        CMSampleBufferCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: converted, dataReady: true, makeDataReadyCallback: nil, refcon: refCon.mutableBytes, formatDescription: format, sampleTiming: &timingInfo, sampleBufferOut: &output)
+        guard let sample = output else {
+            return nil
+        }
+        return CMSampleBufferGetImageBuffer(sample)
     }
 
-    /// function called to remove keyboard
-    ///
-    /// - Parameter textField:
-    /// - Returns:
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        guard time - lastCalibration > 0.5 else {
+            return
+        }
+        lastCalibration = time
+        calibrateCameraHeight()
     }
 
-    /// function called to remove keyboard
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
+    /// Measures the camera height from ARKit's floor plane, if it sees one.
+    private func calibrateCameraHeight() {
+        guard let frame = sceneView.session.currentFrame, let camera = sceneView.pointOfView?.presentation else {
+            return
+        }
+        let cameraY = camera.simdWorldPosition.y
+        var planes: [(y: Float, area: Float)] = []
+        var floors: [(y: Float, area: Float)] = []
+        for case let anchor as ARPlaneAnchor in frame.anchors where anchor.alignment == .horizontal {
+            let center = anchor.transform * simd_float4(anchor.center, 1)
+            let plane = (y: center.y, area: anchor.extent.x * anchor.extent.z)
+            planes.append(plane)
+            // Phones with LiDAR label planes; trust a plane labelled as floor over size alone.
+            if ARPlaneAnchor.isClassificationSupported, case .floor = anchor.classification {
+                floors.append(plane)
+            }
+        }
+        guard let floorY = PointGoalMath.pickFloorY(planes: floors.isEmpty ? planes : floors, cameraY: cameraY) else {
+            return
+        }
+        let height = cameraY - floorY
+        // Only heights a phone on the robot can have; not while someone holds it up by hand.
+        guard height >= PointGoalMath.minMountHeight, height <= PointGoalMath.maxMountHeight else {
+            return
+        }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            if !self.cameraHeightMeasured || abs(height - self.cameraHeight) > 0.005 {
+                print("camera height measured: \(height) m")
+                UserDefaults.standard.set(height, forKey: PointGoalFragment.cameraHeightKey)
+            }
+            self.cameraHeight = height
+            self.cameraHeightMeasured = true
+        }
+    }
+
+    private static func savedCameraHeight() -> Float {
+        let saved = UserDefaults.standard.float(forKey: cameraHeightKey)
+        return saved > 0 ? saved : PointGoalMath.defaultCameraHeight
     }
 
     /// function to calculate the delta yaw for device position and goal position
@@ -446,36 +462,6 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         return resultYaw
     }
 
-    /// Utility functions for dot and cross products
-    func SCNVector3DotProduct(_ a: SCNVector3, _ b: SCNVector3) -> Float {
-        a.x * b.x + a.y * b.y + a.z * b.z
-    }
-
-    /// function to do cross product between two vectors
-    ///
-    /// - Parameters:
-    ///   - a: first vector
-    ///   - b: second vector
-    /// - Returns: cross product of a and b ie. a*b
-    func SCNVector3CrossProduct(_ a: SCNVector3, _ b: SCNVector3) -> SCNVector3 {
-        SCNVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
-    }
-
-    ///function to send output controls to openBot
-    ///
-    /// - Parameter control:
-    func sendControl(control: Control) {
-        if (control.getRight() != vehicleControl.getRight() || control.getLeft() != vehicleControl.getLeft()) {
-            let left = control.getLeft() * gameController.selectedSpeedMode.rawValue
-            let right = control.getRight() * gameController.selectedSpeedMode.rawValue
-            print("left -> \(control.getLeft()) , right ----> \(control.getRight())")
-            vehicleControl = control
-            bluetooth.sendData(payload: "c" + String(left) + "," + String(right) + "\n")
-            NotificationCenter.default.post(name: .updateSpeedLabel, object: String(Int(left)) + "," + String(Int(right)))
-            NotificationCenter.default.post(name: .updateRpmLabel, object: String(Int(control.getLeft())) + "," + String(Int(control.getRight())))
-        }
-    }
-
     func setupNavigationBarItem() {
         if UIImage(named: "back") != nil {
             let backNavigationIcon = (UIImage(named: "back")?.withRenderingMode(.alwaysOriginal))!
@@ -486,6 +472,166 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
 
     @objc func back(sender: UIBarButtonItem) {
         _ = navigationController?.popViewController(animated: true)
+    }
+}
+
+private enum NavigationOutcome {
+    case drive(Control)
+    case arrived(distance: Float)
+    case trackingLost
+    case skipped
+}
+
+/// State read by the render thread and the navigation queue, written by the main thread.
+private final class SharedState {
+    private let lock = NSLock()
+    private var _goal: simd_float3?
+    private var running = false
+    private var generation = 0
+    private var stepInFlight = false
+    private var arrival = ArrivalCheck()
+
+    var goal: simd_float3? {
+        get { lock.lock(); defer { lock.unlock() }; return _goal }
+        set { lock.lock(); _goal = newValue; lock.unlock() }
+    }
+
+    func startRun(generation: Int) {
+        lock.lock()
+        running = true
+        self.generation = generation
+        arrival = ArrivalCheck()
+        lock.unlock()
+    }
+
+    func stopRun() {
+        lock.lock()
+        running = false
+        lock.unlock()
+    }
+
+    /// Claims the next navigation step, or nil if not driving or a step is still running.
+    func beginStep() -> (generation: Int, goal: simd_float3)? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard running, !stepInFlight, let goal = _goal else {
+            return nil
+        }
+        stepInFlight = true
+        return (generation, goal)
+    }
+
+    func endStep() {
+        lock.lock()
+        stepInFlight = false
+        lock.unlock()
+    }
+
+    func hasArrived(distance: Float, deltaYaw: Float) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return arrival.hasArrived(distance: distance, deltaYaw: deltaYaw)
+    }
+}
+
+/// Math for turning a tap into a goal on the floor, in ARKit world coordinates (y is up, meters).
+/// Kept lenient on purpose: it only rejects taps a floor robot can never drive to.
+enum PointGoalMath {
+    enum Result: Equatable {
+        case ok
+        case notFloor
+        case tooClose
+    }
+
+    /// The floor is always at least this far below the phone on the robot.
+    static let minCameraHeight: Float = 0.03
+    /// Phone camera height on an OpenBot DIY body, until it has been measured.
+    static let defaultCameraHeight: Float = 0.12
+    /// Measured heights outside this range mean the phone isn't on the robot right now.
+    static let minMountHeight: Float = 0.04
+    static let maxMountHeight: Float = 0.40
+    /// Closer goals would count as reached right away.
+    static let minGoalDistance: Float = 0.30
+    /// Further than this the tap ray is so flat that a tiny angle error is a big distance error
+    /// (at 12 cm height, 0.1 degree is already ~25 cm at 4 m).
+    static let maxRayDistance: Float = 6
+    /// Size of the goal pin in meters.
+    static let markerSize: Float = 0.1
+
+    static func validate(camera: simd_float3, goal: simd_float3?) -> Result {
+        guard let goal = goal else {
+            return .notFloor
+        }
+        // Windows, walls, sky: anything at or above the camera can't be on the floor.
+        if goal.y > camera.y - minCameraHeight {
+            return .notFloor
+        }
+        if horizontalDistance(camera, goal) < minGoalDistance {
+            return .tooClose
+        }
+        return .ok
+    }
+
+    /// Where the tap ray meets the floor. Taps at or above the horizon (window, wall, sky) never do.
+    static func intersectFloor(origin: simd_float3, direction: simd_float3, floorY: Float) -> simd_float3? {
+        guard direction.y < -1e-4 else {
+            return nil
+        }
+        let t = (floorY - origin.y) / direction.y
+        guard t > 0 else {
+            return nil
+        }
+        let hit = origin + t * direction
+        guard horizontalDistance(origin, hit) <= maxRayDistance else {
+            return nil
+        }
+        return simd_float3(hit.x, floorY, hit.z)
+    }
+
+    /// Floor height from horizontal planes: the largest one below the camera. The lowest one would
+    /// pick up false planes reflected in shiny floors.
+    static func pickFloorY(planes: [(y: Float, area: Float)], cameraY: Float) -> Float? {
+        var floorY: Float?
+        var bestArea: Float = 0
+        for plane in planes where plane.y <= cameraY - minCameraHeight && plane.area > bestArea {
+            bestArea = plane.area
+            floorY = plane.y
+        }
+        return floorY
+    }
+
+    static func horizontalDistance(_ a: simd_float3, _ b: simd_float3) -> Float {
+        simd_length(simd_float2(a.x - b.x, a.z - b.z))
+    }
+}
+
+/// Decides when the robot has arrived. Besides being within the goal radius, a robot that is close and
+/// has just passed the goal (it's now beside or behind it, or getting further away again) has arrived
+/// too: turning back to hit the exact spot only makes it circle around it.
+struct ArrivalCheck {
+    /// Within this distance of the goal the robot has arrived.
+    static let goalRadius: Float = 0.10
+    /// Inside this distance, passing the goal also counts as arriving.
+    static let arrivalZone: Float = 0.30
+    /// Moving away by more than this from the closest point means the goal was passed.
+    static let movingAway: Float = 0.03
+
+    private var closest = Float.greatestFiniteMagnitude
+
+    /// - Parameters:
+    ///   - distance: distance to the goal in meters
+    ///   - deltaYaw: angle between heading and goal direction, as from computeDeltaYaw
+    mutating func hasArrived(distance: Float, deltaYaw: Float) -> Bool {
+        closest = min(closest, distance)
+        if distance < ArrivalCheck.goalRadius {
+            return true
+        }
+        if distance >= ArrivalCheck.arrivalZone {
+            return false
+        }
+        let goalBesideOrBehind = abs(deltaYaw) > Float.pi / 2
+        let movingAway = distance > closest + ArrivalCheck.movingAway
+        return goalBesideOrBehind || movingAway
     }
 }
 
@@ -540,5 +686,3 @@ class Pose {
         ]
     }
 }
-
-

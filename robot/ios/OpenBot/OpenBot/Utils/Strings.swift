@@ -265,6 +265,14 @@ struct Strings {
 
     // Point Goal Navigation
     static var goalReachedMessage: String { L10n.string("goalReachedMessage") }
+    static var pointGoalTapHint: String { L10n.string("pointGoalTapHint") }
+    /// Format string with one %.1f placeholder for the distance in meters.
+    static var pointGoalSet: String { L10n.string("pointGoalSet") }
+    static var pointGoalNotFloor: String { L10n.string("pointGoalNotFloor") }
+    /// Format string with one %.1f placeholder for the minimum distance in meters.
+    static var pointGoalTooClose: String { L10n.string("pointGoalTooClose") }
+    static var pointGoalWatchdog: String { L10n.string("pointGoalWatchdog") }
+    static var pointGoalTrackingLost: String { L10n.string("pointGoalTrackingLost") }
 
     // Model Management filter dropdown
     static var modelFilterAll: String { L10n.string("modelFilterAll") }
