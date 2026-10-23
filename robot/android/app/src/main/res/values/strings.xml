@@ -99,6 +99,8 @@
     <string name="point_goal_not_floor">That\'s not the floor. Tap on the floor where the robot can drive.</string>
     <string name="point_goal_too_close">Too close. Tap a spot at least %1$.1f m away.</string>
     <string name="point_goal_watchdog">The robot was stopped because the app stopped responding.</string>
+    <string name="point_goal_arcore_failure">ARCore failure. Make sure that your device is compatible and the ARCore SDK is installed.</string>
+    <string name="point_goal_model_failure">Navigation policy could not be initialized.</string>
     <string name="no_initial_ar_core_pose">No initial AR Core pose.</string>
     <string name="ar_core_session_paused">AR Core session paused.</string>
     <string name="start">Start</string>

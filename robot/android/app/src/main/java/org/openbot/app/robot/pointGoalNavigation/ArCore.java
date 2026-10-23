@@ -59,14 +59,16 @@ public class ArCore implements GLSurfaceView.Renderer {
   private volatile Pose currentPose;
   private ArCoreListener arCoreListener = null;
   private final float[] anchorMatrix = new float[16];
-  private Anchor startAnchor, targetAnchor;
+  private Anchor startAnchor;
+  // Set on the GL thread (tap) and cleared on the UI thread (Stop), so read it once into a local.
+  private volatile Anchor targetAnchor;
   private Handler handlerMain;
   private GLSurfaceView surfaceView;
   private boolean renderFrame = true;
   private Pose startPose = null, targetPose = null;
   // Written on the UI thread, consumed on the GL thread.
   private volatile float[] pendingTap = null;
-  // Floor and wall detection cost CPU, so only the tap-to-goal screen turns them on.
+  // Floor detection costs CPU, so only the tap-to-goal screen turns it on.
   private boolean goalPlacementEnabled = false;
   // The marker quad reaches this far below its center; lift it so the pin tip touches the floor.
   private static final float MARKER_TIP_OFFSET_M = 0.1f;
@@ -135,7 +137,8 @@ public class ArCore implements GLSurfaceView.Renderer {
   }
 
   public Pose getTargetPose() {
-    return targetAnchor == null ? null : targetAnchor.getPose();
+    Anchor target = targetAnchor;
+    return target == null ? null : target.getPose();
   }
 
   public void setTargetAnchor(Pose pose) {
@@ -147,24 +150,6 @@ public class ArCore implements GLSurfaceView.Renderer {
   }
 
   /**
-   * Replaces the current target anchor with a plain anchor at its current pose. Anchors created
-   * from a hit result stay attached to their plane and move as ARCore refines it, which would make
-   * the goal drift while driving. A plain {@code session.createAnchor(pose)} anchor stays fixed.
-   */
-  public void freezeTargetAnchor() {
-    if (targetAnchor == null) {
-      Timber.d("freezeTargetAnchor: no target anchor to freeze");
-      return;
-    }
-    Pose frozenPose = targetAnchor.getPose();
-    targetAnchor.detach();
-    targetAnchor = session.createAnchor(frozenPose);
-    Timber.d(
-        "freezeTargetAnchor: frozen at (%.3f, %.3f, %.3f)",
-        frozenPose.tx(), frozenPose.ty(), frozenPose.tz());
-  }
-
-  /**
    * Requests that the given screen-space tap (in {@link #surfaceView} pixel coordinates) be turned
    * into a goal pose on the next rendered frame. The actual hit-test runs on the GL thread inside
    * {@link #onDrawFrame}, since it needs the current frame's {@link Frame} object.
@@ -173,7 +158,7 @@ public class ArCore implements GLSurfaceView.Renderer {
     pendingTap = new float[] {screenX, screenY};
   }
 
-  /** Turns on floor/wall detection and depth for tap-to-goal. Call before {@link #resume()}. */
+  /** Turns on floor detection for tap-to-goal (camera height). Call before {@link #resume()}. */
   public void setGoalPlacementEnabled(boolean enabled) {
     goalPlacementEnabled = enabled;
     cameraHeightM =
@@ -254,8 +239,9 @@ public class ArCore implements GLSurfaceView.Renderer {
       if (startAnchor != null) {
         startPose = startAnchor.getPose();
       }
-      if (targetAnchor != null) {
-        targetPose = targetAnchor.getPose();
+      Anchor target = targetAnchor;
+      if (target != null) {
+        targetPose = target.getPose();
       }
 
       if (goalPlacementEnabled && frameCount++ % CALIBRATE_EVERY_FRAMES == 0) {
@@ -309,7 +295,8 @@ public class ArCore implements GLSurfaceView.Renderer {
       backgroundRenderer.draw(frame);
 
       // visualize goal
-      if (targetAnchor != null && trackingState == TrackingState.TRACKING) {
+      Anchor marker = targetAnchor;
+      if (marker != null && trackingState == TrackingState.TRACKING) {
         // Get projection matrix.
         float[] projmtx = new float[16];
         camera.getProjectionMatrix(projmtx, 0, 0.1f, 100.0f);
@@ -327,7 +314,7 @@ public class ArCore implements GLSurfaceView.Renderer {
         // Stand the pin upright in the world (local +y = world up) and turn it about the
         // vertical axis to face the camera, so it looks right however the phone is mounted:
         // portrait, landscape or upside down. Its tip sits on the goal spot on the floor.
-        float[] goal = targetAnchor.getPose().getTranslation();
+        float[] goal = marker.getPose().getTranslation();
         float yaw = (float) Math.atan2(currentPose.tx() - goal[0], currentPose.tz() - goal[2]);
         Pose markerPose =
             new Pose(
@@ -373,8 +360,9 @@ public class ArCore implements GLSurfaceView.Renderer {
     try {
       // A plain anchor at a world position stays fixed; it doesn't follow the screen.
       Anchor newAnchor = session.createAnchor(Pose.makeTranslation(goal[0], goal[1], goal[2]));
-      if (targetAnchor != null) targetAnchor.detach();
+      Anchor previous = targetAnchor;
       targetAnchor = newAnchor;
+      if (previous != null) previous.detach();
       targetPose = newAnchor.getPose();
       float distance = GoalValidator.horizontalDistance(cameraPos, goal);
       runOnMainThread(
@@ -406,10 +394,6 @@ public class ArCore implements GLSurfaceView.Renderer {
     }
     cameraHeightM = height;
     cameraHeightMeasured = true;
-  }
-
-  public float getCameraHeight() {
-    return cameraHeightM;
   }
 
   /** World-space ray {origin, direction} through a screen pixel. */

@@ -454,7 +454,6 @@ public class Vehicle {
   }
 
   public void startHeartbeat() {
-    if (heartbeatTimer != null) return; // already running, don't start a second timer
     heartbeatTimer = new Timer();
     HeartBeatTask heartBeatTask = new HeartBeatTask();
     heartbeatTimer.schedule(heartBeatTask, 250, 250); // 250ms delay and 250ms intervals

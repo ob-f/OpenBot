@@ -79,6 +79,8 @@
     <string name="point_goal_not_floor">यह फ़र्श नहीं है। फ़र्श पर वहाँ टैप करें जहाँ रोबोट चल सकता है।</string>
     <string name="point_goal_too_close">बहुत पास। कम से कम %1$.1f मी दूर की जगह पर टैप करें।</string>
     <string name="point_goal_watchdog">ऐप ने जवाब देना बंद कर दिया, इसलिए रोबोट रोक दिया गया।</string>
+    <string name="point_goal_arcore_failure">ARCore त्रुटि। सुनिश्चित करें कि आपका डिवाइस संगत है और ARCore इंस्टॉल है।</string>
+    <string name="point_goal_model_failure">नेविगेशन पॉलिसी शुरू नहीं हो सकी।</string>
     <string name="no_initial_ar_core_pose">कोई प्रारंभिक AR Core पोज़ नहीं।</string>
     <string name="ar_core_session_paused">AR Core सत्र रोका गया।</string>
     <string name="tips_connect_timeout">कनेक्ट टाइमआउट</string>

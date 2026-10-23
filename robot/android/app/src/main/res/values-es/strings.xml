@@ -79,6 +79,8 @@
     <string name="point_goal_not_floor">Eso no es el suelo. Toca el suelo por donde el robot pueda moverse.</string>
     <string name="point_goal_too_close">Demasiado cerca. Toca un punto a al menos %1$.1f m.</string>
     <string name="point_goal_watchdog">El robot se detuvo porque la aplicación dejó de responder.</string>
+    <string name="point_goal_arcore_failure">Error de ARCore. Asegúrate de que tu dispositivo sea compatible y de que ARCore esté instalado.</string>
+    <string name="point_goal_model_failure">No se pudo inicializar la política de navegación.</string>
     <string name="no_initial_ar_core_pose">No hay pose inicial de AR Core.</string>
     <string name="ar_core_session_paused">Sesión de AR Core en pausa.</string>
     <string name="tips_connect_timeout">tiempo de conexión agotado</string>

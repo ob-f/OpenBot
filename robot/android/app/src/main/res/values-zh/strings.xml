@@ -79,6 +79,8 @@
     <string name="point_goal_not_floor">这不是地面。请点击机器人可以行驶的地面。</string>
     <string name="point_goal_too_close">太近了。请点击至少 %1$.1f 米外的位置。</string>
     <string name="point_goal_watchdog">应用无响应，机器人已停止。</string>
+    <string name="point_goal_arcore_failure">ARCore 出错。请确认您的设备兼容并已安装 ARCore。</string>
+    <string name="point_goal_model_failure">无法初始化导航策略。</string>
     <string name="no_initial_ar_core_pose">没有初始 AR Core 姿态。</string>
     <string name="ar_core_session_paused">AR Core 会话已暂停。</string>
     <string name="tips_connect_timeout">连接超时</string>

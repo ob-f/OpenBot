@@ -79,6 +79,8 @@
     <string name="point_goal_not_floor">Das ist nicht der Boden. Tippen Sie auf den Boden, auf dem der Roboter fahren kann.</string>
     <string name="point_goal_too_close">Zu nah. Tippen Sie auf eine Stelle, die mindestens %1$.1f m entfernt ist.</string>
     <string name="point_goal_watchdog">Der Roboter wurde angehalten, weil die App nicht mehr reagiert hat.</string>
+    <string name="point_goal_arcore_failure">ARCore-Fehler. Stellen Sie sicher, dass Ihr Gerät kompatibel ist und ARCore installiert ist.</string>
+    <string name="point_goal_model_failure">Die Navigationssteuerung konnte nicht initialisiert werden.</string>
     <string name="no_initial_ar_core_pose">Keine anfängliche AR-Core-Pose.</string>
     <string name="ar_core_session_paused">AR-Core-Sitzung pausiert.</string>
     <string name="tips_connect_timeout">Verbindungs-Timeout</string>

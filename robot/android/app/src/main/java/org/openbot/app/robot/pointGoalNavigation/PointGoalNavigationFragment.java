@@ -82,7 +82,6 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (getArguments() != null) {}
   }
 
   @Override
@@ -359,7 +358,8 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
             isRunning = false;
             handlerMain.post(
                 () -> {
-                  if (binding == null) return;
+                  // The motors are already stopped above; skip the UI if the screen is going away.
+                  if (binding == null || !isAdded() || getView() == null) return;
                   stop();
                   showInfoDialog(getString(R.string.point_goal_watchdog));
                 });
@@ -437,6 +437,10 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
     if (vehicle != null && isRunning) vehicle.stopBot();
     isRunning = false;
     if (watchdogThread != null) watchdogThread.quitSafely();
+    if (navigationPolicy != null) {
+      navigationPolicy.close();
+      navigationPolicy = null;
+    }
     arCore.closeSession();
   }
 
@@ -490,8 +494,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       e.printStackTrace();
     }
 
-    showInfoDialog(
-        "ARCore failure. Make sure that your device is compatible and the ARCore SDK is installed.");
+    showInfoDialog(getString(R.string.point_goal_arcore_failure));
   }
 
   private void showInfoDialog(String message) {
@@ -547,30 +550,27 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       // guard against it anyway (e.g. a stale click event).
       return;
     }
-    arCore.freezeTargetAnchor();
     binding.start.setVisibility(View.GONE);
 
-    Model model =
-        new Model(
-            0,
-            CLASS.NAVIGATION,
-            TYPE.GOALNAV,
-            "navigation.tflite",
-            PATH_TYPE.ASSET,
-            "networks/navigation.tflite",
-            "160x90");
-
-    try {
-      navigationPolicy = new Navigation(requireActivity(), model, Device.CPU, 1);
-    } catch (IOException e) {
-      e.printStackTrace();
-      showInfoDialog("Navigation policy could not be initialized.");
-      return;
+    // Load the model once and reuse it; loading it on every Start leaked a copy each time.
+    if (navigationPolicy == null) {
+      Model model =
+          new Model(
+              0,
+              CLASS.NAVIGATION,
+              TYPE.GOALNAV,
+              "navigation.tflite",
+              PATH_TYPE.ASSET,
+              "networks/navigation.tflite",
+              "160x90");
+      try {
+        navigationPolicy = new Navigation(requireActivity(), model, Device.CPU, 1);
+      } catch (IOException e) {
+        e.printStackTrace();
+        showInfoDialog(getString(R.string.point_goal_model_failure));
+        return;
+      }
     }
-
-    // The firmware stops the motors by itself if these stop arriving (app killed or crashed).
-    // USB connections already send them; Bluetooth ones don't, so start them here.
-    if (vehicle != null) vehicle.startHeartbeat();
 
     lastNavUpdateMs = SystemClock.elapsedRealtime();
     arrivalCheck.reset();

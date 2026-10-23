@@ -79,6 +79,8 @@
     <string name="point_goal_not_floor">바닥이 아닙니다. 로봇이 주행할 수 있는 바닥을 탭하세요.</string>
     <string name="point_goal_too_close">너무 가깝습니다. 최소 %1$.1f m 떨어진 곳을 탭하세요.</string>
     <string name="point_goal_watchdog">앱이 응답하지 않아 로봇을 정지했습니다.</string>
+    <string name="point_goal_arcore_failure">ARCore 오류입니다. 기기가 호환되고 ARCore가 설치되어 있는지 확인하세요.</string>
+    <string name="point_goal_model_failure">내비게이션 정책을 초기화할 수 없습니다.</string>
     <string name="no_initial_ar_core_pose">초기 AR Core 포즈가 없습니다.</string>
     <string name="ar_core_session_paused">AR Core 세션이 일시 중지되었습니다.</string>
     <string name="tips_connect_timeout">연결 시간 초과</string>
