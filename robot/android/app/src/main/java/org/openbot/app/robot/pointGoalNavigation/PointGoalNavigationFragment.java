@@ -2,11 +2,15 @@ package org.openbot.app.robot.pointGoalNavigation;
 
 import static java.lang.Math.abs;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.activity.result.ActivityResultLauncher;
@@ -14,10 +18,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.ar.core.Pose;
 import com.google.ar.core.TrackingFailureReason;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
-import com.google.ar.core.exceptions.NotTrackingException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
@@ -36,6 +40,7 @@ import org.openbot.app.robot.tflite.Network.Device;
 import org.openbot.app.robot.utils.Constants;
 import org.openbot.app.robot.utils.PermissionUtils;
 import org.openbot.app.robot.vehicle.Control;
+import org.openbot.app.robot.vehicle.Vehicle;
 import timber.log.Timber;
 
 public class PointGoalNavigationFragment extends ControlsFragment implements ArCoreListener {
@@ -44,7 +49,21 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   private Handler handlerMain;
   private ArCore arCore;
   private FragmentPointGoalNavigationBinding binding;
-  private boolean isRunning = false;
+  // Read by the watchdog thread.
+  private volatile boolean isRunning = false;
+  private volatile long lastNavUpdateMs = 0;
+  private final ArrivalCheck arrivalCheck = new ArrivalCheck();
+  private HandlerThread watchdogThread;
+  private Handler watchdogHandler;
+
+  // ARCore calls back every frame (~33 ms); this long without one means the app is stuck.
+  private static final long WATCHDOG_TIMEOUT_MS = 700;
+  private static final long WATCHDOG_CHECK_MS = 200;
+  // Frames that waited this long in the main-thread queue are dropped; driving on them is late
+  // anyway, and a backlog would delay the Stop button.
+  private static final long MAX_FRAME_AGE_MS = 100;
+  // Resend the stop once in case the first command got lost over Bluetooth.
+  private static final long STOP_RESEND_MS = 100;
   private boolean isPermissionRequested = false;
   private Navigation navigationPolicy;
   static final int kMaxChannelValue = 262143;
@@ -63,7 +82,6 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (getArguments() != null) {}
   }
 
   @Override
@@ -83,6 +101,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
 
     handlerMain = new Handler(Looper.getMainLooper());
     arCore = new ArCore(requireContext(), binding.surfaceView, handlerMain);
+    arCore.setGoalPlacementEnabled(true);
 
     if (vehicle == null) {
       mainViewModel
@@ -93,13 +112,69 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
                 if (v != null && vehicle == null) {
                   vehicle = v;
                   if (isAdded()) {
-                    showStartDialog();
+                    setupTapToSetGoal();
                   }
                 }
               });
       return;
     }
-    showStartDialog();
+    setupTapToSetGoal();
+  }
+
+  // performClick() is called on ACTION_UP; lint can't see that through a stock GLSurfaceView.
+  @SuppressLint("ClickableViewAccessibility")
+  private void setupTapToSetGoal() {
+    binding.surfaceView.setOnTouchListener(
+        (v, event) -> {
+          if (event.getAction() == MotionEvent.ACTION_UP) {
+            v.performClick();
+            if (!isRunning) arCore.requestTapAt(event.getX(), event.getY());
+          }
+          return true;
+        });
+    binding.start.setOnClickListener(v -> startDriving());
+    // Stop on finger down, not on release, so the robot stops the moment the button is touched.
+    binding.stop.setOnTouchListener(
+        (v, event) -> {
+          if (event.getAction() == MotionEvent.ACTION_DOWN && isRunning) {
+            Timber.d("nav: stopped by user");
+            stop();
+            showHint(getString(R.string.point_goal_tap_hint));
+          }
+          return false;
+        });
+
+    watchdogThread = new HandlerThread("PointGoalWatchdog");
+    watchdogThread.start();
+    watchdogHandler = new Handler(watchdogThread.getLooper());
+
+    Snackbar.make(binding.getRoot(), R.string.point_goal_tap_hint, Snackbar.LENGTH_LONG).show();
+  }
+
+  @Override
+  public void onGoalPlaced(float distanceM) {
+    if (binding == null || isRunning) return;
+    binding.start.setVisibility(View.VISIBLE);
+    showHint(getString(R.string.point_goal_set, distanceM));
+  }
+
+  @Override
+  public void onGoalRejected(GoalValidator.Result reason) {
+    if (binding == null || isRunning) return;
+    switch (reason) {
+      case NOT_FLOOR:
+        showHint(getString(R.string.point_goal_not_floor));
+        break;
+      case TOO_CLOSE:
+        showHint(getString(R.string.point_goal_too_close, GoalValidator.MIN_GOAL_DISTANCE_M));
+        break;
+      default:
+        break;
+    }
+  }
+
+  private void showHint(String message) {
+    Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
   }
 
   @Override
@@ -110,15 +185,32 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       long timestamp) {
     Pose targetPose = navigationPoses.getTargetPose();
     Pose currentPose = navigationPoses.getCurrentPose();
+    lastNavUpdateMs = SystemClock.elapsedRealtime();
+    long frameAgeMs = (SystemClock.elapsedRealtimeNanos() - timestamp) / 1_000_000;
+    if (isRunning && frameAgeMs > MAX_FRAME_AGE_MS) {
+      Timber.d("nav: dropping frame that is %d ms old", frameAgeMs);
+      return;
+    }
     if (isRunning && vehicle != null && targetPose != null && currentPose != null) {
       float goalDistance = computeDistance(targetPose, currentPose);
 
-      if (goalDistance < 0.15f) {
+      Timber.d(
+          "nav: current=(%.3f, %.3f, %.3f) target=(%.3f, %.3f, %.3f) distance=%.3f",
+          currentPose.tx(),
+          currentPose.ty(),
+          currentPose.tz(),
+          targetPose.tx(),
+          targetPose.ty(),
+          targetPose.tz(),
+          goalDistance);
+
+      float deltaYaw = computeDeltaYaw(currentPose, targetPose);
+      if (arrivalCheck.hasArrived(goalDistance, deltaYaw)) {
+        Timber.d("nav: goal reached at distance=%.3f deltaYaw=%.3f", goalDistance, deltaYaw);
         stop();
         audioPlayer.playFromStringID(R.string.goal_reached);
         showInfoDialog(getString(R.string.goal_reached));
       } else {
-        float deltaYaw = computeDeltaYaw(currentPose, targetPose);
 
         Bitmap bitmap = convertRGBFrameToScaledBitmap(rgb, 160.f / 480.f);
         bitmap = Bitmap.createBitmap(bitmap, 0, 30, 160, 90);
@@ -127,7 +219,9 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
             navigationPolicy.recognizeImage(
                 bitmap, goalDistance, (float) Math.sin(deltaYaw), (float) Math.cos(deltaYaw));
 
-        Timber.d("control: (" + control.getLeft() + ", " + control.getRight() + ")");
+        Timber.d(
+            "nav: deltaYaw=%.3f control=(%.3f, %.3f)",
+            deltaYaw, control.getLeft(), control.getRight());
         vehicle.setControl(control);
       }
     }
@@ -232,6 +326,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
 
   @Override
   public void onArCoreTrackingFailure(long timestamp, TrackingFailureReason trackingFailureReason) {
+    lastNavUpdateMs = SystemClock.elapsedRealtime();
     if (isRunning) {
       stop();
       audioPlayer.playFromStringID(R.string.tracking_lost);
@@ -246,12 +341,50 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
     showInfoDialog(getString(R.string.ar_core_session_paused));
   }
 
+  /**
+   * Runs on its own thread, so it still works when the main thread or ARCore hangs: if the
+   * navigation loop stops calling back while driving, the robot is stopped right away instead of
+   * driving on with its last command.
+   */
+  private final Runnable watchdog =
+      new Runnable() {
+        @Override
+        public void run() {
+          if (!isRunning) return;
+          long silentMs = SystemClock.elapsedRealtime() - lastNavUpdateMs;
+          if (silentMs > WATCHDOG_TIMEOUT_MS) {
+            Timber.w("nav: no update for %d ms, stopping robot", silentMs);
+            if (vehicle != null) vehicle.stopBot();
+            isRunning = false;
+            handlerMain.post(
+                () -> {
+                  // The motors are already stopped above; skip the UI if the screen is going away.
+                  if (binding == null || !isAdded() || getView() == null) return;
+                  stop();
+                  showInfoDialog(getString(R.string.point_goal_watchdog));
+                });
+            return;
+          }
+          watchdogHandler.postDelayed(this, WATCHDOG_CHECK_MS);
+        }
+      };
+
   private void stop() {
-    arCore.detachAnchors();
+    // Motors first, everything else after.
+    isRunning = false;
     if (vehicle != null) {
       vehicle.stopBot();
+      Vehicle stoppedVehicle = vehicle;
+      handlerMain.postDelayed(
+          () -> {
+            if (!isRunning) stoppedVehicle.stopBot();
+          },
+          STOP_RESEND_MS);
     }
-    isRunning = false;
+    if (watchdogHandler != null) watchdogHandler.removeCallbacks(watchdog);
+    binding.stop.setVisibility(View.GONE);
+    arCore.detachAnchors();
+    binding.start.setVisibility(View.GONE);
   }
 
   private static float computeDistance(Pose goalPose, Pose robotPose) {
@@ -279,6 +412,8 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   public void onPause() {
     super.onPause();
 
+    // Leaving the screen (home button, another app, closing) must never leave the robot driving.
+    if (isRunning) stop();
     arCore.pause();
   }
 
@@ -299,6 +434,13 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   public void onDestroy() {
     super.onDestroy();
 
+    if (vehicle != null && isRunning) vehicle.stopBot();
+    isRunning = false;
+    if (watchdogThread != null) watchdogThread.quitSafely();
+    if (navigationPolicy != null) {
+      navigationPolicy.close();
+      navigationPolicy = null;
+    }
     arCore.closeSession();
   }
 
@@ -352,34 +494,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       e.printStackTrace();
     }
 
-    showInfoDialog(
-        "ARCore failure. Make sure that your device is compatible and the ARCore SDK is installed.");
-  }
-
-  private void showStartDialog() {
-    if (getChildFragmentManager().findFragmentByTag(SetGoalDialogFragment.TAG) == null) {
-      SetGoalDialogFragment dialog = SetGoalDialogFragment.newInstance();
-      dialog.setCancelable(false);
-      dialog.show(getChildFragmentManager(), SetGoalDialogFragment.TAG);
-    }
-
-    getChildFragmentManager()
-        .setFragmentResultListener(
-            SetGoalDialogFragment.TAG,
-            getViewLifecycleOwner(),
-            (requestKey, result) -> {
-              Boolean start = result.getBoolean("start");
-
-              if (start) {
-                Float forward = result.getFloat("forward");
-                Float left = result.getFloat("left");
-
-                // x: right, z: backwards
-                startDriving(-left, -forward);
-              } else {
-                requireActivity().onBackPressed();
-              }
-            });
+    showInfoDialog(getString(R.string.point_goal_arcore_failure));
   }
 
   private void showInfoDialog(String message) {
@@ -397,7 +512,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
               Boolean restart = result.getBoolean("restart");
 
               if (restart) {
-                showStartDialog();
+                showHint(getString(R.string.point_goal_tap_hint));
               } else {
                 requireActivity().onBackPressed();
               }
@@ -429,42 +544,38 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
             });
   }
 
-  private void startDriving(float goalX, float goalZ) {
-    Timber.i("setting goal at (" + goalX + ", " + goalZ + ")");
+  private void startDriving() {
+    if (arCore.getTargetPose() == null) {
+      // No goal has been tapped yet; the Start button should be hidden in this state, but
+      // guard against it anyway (e.g. a stale click event).
+      return;
+    }
+    binding.start.setVisibility(View.GONE);
 
-    try {
-      arCore.detachAnchors();
-      arCore.setStartAnchorAtCurrentPose();
-
-      Pose startPose = arCore.getStartPose();
-      if (startPose == null) {
-        showInfoDialog(getString(R.string.no_initial_ar_core_pose));
+    // Load the model once and reuse it; loading it on every Start leaked a copy each time.
+    if (navigationPolicy == null) {
+      Model model =
+          new Model(
+              0,
+              CLASS.NAVIGATION,
+              TYPE.GOALNAV,
+              "navigation.tflite",
+              PATH_TYPE.ASSET,
+              "networks/navigation.tflite",
+              "160x90");
+      try {
+        navigationPolicy = new Navigation(requireActivity(), model, Device.CPU, 1);
+      } catch (IOException e) {
+        e.printStackTrace();
+        showInfoDialog(getString(R.string.point_goal_model_failure));
         return;
       }
-      arCore.setTargetAnchor(startPose.compose(Pose.makeTranslation(goalX, 0.0f, goalZ)));
-    } catch (NotTrackingException e) {
-      e.printStackTrace();
-      showInfoDialog(getString(R.string.tracking_lost));
-      return;
-    }
-    Model model =
-        new Model(
-            0,
-            CLASS.NAVIGATION,
-            TYPE.GOALNAV,
-            "navigation.tflite",
-            PATH_TYPE.ASSET,
-            "networks/navigation.tflite",
-            "160x90");
-
-    try {
-      navigationPolicy = new Navigation(requireActivity(), model, Device.CPU, 1);
-    } catch (IOException e) {
-      e.printStackTrace();
-      showInfoDialog("Navigation policy could not be initialized.");
-      return;
     }
 
+    lastNavUpdateMs = SystemClock.elapsedRealtime();
+    arrivalCheck.reset();
     isRunning = true;
+    binding.stop.setVisibility(View.VISIBLE);
+    watchdogHandler.postDelayed(watchdog, WATCHDOG_CHECK_MS);
   }
 }

@@ -74,6 +74,13 @@
     <string name="selectAll">Seleccionar todo</string>
     <string name="clearAll">Borrar todo</string>
     <string name="tracking_lost">Seguimiento perdido.</string>
+    <string name="point_goal_tap_hint">Toca el suelo donde quieres que vaya el robot y luego pulsa Iniciar.</string>
+    <string name="point_goal_set">Objetivo fijado a %1$.1f m. Pulsa Iniciar.</string>
+    <string name="point_goal_not_floor">Eso no es el suelo. Toca el suelo por donde el robot pueda moverse.</string>
+    <string name="point_goal_too_close">Demasiado cerca. Toca un punto a al menos %1$.1f m.</string>
+    <string name="point_goal_watchdog">El robot se detuvo porque la aplicación dejó de responder.</string>
+    <string name="point_goal_arcore_failure">Error de ARCore. Asegúrate de que tu dispositivo sea compatible y de que ARCore esté instalado.</string>
+    <string name="point_goal_model_failure">No se pudo inicializar la política de navegación.</string>
     <string name="no_initial_ar_core_pose">No hay pose inicial de AR Core.</string>
     <string name="ar_core_session_paused">Sesión de AR Core en pausa.</string>
     <string name="tips_connect_timeout">tiempo de conexión agotado</string>
@@ -157,11 +164,7 @@
         <item>Servidor local</item>
     </string-array>
 
-    <string name="set_goal_title">Establecer objetivo</string>
-    <string name="set_goal_message">Monta el teléfono en el robot y especifica un objetivo. El robot intentará alcanzar el objetivo después de pulsar Iniciar.</string>
     <string name="start">Iniciar</string>
-    <string name="forward_hint_m">Adelante [m]</string>
-    <string name="left_hint_m">Izquierda [m]</string>
     <string name="log_data">Registrar datos</string>
     <string name="model_resolution">Resolución del modelo</string>
     <string name="sensor_data">Datos del sensor</string>
