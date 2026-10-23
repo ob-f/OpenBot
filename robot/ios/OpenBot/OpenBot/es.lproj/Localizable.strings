@@ -190,6 +190,13 @@
 
 /* Point Goal Navigation */
 "goalReachedMessage" = "Meta alcanzada";
+"pointGoalTapHint" = "Toca el suelo donde quieres que vaya el robot y luego pulsa Iniciar.";
+"pointGoalSet" = "Objetivo fijado a %.1f m. Pulsa Iniciar.";
+"pointGoalNotFloor" = "Eso no es el suelo. Toca el suelo por donde el robot pueda moverse.";
+"pointGoalTooClose" = "Demasiado cerca. Toca un punto a al menos %.1f m.";
+"pointGoalWatchdog" = "El robot se detuvo porque la aplicación dejó de responder.";
+"pointGoalTrackingLost" = "Seguimiento perdido. El robot se detuvo.";
+"pointGoalModelFailure" = "No se pudo inicializar la política de navegación.";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "Todos";

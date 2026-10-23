@@ -190,6 +190,13 @@
 
 /* Point Goal Navigation */
 "goalReachedMessage" = "Goal reached";
+"pointGoalTapHint" = "Tap on the floor where you want the robot to go, then press Start.";
+"pointGoalSet" = "Goal set %.1f m away. Press Start to drive.";
+"pointGoalNotFloor" = "That's not the floor. Tap on the floor where the robot can drive.";
+"pointGoalTooClose" = "Too close. Tap a spot at least %.1f m away.";
+"pointGoalWatchdog" = "The robot was stopped because the app stopped responding.";
+"pointGoalTrackingLost" = "Tracking lost. The robot was stopped.";
+"pointGoalModelFailure" = "Navigation policy could not be initialized.";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "All";
