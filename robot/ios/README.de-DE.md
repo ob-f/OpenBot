@@ -14,7 +14,7 @@
 Klicken Sie auf die untenstehenden Links, um mehr über die Funktionen der Apps zu erfahren.
 
 - [Robot App](OpenBot/README.md)
-- Controller App (Kommt bald)
+- [Controller-App](../../controller/flutter/README.de-DE.md)
 
 ## Installation der Apps
 Derzeit ist der einzige Weg, die iOS-Apps auf Ihrem Telefon auszuführen, über die Entwickler-Builds, wie im folgenden Abschnitt beschrieben.
@@ -25,6 +25,7 @@ Derzeit ist der einzige Weg, die iOS-Apps auf Ihrem Telefon auszuführen, über 
 
 - [Xcode iOS 13 oder später](https://developer.apple.com/xcode/) zum Bauen und Installieren der Apps.
 - [Cocoapods](https://cocoapods.org/) auf Ihrem System installiert.
+- Richten Sie das [Firebase-Projekt](./OpenBot/OpenBot/Authentication/README.de-DE.md) ein.
 - Derzeit verwenden wir die iOS-Zielversion 15.5.
 - Das Projekt ist so konfiguriert, dass es "Signing automatisch verwalten" verwendet, sodass Sie Ihr eigenes unabhängiges Konto zum Bauen der App konfigurieren können -
   <img alt="iOS App" width="100%" src="../../docs/images/ios_automatically_manage_signing.png" />

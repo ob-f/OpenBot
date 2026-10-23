@@ -45,12 +45,13 @@ npm start
 4. 在 OpenBot 移动应用中，登录后可以从 Google Drive 中检索保存的文件，并一键加载。
 5. 零代码设计 OpenBot 的指令。
 6. 完全响应式设计，优化了移动设备和平板电脑的浏览体验。
+7. 可以[探索](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA)的 OpenBot Playground 积木。
 
 ### 项目存储
 
 该项目允许用户将数据存储在本地和 `Google Drive` 上。当项目创建时，它会自动存储在用户设备的 `本地存储` 中。随着项目的更改，本地存储会实时更新。
 
-此外，用户可以通过点击 [上传按钮](#generate-Code) 将项目上传到 Google Drive。这使得用户可以从任何有互联网访问的设备上访问他们的项目，从而更容易在不同地点工作。
+此外，用户可以通过点击 [上传按钮](#生成代码) 将项目上传到 Google Drive。这使得用户可以从任何有互联网访问的设备上访问他们的项目，从而更容易在不同地点工作。
 
 - #### 本地存储
   本地存储是一种内置的 Web 技术，允许 Web 应用程序在用户的浏览器中本地存储数据。这意味着项目存储在用户的设备上，可以在没有互联网连接的情况下访问。
@@ -62,7 +63,7 @@ npm start
 
   在这个项目中，用户可以在登录网站时点击上传图标将项目上传到 Google Drive。项目存储在用户的 Google Drive 账户中，这意味着可以从任何有互联网访问的设备上访问。
 
-  要从 Google Drive 访问他们的项目，用户只需登录到他们的 Google 账户并导航到 [我的项目](#project-section)，所有存储的项目都会显示在那里。
+  要从 Google Drive 访问他们的项目，用户只需登录到他们的 Google 账户并导航到 [我的项目](#项目部分)，所有存储的项目都会显示在那里。
 
 ## OpenBot Playground 屏幕
 
@@ -70,17 +71,17 @@ npm start
 
 `OpenBot Playground` 从包含以下组件的主页开始：
 
-- [头部](#header) ：头部包含两个部分，切换主题和用户登录。
-- [轮播](#Carousal)：轮播内容解释了 Playground 的工作原理。
-- [项目部分](#project-section) ：项目部分包含项目列表和创建新项目按钮。
+- [头部](#头部) ：头部包含两个部分，切换主题和用户登录。
+- [轮播](#轮播)：轮播内容解释了 Playground 的工作原理。
+- [项目部分](#项目部分) ：项目部分包含项目列表和创建新项目按钮。
 
 ### Playground 页面
 
 `Playground` 页面是 `OpenBot Playground` 平台的一个关键功能，提供各种编码块，用户可以创建不同类型的功能，如控制、循环、移动、运算符、传感器等。
 
-- [头部](#header) ：头部包含项目名称、帮助中心、自动同步、切换主题和用户登录部分。
-- [工作区](#workSpace)：用户可以在工作区拖放编码块生成代码，可以转换为 JavaScript 和 Python。
-- [Playground 底部栏](#Playground-Bottom-Bar) ：底部栏包含生成代码、上传项目到 Google Drive、放大和缩小块、添加模型、撤销和重做工作区更改的按钮。
+- [头部](#头部) ：头部包含项目名称、帮助中心、自动同步、切换主题和用户登录部分。
+- [工作区](#工作区)：用户可以在工作区拖放编码块生成代码，可以转换为 JavaScript 和 Python。
+- [Playground 底部栏](#playground-底部栏) ：底部栏包含生成代码、上传项目到 Google Drive、放大和缩小块、添加模型、撤销和重做工作区更改的按钮。
 
 ### 头部
 
@@ -203,4 +204,4 @@ npm start
 
 ## 下一步（可选）
 
-Firebase 身份验证故障排除 [Firebase](src/services/README.zh-CN.md#troubleshooting)
+Firebase 身份验证故障排除 [Firebase](src/services/README.zh-CN.md#故障排除)

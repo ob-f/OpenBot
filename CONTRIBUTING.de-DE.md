@@ -38,7 +38,7 @@
 ## Richtlinien
 
 - Verwenden Sie denselben Stil und dieselbe Formatierung wie der Rest des Codes.
-  - Für den Java (Android)- und Python-Code siehe [unten](#Formatierung).
+  - Für den Java (Android)- und Python-Code siehe [unten](#formatierung).
   - Für jeden anderen Code versuchen Sie einfach, sich anzupassen.
 - Aktualisieren Sie die Dokumentation, die mit den von Ihnen vorgenommenen Codeänderungen verbunden ist.
 - Wenn Sie Drittanbieter-Abhängigkeiten einbeziehen möchten, besprechen Sie dies bitte zuerst im Issue.

@@ -73,6 +73,7 @@
   下面是一些示例：
     - 指示灯：用于通过打开/关闭来启用指示灯的块。
     - 亮度：用于通过动态值设置尾灯和前灯的亮度。
+    - [演示视频](https://www.youtube.com/watch?v=ICSi-1ip22U&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=3)
 
   注意：将亮度保持在零将使亮度模式关闭，如果亮度达到最高点即100，将打开亮度模式。
 
@@ -99,6 +100,7 @@
 
     - 速度：帮助您播放慢速、中速和快速的声音。
     - 模式：帮助您播放双重、摇杆或游戏模式的声音。
+    - [演示视频](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=1)
 
 - ### 传感器：
 
@@ -109,6 +111,7 @@
   概述：
     - 手机传感器：帮助测量不同轴（3维）的陀螺仪、加速度和磁性读数。
     - 车传感器：帮助提供不同的读数，如声纳、速度。还会检查碰撞传感器是否与障碍物碰撞。
+    - [演示视频](https://www.youtube.com/watch?v=Ubcb1bTgfuc&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=2)
 
 - ### 移动：
 
@@ -120,6 +123,7 @@
 
     - 设置速度：帮助设置慢速、中速和快速的速度。
     - 移动：帮助以所需速度向前或向后、向左或向右移动。
+    - [演示视频](https://www.youtube.com/watch?v=X7M45-PGOVg&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=4)
 
   关键点：
     - 如果左侧速度值设置低于右侧，机器人将逆时针移动，反之亦然。
@@ -136,6 +140,7 @@
     - ``物体跟踪``：其主要功能是检测物体。这个 AI 片段允许您选择任何物体进行跟踪。根据您的手机性能，您可以灵活选择物体检测模型。默认情况下，此块配备了“MobileNetV1-300”模型。此外，您还可以手动添加任何您选择的模型。
     - ``自动驾驶``：此片段也可通过 OpenBot Playground 使用，利用数据收集，其中预训练的数据集（ML 模型 CIL-Mobile-Cmd）已集成。随后，摄像头片段显示在屏幕上，开始跟踪捕获的路径。
     - ``目标导航``：此块的主要目标是通过导航到达指定点。您可以使用其中的导航模型在三维视图中配置前进和左转值。当项目在手机上执行时，点导航片段将显示在屏幕上，带有增强现实（AR）视图。随后，机器人将开始移动，直到成功到达目标。
+    - [演示视频](https://www.youtube.com/watch?v=MPzbwUoG97Q&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=6)
 
    <p style="color: yellow">提示：如果您已集成外部模型，请确保在 Playground 中启用 AutoSync。此功能将帮助您在块中显示新添加的模型，并验证模型在机器人应用程序中的可用性和成功下载。</p>
 

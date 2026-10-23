@@ -242,7 +242,7 @@ Bevor Sie fortfahren, stellen Sie sicher, dass die Reifen entfernt sind. Sie ben
 
 Bevor Sie das Auto mit einem Smartphone testen, auf dem die OpenBot-Anwendung installiert ist, können Sie das Auto auch ohne Telefon testen. Setzen Sie einfach `NO_PHONE_MODE 1` in den Einstellungen. Das Auto fährt nun mit _normaler Geschwindigkeit_ (75% PWM) und verlangsamt sich, wenn es Hindernisse mit dem Ultraschallsensor erkennt. Sobald es sich dem `TURN_THRESHOLD` (Standard: 50 cm) nähert, beginnt es, sich in eine zufällige Richtung zu drehen und schaltet die LED auf dieser Seite ein. Wenn der geschätzte freie Raum vor dem Auto unter den `TURN_THRESHOLD` fällt, fährt es langsam rückwärts und beide LEDs leuchten auf. Beachten Sie, dass sowohl das Auto als auch der Arduino mit Strom versorgt werden müssen. Der Arduino kann mit Strom versorgt werden, indem der 5V-Pin mit dem 5V-Ausgang des L298N-Motortreibers verbunden wird oder indem das USB-Kabel an eine Stromquelle (z.B. Telefon) angeschlossen wird.
 
-Bevor Sie das Auto laufen lassen, empfehlen wir, die Reifen zu entfernen, den Arduino mit einem Computer zu verbinden und den seriellen Monitor wie im Abschnitt [Testen](#testing) zu beobachten. Die Ausgabe auf dem seriellen Monitor ist etwas einfacher zu parsen (gleich wie OLED) und zeigt die Batteriespannung, die Umdrehungen pro Minute für die linken und rechten Motoren und den geschätzten freien Raum vor dem Auto an. Sie können ein großes Objekt vor dem Ultraschallsensor hin und her bewegen und beobachten, wie sich die Geschwindigkeit der Motoren ändert.
+Bevor Sie das Auto laufen lassen, empfehlen wir, die Reifen zu entfernen, den Arduino mit einem Computer zu verbinden und den seriellen Monitor wie im Abschnitt [Testen](#testen) zu beobachten. Die Ausgabe auf dem seriellen Monitor ist etwas einfacher zu parsen (gleich wie OLED) und zeigt die Batteriespannung, die Umdrehungen pro Minute für die linken und rechten Motoren und den geschätzten freien Raum vor dem Auto an. Sie können ein großes Objekt vor dem Ultraschallsensor hin und her bewegen und beobachten, wie sich die Geschwindigkeit der Motoren ändert.
 
 :warning: WARNUNG: Wenn Sie keinen Ultraschallsensor installiert haben oder wenn er deaktiviert ist, fährt das Auto einfach mit _normaler Geschwindigkeit_ (75% PWM) vorwärts und wird schließlich kollidieren. Selbst mit installiertem Sensor kann das Auto gelegentlich aufgrund von Rauschmessungen kollidieren.
 
@@ -272,6 +272,8 @@ Schalten Sie den Roboter ein und versetzen Sie das Gamepad in den Kopplungsmodus
 | Switch Pro, Joy-Con, 8BitDo und andere | Den Bluetooth-Kopplungsmodus des Gamepads verwenden (siehe Anleitung). |
 
 Die [Bluepad32-Liste unterstützter Gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) enthält weitere Modelle, darunter den PS3 DualShock 3, der zusätzliche Einrichtung braucht. Mit `DEBUG 1` zeigt der serielle Monitor den Namen jedes Gamepads an, das sich verbindet.
+
+Wenn ein bereits gekoppeltes Gamepad die Steuerung nicht übernimmt, zum Beispiel ein PS4- oder PS5-Controller, dessen Lichtleiste blau bleibt, statt grün, orange oder rot zu werden, versetzen Sie es erneut in den Kopplungsmodus und starten Sie den Roboter neu.
 
 #### Bedienung
 

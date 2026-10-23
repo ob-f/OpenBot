@@ -242,7 +242,7 @@ Avant de continuer, assurez-vous que les pneus sont retirés. Vous aurez besoin 
 
 Avant de tester la voiture avec un smartphone qui a l'application OpenBot installée, vous pouvez également tester la voiture sans téléphone d'abord. Réglez simplement `NO_PHONE_MODE 1` dans les réglages. La voiture roulera maintenant à _vitesse normale_ (75% PWM) et ralentira à mesure qu'elle détecte des obstacles avec le capteur ultrasonique. Une fois qu'elle se rapproche du `TURN_THRESHOLD` (par défaut : 50 cm), elle commencera à tourner dans une direction aléatoire et allumera la LED de ce côté. Si l'espace libre estimé devant la voiture tombe en dessous du `TURN_THRESHOLD`, elle reculera lentement et les deux LED s'allumeront. Notez que la voiture et l'Arduino doivent être alimentés. L'Arduino peut être alimenté en connectant la broche 5V à la sortie 5V du pilote de moteur L298N, ou en connectant le câble USB à une source d'alimentation (par exemple, téléphone).
 
-Avant de faire rouler la voiture, nous vous recommandons de retirer les pneus, de connecter l'Arduino à un ordinateur et d'observer le moniteur série comme dans la section [Test](#testing). La sortie sur le moniteur série est un peu plus facile à analyser (même que l'OLED) et montre la tension de la batterie, le régime pour les moteurs gauche et droit et l'espace libre estimé devant la voiture. Vous pouvez déplacer un grand objet d'avant en arrière devant le capteur ultrasonique et observer la vitesse des moteurs changer.
+Avant de faire rouler la voiture, nous vous recommandons de retirer les pneus, de connecter l'Arduino à un ordinateur et d'observer le moniteur série comme dans la section [Test](#test). La sortie sur le moniteur série est un peu plus facile à analyser (même que l'OLED) et montre la tension de la batterie, le régime pour les moteurs gauche et droit et l'espace libre estimé devant la voiture. Vous pouvez déplacer un grand objet d'avant en arrière devant le capteur ultrasonique et observer la vitesse des moteurs changer.
 
 :warning: AVERTISSEMENT : Si vous n'avez pas installé de capteur ultrasonique ou s'il est désactivé, la voiture roulera simplement en avant à _vitesse normale_ (75% PWM) et finira par entrer en collision. Même avec le capteur installé, la voiture peut parfois entrer en collision en raison de lectures bruyantes.
 
@@ -272,6 +272,8 @@ Allumez le robot et mettez la manette en mode d'appairage. Elle se connecte en q
 | Switch Pro, Joy-Con, 8BitDo et autres | Utilisez le mode d'appairage Bluetooth de la manette (voir son manuel). |
 
 La [liste des manettes prises en charge par Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) contient d'autres modèles, dont la DualShock 3 de la PS3, qui demande une configuration supplémentaire. Avec `DEBUG 1`, le moniteur série affiche le nom de chaque manette qui se connecte.
+
+Si une manette déjà appairée ne prend pas le contrôle, par exemple une manette PS4 ou PS5 dont la barre lumineuse reste bleue au lieu de passer au vert, à l'orange ou au rouge, remettez-la en mode d'appairage et redémarrez le robot.
 
 #### Commandes
 

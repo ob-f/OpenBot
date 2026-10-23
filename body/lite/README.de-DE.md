@@ -9,7 +9,7 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-eSpace von ITE hat einen [Lehrplan](#curriculum) für kostengünstige und skalierbare KI- und Robotikbildung rund um den OpenBot-Software-Stack entwickelt. Dieser besteht aus [Schritt-für-Schritt YouTube-Videos](#step-by-step-video-guides), die dich durch den Zusammenbau des [OpenBot Lite](#openbot-lite-arduino) führen, die notwendige Software installieren, die Personenerkennung nutzen und deine eigene autonome Fahrstrategie trainieren und einsetzen.
+eSpace von ITE hat einen [Lehrplan](#lehrplan) für kostengünstige und skalierbare KI- und Robotikbildung rund um den OpenBot-Software-Stack entwickelt. Dieser besteht aus [Schritt-für-Schritt YouTube-Videos](#schritt-für-schritt-videoanleitungen), die dich durch den Zusammenbau des [OpenBot Lite](#openbot-lite) führen, die notwendige Software installieren, die Personenerkennung nutzen und deine eigene autonome Fahrstrategie trainieren und einsetzen.
 
 ## OpenBot Lite
 

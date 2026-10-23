@@ -226,7 +226,7 @@ At the end of the training process, two tflite files are generated: one correspo
   <img src="../docs/images/android_studio_tflite_dir.jpg" width="200" alt="App GUI" />
 </p>
 
-If you are looking for the folder in your local directory, you will find it at: `app/src/main/assets/networks`.
+If you are looking for the folder in your local directory, you will find it at: `robot/android/app/src/main/assets/networks`.
 
 ## Web App
 

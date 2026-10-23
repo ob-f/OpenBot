@@ -242,7 +242,7 @@ Antes de continuar, asegúrate de que los neumáticos estén removidos. Necesita
 
 Antes de probar el coche con un smartphone que tenga la aplicación OpenBot instalada, también puedes probar el coche sin un teléfono primero. Simplemente ajusta `NO_PHONE_MODE 1` en los ajustes. El coche ahora conducirá a _velocidad normal_ (75% PWM) y disminuirá la velocidad a medida que detecte obstáculos con el sensor ultrasónico. Una vez que se acerque al `TURN_THRESHOLD` (por defecto: 50 cm), comenzará a girar en una dirección aleatoria y encenderá el LED en ese lado. Si el espacio libre estimado frente al coche cae por debajo del `TURN_THRESHOLD`, retrocederá lentamente y ambos LEDs se encenderán. Ten en cuenta que tanto el coche como el Arduino necesitan estar alimentados. El Arduino se puede alimentar conectando el pin de 5V a la salida de 5V del controlador de motor L298N, o conectando el cable USB a una fuente de alimentación (por ejemplo, teléfono).
 
-Antes de hacer funcionar el coche, recomendamos quitar los neumáticos, conectar el Arduino a una computadora y observar el monitor serial como en la sección [Pruebas](#testing). La salida en el monitor serial es un poco más fácil de analizar (igual que el OLED) y muestra el voltaje de la batería, el rpm para los motores izquierdo y derecho y el espacio libre estimado frente al coche. Puedes mover un objeto grande hacia adelante y hacia atrás frente al sensor ultrasónico y observar el cambio de velocidad de los motores.
+Antes de hacer funcionar el coche, recomendamos quitar los neumáticos, conectar el Arduino a una computadora y observar el monitor serial como en la sección [Pruebas](#pruebas). La salida en el monitor serial es un poco más fácil de analizar (igual que el OLED) y muestra el voltaje de la batería, el rpm para los motores izquierdo y derecho y el espacio libre estimado frente al coche. Puedes mover un objeto grande hacia adelante y hacia atrás frente al sensor ultrasónico y observar el cambio de velocidad de los motores.
 
 :warning: ADVERTENCIA: Si no tienes un sensor ultrasónico instalado o si está deshabilitado, el coche simplemente avanzará a _velocidad normal_ (75% PWM) y eventualmente colisionará. Incluso con el sensor instalado, el coche puede colisionar ocasionalmente debido a lecturas ruidosas.
 
@@ -272,6 +272,8 @@ Enciende el robot y pon el gamepad en modo de emparejamiento. Se conecta en poco
 | Switch Pro, Joy-Con, 8BitDo y otros | Usa el modo de emparejamiento Bluetooth del gamepad (consulta su manual). |
 
 La [lista de gamepads compatibles de Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) incluye más modelos, entre ellos el PS3 DualShock 3, que necesita configuración adicional. Con `DEBUG 1`, el monitor serie muestra el nombre de cada gamepad que se conecta.
+
+Si un gamepad que ya estaba emparejado no toma el control, por ejemplo un mando de PS4 o PS5 cuya barra de luz se queda en azul en lugar de ponerse verde, naranja o roja, ponlo de nuevo en modo de emparejamiento y reinicia el robot.
 
 #### Controles
 
