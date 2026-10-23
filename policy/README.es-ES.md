@@ -225,7 +225,7 @@ Al final del proceso de entrenamiento, se generan dos archivos tflite: uno corre
   <img src="../docs/images/android_studio_tflite_dir.jpg" width="200" alt="App GUI" />
 </p>
 
-Si estás buscando la carpeta en tu directorio local, la encontrarás en: `app/src/main/assets/networks`.
+Si estás buscando la carpeta en tu directorio local, la encontrarás en: `robot/android/app/src/main/assets/networks`.
 
 ## Aplicación Web
 

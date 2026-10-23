@@ -226,7 +226,7 @@ python -m openbot.train --model pilot_net --batch_size 128 --num_epochs 100 --ba
   <img src="../docs/images/android_studio_tflite_dir.jpg" width="200" alt="App GUI" />
 </p>
 
-로컬 디렉토리에서 폴더를 찾고 있다면, `app/src/main/assets/networks`에 있습니다.
+로컬 디렉토리에서 폴더를 찾고 있다면, `robot/android/app/src/main/assets/networks`에 있습니다.
 
 ## 웹 앱
 

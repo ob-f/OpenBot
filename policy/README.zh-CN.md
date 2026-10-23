@@ -225,7 +225,7 @@ python -m openbot.train --model pilot_net --batch_size 128 --num_epochs 100 --ba
   <img src="../docs/images/android_studio_tflite_dir.jpg" width="200" alt="应用程序GUI" />
 </p>
 
-如果您在本地目录中查找文件夹，您会在以下位置找到它：`app/src/main/assets/networks`。
+如果您在本地目录中查找文件夹，您会在以下位置找到它：`robot/android/app/src/main/assets/networks`。
 
 ## Web应用程序
 

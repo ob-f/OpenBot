@@ -225,7 +225,7 @@ python -m openbot.train --model pilot_net --batch_size 128 --num_epochs 100 --ba
   <img src="../docs/images/android_studio_tflite_dir.jpg" width="200" alt="GUI de l'application" />
 </p>
 
-Si vous cherchez le dossier dans votre répertoire local, vous le trouverez à : `app/src/main/assets/networks`.
+Si vous cherchez le dossier dans votre répertoire local, vous le trouverez à : `robot/android/app/src/main/assets/networks`.
 
 ## Application Web
 

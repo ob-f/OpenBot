@@ -259,7 +259,12 @@ Version réduite de [YoloV4](https://arxiv.org/abs/2004.10934) avec une résolut
 |téléphone/appareil (fps)| CPU | GPU | NNAPI |
 |------------------------|-----|-----|-------|
 | Samsung S22 Ultra      |  21 |  10 |   21  |
-| Xiaomi Mi9             |  13 |  15 |
+| Xiaomi Mi9             |  13 |  15 |  0.8  |
+| Google Pixel 4XL       |  12 |  17 |   18  |
+
+#### YoloV5s-640 - mAP : 34%
+
+[YoloV5](https://github.com/ultralytics/yolov5) avec une résolution d'entrée de 640x640.
 
 |téléphone/appareil (fps)| CPU | GPU | NNAPI |
 |-----------------------|-----|-----|-------|
