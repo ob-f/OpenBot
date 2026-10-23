@@ -29,6 +29,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     private var lastControl: Control?
     private var cameraHeight: Float = PointGoalFragment.savedCameraHeight()
     private var cameraHeightMeasured = false
+    // When ARKit tracking went "limited" during the current drive, or nil while it's normal.
+    private var trackingLimitedSince: TimeInterval?
 
     // Shared with the render thread and the navigation queue.
     private let shared = SharedState()
@@ -39,8 +41,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     // ARKit calls back every frame (~16 ms); this long without a navigation step means it's stuck.
     private static let watchdogTimeout: TimeInterval = 0.7
     private static let safetyTick: TimeInterval = 0.25
-    // The firmware stops the motors by itself if no heartbeat arrives within this time.
-    private static let heartbeatTimeoutMs = 750
+    // Short tracking hiccups (a bump, a fast turn, a plain floor) only pause the drive; longer ones end it.
+    private static let trackingLimitedTimeout: TimeInterval = 2
     // Resend the stop once in case the first command got lost over Bluetooth.
     private static let stopResendDelay: TimeInterval = 0.1
 
@@ -211,7 +213,12 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         guard !isRunning, shared.goal != nil else {
             return
         }
+        guard navigation != nil else {
+            showHint(Strings.pointGoalModelFailure)
+            return
+        }
         isRunning = true
+        trackingLimitedSince = nil
         runGeneration += 1
         shared.startRun(generation: runGeneration)
         lastNavUpdate = Date.timeIntervalSinceReferenceDate
@@ -219,12 +226,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         startButton.isHidden = true
         stopButton.isHidden = false
 
-        // Heartbeats and the watchdog run on the main thread on purpose: if the main thread hangs, the
-        // heartbeats stop too and the firmware stops the motors by itself.
+        // Stops the robot if the navigation loop goes quiet (frozen camera or app).
         safetyTimer = Timer.scheduledTimer(withTimeInterval: PointGoalFragment.safetyTick, repeats: true) { [weak self] _ in
             self?.safetyTick()
         }
-        bluetooth.sendData(payload: "h\(PointGoalFragment.heartbeatTimeoutMs)\n")
     }
 
     @objc private func stopPressed() {
@@ -237,7 +242,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     }
 
     @objc private func appWillResignActive() {
-        stopDriving()
+        // Only a drive is stopped; a goal that is just placed survives the notification shade or a call banner.
+        if isRunning {
+            stopDriving()
+        }
     }
 
     private func safetyTick() {
@@ -249,9 +257,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
             print("nav: no update for \(silent) s, stopping robot")
             stopDriving()
             showHint(Strings.pointGoalWatchdog)
-            return
         }
-        bluetooth.sendData(payload: "h\(PointGoalFragment.heartbeatTimeoutMs)\n")
     }
 
     /// Stops the motors first, then cleans up. Safe to call when not driving.
@@ -260,15 +266,14 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         isRunning = false
         shared.stopRun()
         sendControl(Control(), force: true)
+        // A write without response is skipped while the Bluetooth buffer is full; this one is queued.
+        bluetooth.stopRobot()
         if wasRunning {
             DispatchQueue.main.asyncAfter(deadline: .now() + PointGoalFragment.stopResendDelay) { [weak self] in
                 guard let self = self, !self.isRunning else {
                     return
                 }
                 self.sendControl(Control(), force: true)
-                // Back to the firmware default (no heartbeat timeout) so other screens, which don't
-                // send heartbeats, keep working.
-                self.bluetooth.sendData(payload: "h-1\n")
             }
         }
         safetyTimer?.invalidate()
@@ -282,19 +287,31 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         guard isRunning, generation == runGeneration else {
             return
         }
-        lastNavUpdate = Date.timeIntervalSinceReferenceDate
+        let now = Date.timeIntervalSinceReferenceDate
         switch outcome {
         case .drive(let control):
+            lastNavUpdate = now
+            trackingLimitedSince = nil
             sendControl(control, force: false)
         case .arrived(let distance):
             print("nav: goal reached at distance=\(distance)")
             stopDriving()
             showHint(Strings.goalReachedMessage)
-        case .trackingLost:
-            print("nav: tracking lost, stopping")
-            stopDriving()
-            showHint(Strings.pointGoalTrackingLost)
+        case .trackingLimited:
+            // The pose can't be trusted right now: hold still, keep the goal, and resume once tracking
+            // is back. Only a long outage ends the drive.
+            lastNavUpdate = now
+            sendControl(Control(), force: false)
+            let since = trackingLimitedSince ?? now
+            trackingLimitedSince = since
+            if now - since > PointGoalFragment.trackingLimitedTimeout {
+                print("nav: tracking limited for \(now - since) s, stopping")
+                stopDriving()
+                showHint(Strings.pointGoalTrackingLost)
+            }
         case .skipped:
+            // No new command was computed, so this doesn't count as a healthy step: if it keeps
+            // happening, the watchdog stops the robot instead of it driving on its last command.
             break
         }
     }
@@ -304,8 +321,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
             return
         }
         lastControl = control
-        let left = Int((control.getLeft() * gameController.selectedSpeedMode.rawValue).rounded())
-        let right = Int((control.getRight() * gameController.selectedSpeedMode.rawValue).rounded())
+        // The policy can ask for a bit more than full power; the firmware doesn't cap it, so cap here.
+        let speed = gameController.selectedSpeedMode.rawValue
+        let left = Int((max(-1, min(1, control.getLeft())) * speed).rounded())
+        let right = Int((max(-1, min(1, control.getRight())) * speed).rounded())
         bluetooth.sendData(payload: "c\(left),\(right)\n")
         NotificationCenter.default.post(name: .updateSpeedLabel, object: "\(left),\(right)")
         NotificationCenter.default.post(name: .updateRpmLabel, object: String(Int(control.getLeft())) + "," + String(Int(control.getRight())))
@@ -328,7 +347,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         } else {
             shared.endStep()
             DispatchQueue.main.async { [weak self] in
-                self?.onNavigationStep(generation: generation, outcome: .trackingLost)
+                self?.onNavigationStep(generation: generation, outcome: .trackingLimited)
             }
             return
         }
@@ -350,10 +369,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
 
     /// Runs on the navigation queue.
     private func navigationStep(pixelBuffer: CVPixelBuffer, position: simd_float3, orientation: simd_quatf, goal: simd_float3) -> NavigationOutcome {
-        let robotPose = Pose(tx: position.x, ty: position.y, tz: position.z, qx: orientation.imag.x, qy: orientation.imag.y, qz: orientation.imag.z, qw: orientation.real)
-        let goalPose = Pose(tx: goal.x, ty: goal.y, tz: goal.z, qx: 0, qy: 0, qz: 0, qw: 1)
         let distance = PointGoalMath.horizontalDistance(position, goal)
-        let yaw = computeDeltaYaw(pose: robotPose, goalPose: goalPose)
+        let yaw = PointGoalMath.deltaYaw(position: position, orientation: orientation, goal: goal)
 
         if shared.hasArrived(distance: distance, deltaYaw: yaw) {
             return .arrived(distance: distance)
@@ -435,33 +452,6 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         return saved > 0 ? saved : PointGoalMath.defaultCameraHeight
     }
 
-    /// function to calculate the delta yaw for device position and goal position
-    ///
-    /// - Parameters:
-    ///   - pose: device position
-    ///   - goalPose: destination position
-    /// - Returns:
-    func computeDeltaYaw(pose: Pose, goalPose: Pose) -> Float {
-        // compute robot forward axis (global coordinate system)
-        let forward: [Float] = [0.0, 0.0, -1.0]
-        let forwardRotated = pose.rotateVector(vector: forward)
-
-        // distance vector to goal (global coordinate system)
-        let dx = goalPose.tx - pose.tx
-        let dz = goalPose.tz - pose.tz
-
-        let yaw = atan2(forwardRotated[2], forwardRotated[0]) - atan2(dz, dx)
-
-        // fit to range (-pi, pi]
-        var resultYaw = yaw
-        if (resultYaw > Float.pi) {
-            resultYaw -= 2 * Float.pi
-        } else if (resultYaw <= -Float.pi) {
-            resultYaw += 2 * Float.pi
-        }
-        return resultYaw
-    }
-
     func setupNavigationBarItem() {
         if UIImage(named: "back") != nil {
             let backNavigationIcon = (UIImage(named: "back")?.withRenderingMode(.alwaysOriginal))!
@@ -478,7 +468,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
 private enum NavigationOutcome {
     case drive(Control)
     case arrived(distance: Float)
-    case trackingLost
+    case trackingLimited
     case skipped
 }
 
@@ -603,6 +593,19 @@ enum PointGoalMath {
     static func horizontalDistance(_ a: simd_float3, _ b: simd_float3) -> Float {
         simd_length(simd_float2(a.x - b.x, a.z - b.z))
     }
+
+    /// Angle from the camera's forward direction to the goal, in (-pi, pi].
+    /// Uses simd's quaternion rotation, which is right for any phone roll (landscape mount).
+    static func deltaYaw(position: simd_float3, orientation: simd_quatf, goal: simd_float3) -> Float {
+        let forward = orientation.act(simd_float3(0, 0, -1))
+        var yaw = atan2(forward.z, forward.x) - atan2(goal.z - position.z, goal.x - position.x)
+        if yaw > .pi {
+            yaw -= 2 * .pi
+        } else if yaw <= -.pi {
+            yaw += 2 * .pi
+        }
+        return yaw
+    }
 }
 
 /// Decides when the robot has arrived. Besides being within the goal radius, a robot that is close and
@@ -620,7 +623,7 @@ struct ArrivalCheck {
 
     /// - Parameters:
     ///   - distance: distance to the goal in meters
-    ///   - deltaYaw: angle between heading and goal direction, as from computeDeltaYaw
+    ///   - deltaYaw: angle between heading and goal direction, as from PointGoalMath.deltaYaw
     mutating func hasArrived(distance: Float, deltaYaw: Float) -> Bool {
         closest = min(closest, distance)
         if distance < ArrivalCheck.goalRadius {

@@ -196,6 +196,7 @@
 "pointGoalTooClose" = "बहुत पास। कम से कम %.1f मी दूर की जगह पर टैप करें।";
 "pointGoalWatchdog" = "ऐप ने जवाब देना बंद कर दिया, इसलिए रोबोट रोक दिया गया।";
 "pointGoalTrackingLost" = "ट्रैकिंग खो गई। रोबोट रोक दिया गया।";
+"pointGoalModelFailure" = "नेविगेशन पॉलिसी शुरू नहीं हो सकी।";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "सभी";

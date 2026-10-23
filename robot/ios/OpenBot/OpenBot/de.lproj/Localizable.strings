@@ -196,6 +196,7 @@
 "pointGoalTooClose" = "Zu nah. Tippen Sie auf eine Stelle, die mindestens %.1f m entfernt ist.";
 "pointGoalWatchdog" = "Der Roboter wurde angehalten, weil die App nicht mehr reagiert hat.";
 "pointGoalTrackingLost" = "Tracking verloren. Der Roboter wurde angehalten.";
+"pointGoalModelFailure" = "Die Navigationssteuerung konnte nicht initialisiert werden.";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "Alle";

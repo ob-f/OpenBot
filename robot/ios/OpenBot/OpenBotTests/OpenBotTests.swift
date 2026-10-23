@@ -101,6 +101,37 @@ class PointGoalMathTests: XCTestCase {
     func testNoPlanesNoFloor() {
         XCTAssertNil(PointGoalMath.pickFloorY(planes: [], cameraY: 0))
     }
+
+    // Phone mounted in landscape: rolled 90 degrees around its forward axis.
+    private let landscape = simd_quatf(angle: .pi / 2, axis: simd_float3(0, 0, -1))
+    private let portrait = simd_quatf(angle: 0, axis: simd_float3(0, 1, 0))
+
+    private func yaw(_ orientation: simd_quatf, goal: simd_float3) -> Float {
+        PointGoalMath.deltaYaw(position: simd_float3(0, 0, 0), orientation: orientation, goal: goal)
+    }
+
+    func testGoalAheadIsZeroYaw() {
+        XCTAssertEqual(yaw(portrait, goal: simd_float3(0, -0.15, -1)), 0, accuracy: 1e-4)
+        XCTAssertEqual(yaw(landscape, goal: simd_float3(0, -0.15, -1)), 0, accuracy: 1e-4)
+    }
+
+    func testGoalToTheSidesIsQuarterTurn() {
+        for orientation in [portrait, landscape] {
+            XCTAssertEqual(abs(yaw(orientation, goal: simd_float3(1, -0.15, 0))), .pi / 2, accuracy: 1e-4)
+            XCTAssertEqual(abs(yaw(orientation, goal: simd_float3(-1, -0.15, 0))), .pi / 2, accuracy: 1e-4)
+            XCTAssertNotEqual(yaw(orientation, goal: simd_float3(1, -0.15, 0)).sign, yaw(orientation, goal: simd_float3(-1, -0.15, 0)).sign)
+        }
+    }
+
+    func testGoalBehindIsHalfTurn() {
+        XCTAssertEqual(abs(yaw(landscape, goal: simd_float3(0, -0.15, 1))), .pi, accuracy: 1e-4)
+    }
+
+    func testRobotTurnedTowardGoalIsZeroYaw() {
+        // Robot turned 90 degrees left (and phone still in landscape) facing a goal on its left.
+        let turned = simd_quatf(angle: .pi / 2, axis: simd_float3(0, 1, 0)) * landscape
+        XCTAssertEqual(yaw(turned, goal: simd_float3(-1, -0.15, 0)), 0, accuracy: 1e-4)
+    }
 }
 
 class ArrivalCheckTests: XCTestCase {

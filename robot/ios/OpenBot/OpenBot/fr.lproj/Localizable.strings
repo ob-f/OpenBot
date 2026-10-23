@@ -196,6 +196,7 @@
 "pointGoalTooClose" = "Trop proche. Touchez un point à au moins %.1f m.";
 "pointGoalWatchdog" = "Le robot a été arrêté car l'application ne répondait plus.";
 "pointGoalTrackingLost" = "Suivi perdu. Le robot a été arrêté.";
+"pointGoalModelFailure" = "Impossible d'initialiser la politique de navigation.";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "Tous";

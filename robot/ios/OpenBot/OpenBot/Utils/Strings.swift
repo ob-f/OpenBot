@@ -273,6 +273,7 @@ struct Strings {
     static var pointGoalTooClose: String { L10n.string("pointGoalTooClose") }
     static var pointGoalWatchdog: String { L10n.string("pointGoalWatchdog") }
     static var pointGoalTrackingLost: String { L10n.string("pointGoalTrackingLost") }
+    static var pointGoalModelFailure: String { L10n.string("pointGoalModelFailure") }
 
     // Model Management filter dropdown
     static var modelFilterAll: String { L10n.string("modelFilterAll") }

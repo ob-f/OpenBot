@@ -196,6 +196,7 @@
 "pointGoalTooClose" = "太近了。请点击至少 %.1f 米外的位置。";
 "pointGoalWatchdog" = "应用无响应，机器人已停止。";
 "pointGoalTrackingLost" = "跟踪丢失，机器人已停止。";
+"pointGoalModelFailure" = "无法初始化导航策略。";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "全部";
