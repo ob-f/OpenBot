@@ -73,7 +73,7 @@ Para integrar Firebase en la aplicación Android de OpenBot para el inicio de se
 
   - **En Windows**
     ```shell 
-    keytool -list -v -keystore "%USERPROFILE%.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+    keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
     ```
     Este comando es parecido al de Mac, pero usa una `ruta distinta` al archivo debug.keystore. `%USERPROFILE%` es una variable de entorno del sistema que apunta a la carpeta del perfil del usuario actual, donde está la carpeta `.android` con el archivo `debug.keystore`.
 

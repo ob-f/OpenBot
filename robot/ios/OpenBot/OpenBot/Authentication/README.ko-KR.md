@@ -84,28 +84,13 @@ Google Firebase는 모바일과 웹 애플리케이션 개발 플랫폼으로, �
 
 ### iOS 프로젝트 설정
 
-CocoaPods로 Firebase SDK를 설치합니다. Mac에서 터미널 앱을 열고 Xcode 프로젝트의 루트 디렉터리로 이동합니다. 다음 명령을 실행해 Xcode 프로젝트의 루트 디렉터리에 Podfile을 만듭니다.
-
-```
-pod init
-```
-
-원하는 텍스트 편집기로 Podfile을 열고 파일 끝에 다음 줄을 추가합니다.
-
-```
-pod 'Firebase/Core'
-pod 'Firebase/Storage'
-pod 'Firebase/Auth'
-pod 'GoogleSignIn'
-pod 'GoogleSignInSwiftSupport'
-pod 'GoogleAPIClientForREST/Drive' 
-```
-
-Podfile을 저장하고 닫은 다음, 다음 명령으로 Firebase SDK를 설치합니다.
+Firebase SDK는 CocoaPods로 설치합니다. 저장소에는 필요한 모든 pod가 들어 있는 Podfile이 이미 있습니다. Mac에서 터미널 앱을 열고 `robot/ios/OpenBot`으로 이동한 다음 실행합니다.
 
 ```
 pod install
 ```
+
+그런 다음 Xcode에서 `OpenBot.xcodeproj`가 아닌 `OpenBot.xcworkspace`를 엽니다.
 
 ### 문제 해결
 

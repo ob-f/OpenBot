@@ -73,7 +73,7 @@ Um Firebase für die Google-Anmeldung in die OpenBot-Android-App einzubinden, br
 
   - **Unter Windows**
     ```shell 
-    keytool -list -v -keystore "%USERPROFILE%.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+    keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
     ```
     Dieser Befehl entspricht dem Mac-Befehl, verwendet aber einen `anderen Pfad` zur Datei debug.keystore. `%USERPROFILE%` ist eine Systemumgebungsvariable für das Profilverzeichnis des aktuellen Benutzers, in dem der Ordner `.android` mit der Datei `debug.keystore` liegt.
 

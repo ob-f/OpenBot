@@ -105,29 +105,13 @@ building great user experiences.
 
 ### Set up the iOS Project
 
-Install the Firebase SDK using CocoaPods. Open the Terminal app on your Mac and navigate to your Xcode project's root
-directory. Run the following command to create a Podfile in your Xcode project's root directory:
+The Firebase SDK is installed with CocoaPods. The repository already includes a Podfile with all required pods. Open the Terminal app on your Mac, go to `robot/ios/OpenBot` and run:
 
 ```
-pod init
+pod install
 ```
 
-Open the Podfile using your preferred text editor and add the following lines at the end of the file:
-
-```
-pod 'Firebase/Core'
-pod 'Firebase/Storage'
-pod 'Firebase/Auth'
-pod 'GoogleSignIn'
-pod 'GoogleSignInSwiftSupport'
-pod 'GoogleAPIClientForREST/Drive' 
-  ```
-
-Save and close the Podfile, then Run the following command to install the Firebase SDKs:
-
-  ```
-  pod install
-```
+Then open `OpenBot.xcworkspace` (not `OpenBot.xcodeproj`) in Xcode.
 
 ### Troubleshooting
 

@@ -70,7 +70,7 @@ keyPassword=<your key password>
 keyAlias=upload
 storeFile=/absolute/path/to/release.keystore
 ```
-`storeFile` 必须是指向第 1 步生成的密钥库的绝对路径（或可从 `controller/flutter/android/` 解析的路径）。
+`storeFile` 必须是指向第 1 步生成的密钥库的绝对路径（或可从 `controller/flutter/android/app/` 解析的路径）。
 
 ### 3. 构建
 ```bash

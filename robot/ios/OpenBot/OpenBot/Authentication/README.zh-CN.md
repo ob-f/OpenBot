@@ -84,28 +84,13 @@ Google Firebase 是一个移动和 Web 应用开发平台，提供多种服务�
 
 ### 设置 iOS 项目
 
-使用 CocoaPods 安装 Firebase SDK。在 Mac 上打开“终端”应用，进入 Xcode 项目的根目录。运行以下命令，在 Xcode 项目根目录中创建 Podfile：
-
-```
-pod init
-```
-
-用您喜欢的文本编辑器打开 Podfile，在文件末尾添加以下几行：
-
-```
-pod 'Firebase/Core'
-pod 'Firebase/Storage'
-pod 'Firebase/Auth'
-pod 'GoogleSignIn'
-pod 'GoogleSignInSwiftSupport'
-pod 'GoogleAPIClientForREST/Drive' 
-```
-
-保存并关闭 Podfile，然后运行以下命令安装 Firebase SDK：
+Firebase SDK 通过 CocoaPods 安装。仓库中已经包含带有所有所需 pod 的 Podfile。在 Mac 上打开“终端”应用，进入 `robot/ios/OpenBot`，然后运行：
 
 ```
 pod install
 ```
+
+然后在 Xcode 中打开 `OpenBot.xcworkspace`（而不是 `OpenBot.xcodeproj`）。
 
 ### 故障排除
 

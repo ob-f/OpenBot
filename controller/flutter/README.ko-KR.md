@@ -71,7 +71,7 @@ keyPassword=<your key password>
 keyAlias=upload
 storeFile=/absolute/path/to/release.keystore
 ```
-`storeFile`은 1단계에서 생성한 키 저장소의 절대 경로(또는 `controller/flutter/android/`에서 찾을 수 있는 경로)여야 합니다.
+`storeFile`은 1단계에서 생성한 키 저장소의 절대 경로(또는 `controller/flutter/android/app/`에서 찾을 수 있는 경로)여야 합니다.
 
 ### 3. 빌드
 ```bash

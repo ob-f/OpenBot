@@ -317,16 +317,6 @@ Version réduite de [YoloV4](https://arxiv.org/abs/2004.10934) avec une résolut
 | Xiaomi Mi9            | 6.4 | 9.4 |   -   |
 | Google Pixel 4XL      | 7.7 | 8.3 |  7.6  |
 
-#### EfficientDet-L2-448 - mAP: 34%
-
-[EfficientDet-L2](https://tfhub.dev/tensorflow/lite-model/efficientdet/lite2/detection/metadata/1) avec une résolution d'entrée de 448x448. Remarque : les performances du modèle se dégradent en mode paysage ; il faudra peut-être ajuster le seuil de confiance.
-
-|téléphone/appareil (fps)| CPU | GPU | NNAPI |
-|------------------|-----|-----|-------|
-| Samsung S22 Ultra| 9.8 | 8.4 |  8.2  |
-| Xiaomi Mi9       | 6.4 | 9.4 |   -   |
-| Google Pixel 4XL | 7.7 | 8.3 |  7.6  |
-
 ### Par défaut
 
 La [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivity.java) inclut les fonctionnalités les plus importantes de l'application OpenBot sur un seul écran. Elle affiche l'état de la connexion au véhicule et rapporte les mesures des capteurs du véhicule. Le robot peut être contrôlé par des manettes de jeu BT standard ou un autre smartphone exécutant l'application [controller](../../../controller/flutter/README.fr-FR.md) OpenBot. Nous avons également implémenté un enregistreur de données pour collecter des ensembles de données avec le robot. Actuellement, nous enregistrons les lectures des capteurs suivants : caméra, gyroscope, accéléromètre, magnétomètre, capteur de lumière ambiante et baromètre. En utilisant l'API Android, nous pouvons obtenir les lectures des capteurs suivants : images RGB, vitesse angulaire, accélération linéaire, gravité, intensité du champ magnétique, intensité lumineuse, pression atmosphérique, latitude, longitude, altitude, cap et vitesse. En plus des capteurs du téléphone, nous enregistrons les lectures des capteurs du corps (odométrie des roues, distance des obstacles et tension de la batterie), qui sont transmises via le lien série. Nous enregistrons également et horodatons les signaux de contrôle reçus d'un contrôleur connecté, le cas échéant. Enfin, nous intégrons plusieurs réseaux neuronaux pour le suivi des personnes et la navigation autonome.

@@ -72,7 +72,7 @@ Google Firebase 是一个移动和 Web 应用开发平台，提供多种服务�
 
   - **在 Windows 上**
     ```shell 
-    keytool -list -v -keystore "%USERPROFILE%.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+    keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
     ```
     此命令与 Mac 上的命令类似，但使用`不同的路径`来定位 debug.keystore 文件。`%USERPROFILE%` 是指向当前用户配置文件目录的系统环境变量，该目录中包含存放 `debug.keystore` 文件的 `.android` 目录。
 

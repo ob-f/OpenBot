@@ -72,7 +72,7 @@ Google 로그인을 위해 OpenBot Android 앱에 Firebase를 연동하려면 �
 
   - **Windows에서**
     ```shell 
-    keytool -list -v -keystore "%USERPROFILE%.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+    keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
     ```
     이 명령은 Mac 명령과 비슷하지만 debug.keystore 파일을 찾는 `경로가 다릅니다`. `%USERPROFILE%`은 현재 사용자의 프로필 디렉터리를 가리키는 시스템 환경 변수이며, 이 디렉터리 안의 `.android` 디렉터리에 `debug.keystore` 파일이 있습니다.
 

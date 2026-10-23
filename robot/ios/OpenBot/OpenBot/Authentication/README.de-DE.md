@@ -85,28 +85,13 @@ Google Firebase ist eine Entwicklungsplattform für mobile Apps und Web-Apps mit
 
 ### iOS-Projekt einrichten
 
-Installieren Sie das Firebase SDK mit CocoaPods. Öffnen Sie das Terminal auf Ihrem Mac und wechseln Sie in den Hauptordner Ihres Xcode-Projekts. Erstellen Sie dort mit diesem Befehl eine Podfile:
-
-```
-pod init
-```
-
-Öffnen Sie die Podfile in einem Texteditor und fügen Sie am Ende diese Zeilen hinzu:
-
-```
-pod 'Firebase/Core'
-pod 'Firebase/Storage'
-pod 'Firebase/Auth'
-pod 'GoogleSignIn'
-pod 'GoogleSignInSwiftSupport'
-pod 'GoogleAPIClientForREST/Drive' 
-```
-
-Speichern und schließen Sie die Podfile und installieren Sie die Firebase SDKs mit diesem Befehl:
+Das Firebase SDK wird mit CocoaPods installiert. Das Repository enthält bereits eine Podfile mit allen nötigen Pods. Öffnen Sie das Terminal auf Ihrem Mac, wechseln Sie nach `robot/ios/OpenBot` und führen Sie aus:
 
 ```
 pod install
 ```
+
+Öffnen Sie danach `OpenBot.xcworkspace` (nicht `OpenBot.xcodeproj`) in Xcode.
 
 ### Fehlerbehebung
 

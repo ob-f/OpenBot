@@ -57,7 +57,7 @@ OpenBot RC-Truck的底盘由两个主要组件组成：(a) 您选择的1:16比�
 由于许多常见的3D打印机具有较小的构建体积（通常为220mmx220mm），还有两个可行的选项。
 第一个选项是以45度角打印```main_frame```，并增加支撑材料。
 第二个选项需要修改原始的```main_frame```零件。我们推荐使用[Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview)进行此类CAD修改（Fusion 360提供免费的1年学术许可证）。
-对于此选项，我们提供其[STEP](/body/cad/rc_truck_body/main_frame.step)文件，您可以将其切割成两/三个较小的部分。
+对于此选项，我们提供其[STEP](cad/rc_truck_body/main_frame.step)文件，您可以将其切割成两/三个较小的部分。
 然后，生成的子部分将适合标准（即220mmx220mm）的打印板，并可以在打印后组装在一起。
 将来，我们可能还会在此处发布这种模块化版本的```main_frame```。所有其他零件需要最小的打印板尺寸为220mmx60mm。
 
@@ -84,7 +84,7 @@ OpenBot RC-Truck的底盘由两个主要组件组成：(a) 您选择的1:16比�
 
 ## 组装
 
-虽然可以采用类似于常规OpenBot的DIY方法构建您的OpenBot RC-Truck（参见OpenBot的DIY构建组件和说明[这里](/body/README.md)），我们推荐使用OpenBot的[定制PCB](/body/pcb)来构建和组装OpenBot RC-Truck。如果您希望构建更整洁或希望构建多个OpenBot RC-Truck，这个选项是推荐的。使用我们的[定制PCB](/body/pcb)的另一个优势是，您可以使用相同的组件构建并在不同的OpenBot车身之间切换。
+虽然可以采用类似于常规OpenBot的DIY方法构建您的OpenBot RC-Truck（参见OpenBot的DIY构建组件和说明[这里](/body/README.md)），我们推荐使用OpenBot的[定制PCB](../diy/pcb/README.zh-CN.md)来构建和组装OpenBot RC-Truck。如果您希望构建更整洁或希望构建多个OpenBot RC-Truck，这个选项是推荐的。使用我们的[定制PCB](../diy/pcb/README.zh-CN.md)的另一个优势是，您可以使用相同的组件构建并在不同的OpenBot车身之间切换。
 
 ### 材料清单
 
@@ -94,7 +94,7 @@ OpenBot RC-Truck主要依赖于易得的业余电子产品。我们提供了德�
 
 - 1x RC玩具卡车/越野车（[EU](https://www.amazon.de/dp/B00M3J7DJW), [EU](https://www.amazon.de/dp/B088FGVYNW), [US](https://www.amazon.com/gp/product/B09C8XMPQ9)）
 - 1x Arduino Nano（[EU](https://www.amazon.de/dp/B01MS7DUEM), [US](https://www.amazon.com/dp/B00NLAMS9C), [AE](https://www.aliexpress.com/item/32866959979.html)）
-- 1x OpenBot [定制PCB](/body/pcb)
+- 1x OpenBot [定制PCB](../diy/pcb/README.zh-CN.md)
 - 1x USB OTG电缆（[EU](https://www.amazon.de/gp/product/B075M4CQHZ), [US](https://www.amazon.com/dp/B07LBHKTMM), [AE](https://www.aliexpress.com/item/10000330515850.html)）
 - 1x 弹簧或橡皮筋（[EU](https://www.amazon.de/gp/product/B01N30EAZO/), [US](https://www.amazon.com/dp/B008RFVWU2), [AE](https://www.aliexpress.com/item/33043769059.html)）
 - 6x M3x25螺丝（[EU](https://www.amazon.de/dp/B07KFL3SSV), [US](https://www.amazon.com/dp/B07WJL3P3X), [AE](https://www.aliexpress.com/item/4000173341865.html)）
@@ -120,7 +120,7 @@ OpenBot RC-Truck主要依赖于易得的业余电子产品。我们提供了德�
       <img src="/docs/images/rc_truck_disassembly_2.JPG" width="32%" /> 
       <img src="/docs/images/rc_truck_disassembly_3.JPG" width="32%" />
     </p>
-2. 注意到```main_frame```上的两个尺寸d1和d2（如下图所示）取决于所使用的遥控玩具卡车的型号。我们为[这个](https://www.amazon.de/dp/B00M3J7DJW)遥控玩具卡车型号设计了我们的```main_frame```部件。根据你使用的卡车（1:16比例），你可能需要使用```main_frame``` [STEP](/body/cad/rc_truck_body/main_frame.step)文件稍微调整这些尺寸。我们推荐使用[Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview)进行此类CAD修改（Fusion 360提供免费的一年学术许可证）。另外，注意```main_frame```上的小楔形/三角形表示前进方向。
+2. 注意到```main_frame```上的两个尺寸d1和d2（如下图所示）取决于所使用的遥控玩具卡车的型号。我们为[这个](https://www.amazon.de/dp/B00M3J7DJW)遥控玩具卡车型号设计了我们的```main_frame```部件。根据你使用的卡车（1:16比例），你可能需要使用```main_frame``` [STEP](cad/rc_truck_body/main_frame.step)文件稍微调整这些尺寸。我们推荐使用[Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview)进行此类CAD修改（Fusion 360提供免费的一年学术许可证）。另外，注意```main_frame```上的小楔形/三角形表示前进方向。
     <p float="left">
       <img src="/docs/images/main-frame-dimensions.png" width="32%" />
       <img src="/docs/images/main-frame-direction.png" width="32%" />
