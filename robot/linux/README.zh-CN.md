@@ -77,7 +77,7 @@
 - 通过`test_generate_data.py`生成训练数据
 - 在调试模式下进行OpenVino、Tensorflow和Tflite的推理，通过`test_infer.py`
     - *注意*：logs1中的测试数据是使用`OpenBot.policy.openbot`中的`associate_frames.py`脚本生成的，其中图像路径硬编码在`logs1/data/sensor_data/matched_frame_ctrl_cmd_processed.txt`中。
-    - 因此，请在`test_infer.py`中将`path_to_openbot`替换为`OpenBot`仓库的实际路径。
+    - `test_infer.py` 会将其替换为您本地 `OpenBot` 仓库的路径。
 - 通过`test_joystick.py`进行操纵杆连接
 - 通过`test_motor.py`从串口到Arduino的电机连接
 - 通过`test_realsense.py`进行Realsense摄像头的视频流
@@ -104,7 +104,7 @@ conda create --name openbot python==3.9
 
 首先，通过以下命令安装OpenBot.policy的依赖项：
 ```
-../policy && pip install -r requirements.txt
+cd ../../policy && pip install -r requirements.txt && cd ../robot/linux
 ```
 
 然后，通过以下命令安装所需的模块：

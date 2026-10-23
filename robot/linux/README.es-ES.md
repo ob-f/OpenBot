@@ -77,7 +77,7 @@ Ejecuta `pytest` en la carpeta `tests` o ejecuta los archivos `test_*.py` indivi
 - generar datos de entrenamiento mediante `test_generate_data.py`.
 - inferencia en modo debug para OpenVino, Tensorflow, y Tflite mediante `test_infer.py`.
     - *Nota*: Los datos de prueba en logs1 se generan usando el script `associate_frames.py` en `OpenBot.policy.openbot`, donde la ruta a las imágenes está codificada en `logs1/data/sensor_data/matched_frame_ctrl_cmd_processed.txt`.
-    - Por lo tanto, por favor reemplaza `path_to_openbot` con la ruta real al repositorio `OpenBot` en `test_infer.py`.
+    - `test_infer.py` la reemplaza por la ruta a tu copia del repositorio `OpenBot`.
 - conexión del joystick mediante `test_joystick.py`
 - conexión del motor desde el puerto serie al Arduino mediante `test_motor.py`.
 - transmisión de video a la cámara Realsense mediante `test_realsense.py`.
@@ -104,7 +104,7 @@ conda create --name openbot python==3.9
 
 Primero, instala los requisitos de OpenBot.policy mediante
 ```
-../policy && pip install -r requirements.txt
+cd ../../policy && pip install -r requirements.txt && cd ../robot/linux
 ```
 
 Luego, instala los módulos requeridos mediante
