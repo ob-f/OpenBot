@@ -54,6 +54,34 @@ Android에서는 최신 [릴리스](https://github.com/ob-f/OpenBot/releases)의
     <img src="../../docs/images/run_editor.jpg" width="50%" />
   </p>
 
+## 서명된 릴리스 빌드 만들기(Android)
+릴리스 빌드(`flutter build apk --release` / `flutter build appbundle --release`)는 `android/key.properties`에서 참조하는 키 저장소로 서명됩니다. 이 파일은 **gitignore**되어 커밋되지 않으므로 개발자마다 자신의 로컬 사본을 만들어야 합니다. 디버그 빌드(`flutter build apk --debug`, `flutter run`)에는 필요하지 않습니다.
+
+### 1. 키 저장소 생성(한 번만)
+```bash
+keytool -genkey -v -keystore ~/release.keystore -alias upload -keyalg RSA -keysize 2048 -validity 10000
+```
+생성한 `.keystore`/`.jks` 파일과 비밀번호는 저장소 밖 안전한 곳에 보관하세요. 잃어버리면 같은 앱 서명으로 더 이상 업데이트를 배포할 수 없습니다.
+
+### 2. `android/key.properties` 만들기
+`android/app/build.gradle`은 `controller/flutter/android/key.properties`에서 이 파일을 읽으므로, 그 위치에 다음 내용으로 만드세요.
+```properties
+storePassword=<your keystore password>
+keyPassword=<your key password>
+keyAlias=upload
+storeFile=/absolute/path/to/release.keystore
+```
+`storeFile`은 1단계에서 생성한 키 저장소의 절대 경로(또는 `controller/flutter/android/app/`에서 찾을 수 있는 경로)여야 합니다.
+
+### 3. 빌드
+```bash
+cd controller/flutter
+flutter build appbundle --release   # Play 스토어 업로드용(.aab)
+# 또는
+flutter build apk --release         # 서명된 설치용 APK
+```
+`app/build.gradle`은 `key.properties`가 있으면 자동으로 불러와 `release` 서명 구성에 사용합니다. 파일이 없으면 릴리스 구성에 서명 값이 없어 서명에 실패합니다(디버그 빌드는 영향을 받지 않습니다).
+
 ## 연결
 
 컨트롤러 휴대폰과 로봇 휴대폰은 같은 Wi-Fi 네트워크에 연결되어 있거나, 한 휴대폰이 다른 휴대폰의 핫스팟에 연결되어 있어야 합니다. 인터넷 연결은 필요하지 않습니다.
@@ -111,5 +139,19 @@ Android에서는 최신 [릴리스](https://github.com/ob-f/OpenBot/releases)의
 - `엑셀러레이터`를 누르면 로봇은 2초 이내에 최대 속도로 가속됩니다. 버튼을 떼면 로봇은 속도를 줄여 정지합니다(정지 속도는 최대 속도의 0%로 설정 가능).
 - `브레이크` 버튼을 누르면 로봇이 즉시 정지합니다. 브레이크를 1초 더 누르면 로봇이 후진을 시작하고 1초 이내에 최대 후진 속도에 도달합니다. 브레이크를 떼면 로봇은 정지합니다.
 - 로봇은 컨트롤러 폰을 왼쪽/오른쪽으로 기울여 조종합니다.
+
+### 컨트롤러 설정 UI
+
+`Controller Settings` 화면의 모습입니다.
+
+- 컨트롤러 선택: 아이콘으로 여러 컨트롤러 유형(예: 휴대폰, 조이스틱)을 전환합니다.
+ 
+- 서버: 현재 서버 상태를 보여 주며, 드롭다운으로 서버를 선택하거나 바꿀 수 있습니다.
+ 
+- 노이즈 토글: 스위치로 노이즈 시뮬레이션을 켜거나 끕니다.
+
+<p float="left">
+  <img src="../../docs/images/flutter_controller_setting.jpg" width="50%" />
+</p>
 
 여기에는 [기술 개요](../../docs/technical/OpenBotController.pdf)도 포함되어 있습니다.

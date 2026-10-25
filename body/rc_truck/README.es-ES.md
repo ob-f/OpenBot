@@ -57,7 +57,7 @@ Para todas las piezas anteriores, tu placa de construcción necesita ser al meno
 Dado que muchas impresoras 3D comunes tienen un volumen de construcción más pequeño (generalmente 220mmx220mm), hay dos opciones más que pueden funcionar.
 La primera opción es imprimir el ```main_frame``` a 45 grados con material de soporte adicional.
 La segunda opción requiere modificar la pieza original ```main_frame```. Recomendamos usar [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) para tales modificaciones CAD (Fusion 360 tiene una licencia académica gratuita de 1 año disponible).
-Para esta opción, ponemos a disposición su archivo [STEP](/body/cad/rc_truck_body/main_frame.step), que puedes cortar en dos/tres piezas más pequeñas.
+Para esta opción, ponemos a disposición su archivo [STEP](cad/rc_truck_body/main_frame.step), que puedes cortar en dos/tres piezas más pequeñas.
 Las sub-piezas resultantes se ajustarán a una placa de construcción estándar (es decir, 220mmx220mm) y se pueden unir después de la impresión.
 En el futuro, también podemos lanzar una versión modular del ```main_frame``` aquí. Todas las demás piezas requieren una placa de construcción mínima de 220mmx60mm.
 
@@ -84,7 +84,7 @@ Antes de proceder con la construcción, es posible que necesites limpiar la impr
 
 ## Ensamblaje
 
-Si bien es posible construir tu OpenBot RC-Truck con un enfoque de bricolaje similar al OpenBot regular (ver componentes e instrucciones de construcción de bricolaje para OpenBot [aquí](/body/README.es-ES.md)), recomendamos usar la [PCB personalizada](/body/pcb) de OpenBot para construir y ensamblar el OpenBot RC-Truck. Esta opción es recomendada si deseas una construcción más limpia o quieres construir múltiples OpenBot RC-Trucks. Una ventaja adicional de usar nuestra [PCB personalizada](/body/pcb) es que puedes usar los mismos componentes para construir y cambiar entre diferentes cuerpos de OpenBot.
+Si bien es posible construir tu OpenBot RC-Truck con un enfoque de bricolaje similar al OpenBot regular (ver componentes e instrucciones de construcción de bricolaje para OpenBot [aquí](/body/README.es-ES.md)), recomendamos usar la [PCB personalizada](../diy/pcb/README.es-ES.md) de OpenBot para construir y ensamblar el OpenBot RC-Truck. Esta opción es recomendada si deseas una construcción más limpia o quieres construir múltiples OpenBot RC-Trucks. Una ventaja adicional de usar nuestra [PCB personalizada](../diy/pcb/README.es-ES.md) es que puedes usar los mismos componentes para construir y cambiar entre diferentes cuerpos de OpenBot.
 
 ### Lista de materiales
 
@@ -94,7 +94,7 @@ El OpenBot RC-Truck se basa principalmente en electrónica de hobby fácilmente 
 
 - 1x camión/buggy de juguete RC ([EU](https://www.amazon.de/dp/B00M3J7DJW), [EU](https://www.amazon.de/dp/B088FGVYNW), [US](https://www.amazon.com/gp/product/B09C8XMPQ9))
 - 1x Arduino Nano ([EU](https://www.amazon.de/dp/B01MS7DUEM), [US](https://www.amazon.com/dp/B00NLAMS9C), [AE](https://www.aliexpress.com/item/32866959979.html))
-- 1x OpenBot [PCB personalizada](/body/pcb)
+- 1x OpenBot [PCB personalizada](../diy/pcb/README.es-ES.md)
 - 1x cable USB OTG ([EU](https://www.amazon.de/gp/product/B075M4CQHZ), [US](https://www.amazon.com/dp/B07LBHKTMM), [AE](https://www.aliexpress.com/item/10000330515850.html))
 - 1x resorte o banda elástica ([EU](https://www.amazon.de/gp/product/B01N30EAZO/), [US](https://www.amazon.com/dp/B008RFVWU2), [AE](https://www.aliexpress.com/item/33043769059.html))
 - 6x tornillo M3x25 ([EU](https://www.amazon.de/dp/B07KFL3SSV), [US](https://www.amazon.com/dp/B07WJL3P3X), [AE](https://www.aliexpress.com/item/4000173341865.html))
@@ -120,7 +120,7 @@ El OpenBot RC-Truck se basa principalmente en electrónica de hobby fácilmente 
       <img src="/docs/images/rc_truck_disassembly_2.JPG" width="32%" /> 
       <img src="/docs/images/rc_truck_disassembly_3.JPG" width="32%" />
     </p>
-2. Nota que las dos dimensiones d1 y d2 (como se muestra a continuación) en el ```main_frame``` dependen del modelo del camión de juguete RC utilizado. Diseñamos nuestra pieza ```main_frame``` para [este](https://www.amazon.de/dp/B00M3J7DJW) modelo de camión de juguete RC. Según el camión (a escala 1:16) que uses, es posible que necesites ajustar estas dimensiones ligeramente usando el archivo ```main_frame``` [STEP](/body/cad/rc_truck_body/main_frame.step). Recomendamos usar [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) para tales modificaciones CAD (Fusion 360 tiene una licencia académica gratuita de 1 año disponible). Además, ten en cuenta que la pequeña cuña/triángulo en el ```main_frame``` representa la dirección hacia adelante.
+2. Nota que las dos dimensiones d1 y d2 (como se muestra a continuación) en el ```main_frame``` dependen del modelo del camión de juguete RC utilizado. Diseñamos nuestra pieza ```main_frame``` para [este](https://www.amazon.de/dp/B00M3J7DJW) modelo de camión de juguete RC. Según el camión (a escala 1:16) que uses, es posible que necesites ajustar estas dimensiones ligeramente usando el archivo ```main_frame``` [STEP](cad/rc_truck_body/main_frame.step). Recomendamos usar [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) para tales modificaciones CAD (Fusion 360 tiene una licencia académica gratuita de 1 año disponible). Además, ten en cuenta que la pequeña cuña/triángulo en el ```main_frame``` representa la dirección hacia adelante.
     <p float="left">
       <img src="/docs/images/main-frame-dimensions.png" width="32%" />
       <img src="/docs/images/main-frame-direction.png" width="32%" />
@@ -144,4 +144,63 @@ El OpenBot RC-Truck se basa principalmente en electrónica de hobby fácilmente 
     </p>
 **Consejo:** Para evitar el desorden y posibles errores de conexión a tierra durante el cableado, se recomienda formar un bucle de tierra unificado para los terminales negativos de todos los LEDs. Esto simplemente significa pasar un cable debajo del ```main_frame``` que conecte todos los terminales negativos de los LEDs. Este bucle de tierra luego se puede conectar al pin de tierra del Arduino Nano usando un solo cable Dupont, que se pasa a la abertura rectangular en la parte trasera del ```main_frame```.
 
-6. (Opcional) Instala las lámparas LED delanteras. Puedes usar pegamento caliente para mantener la base en su lugar y atornillar la lámpara en su respectiva base a través de la abertura frontal en cada lado. Conecta ambas lámparas LED delanteras en paralelo conectando sus terminales positivos y negativos juntos respectivamente. Dado que estas lámparas funcionan a 6V, puedes conectarlas directamente a la salida del UBEC a través de sus terminales positivos. Conecta los terminales negativos al
+6. (Opcional) Instala las lámparas LED delanteras. Puedes usar pegamento caliente para mantener la base en su lugar y atornillar la lámpara en su respectiva base a través de la abertura frontal en cada lado. Conecta ambas lámparas LED delanteras en paralelo conectando sus terminales positivos y negativos juntos respectivamente. Dado que estas lámparas funcionan a 6V, puedes conectarlas directamente a la salida del UBEC a través de sus terminales positivos. Conecta los terminales negativos al bucle de tierra (ver el consejo anterior). La resistencia interna de estos LEDs es bastante alta, así que no hace falta añadir ninguna resistencia externa. Después de instalar las lámparas LED, coloca y pega con pegamento caliente los dos ```front_light_spacers``` en cada lado para fijar los LEDs.
+    <p float="left">
+      <img src="/docs/images/insert-lamps-1.png" width="32%" />
+      <img src="/docs/images/led-lamp-wiring.jpg" width="32%" />
+      <img src="/docs/images/add_front_light_spacer.png" width="32%" />
+    </p>
+7. (Opcional) Instala los LEDs rojos de las luces traseras. Puedes usar pegamento caliente para mantenerlos en su lugar si es necesario. Conecta los cuatro LEDs rojos en paralelo, es decir, conecta sus terminales positivos y negativos juntos respectivamente. Los terminales negativos van a tierra, mientras que los positivos se conectan juntos a la salida del UBEC a través de un divisor de voltaje adecuado (consulta el siguiente paso para construir el divisor de voltaje).
+    <p float="left">
+      <img src="/docs/images/insert-leds-red.png" width="32%" />
+      <img src="/docs/images/red-led.jpg" width="32%" />
+    </p>
+8. (Opcional) Instala el divisor de voltaje para los LEDs rojos traseros. La mayoría de los LEDs de color (p. ej., rojo, naranja, amarillo) funcionan a 2-3V y no a los 5V habituales, que son la tensión de trabajo normal del Arduino Nano. Por eso hace falta un divisor de voltaje para usar estos LEDs con seguridad. Para las señales de los indicadores, nuestra PCB personalizada ya tiene un divisor de voltaje incorporado, así que no tienes que hacer nada para los LEDs de los indicadores (naranjas). Sin embargo, si también añades luces traseras, es decir, LEDs rojos, necesitan un divisor de voltaje externo. Recomendamos usar una resistencia variable de 10kΩ o más para el divisor. Según la tensión de salida de tu UBEC (6V en nuestro caso), tienes que ajustar el divisor para que dé 2-3V. Para ello, aplica la salida del UBEC a los extremos de la resistencia, gira el tornillo de la parte superior y mide la tensión de salida con un multímetro digital entre tierra y el terminal central (ver la figura a continuación). Cuando la tensión de salida de la resistencia variable, es decir, del divisor de voltaje, esté en el rango de 2-3V, fija el tornillo con un poco de pegamento caliente y coloca el divisor debajo del ```main_frame``` en un lugar cómodo.
+    <p float="left">
+      <img src="/docs/images/variable-resistor.jpg" width="32%" />
+      <img src="/docs/images/voltage-divider-animation.png" width="32%" />
+    </p>
+9. (Opcional) También puedes usar uno o dos interruptores de encendido/apagado para encender y apagar los LEDs delanteros y traseros. Sigue las instrucciones del paso 3 para instalar uno o varios interruptores con este fin.
+10. Ya casi has terminado el cableado del robot. Tómate un momento para comprobar que todos los cables y conexiones debajo del ```main_frame``` son correctos y están bien aislados con tubo termorretráctil o cinta eléctrica. Usa pegamento caliente para sujetar los cables sueltos de modo que no toquen las ruedas ni ninguna pieza móvil del robot después del ensamblaje. Asegúrate de que todos los cables de los motores, el UBEC del controlador de velocidad, los LEDs y el sensor ultrasónico salen sin problemas por la abertura rectangular de la parte trasera del ```main_frame```.
+11. Monta el ```phone_mount_bottom``` en el ```main_frame``` con dos tornillos M3x25 y tuercas. Si quieres ajustar la altura del soporte del teléfono, puedes poner uno o más ```camera_elevators``` entre ambos. Si usas un ```camera_elevator```, necesitarás tornillos M3x35 o más largos para montar el soporte del teléfono en el ```main_frame```.
+    <p float="left">
+      <img src="/docs/images/add_phone_mount_bottom.png" width="32%" />
+      <img src="/docs/images/add_phone_mount_bottom_elevator.png" width="32%" /> 
+    </p>
+10. Coloca el ```phone_mount_top``` e instala el muelle o la goma elástica.
+    <p float="left">
+      <img src="/docs/images/add_phone_mount_top.png" width="32%" />
+    </p>
+11. Coloca las dos ```side_covers``` en sus ranuras.
+    <p float="left">
+      <img src="/docs/images/add_side_covers.png" width="32%" />
+      <img src="/docs/images/add_side_covers_2.png" width="32%" />
+    </p>    
+12. Monta el ```main_frame``` en el cuerpo del RC-Truck con los cuatro pasadores de montaje y sus tornillos. Asegúrate de que todos los conectores de los cables y el interruptor de alimentación del robot quedan accesibles a través de la abertura rectangular de la parte trasera del ```main_frame``` para conectarlos a la PCB. Saca el conector de la batería por la abertura triangular de la parte delantera del ```main_frame```.
+    <p float="left">
+      <img src="/docs/images/add_main_frame_1.JPG" width="32%" />
+      <img src="/docs/images/add_main_frame_2.png" width="32%" />
+      <img src="/docs/images/add_main_frame_3.JPG" width="32%" />
+    </p>
+12. Monta la PCB con cuatro tornillos M3x25 y tuercas, con cuatro ```spacers``` entre medias, en la parte trasera del ```main_frame```. Monta el Arduino Nano en la PCB y conecta el cable USB OTG al puerto USB del Arduino Nano.
+    <p float="left">
+      <img src="/docs/images/pcb_assembly.JPG" width="32%" />
+    </p>
+13. Conecta los cables del sensor ultrasónico al conector marcado como "sonar" en la PCB. Asegúrate de que la polaridad +ve/-ve y las líneas de datos coinciden entre el sensor y los puertos de la PCB.
+14. Conecta los cables de los LEDs de los indicadores izquierdo y derecho a sus conectores de señal de indicador en la PCB. Asegúrate de respetar la polaridad +ve y -ve de los terminales de los LEDs.
+15. Conecta la salida del UBEC (+6V) al pin Vin del Arduino Nano (opcional, el Arduino también puede alimentarse desde el teléfono), y la GND del UBEC al pin GND del Arduino (junto a Vin).
+16. Conecta la salida del UBEC (+6V) a los terminales +ve del servo de dirección, de las lámparas LED delanteras y, a través del divisor de voltaje, de los LEDs rojos traseros.
+17. Conecta también el cable de tierra del servo de dirección al pin GND del Arduino.
+18. Conecta el cable PWM del servo del acelerador (del controlador de velocidad) al pin A0 del Arduino Nano o de la placa de conexiones de la PCB.
+19. Conecta el cable PWM del servo de dirección al pin A1 del Arduino Nano o de la placa de conexiones de la PCB.
+**Consejo:** Si has creado un bucle de tierra unificado para el cableado de los LEDs, conecta también el cable del bucle de tierra a uno de los pines GND del Arduino. El Arduino Nano tiene tres pines GND. Si no has hecho un bucle de tierra, asegúrate de que todos los LEDs, el servo de dirección, los sensores, el Arduino Nano y el UBEC del controlador de velocidad comparten la misma tierra con el cableado y las conexiones adecuados.
+21. Conecta el paquete de baterías en la parte delantera y sujétalo con velcro o cinta de montaje. Con la batería delante es fácil acceder a ella para recargarla. Esta posición también ayuda a equilibrar el peso del robot cuando hay un smartphone montado encima.
+22. Coloca las ```electronics_covers``` delantera y trasera. Saca el cable USB OTG por el hueco de la ```electronics_cover``` trasera para conectarlo a un smartphone Android.
+<p float="left">
+      <img src="/docs/images/add_covers_1.png" width="32%" />
+      <img src="/docs/images/add_covers_2.JPG" width="32%" />
+    </p>
+
+## Siguiente
+
+Flashea el [firmware de Arduino](../../firmware/README.es-ES.md)

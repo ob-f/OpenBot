@@ -579,7 +579,7 @@ The left leg of the MTV consists of the following parts:
 
 - 1 x 3D-printed <a href="cad/Joints/90deg_Joint.stl">90 deg Joint </a> (A4)
 - 1 x 3D-printed <a href="cad/Joints/End_Joint.stl">End Joint  </a> (A7)
-- 1 x 3D-printed <a href="cad/Joints/BearingCover.stl">Bearing Cover </a> (A11)
+- 1 x 3D-printed <a href="cad/BearingCover/BearingCover.stl">Bearing Cover </a> (A11)
 - 1 x 3D-printed <a href="cad/Joints/100deg_Joint.stl">100 deg Joint </a> (A5)
 - 2 x 3D-printed <a href="cad/Legs/Front_Leg.stl">Front Leg </a> (A8)
 - 1 x 3D-printed <a href="cad/Legs/Mid_Leg.stl">Mid Leg </a> (A9)
@@ -592,7 +592,7 @@ The right leg of the MTV consists of the following parts:
 
 - 1 x 3D-printed <a href="cad/Joints/90deg_Joint.stl">90 deg Joint </a> (A4)
 - 1 x 3D-printed <a href="cad/Joints/End_Joint.stl">End Joint  </a> (A7)
-- 1 x 3D-printed <a href="cad/Joints/BearingCover.stl">Bearing Cover </a> (A11)
+- 1 x 3D-printed <a href="cad/BearingCover/BearingCover.stl">Bearing Cover </a> (A11)
 - 1 x 3D-printed <a href="cad/Joints/100deg_Joint_Mirror.stl">100 deg Joint Mirror</a> (A6)
 - 2 x 3D-printed <a href="cad/Legs/Front_Leg.stl">Front Leg </a> (A8)
 - 1 x 3D-printed <a href="cad/Legs/Mid_Leg.stl">Mid Leg </a> (A9)
@@ -626,7 +626,7 @@ Complete the chassis assembly, including attaching the cable duct (O4) as requir
 
 The main compartment consist of the following parts:
 
-- 2 x 3D-printed <a href="cad/Joints/BearingCover.stl">Bearing Cover </a> (A11)
+- 2 x 3D-printed <a href="cad/BearingCover/BearingCover.stl">Bearing Cover </a> (A11)
 - 1 x 3D-printed <a href="cad/PhoneMount/Phone_Mount.stl">Phone Mount Platform </a> (A12)
 - 1 x 3D-printed <a href="cad/Buffer/Name_Front.stl">Name Front </a> (A13)
 - 1 x 3D-printed <a href="cad/Buffer/Name_Back.stl">Name Back </a> (A14)

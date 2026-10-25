@@ -98,7 +98,7 @@ pip install -r requirements.txt
 
 如果您想要可视化网络架构，您还可以安装pydot（`pip install pydot`）和graphviz（[参见说明](https://graphviz.gitlab.io/download/)）。
 
-如果您想使用[WebApp](#web-app)进行数据收集和训练，您还需要安装以下依赖项。（在Mac上，`brotlipy`包在pip上当前有问题，因此您需要首先使用conda安装它：`conda install brotlipy=0.7`）
+如果您想使用[WebApp](#web应用程序)进行数据收集和训练，您还需要安装以下依赖项。（在Mac上，`brotlipy`包在pip上当前有问题，因此您需要首先使用conda安装它：`conda install brotlipy=0.7`）
 
 ```bash
 pip install -r requirements_web.txt
@@ -144,7 +144,7 @@ Jupyter notebook期望在同一文件夹中有一个名为`dataset`的文件夹�
 
 <img src="../docs/images/folder_structure.png" width="200" alt="文件夹结构" />
 
-与其手动从手机复制所有文件，您还可以自动将日志上传到计算机上的[Python服务器](#web-app)。在这种情况下，zip文件将被上传并解压到文件夹`dataset/uploaded`中。您仍然需要将它们移动到训练的文件夹结构中。您可以简单地将`uploaded`文件夹视为一个录制会话并将其移动到`train_data`中。然后，Jupyter notebook将识别这些录音为训练数据。如果您在`test_data`文件夹中还没有录制会话，您还需要将至少一个录音从`train_data/uploaded`移动到`test_data/uploaded`中。
+与其手动从手机复制所有文件，您还可以自动将日志上传到计算机上的[Python服务器](#web应用程序)。在这种情况下，zip文件将被上传并解压到文件夹`dataset/uploaded`中。您仍然需要将它们移动到训练的文件夹结构中。您可以简单地将`uploaded`文件夹视为一个录制会话并将其移动到`train_data`中。然后，Jupyter notebook将识别这些录音为训练数据。如果您在`test_data`文件夹中还没有录制会话，您还需要将至少一个录音从`train_data/uploaded`移动到`test_data/uploaded`中。
 
 ### 数据转换（可选）
 
@@ -225,7 +225,7 @@ python -m openbot.train --model pilot_net --batch_size 128 --num_epochs 100 --ba
   <img src="../docs/images/android_studio_tflite_dir.jpg" width="200" alt="应用程序GUI" />
 </p>
 
-如果您在本地目录中查找文件夹，您会在以下位置找到它：`app/src/main/assets/networks`。
+如果您在本地目录中查找文件夹，您会在以下位置找到它：`robot/android/app/src/main/assets/networks`。
 
 ## Web应用程序
 

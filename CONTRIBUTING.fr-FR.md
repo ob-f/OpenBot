@@ -38,7 +38,7 @@
 ## Directives
 
 - Utilisez le même style et formatage que le reste du code.
-  - Pour le code Java (Android) et Python, voir [ci-dessous](#Formatage).
+  - Pour le code Java (Android) et Python, voir [ci-dessous](#formatage).
   - Pour tout autre code, essayez simplement de vous fondre dans le style existant.
 - Mettez à jour la documentation associée aux modifications de code que vous avez apportées.
 - Si vous souhaitez inclure des dépendances tierces, veuillez en discuter d'abord dans le problème.

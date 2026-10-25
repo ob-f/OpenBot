@@ -184,4 +184,48 @@ Nuestro cuerpo de robot se basa en electrónica de hobby fácilmente disponible.
 19. (Opcional) Conecta la pantalla OLED (chip SSD1306) a través del bus I2C al Arduino Nano.
     1. Conecta los pines VIN y GND de la pantalla a 5V y GND.
     2. Conecta el pin SCL de la pantalla al pin A5.
-   
+    3. Conecta el pin SDA de la pantalla al pin A4.
+20. Conecta los cables de alimentación a +12V y GND del L298N.
+21. Conecta el cable USB al Arduino y pásalo por la cubierta superior.
+22. Mete seis tuercas M3 en la placa inferior y monta la cubierta superior con seis tornillos M3x25.
+23. Monta las ruedas.
+
+#### Opción 2: PCB personalizada
+
+1. Suelda a los motores cables con conectores Micro JST PH 2.0 y agrega los discos codificadores a los dos motores frontales si planeas usar los sensores de velocidad.
+    <p float="left">
+      <img src="../../docs/images/add_wires_motor.jpg" width="32%" />
+      <img src="../../docs/images/add_disk_motor.jpg" width="32%" /> 
+    </p>
+2. Monta los motores con ocho tornillos y tuercas M3x25.
+    <p float="left">
+      <img src="../../docs/images/attach_motors_1.jpg" width="32%" />
+      <img src="../../docs/images/attach_motors_2.jpg" width="32%" /> 
+      <img src="../../docs/images/attach_motors_3.jpg" width="32%" />
+    </p>
+3. Conecta los dos motores izquierdos a M3 y M4, y los dos derechos a M1 y M2.
+    <p float="left">
+      <img src="../../docs/images/connect_motors_pcb.jpg" width="32%" />
+    </p>
+4. Monta la PCB con cuatro tornillos M3x5 y los motores con ocho tornillos y tuercas M3x25.
+    <p float="left">
+      <img src="../../docs/images/attach_pcb.jpg" width="32%" />
+      <img src="../../docs/images/chassis_motors_pcb.jpg" width="32%" />
+    </p>
+5. Sigue los pasos 5-12 de la opción DIY.
+6. Conecta el sensor ultrasónico (VCC/+, Trig, Echo, GND/-) al conector de 4 pines marcado *SONAR* en la PCB.
+    <p float="left">
+      <img src="../../docs/images/connect_sonar_sensor.jpg" width="32%" />
+    </p>
+7. Conecta las señales de los indicadores izquierdo y derecho (LEDs naranjas) a los conectores de 2 pines marcados *SIGNAL_L* y *SIGNAL_R* en la PCB. La pata más larga es + y la más corta -.
+8. Conecta los sensores de velocidad izquierdo y derecho (VCC/+, GND/-, D0) a los conectores de 3 pines marcados *SPEED_L* y *SPEED_R*.
+9. (Opcional) Conecta la pantalla OLED (chip SSD1306) al conector IO2 de la PCB.
+    1. Conecta los pines VIN y GND de la pantalla a 5V y GND.
+    2. Conecta el pin SCL de la pantalla al pin A5.
+    3. Conecta el pin SDA de la pantalla al pin A4.
+10. Conecta los cables de alimentación a Vin (conector Micro JST PH 2.0) de la PCB.
+11. Sigue los pasos 21-23 de la opción DIY.
+
+## Siguiente
+
+Flashea el [firmware de Arduino](../../firmware/README.es-ES.md)

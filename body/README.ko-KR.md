@@ -59,4 +59,4 @@ Arduino Nano와 같은 마이크로컨트롤러를 사용하여 OpenBot 소프�
 
 ## 다음
 
-[Arduino 펌웨어](../../firmware/README.ko-KR.md)를 플래시하세요!
+[Arduino 펌웨어](../firmware/README.ko-KR.md)를 플래시하세요!

@@ -31,7 +31,7 @@ OpenBot 利用智能手机作为低成本机器人的大脑。我们设计了一
 - 阅读 [免责声明](DISCLAIMER.md)
 - 构建你自己的 [机器人主体](body/README.zh-CN.md)
 - 刷写 [Arduino 固件](firmware/README.zh-CN.md)
-- 安装 [Android 应用](robot/android/README.zh-CN.md)
+- 安装 [机器人应用](robot/README.zh-CN.md)
 - 通过 [控制器](controller/README.zh-CN.md) 驾驶机器人
 - 在 [Playground](open-code/README.zh-CN.md) 中编程你的机器人
 - 训练你自己的 [驾驶策略](policy/README.zh-CN.md)
@@ -44,7 +44,6 @@ OpenBot 利用智能手机作为低成本机器人的大脑。我们设计了一
     git clone https://github.com/ob-f/OpenBot.git
     ```
 - 你可以 fork OpenBot 仓库，然后克隆你的本地副本。特别是如果你想 [贡献](CONTRIBUTING.md)，这是推荐的方式。
-- 机器人应用位于 `robot/`：`robot/android`（在 Android Studio 中打开此文件夹）、`robot/ios` 和 `robot/linux`。
 
 ## 视频
 
