@@ -784,7 +784,7 @@ unsigned long sonar_time = 0;
 boolean sonar_sent = false;
 boolean ping_success = false;
 unsigned int distance = -1;           //cm
-unsigned int distance_estimate = -1;  //cm
+unsigned int distance_estimate = MAX_SONAR_DISTANCE;  //cm, nothing in front until the first reading
 unsigned long start_time;
 unsigned long echo_time = 0;
 #if (SONAR_MEDIAN)
@@ -793,9 +793,11 @@ int distance_array[distance_array_sz] = {};
 unsigned int distance_counter = 0;
 #endif
 #else
-const unsigned int TURN_DISTANCE = -1;  //cm
-const unsigned int STOP_DISTANCE = 0;   //cm
-unsigned int distance_estimate = -1;    //cm
+// No sonar: the path always looks clear
+const unsigned int MAX_SONAR_DISTANCE = 300;  //cm
+const unsigned int TURN_DISTANCE = 0;         //cm
+const unsigned int STOP_DISTANCE = 0;         //cm
+unsigned int distance_estimate = MAX_SONAR_DISTANCE;
 #endif
 
 #if (HAS_OLED)
@@ -1009,9 +1011,21 @@ struct LiveSettings {
 };
 LiveSettings live;
 
+// Parts that start off: ready-made firmware has every part built in, but only the body's
+// standard parts start on
+uint16_t default_parts_off() {
+#ifdef READY_MADE
+  return PARTS_BUILT & ~PARTS_STANDARD;
+#else
+  return 0;
+#endif
+}
+
 uint32_t firmware_id() {
-  // Changes when the body, the parts or the battery defaults change
-  float defaults[] = { VOLTAGE_MIN, VOLTAGE_LOW, VOLTAGE_MAX, DEFAULT_VOLTAGE_DIVIDER_FACTOR };
+  // Changes when the body, the parts or any default of the live settings change, so a new
+  // upload with other defaults never keeps the old saved settings
+  float defaults[] = { VOLTAGE_MIN, VOLTAGE_LOW, VOLTAGE_MAX, (float)VOLTAGE_DIVIDER_FACTOR,
+                       (float)NO_PHONE_MODE, (float)default_parts_off() };
   uint32_t id = 2166136261UL ^ (OPENBOT * 31 + PARTS_BUILT) ^ ((uint32_t)sizeof(LiveSettings) << 24);
   const uint8_t *bytes = (const uint8_t *)defaults;
   for (unsigned int i = 0; i < sizeof(defaults); i++) {
@@ -1022,11 +1036,7 @@ uint32_t firmware_id() {
 
 void reset_live_settings() {
   live.firmware_id = firmware_id();
-  live.parts_off = 0;
-#ifdef READY_MADE
-  // Ready-made firmware has every part built in; only the body's standard parts start on
-  live.parts_off = PARTS_BUILT & ~PARTS_STANDARD;
-#endif
+  live.parts_off = default_parts_off();
   live.no_phone = NO_PHONE_MODE;
   live.voltage_min = VOLTAGE_MIN;
   live.voltage_low = VOLTAGE_LOW;
@@ -1053,7 +1063,27 @@ void apply_live_settings() {
 #if (HAS_SONAR)
   sonar_interval = live.no_phone ? 100 : 1000;
   if (!part_on(PART_SONAR)) {
-    distance_estimate = -1;  // turned off live: nothing in front
+    distance_estimate = MAX_SONAR_DISTANCE;  // turned off live: nothing in front
+  }
+#endif
+  // A new driving mode starts with the motors stopped, not with the old mode's last command
+  static int8_t applied_no_phone = -1;
+  if (live.no_phone != applied_no_phone) {
+    ctrl_left = 0;
+    ctrl_right = 0;
+    applied_no_phone = live.no_phone;
+  }
+#if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
+  // Start counting afresh, so a pair turned back on doesn't report ticks from while it was off
+  counter_lf = counter_rf = counter_lb = counter_rb = counter_lm = counter_rm = 0;
+  wheel_time = millis();
+#endif
+#if (HAS_INDICATORS)
+  if (!part_on(PART_INDICATORS)) {
+    // Turned off live: back to off, or to the rear light where they share a pin
+    indicator_left = 0;
+    indicator_right = 0;
+    update_indicator();
   }
 #endif
   ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
@@ -1705,6 +1735,7 @@ void coast_right_motors() {
 // Set the indicator LEDs directly (no phone mode); does nothing without indicators
 void set_indicator_leds(int left, int right) {
 #if (HAS_INDICATORS)
+  if (!part_on(PART_INDICATORS)) return;
   digitalWrite(PIN_LED_LI, left);
   digitalWrite(PIN_LED_RI, right);
 #endif
@@ -2306,22 +2337,41 @@ void send_voltage_reading() {
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
 
 void send_wheel_reading(long duration) {
+  // Average over the sensor pairs that are on; pairs turned off live don't count
   float rpm_factor = 60.0 * 1000.0 / duration / TICKS_PER_REV;
-  rpm_left = (counter_lf + counter_lb + counter_lm) * rpm_factor;
-  rpm_right = (counter_rf + counter_rb + counter_rm) * rpm_factor;
+  long left = 0, right = 0;
+  int pairs = 0;
+#if (HAS_SPEED_SENSORS_FRONT)
+  if (part_on(PART_SPEED_SENSORS_FRONT)) {
+    left += counter_lf;
+    right += counter_rf;
+    pairs++;
+  }
+#endif
+#if (HAS_SPEED_SENSORS_BACK)
+  if (part_on(PART_SPEED_SENSORS_BACK)) {
+    left += counter_lb;
+    right += counter_rb;
+    pairs++;
+  }
+#endif
+#if (HAS_SPEED_SENSORS_MIDDLE)
+  if (part_on(PART_SPEED_SENSORS_MIDDLE)) {
+    left += counter_lm;
+    right += counter_rm;
+    pairs++;
+  }
+#endif
   counter_lf = 0;
   counter_rf = 0;
   counter_lb = 0;
   counter_rb = 0;
   counter_lm = 0;
   counter_rm = 0;
-#if (HAS_SPEED_SENSORS_FRONT and HAS_SPEED_SENSORS_BACK and HAS_SPEED_SENSORS_MIDDLE)
-  sendData("w" + String(rpm_left / 3) + "," + String(rpm_right / 3));
-#elif ((HAS_SPEED_SENSORS_FRONT and HAS_SPEED_SENSORS_BACK) or (HAS_SPEED_SENSORS_FRONT and HAS_SPEED_SENSORS_MIDDLE) or (HAS_SPEED_SENSORS_MIDDLE and HAS_SPEED_SENSORS_BACK))
-  sendData("w" + String(rpm_left / 2) + "," + String(rpm_right / 2));
-#elif (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
+  if (pairs == 0) return;
+  rpm_left = left * rpm_factor / pairs;
+  rpm_right = right * rpm_factor / pairs;
   sendData("w" + String(rpm_left) + "," + String(rpm_right));
-#endif
 }
 
 #endif
@@ -2445,11 +2495,8 @@ Serial.print(data);
 Serial.println();
 #if (HAS_BLUETOOTH)
   if (deviceConnected) {
-    char outData[MAX_MSG_SZ] = "";
-    for (int i = 0; i < data.length(); i++) {
-      outData[i] = data[i];
-    }
-    pTxCharacteristic->setValue(outData);
+    // No fixed-size copy: long messages like the settings reply must not overflow
+    pTxCharacteristic->setValue((uint8_t *)data.c_str(), data.length());
     pTxCharacteristic->notify();
   }
 #endif

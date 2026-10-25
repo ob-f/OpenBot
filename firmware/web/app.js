@@ -101,12 +101,36 @@ function pinClashes() {
   return clashes;
 }
 
+// Bluetooth is off in gamepad mode because the gamepad firmware has no phone link
+const forcedOff = (key) => key === "HAS_BLUETOOTH" && state.mode === "gamepad";
+
 // Parts the ready-made firmware can't match: turned on but not built in,
 // or turned off but not switchable on a flashed robot
 function partsNeedingBuild() {
   return Object.entries(boardInfo().parts)
-    .filter(([key, part]) => key !== "HAS_BLUETOOTH" && ((partOn(key) && !part.builtin) || (!partOn(key) && part.default && part.live === null)))
+    .filter(([key, part]) => !forcedOff(key) && ((partOn(key) && !part.builtin) || (!partOn(key) && part.default && part.live === null)))
     .map(([key]) => PARTS.find((p) => p.key === key).name);
+}
+
+// Parts Update settings only can never change: those the robot can't switch live, changed
+// from their default. Live parts are checked against what the robot reports.
+function partsNotLive() {
+  return Object.entries(boardInfo().parts)
+    .filter(([key, part]) => !forcedOff(key) && part.live === null && partOn(key) !== !!part.default)
+    .map(([key]) => PARTS.find((p) => p.key === key).name);
+}
+
+const MIN_VOLTS = 1;
+const MAX_VOLTS = 40;
+
+// What's wrong with a custom battery ("" if it's fine)
+function batteryProblem() {
+  if (state.battery !== "custom") return "";
+  const { low, max } = state;
+  if (!Number.isFinite(low) || !Number.isFinite(max)) return "Enter the Empty and Full voltages of your battery.";
+  if (low < MIN_VOLTS || max > MAX_VOLTS) return `The battery voltages must be between ${MIN_VOLTS} and ${MAX_VOLTS} V.`;
+  if (low >= max) return "Empty must be lower than Full.";
+  return "";
 }
 
 function liveOffMask() {
@@ -149,19 +173,28 @@ function addMessage(names) {
   return `The firmware on your robot doesn't include ${names.join(", ")}. Use Flash firmware to add ${names.length > 1 ? "them" : "it"}.`;
 }
 
-// Why Update settings only can't do what is selected ("" if it can)
-function applyBlocker(clashes, extras) {
-  if (!("serial" in navigator)) return "Updating the settings needs Chrome or Edge on a computer.";
-  if (clashes) return "Two parts use the same pin. Turn one of them off.";
-  if (extras.length) return `${extras.join(", ")} can only be changed with the Arduino IDE.`;
+// Why Update settings only can't do what is selected: { why: "" } if it can. A reason from
+// what the page remembers about the robot can be out of date (after an Arduino IDE upload), so
+// clicking checks the robot again ("recheck").
+function applyBlocker(clashes) {
+  if (!("serial" in navigator)) return { why: "Updating the settings needs Chrome or Edge on a computer." };
+  if (clashes) return { why: "Two parts use the same pin. Turn one of them off." };
+  const battery = batteryProblem();
+  if (battery) return { why: battery };
+  const notLive = partsNotLive();
+  if (notLive.length) return { why: `${notLive.join(", ")} can only be changed with the Arduino IDE.` };
   if (robot && robot.body === state.body && robot.board === state.board) {
     if (robot.gamepad !== undefined && robot.gamepad !== (state.mode === "gamepad")) {
-      return state.mode === "gamepad" ? "The gamepad needs its own firmware. Use Flash firmware." : "Your robot has the gamepad firmware. Use Flash firmware to drive with the phone app or without a controller.";
+      return { why: gamepadMessage(), recheck: true };
     }
     const missing = missingFrom(robot.have);
-    if (missing.length) return addMessage(missing);
+    if (missing.length) return { why: addMessage(missing), recheck: true };
   }
-  return "";
+  return { why: "" };
+}
+
+function gamepadMessage() {
+  return state.mode === "gamepad" ? "This robot doesn't have the gamepad firmware. Use Flash firmware." : "This robot has the gamepad firmware. Use Flash firmware to drive with the phone app or without a controller.";
 }
 
 function save() {
@@ -259,12 +292,12 @@ function renderParts() {
   const groups = GROUPS.map((group) => {
     const rows = PARTS.filter((p) => p.group === group && p.key in available && (!p.needs || partOn(p.needs))).map((p) => {
       const part = available[p.key];
-      const forcedOff = p.key === "HAS_BLUETOOTH" && state.mode === "gamepad";
+      const forced = forcedOff(p.key);
       const on = partOn(p.key);
       let text = p.text || "";
       if (p.key === "HAS_INDICATORS" && available.HAS_LEDS_BACK && available.HAS_LEDS_BACK.pins.join() === part.pins.join()) text = "Blink the rear lights";
-      if (forcedOff) text = "Off: the gamepad uses Bluetooth";
-      const input = el("input", { type: "checkbox", checked: on, disabled: forcedOff || busy });
+      if (forced) text = "Off: the gamepad uses Bluetooth";
+      const input = el("input", { type: "checkbox", checked: on, disabled: forced || busy });
       input.setAttribute("aria-label", p.name);
       input.onchange = () => {
         state.parts[p.key] = input.checked;
@@ -273,7 +306,7 @@ function renderParts() {
       const info = el("div", { className: "part-text" }, el("strong", { textContent: p.name }), text ? el("small", { textContent: text }) : null);
       if (clashing.has(p.key)) info.append(el("small", { className: "warn", textContent: `Uses the same pin as another part (pin ${part.pins.join(", ")})` }));
       const row = el("div", { className: "part" }, info, el("label", { className: "switch" }, input, el("span")));
-      if (!forcedOff && on !== !!part.default) row.classList.add("changed");
+      if (!forced && on !== !!part.default) row.classList.add("changed");
       return row;
     });
     return rows.length ? el("div", { className: "part-group" }, el("h3", { textContent: group }), ...rows) : null;
@@ -343,6 +376,9 @@ function renderRobot() {
 
   const clashes = pinClashes().length > 0;
   const extras = partsNeedingBuild();
+  const battery = batteryProblem();
+  $("battery-error").hidden = !battery;
+  $("battery-error").textContent = battery;
   let flashNote = "";
   let canFlash = true;
   if (!window.isSecureContext) {
@@ -354,6 +390,9 @@ function renderRobot() {
   } else if (clashes) {
     canFlash = false;
     flashNote = "Two parts use the same pin. Turn one of them off.";
+  } else if (battery) {
+    canFlash = false;
+    flashNote = battery;
   } else if (extras.length) {
     canFlash = false;
     flashNote = `${extras.join(", ")} can only be changed with the Arduino IDE. Download the settings file and upload it there.`;
@@ -365,15 +404,17 @@ function renderRobot() {
   }
   $("flash").disabled = busy || !canFlash;
   $("flash-note").textContent = flashNote;
-  $("download").disabled = busy || clashes;
+  $("download").disabled = busy || clashes || !!battery;
   // Blocked, not disabled, so a click or hover can show why
-  const why = applyBlocker(clashes, extras);
+  const blocker = applyBlocker(clashes);
+  const why = blocker.why;
   const apply = $("apply");
   apply.disabled = busy;
   apply.classList.toggle("blocked", !!why);
   apply.setAttribute("aria-disabled", why ? "true" : "false");
   apply.title = why;
   apply.dataset.why = why;
+  apply.dataset.recheck = blocker.recheck ? "true" : "";
   if (!why) $("apply-why").textContent = "";
 }
 
@@ -388,7 +429,7 @@ function settingsFile() {
   set("NO_PHONE_MODE", state.mode === "phone" ? 0 : 1);
   set("HAS_GAMEPAD", state.mode === "gamepad" ? 1 : 0);
   for (const [key, part] of Object.entries(boardInfo().parts)) {
-    if (key === "HAS_BLUETOOTH" && state.mode === "gamepad") continue;
+    if (forcedOff(key)) continue;
     if (partOn(key) !== !!part.default) set(key, partOn(key) ? 1 : 0);
   }
   const v = voltages();
@@ -512,21 +553,21 @@ async function applyLive(port) {
     if (!info) throw new Error("The robot didn't answer the settings. Its firmware may be older than this page; flash it first.");
     const found = parseLive(info);
     const type = (startup.match(/^OpenBot (\S+) \(/) || [])[1];
-    saveRobot({ body: type in BODY_NAMES ? type : state.body, board: found.board, have: Number(found.have), gamepad: / gamepad$|gamepad,/.test(startup) });
-    if (found.board === state.board && robot.gamepad !== (state.mode === "gamepad")) {
-      throw new Error(state.mode === "gamepad" ? "This robot doesn't have the gamepad firmware. Use Flash firmware." : "This robot has the gamepad firmware. Use Flash firmware to drive with the phone app or without a controller.");
+    saveRobot({ body: type, board: found.board, have: Number(found.have), gamepad: / gamepad$|gamepad,/.test(startup) });
+    // Settings for another body or board must never be written to this robot
+    if (type !== state.body || found.board !== state.board) {
+      const name = BODY_NAMES[type] || type || "an unknown body";
+      throw new Error(`This robot reports ${name} with an ${BOARD_NAMES[found.board] || found.board}, but ${BODY_NAMES[state.body]} with an ${BOARD_NAMES[state.board]} is selected. Select your robot above, or use Flash firmware.`);
     }
-    if (found.board === state.board) {
-      const missing = missingFrom(Number(found.have));
-      if (missing.length) throw new Error(addMessage(missing));
-    }
+    if (robot.gamepad !== (state.mode === "gamepad")) throw new Error(gamepadMessage());
+    const missing = missingFrom(Number(found.have));
+    if (missing.length) throw new Error(addMessage(missing));
     const v = voltages();
     const command = `pvlow:${v.low.toFixed(2)}:vmax:${v.max.toFixed(2)}:off:${liveOffMask()}:nophone:${state.mode === "phone" ? 0 : 1}`;
     await reader.send(command);
     const reply = await reader.waitFor((l) => l.startsWith("pboard:"), 3000);
     if (!reply) throw new Error("The robot didn't answer the settings.");
     const live = parseLive(reply);
-    if (live.board !== state.board) log(`This robot has an ${BOARD_NAMES[live.board]}, not an ${BOARD_NAMES[state.board]}.`, "warn");
     // Standard parts of the body that are turned off (the startup line lists the parts that are on)
     const off = PARTS.filter((p) => boardInfo().parts[p.key]?.default && boardInfo().parts[p.key].live !== null && (Number(live.off) >> boardInfo().parts[p.key].live) & 1).map((p) => p.name);
     log(`Battery ${Number(live.vlow).toFixed(1)}–${Number(live.vmax).toFixed(1)} V${off.length ? `, turned off: ${off.join(", ")}` : ""}`, "ok");
@@ -620,7 +661,8 @@ async function apply() {
   const why = $("apply").dataset.why;
   if (why) {
     $("apply-why").textContent = why;
-    return;
+    // Remembered from an earlier visit: check the robot again, it may have new firmware
+    if (!$("apply").dataset.recheck) return;
   }
   await run(async (port) => {
     $("monitor-state").textContent = "applying settings";
@@ -651,8 +693,9 @@ async function start() {
   $("flash").onclick = flash;
   $("apply").onclick = apply;
   const custom = () => {
-    state.low = parseFloat($("volt-low").value) || null;
-    state.max = parseFloat($("volt-max").value) || null;
+    const number = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
+    state.low = number("volt-low");
+    state.max = number("volt-max");
     renderRobot();
     save();
   };
