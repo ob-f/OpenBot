@@ -607,7 +607,8 @@ async function flashEsp32(port, files) {
     });
     await loader.after("hard_reset");
   } finally {
-    await transport.disconnect();
+    // A failed connection may have closed the port already; keep the error that caused it
+    try { await transport.disconnect(); } catch (e) {}
   }
 }
 
