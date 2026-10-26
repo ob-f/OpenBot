@@ -178,7 +178,6 @@ const int PIN_LED_LI = 4;
 const int PIN_LED_RI = 7;
 
 #else  // ESP32
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define DEFAULT_VOLTAGE_MIN 6.0f
 #define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((30 + 10) / 10)
@@ -381,7 +380,6 @@ const String robot_type = "RTR_TT2";
 #if (MCU != ESP32)
 #error "RTR_TT2 needs an ESP32 board."
 #endif
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
@@ -458,7 +456,6 @@ const String robot_type = "RTR_520";
 #if (MCU != ESP32)
 #error "RTR_520 needs an ESP32 board."
 #endif
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
@@ -535,7 +532,6 @@ const String robot_type = "MTV";
 #if (MCU != ESP32)
 #error "MTV needs an ESP32 board."
 #endif
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
@@ -1256,10 +1252,6 @@ void setup() {
   pinMode(PIN_SPEED_RM, INPUT_PULLUP);
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_SPEED_LM), update_speed_lm, RISING);
   attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_SPEED_RM), update_speed_rm, RISING);
-#endif
-
-#if (MCU == ESP32)
-  esp_wifi_deinit();
 #endif
 
 #if (MCU == ESP32)

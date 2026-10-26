@@ -19,7 +19,15 @@ import subprocess
 import sys
 import tempfile
 
-from compile_all import BOARDS, SKETCH, configure, read_sketch, robots
+from compile_all import (
+    BOARDS,
+    SKETCH,
+    app_size,
+    app_too_big,
+    configure,
+    read_sketch,
+    robots,
+)
 
 ROOT = SKETCH.parents[2]
 WEB = SKETCH.parents[1] / "web"
@@ -59,7 +67,7 @@ I2C_PINS = {
 }
 # Parts that may share pins: the indicators blink the rear lights, the median filter smooths the sonar
 SHARED = {"HAS_LEDS_BACK": "HAS_INDICATORS", "SONAR_MEDIAN": "HAS_SONAR"}
-# ESP32 flash layout of the esp32 board package 2.0.17 (default partitions)
+# ESP32 flash layout of the esp32 board package 2.0.17 (Minimal SPIFFS partitions, see BOARDS)
 ESP32_IMAGES = [
     ("bootloader.bin", 0x1000),
     ("partitions.bin", 0x8000),
@@ -249,6 +257,19 @@ def build_one(name: str, board: str, mode: str, settings: dict, out: pathlib.Pat
             stderr=subprocess.STDOUT,
             text=True,
         )
+        too_big = app_too_big(build_dir) if result.returncode == 0 else ""
+        if too_big:
+            result = subprocess.CompletedProcess(
+                result.args, 1, result.stdout + f"\nerror: {too_big}\n"
+            )
+        sizes = app_size(build_dir) if result.returncode == 0 else None
+        if sizes and sizes[1]:
+            used, size = sizes
+            print(
+                f"::notice::{name}: app {used // 1024} KB of {size // 1024} KB"
+                f" ({size - used} bytes free)",
+                flush=True,
+            )
         if result.returncode == 0:
             if board == "nano":
                 shutil.copy(build_dir / "openbot.ino.hex", target / "firmware.hex")

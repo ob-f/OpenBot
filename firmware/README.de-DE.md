@@ -177,7 +177,10 @@ Wenn Sie Probleme beim Hochladen haben, versuchen Sie, die Baudrate zu reduziere
 ### Einstellungen (ESP32 Setup)
 
 - `Werkzeuge` :arrow_right: `Board` :arrow_right: `ESP32 Arduino` :arrow_right: `ESP32 Dev Module`
+- `Werkzeuge` :arrow_right: `Partition Scheme` :arrow_right: `Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)`
 - `Werkzeuge` :arrow_right: `Port` :arrow_right: `*Wählen Sie den USB-Port*`
+
+:memo: HINWEIS: Die Firmware mit Bluetooth kann für das Standard-Partitionsschema zu groß sein. Sie lässt sich dann hochladen, aber der ESP32 startet nicht. Wählen Sie deshalb immer **Minimal SPIFFS**.
 
 ### Hochladen der Firmware
 
@@ -255,7 +258,7 @@ Im Kein-Telefon-Modus können Sie einen ESP32-Körper mit einem Bluetooth-Gamepa
 1. Fügen Sie in der Arduino IDE unter **Einstellungen > Zusätzliche Boardverwalter-URLs** diese URL hinzu:
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. Installieren Sie im Boardverwalter **esp32_bluepad32** (4.1.0). Es basiert auf demselben esp32-Core (2.0.17) wie die normale Firmware.
-3. Wählen Sie **ESP32 Dev Module** aus den esp32_bluepad32-Boards.
+3. Wählen Sie **ESP32 Dev Module** aus den esp32_bluepad32-Boards und unter **Werkzeuge > Partition Scheme** **Minimal SPIFFS**.
 4. Setzen Sie in den Einstellungen `NO_PHONE_MODE 1` und `HAS_GAMEPAD 1` und laden Sie hoch.
 
 Das Gamepad nutzt das Bluetooth des ESP32, daher ist die Bluetooth-Verbindung zum Telefon in diesem Modus aus. Um mit der Telefon-App zu fahren, lassen Sie `HAS_GAMEPAD 0` und koppeln Sie das Gamepad stattdessen mit dem Telefon.

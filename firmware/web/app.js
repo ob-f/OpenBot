@@ -448,8 +448,9 @@ function download() {
   link.click();
   URL.revokeObjectURL(link.href);
   const board = BOARD_NAMES[state.board];
-  showLines([...startupLines(), { text: `Downloaded openbot_settings.h. In the Arduino IDE, select ${board} and upload openbot.ino.`, cls: "ok" }]);
-  $("download-note").textContent = `Saved as openbot_settings.h. Select ${board} in the Arduino IDE.`;
+  const partitions = state.board === "esp32" ? " with the Minimal SPIFFS partition scheme" : "";
+  showLines([...startupLines(), { text: `Downloaded openbot_settings.h. In the Arduino IDE, select ${board}${partitions} and upload openbot.ino.`, cls: "ok" }]);
+  $("download-note").textContent = `Saved as openbot_settings.h. Select ${board}${partitions} in the Arduino IDE.`;
 }
 
 // ---------- Serial: flashing and live settings ----------

@@ -34,9 +34,47 @@ SKETCH = pathlib.Path(__file__).resolve().parents[1] / "openbot" / "openbot.ino"
 
 BOARDS = {
     "nano": ("arduino:avr", "arduino:avr:nano"),
-    "esp32": ("esp32:esp32@2.0.17", "esp32:esp32:esp32"),
-    "bluepad32": ("esp32-bluepad32:esp32@4.1.0", "esp32-bluepad32:esp32:esp32"),
+    # Minimal SPIFFS partitions: 1.9 MB for the app (the default 1.25 MB is too small) and a
+    # second app slot, so firmware updates over Wi-Fi stay possible
+    "esp32": ("esp32:esp32@2.0.17", "esp32:esp32:esp32:PartitionScheme=min_spiffs"),
+    "bluepad32": (
+        "esp32-bluepad32:esp32@4.1.0",
+        "esp32-bluepad32:esp32:esp32:PartitionScheme=min_spiffs",
+    ),
 }
+
+
+def app_size(build_dir: pathlib.Path) -> tuple[int, int] | None:
+    """(app image size, size of the partition it boots from) of an ESP32 build, else None."""
+    app = build_dir / "openbot.ino.bin"
+    table = build_dir / "openbot.ino.partitions.bin"
+    if not app.exists() or not table.exists():
+        return None
+    data = table.read_bytes()
+    for i in range(0, len(data) - 31, 32):
+        entry = data[i : i + 32]
+        if entry[:2] != b"\xaa\x50":
+            break
+        kind = entry[2]
+        offset = int.from_bytes(entry[4:8], "little")
+        if kind == 0 and offset == 0x10000:  # the app the bootloader starts
+            return app.stat().st_size, int.from_bytes(entry[8:12], "little")
+    return app.stat().st_size, 0
+
+
+def app_too_big(build_dir: pathlib.Path) -> str:
+    """Why the ESP32 app image doesn't fit its flash partition ("" if it fits or isn't ESP32).
+
+    The compiler's size check uses an estimate a few KB below the real image, and an app
+    bigger than its partition flashes fine but never starts, so check the real files."""
+    sizes = app_size(build_dir)
+    if sizes is None:
+        return ""
+    used, size = sizes
+    if used > size:
+        return f"the app is {used} bytes, but its flash partition holds only {size}"
+    return ""
+
 
 ERR_GAMEPAD_PHONE = "HAS_GAMEPAD is for no phone mode"
 ERR_GAMEPAD_NANO = "HAS_GAMEPAD needs an ESP32 body"
@@ -194,6 +232,7 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
         sketch.write_text(
             configure(sketch.read_text(encoding="utf-8"), settings), encoding="utf-8"
         )
+        build_dir = pathlib.Path(tmp) / "build"
         result = subprocess.run(
             [
                 "arduino-cli",
@@ -202,11 +241,18 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
                 fqbn,
                 "--warnings",
                 "default",
+                "--output-dir",
+                str(build_dir),
                 str(sketch_dir),
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+        )
+        too_big = app_too_big(build_dir) if result.returncode == 0 else ""
+    if too_big:
+        result = subprocess.CompletedProcess(
+            result.args, 1, result.stdout + f"\nerror: {too_big}\n"
         )
     if expect_error is None:
         ok = result.returncode == 0
