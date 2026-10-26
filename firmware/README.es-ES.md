@@ -82,6 +82,8 @@ El indicador de batería de la aplicación va de `VOLTAGE_LOW` (vacía) a `VOLTA
 
 Si tu divisor de voltaje es distinto al del cuerpo, ajusta también `VOLTAGE_DIVIDER_FACTOR` a (R1 + R2) / R2. `VOLTAGE_MIN` es el voltaje más bajo al que los motores aún giran; el firmware solo lo usa en el modo sin teléfono.
 
+**El robot deja de responder a toda velocidad.** A gran velocidad, y sobre todo al arrancar en el suelo, los motores consumen mucha corriente. Con pilas AA débiles o alcalinas, el voltaje puede bajar tanto que la placa se reinicia y la app o el gamepad pierde la conexión. Usa pilas nuevas o recargables (NiMH o Li-ion), o conduce en un modo de velocidad más lento. Después, puede que tengas que [emparejar el gamepad de nuevo](#emparejamiento).
+
 ### Comprobar la configuración
 
 Al arrancar el robot, el Monitor Serie (115200 baudios) muestra el cuerpo y los componentes activados, por ejemplo:

@@ -82,6 +82,8 @@ Die Batterieanzeige der App reicht von `VOLTAGE_LOW` (leer) bis `VOLTAGE_MAX` (v
 
 Wenn Ihr Spannungsteiler von dem des Körpers abweicht, setzen Sie auch `VOLTAGE_DIVIDER_FACTOR` auf (R1 + R2) / R2. `VOLTAGE_MIN` ist die niedrigste Spannung, bei der sich die Motoren noch drehen; die Firmware verwendet sie nur im Kein-Telefon-Modus.
 
+**Der Roboter reagiert bei voller Geschwindigkeit nicht mehr.** Bei hoher Geschwindigkeit, vor allem beim Anfahren auf dem Boden, ziehen die Motoren viel Strom. Mit schwachen oder Alkaline-AA-Batterien kann die Spannung so weit einbrechen, dass die Platine neu startet und die App oder das Gamepad die Verbindung verliert. Verwenden Sie frische oder wiederaufladbare Akkus (NiMH oder Li-Ion), oder fahren Sie in einer langsameren Stufe. Ein Gamepad muss danach eventuell [neu gekoppelt](#koppeln) werden.
+
 ### Konfiguration prüfen
 
 Beim Start zeigt der serielle Monitor (115200 Baud) den Körper und die eingeschalteten Teile, zum Beispiel:

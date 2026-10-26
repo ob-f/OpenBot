@@ -84,6 +84,8 @@ The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full).
 
 If your voltage divider differs from the body's, also set `VOLTAGE_DIVIDER_FACTOR` to (R1 + R2) / R2. `VOLTAGE_MIN` is the lowest voltage at which the motors still turn; the firmware only uses it in no phone mode.
 
+**The robot stops responding at full speed.** At high speed, and especially when starting on the floor, the motors draw a lot of current. With weak or alkaline AA batteries the voltage can dip so low that the board restarts and the app or gamepad loses its connection. Use fresh or rechargeable batteries (NiMH or Li-ion), or drive in a slower speed mode. A gamepad may then need [pairing again](#pairing).
+
 ### Check the configuration
 
 When the robot starts, the Serial Monitor (115200 baud) shows the body and the parts that are on, for example:

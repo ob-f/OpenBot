@@ -82,6 +82,8 @@ La jauge de batterie de l'application va de `VOLTAGE_LOW` (vide) à `VOLTAGE_MAX
 
 Si votre diviseur de tension diffère de celui du corps, réglez aussi `VOLTAGE_DIVIDER_FACTOR` sur (R1 + R2) / R2. `VOLTAGE_MIN` est la tension la plus basse à laquelle les moteurs tournent encore ; le firmware ne l'utilise qu'en mode sans téléphone.
 
+**Le robot ne répond plus à pleine vitesse.** À grande vitesse, surtout au démarrage sur le sol, les moteurs consomment beaucoup de courant. Avec des piles AA faibles ou alcalines, la tension peut chuter au point que la carte redémarre et que l'application ou la manette perde la connexion. Utilisez des piles neuves ou rechargeables (NiMH ou Li-ion), ou roulez dans un mode plus lent. Il faudra peut-être ensuite [appairer à nouveau la manette](#appairage).
+
 ### Vérifier la configuration
 
 Au démarrage du robot, le moniteur série (115200 bauds) affiche le corps et les composants activés, par exemple :
