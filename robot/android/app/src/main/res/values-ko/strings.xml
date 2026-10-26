@@ -74,6 +74,14 @@
     <string name="selectAll">전체 선택</string>
     <string name="clearAll">전체 지우기</string>
     <string name="tracking_lost">추적이 끊겼습니다.</string>
+    <string name="point_goal_tap_hint">로봇이 갈 바닥 위치를 탭한 다음 시작을 누르세요.</string>
+    <string name="point_goal_set">%1$.1f m 거리에 목표가 설정되었습니다. 시작을 누르세요.</string>
+    <string name="point_goal_not_floor">바닥이 아닙니다. 로봇이 주행할 수 있는 바닥을 탭하세요.</string>
+    <string name="point_goal_not_tracking">아직 추적 중이 아닙니다. 바닥이 인식될 때까지 휴대폰을 천천히 움직인 후 다시 탭하세요.</string>
+    <string name="point_goal_too_close">너무 가깝습니다. 최소 %1$.1f m 떨어진 곳을 탭하세요.</string>
+    <string name="point_goal_watchdog">앱이 응답하지 않아 로봇을 정지했습니다.</string>
+    <string name="point_goal_arcore_failure">ARCore 오류입니다. 기기가 호환되고 ARCore가 설치되어 있는지 확인하세요.</string>
+    <string name="point_goal_model_failure">내비게이션 정책을 초기화할 수 없습니다.</string>
     <string name="no_initial_ar_core_pose">초기 AR Core 포즈가 없습니다.</string>
     <string name="ar_core_session_paused">AR Core 세션이 일시 중지되었습니다.</string>
     <string name="tips_connect_timeout">연결 시간 초과</string>
@@ -157,11 +165,7 @@
         <item>로컬 서버</item>
     </string-array>
 
-    <string name="set_goal_title">목표 설정</string>
-    <string name="set_goal_message">로봇에 휴대폰을 장착하고 목표를 지정하세요. 시작을 누르면 로봇이 목표에 도달하려고 시도합니다.</string>
     <string name="start">시작</string>
-    <string name="forward_hint_m">전진 [m]</string>
-    <string name="left_hint_m">왼쪽 [m]</string>
     <string name="log_data">데이터 기록</string>
     <string name="model_resolution">모델 해상도</string>
     <string name="sensor_data">센서 데이터</string>
