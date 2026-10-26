@@ -73,13 +73,11 @@ public class ArCore implements GLSurfaceView.Renderer {
   // The marker quad reaches this far below its center; lift it so the pin tip touches the floor.
   private static final float MARKER_TIP_OFFSET_M = 0.1f;
 
-  private static final String PREFS = "point_goal_navigation";
-  private static final String PREF_CAMERA_HEIGHT = "camera_height_m";
   private static final int CALIBRATE_EVERY_FRAMES = 15;
-  // Height of the phone camera above the floor. Distances come from it, so it is re-measured
-  // from ARCore's floor plane whenever one is found and remembered for next time.
-  private float cameraHeightM;
-  private boolean cameraHeightMeasured = false;
+  // Re-measured from ARCore's floor plane; never saved.
+  // Written by the UI thread and the GL thread.
+  private volatile float cameraHeightM = GoalValidator.DEFAULT_CAMERA_HEIGHT_M;
+  private volatile boolean cameraHeightMeasured = false;
   private int frameCount = 0;
 
   public ArCore(Context context, GLSurfaceView surfaceView, Handler handlerMain) {
@@ -131,7 +129,7 @@ public class ArCore implements GLSurfaceView.Renderer {
   }
 
   public void setStartAnchorAtCurrentPose() {
-    if (currentPose != null) {
+    if (session != null && currentPose != null) {
       startAnchor = session.createAnchor(currentPose);
     }
   }
@@ -142,10 +140,12 @@ public class ArCore implements GLSurfaceView.Renderer {
   }
 
   public void setTargetAnchor(Pose pose) {
+    if (session == null) return;
     targetAnchor = session.createAnchor(pose);
   }
 
   public void setTargetAnchorAtCurrentPose() {
+    if (session == null) return;
     targetAnchor = session.createAnchor(currentPose);
   }
 
@@ -161,10 +161,11 @@ public class ArCore implements GLSurfaceView.Renderer {
   /** Turns on floor detection for tap-to-goal (camera height). Call before {@link #resume()}. */
   public void setGoalPlacementEnabled(boolean enabled) {
     goalPlacementEnabled = enabled;
-    cameraHeightM =
-        appContext
-            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getFloat(PREF_CAMERA_HEIGHT, GoalValidator.DEFAULT_CAMERA_HEIGHT_M);
+  }
+
+  /** Used until the floor is measured. */
+  public void setStartingCameraHeight(float heightM) {
+    if (!cameraHeightMeasured) cameraHeightM = heightM;
   }
 
   @Override
@@ -223,6 +224,12 @@ public class ArCore implements GLSurfaceView.Renderer {
     TrackingState trackingState = camera.getTrackingState();
     if (trackingState != TrackingState.TRACKING) {
       Timber.d("ARCore is not tracking.");
+
+      // No pose yet: reject the tap.
+      if (pendingTap != null) {
+        pendingTap = null;
+        notifyRejected(GoalValidator.Result.NOT_TRACKING);
+      }
 
       TrackingFailureReason trackingFailureReason = camera.getTrackingFailureReason();
       runOnMainThread(
@@ -349,7 +356,7 @@ public class ArCore implements GLSurfaceView.Renderer {
         tapY,
         Arrays.toString(cameraPos),
         cameraHeightM,
-        cameraHeightMeasured ? "measured" : "saved",
+        cameraHeightMeasured ? "measured" : "starting",
         Arrays.toString(goal),
         result);
     if (result != GoalValidator.Result.OK) {
@@ -386,11 +393,6 @@ public class ArCore implements GLSurfaceView.Renderer {
     }
     if (!cameraHeightMeasured || Math.abs(height - cameraHeightM) > 0.005f) {
       Timber.d("camera height measured: %.3f m", height);
-      appContext
-          .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-          .edit()
-          .putFloat(PREF_CAMERA_HEIGHT, height)
-          .apply();
     }
     cameraHeightM = height;
     cameraHeightMeasured = true;
@@ -469,10 +471,18 @@ public class ArCore implements GLSurfaceView.Renderer {
       throws UnavailableSdkTooOldException, UnavailableDeviceNotCompatibleException,
           UnavailableArcoreNotInstalledException, UnavailableApkTooOldException,
           CameraNotAvailableException {
-    session = new Session(appContext);
-
-    setConfig();
-    setCameraConfig();
+    // Reuse the session; two would fight over the camera.
+    if (session == null) {
+      session = new Session(appContext);
+      try {
+        setConfig();
+        setCameraConfig();
+      } catch (RuntimeException | CameraNotAvailableException e) {
+        session.close();
+        session = null;
+        throw e;
+      }
+    }
 
     // Note that order matters - see the note in onPause(), the reverse applies here.
     session.resume();
@@ -599,20 +609,26 @@ public class ArCore implements GLSurfaceView.Renderer {
     // thread.
     // Reference: https://developers.google.com/ar/reference/java/com/google/ar/core/Session#close()
     if (session != null) {
+      Session closing = session;
       runOnMainThread(
           () -> {
+            // Already closed by an earlier call.
+            if (session != closing) return;
             pause();
+            session = null;
             HandlerThread handlerThread = new HandlerThread("ArCore Session Close Handler");
             handlerThread.start();
             Handler sessionCloseHandler = new Handler(handlerThread.getLooper());
-            sessionCloseHandler.post(() -> session.close());
+            sessionCloseHandler.post(closing::close);
           });
     }
   }
 
   public void detachAnchors() {
-    for (Anchor anchor : session.getAllAnchors()) {
-      anchor.detach();
+    if (session != null) {
+      for (Anchor anchor : session.getAllAnchors()) {
+        anchor.detach();
+      }
     }
 
     startAnchor = null;

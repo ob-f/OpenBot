@@ -97,6 +97,7 @@
     <string name="point_goal_tap_hint">Tap on the floor where you want the robot to go, then press Start.</string>
     <string name="point_goal_set">Goal set %1$.1f m away. Press Start to drive.</string>
     <string name="point_goal_not_floor">That\'s not the floor. Tap on the floor where the robot can drive.</string>
+    <string name="point_goal_not_tracking">Not tracking yet. Move the phone slowly until the floor is found, then tap again.</string>
     <string name="point_goal_too_close">Too close. Tap a spot at least %1$.1f m away.</string>
     <string name="point_goal_watchdog">The robot was stopped because the app stopped responding.</string>
     <string name="point_goal_arcore_failure">ARCore failure. Make sure that your device is compatible and the ARCore SDK is installed.</string>

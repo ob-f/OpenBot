@@ -77,6 +77,7 @@
     <string name="point_goal_tap_hint">Touchez le sol à l\'endroit où le robot doit aller, puis appuyez sur Démarrer.</string>
     <string name="point_goal_set">Objectif placé à %1$.1f m. Appuyez sur Démarrer.</string>
     <string name="point_goal_not_floor">Ce n\'est pas le sol. Touchez le sol où le robot peut rouler.</string>
+    <string name="point_goal_not_tracking">Pas encore de suivi. Déplacez lentement le téléphone jusqu\'à ce que le sol soit détecté, puis touchez à nouveau.</string>
     <string name="point_goal_too_close">Trop proche. Touchez un point à au moins %1$.1f m.</string>
     <string name="point_goal_watchdog">Le robot a été arrêté car l\'application ne répondait plus.</string>
     <string name="point_goal_arcore_failure">Erreur ARCore. Vérifiez que votre appareil est compatible et qu\'ARCore est installé.</string>

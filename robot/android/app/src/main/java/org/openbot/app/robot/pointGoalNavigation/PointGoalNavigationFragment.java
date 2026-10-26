@@ -9,10 +9,12 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -49,6 +51,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   private Handler handlerMain;
   private ArCore arCore;
   private FragmentPointGoalNavigationBinding binding;
+  private Snackbar hintSnackbar;
   // Read by the watchdog thread.
   private volatile boolean isRunning = false;
   private volatile long lastNavUpdateMs = 0;
@@ -82,6 +85,11 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    // Fragment-scoped: started and quit once.
+    watchdogThread = new HandlerThread("PointGoalWatchdog");
+    watchdogThread.start();
+    watchdogHandler = new Handler(watchdogThread.getLooper());
   }
 
   @Override
@@ -128,7 +136,12 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
         (v, event) -> {
           if (event.getAction() == MotionEvent.ACTION_UP) {
             v.performClick();
-            if (!isRunning) arCore.requestTapAt(event.getX(), event.getY());
+            if (!isRunning) {
+              arCore.setStartingCameraHeight(
+                  GoalValidator.startingCameraHeight(
+                      vehicle == null ? null : vehicle.getVehicleType()));
+              arCore.requestTapAt(event.getX(), event.getY());
+            }
           }
           return true;
         });
@@ -144,11 +157,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
           return false;
         });
 
-    watchdogThread = new HandlerThread("PointGoalWatchdog");
-    watchdogThread.start();
-    watchdogHandler = new Handler(watchdogThread.getLooper());
-
-    Snackbar.make(binding.getRoot(), R.string.point_goal_tap_hint, Snackbar.LENGTH_LONG).show();
+    showHint(getString(R.string.point_goal_tap_hint));
   }
 
   @Override
@@ -168,13 +177,29 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       case TOO_CLOSE:
         showHint(getString(R.string.point_goal_too_close, GoalValidator.MIN_GOAL_DISTANCE_M));
         break;
+      case NOT_TRACKING:
+        showHint(getString(R.string.point_goal_not_tracking));
+        break;
       default:
         break;
     }
   }
 
   private void showHint(String message) {
-    Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
+    if (binding == null) return;
+    hintSnackbar = Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG);
+    hintSnackbar.setAnimationMode(Snackbar.ANIMATION_MODE_FADE);
+    View view = hintSnackbar.getView();
+    if (view.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+      // Top of this screen, which is already below the status bar.
+      int[] rootLocation = new int[2];
+      binding.getRoot().getLocationInWindow(rootLocation);
+      FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+      params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+      params.topMargin += rootLocation[1];
+      view.setLayoutParams(params);
+    }
+    hintSnackbar.show();
   }
 
   @Override
@@ -185,9 +210,9 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       long timestamp) {
     Pose targetPose = navigationPoses.getTargetPose();
     Pose currentPose = navigationPoses.getCurrentPose();
-    lastNavUpdateMs = SystemClock.elapsedRealtime();
     long frameAgeMs = (SystemClock.elapsedRealtimeNanos() - timestamp) / 1_000_000;
     if (isRunning && frameAgeMs > MAX_FRAME_AGE_MS) {
+      // Late frames don't feed the watchdog.
       Timber.d("nav: dropping frame that is %d ms old", frameAgeMs);
       return;
     }
@@ -223,6 +248,7 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
             "nav: deltaYaw=%.3f control=(%.3f, %.3f)",
             deltaYaw, control.getLeft(), control.getRight());
         vehicle.setControl(control);
+        lastNavUpdateMs = SystemClock.elapsedRealtime();
       }
     }
   }
@@ -412,6 +438,12 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   public void onPause() {
     super.onPause();
 
+    // Hide the hint when leaving.
+    if (hintSnackbar != null) {
+      hintSnackbar.dismiss();
+      hintSnackbar = null;
+    }
+
     // Leaving the screen (home button, another app, closing) must never leave the robot driving.
     if (isRunning) stop();
     arCore.pause();
@@ -467,8 +499,9 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       registerForActivityResult(
           new ActivityResultContracts.RequestPermission(),
           isGranted -> {
+            // If not resumed yet, onResume starts ARCore.
             if (isGranted) {
-              setupArCore();
+              if (isResumed()) setupArCore();
             } else {
               showPermissionDialog();
             }

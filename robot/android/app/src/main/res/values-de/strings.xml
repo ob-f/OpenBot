@@ -77,6 +77,7 @@
     <string name="point_goal_tap_hint">Tippen Sie auf den Boden, wohin der Roboter fahren soll, und drücken Sie dann Start.</string>
     <string name="point_goal_set">Ziel in %1$.1f m Entfernung gesetzt. Drücken Sie Start.</string>
     <string name="point_goal_not_floor">Das ist nicht der Boden. Tippen Sie auf den Boden, auf dem der Roboter fahren kann.</string>
+    <string name="point_goal_not_tracking">Noch kein Tracking. Bewegen Sie das Telefon langsam, bis der Boden erkannt wird, und tippen Sie erneut.</string>
     <string name="point_goal_too_close">Zu nah. Tippen Sie auf eine Stelle, die mindestens %1$.1f m entfernt ist.</string>
     <string name="point_goal_watchdog">Der Roboter wurde angehalten, weil die App nicht mehr reagiert hat.</string>
     <string name="point_goal_arcore_failure">ARCore-Fehler. Stellen Sie sicher, dass Ihr Gerät kompatibel ist und ARCore installiert ist.</string>

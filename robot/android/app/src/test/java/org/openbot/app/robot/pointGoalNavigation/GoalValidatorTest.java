@@ -14,6 +14,16 @@ public class GoalValidatorTest {
   private static final float[] CAMERA = {0f, 0f, 0f};
 
   @Test
+  public void startingCameraHeight_followsTheRobotBody() {
+    assertEquals(0.16f, GoalValidator.startingCameraHeight("RTR_520"), 1e-6f);
+    assertEquals(0.22f, GoalValidator.startingCameraHeight("RC_CAR"), 1e-6f);
+    assertEquals(0.23f, GoalValidator.startingCameraHeight("MTV"), 1e-6f);
+    assertEquals(0.12f, GoalValidator.startingCameraHeight("DIY"), 1e-6f);
+    assertEquals(0.12f, GoalValidator.startingCameraHeight(""), 1e-6f);
+    assertEquals(0.12f, GoalValidator.startingCameraHeight(null), 1e-6f);
+  }
+
+  @Test
   public void floorTwoMetersAhead_isAccepted() {
     assertEquals(Result.OK, GoalValidator.validate(CAMERA, new float[] {0f, -0.15f, -2f}));
   }

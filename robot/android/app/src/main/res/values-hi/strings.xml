@@ -77,6 +77,7 @@
     <string name="point_goal_tap_hint">फ़र्श पर वहाँ टैप करें जहाँ रोबोट को जाना है, फिर स्टार्ट दबाएँ।</string>
     <string name="point_goal_set">लक्ष्य %1$.1f मी दूर सेट हुआ। चलाने के लिए स्टार्ट दबाएँ।</string>
     <string name="point_goal_not_floor">यह फ़र्श नहीं है। फ़र्श पर वहाँ टैप करें जहाँ रोबोट चल सकता है।</string>
+    <string name="point_goal_not_tracking">ट्रैकिंग अभी शुरू नहीं हुई। फ़र्श मिलने तक फ़ोन को धीरे-धीरे हिलाएँ, फिर दोबारा टैप करें।</string>
     <string name="point_goal_too_close">बहुत पास। कम से कम %1$.1f मी दूर की जगह पर टैप करें।</string>
     <string name="point_goal_watchdog">ऐप ने जवाब देना बंद कर दिया, इसलिए रोबोट रोक दिया गया।</string>
     <string name="point_goal_arcore_failure">ARCore त्रुटि। सुनिश्चित करें कि आपका डिवाइस संगत है और ARCore इंस्टॉल है।</string>

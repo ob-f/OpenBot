@@ -77,6 +77,7 @@
     <string name="point_goal_tap_hint">로봇이 갈 바닥 위치를 탭한 다음 시작을 누르세요.</string>
     <string name="point_goal_set">%1$.1f m 거리에 목표가 설정되었습니다. 시작을 누르세요.</string>
     <string name="point_goal_not_floor">바닥이 아닙니다. 로봇이 주행할 수 있는 바닥을 탭하세요.</string>
+    <string name="point_goal_not_tracking">아직 추적 중이 아닙니다. 바닥이 인식될 때까지 휴대폰을 천천히 움직인 후 다시 탭하세요.</string>
     <string name="point_goal_too_close">너무 가깝습니다. 최소 %1$.1f m 떨어진 곳을 탭하세요.</string>
     <string name="point_goal_watchdog">앱이 응답하지 않아 로봇을 정지했습니다.</string>
     <string name="point_goal_arcore_failure">ARCore 오류입니다. 기기가 호환되고 ARCore가 설치되어 있는지 확인하세요.</string>

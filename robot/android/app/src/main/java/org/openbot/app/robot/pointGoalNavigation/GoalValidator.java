@@ -15,6 +15,21 @@ public final class GoalValidator {
   /** Phone camera height on an OpenBot DIY body, until it has been measured. */
   public static final float DEFAULT_CAMERA_HEIGHT_M = 0.12f;
 
+  /** Starting camera height per robot body, until the floor is measured (about +-3 cm). */
+  public static float startingCameraHeight(@Nullable String vehicleType) {
+    if (vehicleType == null) return DEFAULT_CAMERA_HEIGHT_M;
+    switch (vehicleType) {
+      case "RTR_520":
+        return 0.16f;
+      case "RC_CAR":
+        return 0.22f;
+      case "MTV":
+        return 0.23f;
+      default:
+        return DEFAULT_CAMERA_HEIGHT_M;
+    }
+  }
+
   /** Measured heights outside this range mean the phone isn't on the robot right now. */
   public static final float MIN_MOUNT_HEIGHT_M = 0.04f;
 
@@ -32,7 +47,8 @@ public final class GoalValidator {
   public enum Result {
     OK,
     NOT_FLOOR,
-    TOO_CLOSE
+    TOO_CLOSE,
+    NOT_TRACKING
   }
 
   private GoalValidator() {}

@@ -77,6 +77,7 @@
     <string name="point_goal_tap_hint">Toca el suelo donde quieres que vaya el robot y luego pulsa Iniciar.</string>
     <string name="point_goal_set">Objetivo fijado a %1$.1f m. Pulsa Iniciar.</string>
     <string name="point_goal_not_floor">Eso no es el suelo. Toca el suelo por donde el robot pueda moverse.</string>
+    <string name="point_goal_not_tracking">Aún sin seguimiento. Mueve el teléfono despacio hasta encontrar el suelo y vuelve a tocar.</string>
     <string name="point_goal_too_close">Demasiado cerca. Toca un punto a al menos %1$.1f m.</string>
     <string name="point_goal_watchdog">El robot se detuvo porque la aplicación dejó de responder.</string>
     <string name="point_goal_arcore_failure">Error de ARCore. Asegúrate de que tu dispositivo sea compatible y de que ARCore esté instalado.</string>
