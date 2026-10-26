@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import simd
 @testable import OpenBot
 
 class OpenBotTests: XCTestCase {
@@ -34,4 +35,169 @@ class OpenBotTests: XCTestCase {
         }
     }
 
+}
+
+class PointGoalMathTests: XCTestCase {
+
+    // Phone mounted on the robot ~15 cm above the floor, world y is up.
+    private let camera = simd_float3(0, 0, 0)
+
+    func testStartingCameraHeightFollowsTheRobotBody() {
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fRTR_520:v1"), 0.16, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fRC_CAR:v1"), 0.22, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fMTV:v1"), 0.23, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fDIY:v1"), 0.12, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: ""), 0.12, accuracy: 1e-6)
+    }
+
+    func testRotateVectorKeepsForwardWhenPhoneIsRolled() {
+        // Rolled phone (landscape): forward must not collapse to zero.
+        let half = Float.pi / 4
+        let pose = Pose(tx: 0, ty: 0, tz: 0, qx: 0, qy: 0, qz: sin(half), qw: cos(half))
+        let forward = pose.rotateVector(vector: [0, 0, -1])
+        XCTAssertEqual(forward[2], -1, accuracy: 1e-5)
+        XCTAssertEqual(forward[0], 0, accuracy: 1e-5)
+    }
+
+    func testRotateVectorQuarterTurnAroundUp() {
+        // A quarter turn around up turns forward (-z) into left (-x).
+        let half = Float.pi / 4
+        let pose = Pose(tx: 0, ty: 0, tz: 0, qx: 0, qy: sin(half), qz: 0, qw: cos(half))
+        let rotated = pose.rotateVector(vector: [0, 0, -1])
+        XCTAssertEqual(rotated[0], -1, accuracy: 1e-5)
+        XCTAssertEqual(rotated[2], 0, accuracy: 1e-5)
+    }
+
+    func testFloorTwoMetersAheadIsAccepted() {
+        XCTAssertEqual(PointGoalMath.validate(camera: camera, goal: simd_float3(0, -0.15, -2)), .ok)
+    }
+
+    func testTapNotReachingTheFloorIsNotFloor() {
+        XCTAssertEqual(PointGoalMath.validate(camera: camera, goal: nil), .notFloor)
+    }
+
+    func testWindowOrBuildingAboveCameraIsNotFloor() {
+        XCTAssertEqual(PointGoalMath.validate(camera: camera, goal: simd_float3(0, 3, -40)), .notFloor)
+    }
+
+    func testGoalUnderTheRobotIsTooClose() {
+        XCTAssertEqual(PointGoalMath.validate(camera: camera, goal: simd_float3(0, -0.15, -0.2)), .tooClose)
+    }
+
+    func testSpotThirtyCentimetersAwayMeasuresThirtyCentimeters() {
+        // Camera 12 cm up; a floor spot 0.3 m ahead is atan(0.12 / 0.3) = 21.8 deg below horizon.
+        let angle = atan2(Float(0.12), Float(0.3))
+        let origin = simd_float3(0, 0.12, 0)
+        let hit = PointGoalMath.intersectFloor(origin: origin, direction: simd_float3(0, -sin(angle), -cos(angle)), floorY: 0)
+        XCTAssertNotNil(hit)
+        XCTAssertEqual(PointGoalMath.horizontalDistance(origin, hit!), 0.3, accuracy: 1e-4)
+        XCTAssertEqual(PointGoalMath.validate(camera: origin, goal: hit), .ok)
+    }
+
+    func testSpotTwoMetersToTheSideMeasuresTwoMeters() {
+        let angle = atan2(Float(0.12), Float(2.0))
+        let hit = PointGoalMath.intersectFloor(origin: simd_float3(0, 0.12, 0), direction: simd_float3(cos(angle), -sin(angle), 0), floorY: 0)
+        XCTAssertEqual(hit!.x, 2, accuracy: 1e-3)
+        XCTAssertEqual(hit!.z, 0, accuracy: 1e-5)
+    }
+
+    func testRayLevelOrUpNeverHitsTheFloor() {
+        XCTAssertNil(PointGoalMath.intersectFloor(origin: simd_float3(0, 0.15, 0), direction: simd_float3(0, 0, -1), floorY: 0))
+        XCTAssertNil(PointGoalMath.intersectFloor(origin: simd_float3(0, 0.15, 0), direction: simd_normalize(simd_float3(0, 0.5, -1)), floorY: 0))
+    }
+
+    func testFarSpotBeyondTrustedRangeIsRejected() {
+        let angle = atan2(Float(0.12), Float(8.0))
+        XCTAssertNil(PointGoalMath.intersectFloor(origin: simd_float3(0, 0.12, 0), direction: simd_float3(0, -sin(angle), -cos(angle)), floorY: 0))
+    }
+
+    func testDistanceIgnoresHeight() {
+        XCTAssertEqual(PointGoalMath.horizontalDistance(simd_float3(0, 0, 0), simd_float3(3, -5, 4)), 5, accuracy: 1e-5)
+    }
+
+    func testFloorIsLargestPlaneBelowCamera() {
+        let planes: [(y: Float, area: Float)] = [
+            (y: -0.15, area: 6), // floor
+            (y: 0.45, area: 1), // table above the camera
+            (y: -0.5, area: 0.5), // small reflection under a shiny floor
+        ]
+        XCTAssertEqual(PointGoalMath.pickFloorY(planes: planes, cameraY: 0)!, -0.15, accuracy: 1e-5)
+    }
+
+    func testNoPlanesNoFloor() {
+        XCTAssertNil(PointGoalMath.pickFloorY(planes: [], cameraY: 0))
+    }
+
+    // Phone mounted in landscape: rolled 90 degrees around its forward axis.
+    private let landscape = simd_quatf(angle: .pi / 2, axis: simd_float3(0, 0, -1))
+    private let portrait = simd_quatf(angle: 0, axis: simd_float3(0, 1, 0))
+
+    private func yaw(_ orientation: simd_quatf, goal: simd_float3) -> Float {
+        PointGoalMath.deltaYaw(position: simd_float3(0, 0, 0), orientation: orientation, goal: goal)
+    }
+
+    func testGoalAheadIsZeroYaw() {
+        XCTAssertEqual(yaw(portrait, goal: simd_float3(0, -0.15, -1)), 0, accuracy: 1e-4)
+        XCTAssertEqual(yaw(landscape, goal: simd_float3(0, -0.15, -1)), 0, accuracy: 1e-4)
+    }
+
+    func testGoalToTheSidesIsQuarterTurn() {
+        for orientation in [portrait, landscape] {
+            XCTAssertEqual(abs(yaw(orientation, goal: simd_float3(1, -0.15, 0))), .pi / 2, accuracy: 1e-4)
+            XCTAssertEqual(abs(yaw(orientation, goal: simd_float3(-1, -0.15, 0))), .pi / 2, accuracy: 1e-4)
+            XCTAssertNotEqual(yaw(orientation, goal: simd_float3(1, -0.15, 0)).sign, yaw(orientation, goal: simd_float3(-1, -0.15, 0)).sign)
+        }
+    }
+
+    func testGoalBehindIsHalfTurn() {
+        XCTAssertEqual(abs(yaw(landscape, goal: simd_float3(0, -0.15, 1))), .pi, accuracy: 1e-4)
+    }
+
+    func testRobotTurnedTowardGoalIsZeroYaw() {
+        // Robot turned 90 degrees left (and phone still in landscape) facing a goal on its left.
+        let turned = simd_quatf(angle: .pi / 2, axis: simd_float3(0, 1, 0)) * landscape
+        XCTAssertEqual(yaw(turned, goal: simd_float3(-1, -0.15, 0)), 0, accuracy: 1e-4)
+    }
+}
+
+class ArrivalCheckTests: XCTestCase {
+
+    func testFarAwayNotArrived() {
+        var check = ArrivalCheck()
+        XCTAssertFalse(check.hasArrived(distance: 2, deltaYaw: 0))
+    }
+
+    func testWithinTenCentimetersArrived() {
+        var check = ArrivalCheck()
+        XCTAssertTrue(check.hasArrived(distance: 0.09, deltaYaw: 0))
+    }
+
+    func testCloseAndStillAheadKeepsDriving() {
+        var check = ArrivalCheck()
+        XCTAssertFalse(check.hasArrived(distance: 0.25, deltaYaw: 0.2))
+        XCTAssertFalse(check.hasArrived(distance: 0.18, deltaYaw: 0.3))
+    }
+
+    func testPassedTheGoalSidewaysArrived() {
+        var check = ArrivalCheck()
+        XCTAssertTrue(check.hasArrived(distance: 0.20, deltaYaw: 100 * Float.pi / 180))
+    }
+
+    func testStartingWithGoalBehindFarAwayKeepsDriving() {
+        var check = ArrivalCheck()
+        XCTAssertFalse(check.hasArrived(distance: 1.5, deltaYaw: Float.pi))
+    }
+
+    func testGettingFurtherAwayAfterClosestPointArrived() {
+        var check = ArrivalCheck()
+        XCTAssertFalse(check.hasArrived(distance: 0.22, deltaYaw: 0.4))
+        XCTAssertFalse(check.hasArrived(distance: 0.15, deltaYaw: 0.8))
+        XCTAssertTrue(check.hasArrived(distance: 0.19, deltaYaw: 0.9))
+    }
+
+    func testSmallNoiseNearClosestPointIsNotMovingAway() {
+        var check = ArrivalCheck()
+        XCTAssertFalse(check.hasArrived(distance: 0.20, deltaYaw: 0.2))
+        XCTAssertFalse(check.hasArrived(distance: 0.21, deltaYaw: 0.2))
+    }
 }

@@ -190,6 +190,13 @@
 
 /* Point Goal Navigation */
 "goalReachedMessage" = "已到达目标";
+"pointGoalTapHint" = "点击地面上希望机器人前往的位置，然后按开始。";
+"pointGoalSet" = "目标已设置在 %.1f 米外。按开始出发。";
+"pointGoalNotFloor" = "这不是地面。请点击机器人可以行驶的地面。";
+"pointGoalTooClose" = "太近了。请点击至少 %.1f 米外的位置。";
+"pointGoalWatchdog" = "应用无响应，机器人已停止。";
+"pointGoalTrackingLost" = "跟踪丢失，机器人已停止。";
+"pointGoalModelFailure" = "无法初始化导航策略。";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "全部";
