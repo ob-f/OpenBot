@@ -34,13 +34,9 @@ SKETCH = pathlib.Path(__file__).resolve().parents[1] / "openbot" / "openbot.ino"
 
 BOARDS = {
     "nano": ("arduino:avr", "arduino:avr:nano"),
-    # Minimal SPIFFS partitions: 1.9 MB for the app (the default 1.25 MB is too small) and a
-    # second app slot, so firmware updates over Wi-Fi stay possible
-    "esp32": ("esp32:esp32@2.0.17", "esp32:esp32:esp32:PartitionScheme=min_spiffs"),
-    "bluepad32": (
-        "esp32-bluepad32:esp32@4.1.0",
-        "esp32-bluepad32:esp32:esp32:PartitionScheme=min_spiffs",
-    ),
+    # Default partitions, as in the Arduino IDE: two 1.25 MB app slots (see app_too_big)
+    "esp32": ("esp32:esp32@2.0.17", "esp32:esp32:esp32"),
+    "bluepad32": ("esp32-bluepad32:esp32@4.1.0", "esp32-bluepad32:esp32:esp32"),
 }
 
 

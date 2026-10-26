@@ -177,10 +177,7 @@ Si tienes problemas para cargar, intenta reducir la velocidad de baudios. Ve a h
 ### Configuración (configuración ESP32)
 
 - `Tools` :arrow_right: `Board` :arrow_right: `ESP32 Arduino` :arrow_right: `ESP32 Dev Module`
-- `Tools` :arrow_right: `Partition Scheme` :arrow_right: `Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)`
 - `Tools` :arrow_right: `Port` :arrow_right: `*Selecciona el puerto USB*`
-
-:memo: NOTA: El firmware con Bluetooth puede ser demasiado grande para el esquema de particiones predeterminado. Entonces se sube, pero el ESP32 no arranca, así que selecciona siempre **Minimal SPIFFS**.
 
 ### Cargando el firmware
 
@@ -258,7 +255,7 @@ En el modo sin teléfono, puedes conducir un cuerpo con ESP32 con un gamepad Blu
 1. En el Arduino IDE, añade esta URL en **Preferencias > URLs adicionales de gestor de placas**:
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. En el gestor de placas, instala **esp32_bluepad32** (4.1.0). Se basa en el mismo núcleo esp32 (2.0.17) que el firmware normal.
-3. Selecciona **ESP32 Dev Module** entre las placas esp32_bluepad32 y **Minimal SPIFFS** en **Tools > Partition Scheme**.
+3. Selecciona **ESP32 Dev Module** entre las placas esp32_bluepad32.
 4. En los ajustes, configura `NO_PHONE_MODE 1` y `HAS_GAMEPAD 1`, y carga el firmware.
 
 El gamepad usa el Bluetooth del ESP32, así que la conexión Bluetooth con el teléfono está desactivada en este modo. Para conducir con la app del teléfono, deja `HAS_GAMEPAD 0` y empareja el gamepad con el teléfono.

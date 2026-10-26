@@ -177,10 +177,7 @@ Arduino IDE에 ESP32 보드를 설치하려면 다음 지침을 따르세요:
 ### 설정 (ESP32 설정)
 
 - `도구` :arrow_right: `보드` :arrow_right: `ESP32 Arduino` :arrow_right: `ESP32 Dev Module`
-- `도구` :arrow_right: `Partition Scheme` :arrow_right: `Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)`
 - `도구` :arrow_right: `포트` :arrow_right: `*USB 포트 선택*`
-
-:memo: 참고: 블루투스가 포함된 펌웨어는 기본 파티션 구성에 비해 너무 클 수 있습니다. 그러면 업로드는 되지만 ESP32가 시작되지 않으므로 항상 **Minimal SPIFFS**을 선택하세요.
 
 ### 펌웨어 업로드
 
@@ -258,7 +255,7 @@ No Phone 모드에서는 ESP32 본체가 스스로 주행하게 하는 대신 �
 1. Arduino IDE의 **환경설정 > 추가 보드 관리자 URL**에 다음 URL을 추가합니다:
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. 보드 관리자에서 **esp32_bluepad32** (4.1.0)를 설치합니다. 일반 펌웨어와 같은 esp32 코어(2.0.17)를 기반으로 합니다.
-3. esp32_bluepad32 보드 중에서 **ESP32 Dev Module**을 선택하고, **도구 > Partition Scheme**에서 **Minimal SPIFFS**을 선택합니다.
+3. esp32_bluepad32 보드 중에서 **ESP32 Dev Module**을 선택합니다.
 4. 설정에서 `NO_PHONE_MODE 1`과 `HAS_GAMEPAD 1`을 설정하고 업로드합니다.
 
 게임패드가 ESP32의 블루투스를 사용하므로 이 모드에서는 휴대폰과의 블루투스 연결이 꺼집니다. 휴대폰 앱으로 조종하려면 `HAS_GAMEPAD 0`으로 두고 게임패드를 휴대폰에 페어링하세요.

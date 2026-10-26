@@ -177,10 +177,7 @@ OpenBot settings: openbot_settings.h
 ### 设置（ESP32设置）
 
 - `工具` :arrow_right: `板` :arrow_right: `ESP32 Arduino` :arrow_right: `ESP32 Dev Module`
-- `工具` :arrow_right: `Partition Scheme` :arrow_right: `Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)`
 - `工具` :arrow_right: `端口` :arrow_right: `*选择USB端口*`
-
-:memo: 注意：带蓝牙的固件对默认分区方案来说可能太大。这时它可以上传，但 ESP32 无法启动，因此请始终选择 **Minimal SPIFFS**。
 
 ### 上传固件
 
@@ -258,7 +255,7 @@ OpenBot settings: openbot_settings.h
 1. 在 Arduino IDE 的 **首选项 > 附加开发板管理器网址** 中添加此网址：
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. 在开发板管理器中安装 **esp32_bluepad32**（4.1.0）。它基于与普通固件相同的 esp32 内核（2.0.17）。
-3. 在 esp32_bluepad32 开发板中选择 **ESP32 Dev Module**，并在 **工具 > Partition Scheme** 中选择 **Minimal SPIFFS**。
+3. 在 esp32_bluepad32 开发板中选择 **ESP32 Dev Module**。
 4. 在设置中设置 `NO_PHONE_MODE 1` 和 `HAS_GAMEPAD 1`，然后上传。
 
 手柄使用 ESP32 的蓝牙，因此在此模式下与手机的蓝牙连接会关闭。要用手机应用驾驶，请保持 `HAS_GAMEPAD 0`，并将手柄与手机配对。

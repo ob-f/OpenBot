@@ -179,10 +179,7 @@ If you have trouble uploading try reducing the baud rate. Go to tools and select
 ### Settings (ESP32 setup)
 
 - `Tools` :arrow_right: `Board` :arrow_right: `ESP32 Arduino` :arrow_right: `ESP32 Dev Module`
-- `Tools` :arrow_right: `Partition Scheme` :arrow_right: `Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)`
 - `Tools` :arrow_right: `Port` :arrow_right: `*Select the USB port*`
-
-:memo: NOTE: The firmware with Bluetooth can be too big for the default partition scheme. It then uploads, but the ESP32 doesn't start, so always select **Minimal SPIFFS**.
 
 ### Uploading the firmware
 
@@ -260,7 +257,7 @@ In no phone mode, you can drive an ESP32 body with a Bluetooth gamepad instead o
 1. In the Arduino IDE, add this URL under **Preferences > Additional boards manager URLs**:
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. In the Boards Manager, install **esp32_bluepad32** (4.1.0). It is based on the same esp32 core (2.0.17) as the regular firmware.
-3. Select **ESP32 Dev Module** from the esp32_bluepad32 boards, and **Minimal SPIFFS** under **Tools > Partition Scheme**.
+3. Select **ESP32 Dev Module** from the esp32_bluepad32 boards.
 4. In the settings, set `NO_PHONE_MODE 1` and `HAS_GAMEPAD 1`, and upload.
 
 The gamepad uses the ESP32's Bluetooth, so the Bluetooth link to the phone is off in this mode. To drive with the phone app, keep `HAS_GAMEPAD 0` and pair the gamepad to the phone instead.

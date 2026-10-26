@@ -177,10 +177,7 @@ Si vous avez des problèmes de téléchargement, essayez de réduire le débit e
 ### Paramètres (configuration ESP32)
 
 - `Outils` :arrow_right: `Carte` :arrow_right: `ESP32 Arduino` :arrow_right: `ESP32 Dev Module`
-- `Outils` :arrow_right: `Partition Scheme` :arrow_right: `Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)`
 - `Outils` :arrow_right: `Port` :arrow_right: `*Sélectionnez le port USB*`
-
-:memo: REMARQUE : le firmware avec Bluetooth peut être trop gros pour le schéma de partitions par défaut. Il se téléverse alors, mais l'ESP32 ne démarre pas ; sélectionnez donc toujours **Minimal SPIFFS**.
 
 ### Téléchargement du firmware
 
@@ -258,7 +255,7 @@ En mode sans téléphone, vous pouvez piloter un châssis ESP32 avec une manette
 1. Dans l'Arduino IDE, ajoutez cette URL sous **Préférences > URL de gestionnaire de cartes supplémentaires** :
    `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
 2. Dans le gestionnaire de cartes, installez **esp32_bluepad32** (4.1.0). Il repose sur le même cœur esp32 (2.0.17) que le firmware habituel.
-3. Sélectionnez **ESP32 Dev Module** parmi les cartes esp32_bluepad32, et **Minimal SPIFFS** dans **Outils > Partition Scheme**.
+3. Sélectionnez **ESP32 Dev Module** parmi les cartes esp32_bluepad32.
 4. Dans les réglages, réglez `NO_PHONE_MODE 1` et `HAS_GAMEPAD 1`, puis téléversez.
 
 La manette utilise le Bluetooth de l'ESP32 ; la liaison Bluetooth avec le téléphone est donc désactivée dans ce mode. Pour piloter avec l'application du téléphone, laissez `HAS_GAMEPAD 0` et appairez plutôt la manette avec le téléphone.

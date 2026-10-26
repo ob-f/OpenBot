@@ -79,6 +79,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+          retention-days: 7  # long enough to test a pull request
 
   deploy:
     name: Publish on GitHub Pages

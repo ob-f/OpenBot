@@ -67,7 +67,7 @@ I2C_PINS = {
 }
 # Parts that may share pins: the indicators blink the rear lights, the median filter smooths the sonar
 SHARED = {"HAS_LEDS_BACK": "HAS_INDICATORS", "SONAR_MEDIAN": "HAS_SONAR"}
-# ESP32 flash layout of the esp32 board package 2.0.17 (Minimal SPIFFS partitions, see BOARDS)
+# ESP32 flash layout of the esp32 board package 2.0.17 (default partitions)
 ESP32_IMAGES = [
     ("bootloader.bin", 0x1000),
     ("partitions.bin", 0x8000),
