@@ -42,6 +42,32 @@ class PointGoalMathTests: XCTestCase {
     // Phone mounted on the robot ~15 cm above the floor, world y is up.
     private let camera = simd_float3(0, 0, 0)
 
+    func testStartingCameraHeightFollowsTheRobotBody() {
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fRTR_520:v1"), 0.16, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fRC_CAR:v1"), 0.22, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fMTV:v1"), 0.23, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: "fDIY:v1"), 0.12, accuracy: 1e-6)
+        XCTAssertEqual(PointGoalMath.startingCameraHeight(robotInfo: ""), 0.12, accuracy: 1e-6)
+    }
+
+    func testRotateVectorKeepsForwardWhenPhoneIsRolled() {
+        // Rolled phone (landscape): forward must not collapse to zero.
+        let half = Float.pi / 4
+        let pose = Pose(tx: 0, ty: 0, tz: 0, qx: 0, qy: 0, qz: sin(half), qw: cos(half))
+        let forward = pose.rotateVector(vector: [0, 0, -1])
+        XCTAssertEqual(forward[2], -1, accuracy: 1e-5)
+        XCTAssertEqual(forward[0], 0, accuracy: 1e-5)
+    }
+
+    func testRotateVectorQuarterTurnAroundUp() {
+        // A quarter turn around up turns forward (-z) into left (-x).
+        let half = Float.pi / 4
+        let pose = Pose(tx: 0, ty: 0, tz: 0, qx: 0, qy: sin(half), qz: 0, qw: cos(half))
+        let rotated = pose.rotateVector(vector: [0, 0, -1])
+        XCTAssertEqual(rotated[0], -1, accuracy: 1e-5)
+        XCTAssertEqual(rotated[2], 0, accuracy: 1e-5)
+    }
+
     func testFloorTwoMetersAheadIsAccepted() {
         XCTAssertEqual(PointGoalMath.validate(camera: camera, goal: simd_float3(0, -0.15, -2)), .ok)
     }

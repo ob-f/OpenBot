@@ -27,7 +27,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     private var safetyTimer: Timer?
     private var runGeneration = 0
     private var lastControl: Control?
-    private var cameraHeight: Float = PointGoalFragment.savedCameraHeight()
+    private var cameraHeight: Float = PointGoalMath.defaultCameraHeight
     private var cameraHeightMeasured = false
     // When ARKit tracking went "limited" during the current drive, or nil while it's normal.
     private var trackingLimitedSince: TimeInterval?
@@ -37,7 +37,6 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     private let navQueue = DispatchQueue(label: "openbot.navigation.navqueue")
     private var lastCalibration: TimeInterval = 0
 
-    private static let cameraHeightKey = "pointGoalCameraHeight"
     // ARKit calls back every frame (~16 ms); this long without a navigation step means it's stuck.
     private static let watchdogTimeout: TimeInterval = 0.7
     private static let safetyTick: TimeInterval = 0.25
@@ -162,9 +161,13 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         let direction = simd_normalize(far.simdVector - near.simdVector)
         let cameraPosition = camera.presentation.simdWorldPosition
 
+        // Until the floor is found, start from the robot's body height.
+        if !cameraHeightMeasured {
+            cameraHeight = PointGoalMath.startingCameraHeight(robotInfo: bluetooth.robotInfo)
+        }
         let goal = PointGoalMath.intersectFloor(origin: origin, direction: direction, floorY: cameraPosition.y - cameraHeight)
         let result = PointGoalMath.validate(camera: cameraPosition, goal: goal)
-        print("goal tap \(point): camera=\(cameraPosition) height=\(cameraHeight) (\(cameraHeightMeasured ? "measured" : "saved")) goal=\(String(describing: goal)) -> \(result)")
+        print("goal tap \(point): camera=\(cameraPosition) height=\(cameraHeight) (\(cameraHeightMeasured ? "measured" : "starting")) goal=\(String(describing: goal)) -> \(result)")
 
         switch result {
         case .notFloor:
@@ -440,16 +443,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
             }
             if !self.cameraHeightMeasured || abs(height - self.cameraHeight) > 0.005 {
                 print("camera height measured: \(height) m")
-                UserDefaults.standard.set(height, forKey: PointGoalFragment.cameraHeightKey)
             }
             self.cameraHeight = height
             self.cameraHeightMeasured = true
         }
-    }
-
-    private static func savedCameraHeight() -> Float {
-        let saved = UserDefaults.standard.float(forKey: cameraHeightKey)
-        return saved > 0 ? saved : PointGoalMath.defaultCameraHeight
     }
 
     func setupNavigationBarItem() {
@@ -537,6 +534,24 @@ enum PointGoalMath {
     static let minCameraHeight: Float = 0.03
     /// Phone camera height on an OpenBot DIY body, until it has been measured.
     static let defaultCameraHeight: Float = 0.12
+
+    /// Starting camera height per robot body (about +-3 cm); `robotInfo` is `f<type>:...`.
+    static func startingCameraHeight(robotInfo: String) -> Float {
+        guard let start = robotInfo.firstIndex(of: "f"), let end = robotInfo.firstIndex(of: ":"), start < end else {
+            return defaultCameraHeight
+        }
+        switch String(robotInfo[robotInfo.index(after: start)..<end]) {
+        case "RTR_520":
+            return 0.16
+        case "RC_CAR":
+            return 0.22
+        case "MTV":
+            return 0.23
+        default:
+            return defaultCameraHeight
+        }
+    }
+
     /// Measured heights outside this range mean the phone isn't on the robot right now.
     static let minMountHeight: Float = 0.04
     static let maxMountHeight: Float = 0.40
@@ -683,9 +698,9 @@ class Pose {
         let w2 = -qx * x - qy * y - qz * z
 
         return [
-            qy * z2 - qz * y2 + qw * x2 + qx * w2,
-            qz * x2 - qx * z2 + qw * y2 + qy * w2,
-            qx * y2 - qy * x2 + qw * z2 + qz * w2
+            qy * z2 - qz * y2 + qw * x2 - qx * w2,
+            qz * x2 - qx * z2 + qw * y2 - qy * w2,
+            qx * y2 - qy * x2 + qw * z2 - qz * w2
         ]
     }
 }
