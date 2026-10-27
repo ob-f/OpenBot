@@ -44,6 +44,8 @@ You will need to print the following parts in order to build your OpenBot RC-Tru
 3) ```phone_mount_bottom``` ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 4) ```phone_mount_top``` ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+To tilt the phone up by up to 30°, print the tilting version from [body/phone_mount](../phone_mount/README.md) instead of `phone_mount_bottom`.
+
 Notice that \[xN\] indicates the number of copies (i.e., N) you need to print of a particular part (wherever applicable).
 
 Following parts are optional (but recommended) to make your OpenBot RC-Truck more compact and aesthetically pleasing.
