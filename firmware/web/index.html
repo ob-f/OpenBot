@@ -41,6 +41,15 @@
         <li class="step" id="step-mode">
           <h2>How you drive</h2>
           <div class="modes" id="modes" role="radiogroup" aria-label="How you drive"></div>
+          <div class="mode-extra" id="ble-name-box" hidden>
+            <label>Bluetooth name <input type="text" id="ble-name" maxlength="20" autocomplete="off"></label>
+            <p class="hint">How the robot shows up in the app, e.g. "Team 3". Leave it empty for the standard name.</p>
+            <p class="note warn" id="name-error" role="status" hidden></p>
+          </div>
+          <div class="mode-extra" id="forget-box" hidden>
+            <label><input type="checkbox" id="forget-gamepads"> Forget paired gamepads</label>
+            <p class="hint">When flashing, also clears the gamepads the robot remembers. Use it if a controller won't connect.</p>
+          </div>
         </li>
 
         <li class="step" id="step-parts">

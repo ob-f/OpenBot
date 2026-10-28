@@ -108,6 +108,11 @@ button, input { font: inherit; color: inherit; }
 .chip[aria-checked="true"] small { color: rgba(255, 255, 255, 0.8); }
 .custom-battery { display: flex; gap: 16px; margin-top: 12px; }
 .custom-battery[hidden] { display: none; }
+.mode-extra { margin-top: 14px; }
+.mode-extra[hidden] { display: none; }
+.mode-extra label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.mode-extra input[type="text"] { width: 200px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+.mode-extra .hint { margin: 6px 0 0; }
 .custom-battery label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
 .custom-battery input { width: 84px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
 

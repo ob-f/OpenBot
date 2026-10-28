@@ -40,7 +40,7 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
 
 ### 驾驶
 
-默认情况下，您通过手机应用驾驶机器人。要使用[无手机模式](#无手机模式)，请设置 `NO_PHONE_MODE 1`；使用 ESP32 时，还可以用[手柄](#手柄控制)驾驶（`HAS_GAMEPAD 1`）。`COAST_MODE` 决定无控制时电机滑行（1）还是刹车（0），`DEBUG 1` 会在串口监视器上输出调试信息。
+默认情况下，您通过手机应用驾驶机器人。要使用[无手机模式](#无手机模式)，请设置 `NO_PHONE_MODE 1`；使用 ESP32 时，还可以用[手柄](#手柄控制)驾驶（`HAS_GAMEPAD 1`）。`COAST_MODE` 决定无控制时电机滑行（1）还是刹车（0），`DEBUG 1` 会在串口监视器上输出调试信息。 使用与手机的蓝牙连接时，`BLE_NAME` 设置机器人在 App 中显示的名称，例如 `#define BLE_NAME "Team 3"`（最多 20 个字母、数字、空格、- 或 _）。
 
 ### 部件
 
@@ -276,6 +276,8 @@ OpenBot settings: openbot_settings.h
 [Bluepad32 支持的手柄列表](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) 中有更多型号，包括需要额外设置的 PS3 DualShock 3。设置 `DEBUG 1` 后，串口监视器会显示每个连接的手柄名称。
 
 如果之前已配对的手柄没有接管控制，例如 PS4 或 PS5 手柄的灯条一直是蓝色，没有变成绿色、橙色或红色，请让手柄重新进入配对模式并重启机器人。
+
+如果仍然无法连接，请在[设置页面](https://tools.openbot.org/firmware/)刷写时勾选 **Forget paired gamepads**。机器人随后会忘记所有已配对的游戏手柄。
 
 #### 操作
 

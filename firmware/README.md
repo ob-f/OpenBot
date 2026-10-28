@@ -42,7 +42,7 @@ Set `OPENBOT` to your robot body, and select a board it supports in the Arduino 
 
 ### Driving
 
-By default, you drive the robot with the phone app. For [no phone mode](#no-phone-mode), set `NO_PHONE_MODE 1`; with an ESP32 you can then also drive with a [gamepad](#gamepad-control) (`HAS_GAMEPAD 1`). `COAST_MODE` sets whether the motors coast (1) or brake (0) when there is no control, and `DEBUG 1` prints debug output on the Serial Monitor.
+By default, you drive the robot with the phone app. For [no phone mode](#no-phone-mode), set `NO_PHONE_MODE 1`; with an ESP32 you can then also drive with a [gamepad](#gamepad-control) (`HAS_GAMEPAD 1`). `COAST_MODE` sets whether the motors coast (1) or brake (0) when there is no control, and `DEBUG 1` prints debug output on the Serial Monitor. With the Bluetooth link to the phone, `BLE_NAME` sets the name the robot shows in the app, for example `#define BLE_NAME "Team 3"` (up to 20 letters, digits, spaces, - or _).
 
 ### Parts
 
@@ -278,6 +278,8 @@ Power on the robot and put the gamepad in pairing mode. It connects within a few
 The [Bluepad32 list of supported gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) has more models, including the PS3 DualShock 3, which needs extra setup. With `DEBUG 1`, the Serial Monitor shows the name of each gamepad that connects.
 
 If a gamepad that was paired before doesn't take over, for example a PS4 or PS5 controller whose light bar stays blue instead of turning green, orange or red, put it in pairing mode again and restart the robot.
+
+If it still doesn't connect, tick **Forget paired gamepads** when flashing on the [setup page](https://tools.openbot.org/firmware/). The robot then forgets all gamepads it was paired with.
 
 #### Controls
 

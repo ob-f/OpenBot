@@ -40,7 +40,7 @@ Ajusta `OPENBOT` a tu cuerpo de robot y selecciona en el Arduino IDE una placa c
 
 ### Conducción
 
-Por defecto, conduces el robot con la aplicación del teléfono. Para el [modo sin teléfono](#modo-sin-teléfono), ajusta `NO_PHONE_MODE 1`; con un ESP32 también puedes conducir con un [gamepad](#control-con-gamepad) (`HAS_GAMEPAD 1`). `COAST_MODE` define si los motores ruedan libres (1) o frenan (0) cuando no hay control, y `DEBUG 1` muestra información de depuración en el Monitor Serie.
+Por defecto, conduces el robot con la aplicación del teléfono. Para el [modo sin teléfono](#modo-sin-teléfono), ajusta `NO_PHONE_MODE 1`; con un ESP32 también puedes conducir con un [gamepad](#control-con-gamepad) (`HAS_GAMEPAD 1`). `COAST_MODE` define si los motores ruedan libres (1) o frenan (0) cuando no hay control, y `DEBUG 1` muestra información de depuración en el Monitor Serie. Con el enlace Bluetooth al teléfono, `BLE_NAME` define el nombre con el que aparece el robot en la app, por ejemplo `#define BLE_NAME "Team 3"` (hasta 20 letras, dígitos, espacios, - o _).
 
 ### Componentes
 
@@ -276,6 +276,8 @@ Enciende el robot y pon el gamepad en modo de emparejamiento. Se conecta en poco
 La [lista de gamepads compatibles de Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) incluye más modelos, entre ellos el PS3 DualShock 3, que necesita configuración adicional. Con `DEBUG 1`, el monitor serie muestra el nombre de cada gamepad que se conecta.
 
 Si un gamepad que ya estaba emparejado no toma el control, por ejemplo un mando de PS4 o PS5 cuya barra de luz se queda en azul en lugar de ponerse verde, naranja o roja, ponlo de nuevo en modo de emparejamiento y reinicia el robot.
+
+Si aun así no se conecta, marca **Forget paired gamepads** al flashear en la [página de configuración](https://tools.openbot.org/firmware/). El robot olvida entonces todos los gamepads emparejados.
 
 #### Controles
 

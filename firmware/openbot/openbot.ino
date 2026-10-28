@@ -85,6 +85,7 @@
 #define HAS_LEDS_STATUS DEFAULT_HAS_LEDS_STATUS
 #define HAS_OLED DEFAULT_HAS_OLED
 #define HAS_BLUETOOTH DEFAULT_HAS_BLUETOOTH
+#define BLE_NAME ""  // Bluetooth name in the app: up to 20 letters, digits, spaces, - or _ ("": "OpenBot: <body>")
 
 // 4. Battery: empty / full voltage of the app's battery gauge, or the body's default
 //    Body defaults: 9.0 / 12.6, RC_CAR 6.4 / 8.4, LITE 4.5 / 5.0, MTV 20.0 / 24.0
@@ -98,6 +99,10 @@
 //------------------------------------------------------//
 // DEFINITIONS - no need to change anything below
 //------------------------------------------------------//
+
+#ifndef BLE_NAME
+#define BLE_NAME ""
+#endif
 
 //MCUs
 #define NANO 328 //Atmega328p
@@ -996,6 +1001,8 @@ const uint16_t PARTS_STANDARD = 0
 #endif
   ;
 
+const uint8_t MAX_BLE_NAME = 20;  // fits the Bluetooth advertisement next to the service ID
+
 struct LiveSettings {
   uint32_t firmware_id;  // the firmware's defaults; saved settings of other firmware are ignored
   uint16_t parts_off;    // bit per part
@@ -1004,6 +1011,9 @@ struct LiveSettings {
   float voltage_max;
   float voltage_divider_factor;
   uint8_t no_phone;  // no phone mode
+#if (HAS_BLUETOOTH)
+  char ble_name[MAX_BLE_NAME + 1];  // "" for "OpenBot: <body>"
+#endif
 };
 LiveSettings live;
 
@@ -1027,8 +1037,30 @@ uint32_t firmware_id() {
   for (unsigned int i = 0; i < sizeof(defaults); i++) {
     id = (id ^ bytes[i]) * 16777619UL;
   }
+  for (const char *c = BLE_NAME; *c; c++) {
+    id = (id ^ (uint8_t)*c) * 16777619UL;
+  }
   return id;
 }
+
+#if (HAS_BLUETOOTH)
+// Takes the name if it is valid (up to MAX_BLE_NAME letters, digits, spaces, - or _)
+bool set_ble_name(const char *name) {
+  size_t length = strlen(name);
+  if (length > MAX_BLE_NAME) return false;
+  for (size_t i = 0; i < length; i++) {
+    char c = name[i];
+    if (!isalnum(c) && c != ' ' && c != '-' && c != '_') return false;
+  }
+  strcpy(live.ble_name, name);
+  return true;
+}
+
+String ble_name() {
+  if (live.ble_name[0]) return String(live.ble_name);
+  return String("OpenBot: ") + robot_type;
+}
+#endif
 
 void reset_live_settings() {
   live.firmware_id = firmware_id();
@@ -1038,6 +1070,10 @@ void reset_live_settings() {
   live.voltage_low = VOLTAGE_LOW;
   live.voltage_max = VOLTAGE_MAX;
   live.voltage_divider_factor = VOLTAGE_DIVIDER_FACTOR;
+#if (HAS_BLUETOOTH)
+  live.ble_name[0] = '\0';
+  set_ble_name(BLE_NAME);
+#endif
 }
 
 void load_live_settings() {
@@ -1048,6 +1084,9 @@ void load_live_settings() {
   if (live.firmware_id != firmware_id()) {
     reset_live_settings();
   }
+#if (HAS_BLUETOOTH)
+  live.ble_name[MAX_BLE_NAME] = '\0';
+#endif
   apply_live_settings();
 }
 
@@ -1097,8 +1136,25 @@ bool part_on(uint8_t part) {
 }
 
 // "p" shows the live settings, "p<key>:<value>:..." changes them, "preset" restores the defaults.
-// Keys: off (parts turned off, bit mask), vlow, vmax, vmin, vdiv
+// Keys: off (parts turned off, bit mask), vlow, vmax, vmin, vdiv, nophone; "pname:<name>" sets the
+// Bluetooth name
 void process_live_settings_msg() {
+#if (HAS_BLUETOOTH)
+  // "pname:<name>" sets the Bluetooth name, "pname:*" the default; Bluetooth takes it at startup
+  if (strncmp(msg_buf, "name:", 5) == 0) {
+    const char *name = strcmp(msg_buf + 5, "*") == 0 ? "" : msg_buf + 5;
+    bool changed = strcmp(name, live.ble_name) != 0;
+    if (set_ble_name(name) && changed) {
+      save_live_settings();
+      sendData(String("pname:") + ble_name());
+      Serial.flush();
+      delay(100);
+      ESP.restart();
+    }
+    sendData(String("pname:") + ble_name());
+    return;
+  }
+#endif
   if (strcmp(msg_buf, "reset") == 0) {
     reset_live_settings();
     save_live_settings();
@@ -1141,7 +1197,11 @@ void process_live_settings_msg() {
   sendData(String("pboard:") + (MCU == NANO ? "nano" : "esp32") + ":have:" + String(PARTS_BUILT) + ":off:" + String(live.parts_off)
            + ":vlow:" + String(live.voltage_low, 2) + ":vmax:" + String(live.voltage_max, 2)
            + ":vmin:" + String(live.voltage_min, 2) + ":vdiv:" + String(live.voltage_divider_factor, 2)
-           + ":nophone:" + String(live.no_phone));
+           + ":nophone:" + String(live.no_phone)
+#if (HAS_BLUETOOTH)
+           + ":name:" + ble_name()
+#endif
+  );
   print_config();  // the parts that are on now
 }
 
@@ -1286,8 +1346,7 @@ void setup() {
 #endif
 
 #if (HAS_BLUETOOTH)
-  String ble_name = "OpenBot: " + robot_type;
-  BLEDevice::init(ble_name.c_str());
+  BLEDevice::init(ble_name().c_str());
   bleServer = BLEDevice::createServer();
   bleServer->setCallbacks(new MyServerCallbacks());
   BLEService *pService = bleServer->createService(BLEUUID(SERVICE_UUID));
@@ -2192,9 +2251,11 @@ void process_header(char inChar) {
 }
 
 void process_body(char inChar) {
-  // Add the incoming byte to the buffer
-  msg_buf[msg_idx] = inChar;
-  msg_idx++;
+  // Add the incoming byte to the buffer; bytes beyond its size are dropped
+  if (msg_idx < MAX_MSG_SZ - 1) {
+    msg_buf[msg_idx] = inChar;
+    msg_idx++;
+  }
 }
 
 void parse_msg() {

@@ -40,7 +40,7 @@ Setzen Sie `OPENBOT` auf Ihren Roboterkörper und wählen Sie in der Arduino IDE
 
 ### Fahren
 
-Standardmäßig steuern Sie den Roboter mit der Telefon-App. Für den [Kein-Telefon-Modus](#kein-telefon-modus) setzen Sie `NO_PHONE_MODE 1`; mit einem ESP32 können Sie dann auch mit einem [Gamepad](#gamepad-steuerung) fahren (`HAS_GAMEPAD 1`). `COAST_MODE` legt fest, ob die Motoren ohne Steuerung ausrollen (1) oder bremsen (0), und `DEBUG 1` gibt Debug-Ausgaben auf dem seriellen Monitor aus.
+Standardmäßig steuern Sie den Roboter mit der Telefon-App. Für den [Kein-Telefon-Modus](#kein-telefon-modus) setzen Sie `NO_PHONE_MODE 1`; mit einem ESP32 können Sie dann auch mit einem [Gamepad](#gamepad-steuerung) fahren (`HAS_GAMEPAD 1`). `COAST_MODE` legt fest, ob die Motoren ohne Steuerung ausrollen (1) oder bremsen (0), und `DEBUG 1` gibt Debug-Ausgaben auf dem seriellen Monitor aus. Mit der Bluetooth-Verbindung zum Handy legt `BLE_NAME` den Namen fest, unter dem der Roboter in der App erscheint, zum Beispiel `#define BLE_NAME "Team 3"` (bis zu 20 Buchstaben, Ziffern, Leerzeichen, - oder _).
 
 ### Teile
 
@@ -276,6 +276,8 @@ Schalten Sie den Roboter ein und versetzen Sie das Gamepad in den Kopplungsmodus
 Die [Bluepad32-Liste unterstützter Gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) enthält weitere Modelle, darunter den PS3 DualShock 3, der zusätzliche Einrichtung braucht. Mit `DEBUG 1` zeigt der serielle Monitor den Namen jedes Gamepads an, das sich verbindet.
 
 Wenn ein bereits gekoppeltes Gamepad die Steuerung nicht übernimmt, zum Beispiel ein PS4- oder PS5-Controller, dessen Lichtleiste blau bleibt, statt grün, orange oder rot zu werden, versetzen Sie es erneut in den Kopplungsmodus und starten Sie den Roboter neu.
+
+Verbindet es sich dann immer noch nicht, setzen Sie beim Flashen auf der [Einrichtungsseite](https://tools.openbot.org/firmware/) das Häkchen bei **Forget paired gamepads**. Der Roboter vergisst dann alle gekoppelten Gamepads.
 
 #### Bedienung
 

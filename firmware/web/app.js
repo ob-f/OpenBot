@@ -56,8 +56,9 @@ const el = (tag, props = {}, ...children) => {
 };
 
 let data;
-const state = { body: "DIY", board: "esp32", mode: "phone", parts: {}, battery: "body", low: null, max: null };
+const state = { body: "DIY", board: "esp32", mode: "phone", parts: {}, battery: "body", low: null, max: null, bleName: "" };
 let busy = false;
+let forgetGamepads = false;  // for the next flash only, so not saved
 
 // ---------- State ----------
 
@@ -123,6 +124,16 @@ function partsNotLive() {
 const MIN_VOLTS = 1;
 const MAX_VOLTS = 40;
 
+// The robot's Bluetooth name can be set when it has the Bluetooth link to the phone
+const nameApplies = () => state.board === "esp32" && state.mode !== "gamepad" && "HAS_BLUETOOTH" in boardInfo().parts && partOn("HAS_BLUETOOTH");
+const bleName = () => (state.bleName || "").trim();
+const defaultBleName = () => `OpenBot: ${state.body}`;
+
+function nameProblem() {
+  if (!nameApplies() || /^[A-Za-z0-9 _-]{0,20}$/.test(bleName())) return "";
+  return "The Bluetooth name can have up to 20 letters, digits, spaces, - or _.";
+}
+
 // What's wrong with a custom battery ("" if it's fine)
 function batteryProblem() {
   if (state.battery !== "custom") return "";
@@ -179,7 +190,7 @@ function addMessage(names) {
 function applyBlocker(clashes) {
   if (!("serial" in navigator)) return { why: "Updating the settings needs Chrome or Edge on a computer." };
   if (clashes) return { why: "Two parts use the same pin. Turn one of them off." };
-  const battery = batteryProblem();
+  const battery = batteryProblem() || nameProblem();
   if (battery) return { why: battery };
   const notLive = partsNotLive();
   if (notLive.length) return { why: `${notLive.join(", ")} can only be changed with the Arduino IDE.` };
@@ -283,6 +294,16 @@ function renderModes() {
     };
     return button;
   }));
+  $("ble-name-box").hidden = !nameApplies();
+  $("ble-name").placeholder = defaultBleName();
+  if (document.activeElement !== $("ble-name")) $("ble-name").value = state.bleName || "";
+  $("ble-name").disabled = busy;
+  const name = nameProblem();
+  $("name-error").hidden = !name;
+  $("name-error").textContent = name;
+  $("forget-box").hidden = !(state.board === "esp32" && state.mode === "gamepad");
+  $("forget-gamepads").checked = forgetGamepads;
+  $("forget-gamepads").disabled = busy;
 }
 
 function renderParts() {
@@ -376,9 +397,10 @@ function renderRobot() {
 
   const clashes = pinClashes().length > 0;
   const extras = partsNeedingBuild();
-  const battery = batteryProblem();
-  $("battery-error").hidden = !battery;
-  $("battery-error").textContent = battery;
+  const batteryOnly = batteryProblem();
+  $("battery-error").hidden = !batteryOnly;
+  $("battery-error").textContent = batteryOnly;
+  const battery = batteryOnly || nameProblem();
   let flashNote = "";
   let canFlash = true;
   if (!window.isSecureContext) {
@@ -432,6 +454,7 @@ function settingsFile() {
     if (forcedOff(key)) continue;
     if (partOn(key) !== !!part.default) set(key, partOn(key) ? 1 : 0);
   }
+  if (nameApplies() && bleName()) set("BLE_NAME", `"${bleName()}"`);
   const v = voltages();
   if (v.custom) {
     set("VOLTAGE_LOW", `${v.low.toFixed(1)}f`);
@@ -454,6 +477,9 @@ function download() {
 
 // ---------- Serial: flashing and live settings ----------
 
+// NVS partition of the default ESP32 partitions (see build_site.py)
+const NVS_ADDRESS = 0x9000;
+const NVS_SIZE = 0x5000;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 let logLines = [];
 
@@ -534,7 +560,14 @@ class LineReader {
 function parseLive(line) {
   const values = {};
   const parts = line.slice(1).split(":");
-  for (let i = 0; i + 1 < parts.length; i += 2) values[parts[i]] = parts[i + 1];
+  for (let i = 0; i + 1 < parts.length; i += 2) {
+    // The Bluetooth name comes last and may contain ":" (the default is "OpenBot: <body>")
+    if (parts[i] === "name") {
+      values.name = parts.slice(i + 1).join(":");
+      break;
+    }
+    values[parts[i]] = parts[i + 1];
+  }
   return values;
 }
 
@@ -573,6 +606,21 @@ async function applyLive(port) {
     log(`Battery ${Number(live.vlow).toFixed(1)}–${Number(live.vmax).toFixed(1)} V${off.length ? `, turned off: ${off.join(", ")}` : ""}`, "ok");
     const now = await reader.waitFor((l) => l.startsWith("OpenBot "), 2000);
     if (now) log(now);
+    if (nameApplies()) {
+      // The robot restarts when its Bluetooth name changes; Bluetooth takes the name at startup
+      const want = bleName() || defaultBleName();
+      await reader.send(`pname:${bleName() || "*"}`);
+      const answer = await reader.waitFor((l) => l.startsWith("pname:"), 3000);
+      const got = answer ? answer.slice(6) : null;
+      if (got !== want) throw new Error(`The robot didn't take the Bluetooth name "${want}".`);
+      if (live.name !== want) {
+        log(`Bluetooth name: ${want}. The robot restarts to use it.`, "ok");
+        const restarted = await reader.waitFor((l) => l.startsWith("OpenBot "), 6000);
+        if (restarted) log(restarted);
+      } else {
+        log(`Bluetooth name: ${want}`, "ok");
+      }
+    }
   } finally {
     await reader.close();
   }
@@ -594,6 +642,12 @@ async function flashEsp32(port, files) {
     await loader.main();
     const images = [];
     for (const f of files) images.push({ data: loader.ui8ToBstr(await fetchBytes(f.file)), address: f.address });
+    if (state.mode === "gamepad" && forgetGamepads) {
+      // Blank the NVS partition, where the gamepad pairings are kept (default partitions);
+      // the settings saved there too are written again right after flashing
+      images.push({ data: loader.ui8ToBstr(new Uint8Array(NVS_SIZE).fill(0xff)), address: NVS_ADDRESS });
+      log("Forgetting paired gamepads", "dim");
+    }
     const total = images.reduce((sum, i) => sum + i.data.length, 0);
     const before = (index) => images.slice(0, index).reduce((sum, i) => sum + i.data.length, 0);
     await loader.writeFlash({
@@ -700,6 +754,13 @@ async function start() {
     renderRobot();
     save();
   };
+  $("ble-name").oninput = () => {
+    state.bleName = $("ble-name").value;
+    renderRobot();
+    renderModes();
+    save();
+  };
+  $("forget-gamepads").onchange = () => { forgetGamepads = $("forget-gamepads").checked; };
   $("volt-low").oninput = custom;
   $("volt-max").oninput = custom;
   render();
