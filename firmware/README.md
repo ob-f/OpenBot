@@ -17,7 +17,9 @@ The main task of the MCU is to handle the low-level control of the vehicle and p
 
 ## Setup
 
-All settings are in the **SETTINGS** section at the top of `openbot.ino`. You don't need to change anything below it.
+The easiest way is [tools.openbot.org/firmware](https://tools.openbot.org/firmware/): choose your robot and its parts, then flash the firmware straight from the browser (Chrome or Edge on a computer), or download a settings file for the Arduino IDE. The page sets the battery, the parts and phone or no phone mode on the robot itself, so the ready-made firmware fits your robot without compiling. Later changes need no flashing: **Update settings only** sends them to the robot. On the ESP32, the ready-made firmware has every part built in that the body has pins for; the ones you don't use stay off.
+
+To set up the firmware yourself: all settings are in the **SETTINGS** section at the top of `openbot.ino`. You don't need to change anything below it.
 
 To keep your settings when you update the firmware, copy the lines of the SETTINGS section between `#else` and `#endif` into a new file `openbot_settings.h` next to `openbot.ino`, and change them there. If `openbot_settings.h` exists, the firmware uses it instead of the section in `openbot.ino`, and git ignores it, so it isn't pushed by mistake.
 
@@ -40,7 +42,7 @@ Set `OPENBOT` to your robot body, and select a board it supports in the Arduino 
 
 ### Driving
 
-By default, you drive the robot with the phone app. For [no phone mode](#no-phone-mode), set `NO_PHONE_MODE 1`; with an ESP32 you can then also drive with a [gamepad](#gamepad-control) (`HAS_GAMEPAD 1`). `COAST_MODE` sets whether the motors coast (1) or brake (0) when there is no control, and `DEBUG 1` prints debug output on the Serial Monitor.
+By default, you drive the robot with the phone app. For [no phone mode](#no-phone-mode), set `NO_PHONE_MODE 1`; with an ESP32 you can then also drive with a [gamepad](#gamepad-control) (`HAS_GAMEPAD 1`). `COAST_MODE` sets whether the motors coast (1) or brake (0) when there is no control, and `DEBUG 1` prints debug output on the Serial Monitor. With the Bluetooth link to the phone, `BLE_NAME` sets the name the robot shows in the app, for example `#define BLE_NAME "Team 3"` (up to 20 letters, digits, spaces, - or _).
 
 ### Parts
 
@@ -81,6 +83,8 @@ The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full).
 | 8 × AA | 8.0f | 12.0f |
 
 If your voltage divider differs from the body's, also set `VOLTAGE_DIVIDER_FACTOR` to (R1 + R2) / R2. `VOLTAGE_MIN` is the lowest voltage at which the motors still turn; the firmware only uses it in no phone mode.
+
+**The robot stops responding at full speed.** At high speed, and especially when starting on the floor, the motors draw a lot of current. With weak or alkaline AA batteries the voltage can dip so low that the board restarts and the app or gamepad loses its connection. Use fresh or rechargeable batteries (NiMH or Li-ion), or drive in a slower speed mode. A gamepad may then need [pairing again](#pairing).
 
 ### Check the configuration
 
@@ -274,6 +278,8 @@ Power on the robot and put the gamepad in pairing mode. It connects within a few
 The [Bluepad32 list of supported gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) has more models, including the PS3 DualShock 3, which needs extra setup. With `DEBUG 1`, the Serial Monitor shows the name of each gamepad that connects.
 
 If a gamepad that was paired before doesn't take over, for example a PS4 or PS5 controller whose light bar stays blue instead of turning green, orange or red, put it in pairing mode again and restart the robot.
+
+If it still doesn't connect, tick **Forget paired gamepads** when flashing on the [setup page](https://tools.openbot.org/firmware/). The robot then forgets all gamepads it was paired with.
 
 #### Controls
 

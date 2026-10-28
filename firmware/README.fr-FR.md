@@ -40,7 +40,7 @@ Réglez `OPENBOT` sur le corps de votre robot et sélectionnez dans l'IDE Arduin
 
 ### Conduite
 
-Par défaut, vous conduisez le robot avec l'application du téléphone. Pour le [mode sans téléphone](#mode-sans-téléphone), réglez `NO_PHONE_MODE 1` ; avec un ESP32, vous pouvez alors aussi conduire avec une [manette](#contrôle-par-manette) (`HAS_GAMEPAD 1`). `COAST_MODE` détermine si les moteurs roulent en roue libre (1) ou freinent (0) sans commande, et `DEBUG 1` affiche des informations de débogage dans le moniteur série.
+Par défaut, vous conduisez le robot avec l'application du téléphone. Pour le [mode sans téléphone](#mode-sans-téléphone), réglez `NO_PHONE_MODE 1` ; avec un ESP32, vous pouvez alors aussi conduire avec une [manette](#contrôle-par-manette) (`HAS_GAMEPAD 1`). `COAST_MODE` détermine si les moteurs roulent en roue libre (1) ou freinent (0) sans commande, et `DEBUG 1` affiche des informations de débogage dans le moniteur série. Avec la liaison Bluetooth au téléphone, `BLE_NAME` définit le nom sous lequel le robot apparaît dans l'application, par exemple `#define BLE_NAME "Team 3"` (jusqu'à 20 lettres, chiffres, espaces, - ou _).
 
 ### Composants
 
@@ -81,6 +81,8 @@ La jauge de batterie de l'application va de `VOLTAGE_LOW` (vide) à `VOLTAGE_MAX
 | 8 × AA | 8.0f | 12.0f |
 
 Si votre diviseur de tension diffère de celui du corps, réglez aussi `VOLTAGE_DIVIDER_FACTOR` sur (R1 + R2) / R2. `VOLTAGE_MIN` est la tension la plus basse à laquelle les moteurs tournent encore ; le firmware ne l'utilise qu'en mode sans téléphone.
+
+**Le robot ne répond plus à pleine vitesse.** À grande vitesse, surtout au démarrage sur le sol, les moteurs consomment beaucoup de courant. Avec des piles AA faibles ou alcalines, la tension peut chuter au point que la carte redémarre et que l'application ou la manette perde la connexion. Utilisez des piles neuves ou rechargeables (NiMH ou Li-ion), ou roulez dans un mode plus lent. Il faudra peut-être ensuite [appairer à nouveau la manette](#appairage).
 
 ### Vérifier la configuration
 
@@ -274,6 +276,8 @@ Allumez le robot et mettez la manette en mode d'appairage. Elle se connecte en q
 La [liste des manettes prises en charge par Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) contient d'autres modèles, dont la DualShock 3 de la PS3, qui demande une configuration supplémentaire. Avec `DEBUG 1`, le moniteur série affiche le nom de chaque manette qui se connecte.
 
 Si une manette déjà appairée ne prend pas le contrôle, par exemple une manette PS4 ou PS5 dont la barre lumineuse reste bleue au lieu de passer au vert, à l'orange ou au rouge, remettez-la en mode d'appairage et redémarrez le robot.
+
+S'il ne se connecte toujours pas, cochez **Forget paired gamepads** lors du flashage sur la [page de configuration](https://tools.openbot.org/firmware/). Le robot oublie alors toutes les manettes appairées.
 
 #### Commandes
 

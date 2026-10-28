@@ -85,6 +85,7 @@
 #define HAS_LEDS_STATUS DEFAULT_HAS_LEDS_STATUS
 #define HAS_OLED DEFAULT_HAS_OLED
 #define HAS_BLUETOOTH DEFAULT_HAS_BLUETOOTH
+#define BLE_NAME ""  // Bluetooth name in the app: up to 20 letters, digits, spaces, - or _ ("": "OpenBot: <body>")
 
 // 4. Battery: empty / full voltage of the app's battery gauge, or the body's default
 //    Body defaults: 9.0 / 12.6, RC_CAR 6.4 / 8.4, LITE 4.5 / 5.0, MTV 20.0 / 24.0
@@ -98,6 +99,10 @@
 //------------------------------------------------------//
 // DEFINITIONS - no need to change anything below
 //------------------------------------------------------//
+
+#ifndef BLE_NAME
+#define BLE_NAME ""
+#endif
 
 //MCUs
 #define NANO 328 //Atmega328p
@@ -178,7 +183,6 @@ const int PIN_LED_LI = 4;
 const int PIN_LED_RI = 7;
 
 #else  // ESP32
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define DEFAULT_VOLTAGE_MIN 6.0f
 #define DEFAULT_VOLTAGE_DIVIDER_FACTOR ((30 + 10) / 10)
@@ -211,9 +215,10 @@ const int PIN_PWM_RF1 = 25;
 const int PIN_PWM_RF2 = 26;
 const int PIN_PWM_RB1 = 25;
 const int PIN_PWM_RB2 = 26;
+// GPIO 21/22 are kept free for an OLED display (I2C)
 const int PIN_SPEED_LF = 35;
 const int PIN_SPEED_LB = 34;
-const int PIN_SPEED_RF = 22;
+const int PIN_SPEED_RF = 39;
 const int PIN_SPEED_RB = 23;
 const int PIN_VIN = 4;
 const int PIN_TRIGGER = 5;
@@ -223,7 +228,7 @@ const int PIN_LED_RI = 17;
 const int PIN_LED_LB = 16;
 const int PIN_LED_RB = 17;
 const int PIN_LED_LF = 19;
-const int PIN_LED_RF = 21;
+const int PIN_LED_RF = 12;  // must stay low while the ESP32 starts (a transistor stage does that)
 const int PIN_LED_Y = 14;
 const int PIN_LED_G = 27;
 const int PIN_LED_B = 13;
@@ -380,7 +385,6 @@ const String robot_type = "RTR_TT2";
 #if (MCU != ESP32)
 #error "RTR_TT2 needs an ESP32 board."
 #endif
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
@@ -457,7 +461,6 @@ const String robot_type = "RTR_520";
 #if (MCU != ESP32)
 #error "RTR_520 needs an ESP32 board."
 #endif
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
@@ -534,7 +537,6 @@ const String robot_type = "MTV";
 #if (MCU != ESP32)
 #error "MTV needs an ESP32 board."
 #endif
-#include <esp_wifi.h>
 #define DEFAULT_HAS_BLUETOOTH 1
 #define analogWrite ledcWrite
 #define attachPinChangeInterrupt attachInterrupt
@@ -738,7 +740,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 //------------------------------------------------------//
 // INITIALIZATION
 //------------------------------------------------------//
-#if (NO_PHONE_MODE)
+// No phone mode (switchable in the live settings)
 unsigned long turn_direction_time = 0;
 unsigned long turn_direction_interval = 5000;
 unsigned int turn_direction = 0;
@@ -746,7 +748,6 @@ int ctrl_max = 192;
 int ctrl_slow = 96;
 int ctrl_min = (int)255.0 * VOLTAGE_MIN / VOLTAGE_MAX;
 bool explore_enabled = !HAS_GAMEPAD;
-#endif
 
 #if (HAS_GAMEPAD)
 const int GAMEPAD_SPEEDS[] = { 128, 192, 255 };  // slow, normal, fast
@@ -778,28 +779,26 @@ const float US_TO_CM = 0.01715;               //cm/uS -> (343 * 100 / 1000000) /
 const unsigned int MAX_SONAR_DISTANCE = 300;  //cm
 const unsigned long MAX_SONAR_TIME = (long)MAX_SONAR_DISTANCE * 2 * 10 / 343 + 1;
 const unsigned int STOP_DISTANCE = 10;  //cm
-#if (NO_PHONE_MODE)
-const unsigned int TURN_DISTANCE = 50;
-unsigned long sonar_interval = 100;
-#else
-unsigned long sonar_interval = 1000;
-#endif
+const unsigned int TURN_DISTANCE = 50;  // no phone mode
+unsigned long sonar_interval = 1000;    // 100 ms in no phone mode
 unsigned long sonar_time = 0;
 boolean sonar_sent = false;
 boolean ping_success = false;
 unsigned int distance = -1;           //cm
-unsigned int distance_estimate = -1;  //cm
+unsigned int distance_estimate = MAX_SONAR_DISTANCE;  //cm, nothing in front until the first reading
 unsigned long start_time;
 unsigned long echo_time = 0;
 #if (SONAR_MEDIAN)
 const unsigned int distance_array_sz = 3;
-unsigned int distance_array[distance_array_sz] = {};
+int distance_array[distance_array_sz] = {};
 unsigned int distance_counter = 0;
 #endif
 #else
-const unsigned int TURN_DISTANCE = -1;  //cm
-const unsigned int STOP_DISTANCE = 0;   //cm
-unsigned int distance_estimate = -1;    //cm
+// No sonar: the path always looks clear
+const unsigned int MAX_SONAR_DISTANCE = 300;  //cm
+const unsigned int TURN_DISTANCE = 0;         //cm
+const unsigned int STOP_DISTANCE = 0;         //cm
+unsigned int distance_estimate = MAX_SONAR_DISTANCE;
 #endif
 
 #if (HAS_OLED)
@@ -898,6 +897,313 @@ unsigned long heartbeat_time = 0;
 unsigned long display_interval = 1000;  // How frequently vehicle data is displayed (ms).
 unsigned long display_time = 0;
 #endif
+
+//------------------------------------------------------//
+// Live settings: battery and parts, changed over serial or Bluetooth
+// with the "p" message (e.g. from tools.openbot.org/firmware) and kept in EEPROM
+//------------------------------------------------------//
+#include <EEPROM.h>
+#ifndef DEFAULT_VOLTAGE_DIVIDER_FACTOR
+#define DEFAULT_VOLTAGE_DIVIDER_FACTOR 1
+#endif
+
+// Parts that can be turned off live (bit numbers)
+const uint8_t PART_VOLTAGE_DIVIDER = 0;
+const uint8_t PART_INDICATORS = 1;
+const uint8_t PART_SONAR = 2;
+const uint8_t PART_BUMPER = 3;
+const uint8_t PART_SPEED_SENSORS_FRONT = 4;
+const uint8_t PART_SPEED_SENSORS_BACK = 5;
+const uint8_t PART_SPEED_SENSORS_MIDDLE = 6;
+const uint8_t PART_LEDS_FRONT = 7;
+const uint8_t PART_LEDS_BACK = 8;
+const uint8_t PART_LEDS_STATUS = 9;
+const uint8_t PART_OLED = 10;
+const uint8_t PART_SONAR_MEDIAN = 11;
+
+// The parts in this firmware
+const uint16_t PARTS_BUILT = 0
+#if (HAS_VOLTAGE_DIVIDER)
+  | bit(PART_VOLTAGE_DIVIDER)
+#endif
+#if (HAS_INDICATORS)
+  | bit(PART_INDICATORS)
+#endif
+#if (HAS_SONAR)
+  | bit(PART_SONAR)
+#endif
+#if (HAS_BUMPER)
+  | bit(PART_BUMPER)
+#endif
+#if (HAS_SPEED_SENSORS_FRONT)
+  | bit(PART_SPEED_SENSORS_FRONT)
+#endif
+#if (HAS_SPEED_SENSORS_BACK)
+  | bit(PART_SPEED_SENSORS_BACK)
+#endif
+#if (HAS_SPEED_SENSORS_MIDDLE)
+  | bit(PART_SPEED_SENSORS_MIDDLE)
+#endif
+#if (HAS_LEDS_FRONT)
+  | bit(PART_LEDS_FRONT)
+#endif
+#if (HAS_LEDS_BACK)
+  | bit(PART_LEDS_BACK)
+#endif
+#if (HAS_LEDS_STATUS)
+  | bit(PART_LEDS_STATUS)
+#endif
+#if (HAS_OLED)
+  | bit(PART_OLED)
+#endif
+#if (HAS_SONAR && SONAR_MEDIAN)
+  | bit(PART_SONAR_MEDIAN)
+#endif
+  ;
+
+// The body's standard parts
+const uint16_t PARTS_STANDARD = 0
+#if (DEFAULT_HAS_VOLTAGE_DIVIDER)
+  | bit(PART_VOLTAGE_DIVIDER)
+#endif
+#if (DEFAULT_HAS_INDICATORS)
+  | bit(PART_INDICATORS)
+#endif
+#if (DEFAULT_HAS_SONAR)
+  | bit(PART_SONAR)
+#endif
+#if (DEFAULT_HAS_BUMPER)
+  | bit(PART_BUMPER)
+#endif
+#if (DEFAULT_HAS_SPEED_SENSORS_FRONT)
+  | bit(PART_SPEED_SENSORS_FRONT)
+#endif
+#if (DEFAULT_HAS_SPEED_SENSORS_BACK)
+  | bit(PART_SPEED_SENSORS_BACK)
+#endif
+#if (DEFAULT_HAS_SPEED_SENSORS_MIDDLE)
+  | bit(PART_SPEED_SENSORS_MIDDLE)
+#endif
+#if (DEFAULT_HAS_LEDS_FRONT)
+  | bit(PART_LEDS_FRONT)
+#endif
+#if (DEFAULT_HAS_LEDS_BACK)
+  | bit(PART_LEDS_BACK)
+#endif
+#if (DEFAULT_HAS_LEDS_STATUS)
+  | bit(PART_LEDS_STATUS)
+#endif
+#if (DEFAULT_HAS_OLED)
+  | bit(PART_OLED)
+#endif
+#if (DEFAULT_SONAR_MEDIAN)
+  | bit(PART_SONAR_MEDIAN)
+#endif
+  ;
+
+const uint8_t MAX_BLE_NAME = 20;  // fits the Bluetooth advertisement next to the service ID
+
+struct LiveSettings {
+  uint32_t firmware_id;  // the firmware's defaults; saved settings of other firmware are ignored
+  uint16_t parts_off;    // bit per part
+  float voltage_min;
+  float voltage_low;
+  float voltage_max;
+  float voltage_divider_factor;
+  uint8_t no_phone;  // no phone mode
+#if (HAS_BLUETOOTH)
+  char ble_name[MAX_BLE_NAME + 1];  // "" for "OpenBot: <body>"
+#endif
+};
+LiveSettings live;
+
+// Parts that start off: ready-made firmware has every part built in, but only the body's
+// standard parts start on
+uint16_t default_parts_off() {
+#ifdef READY_MADE
+  return PARTS_BUILT & ~PARTS_STANDARD;
+#else
+  return 0;
+#endif
+}
+
+uint32_t firmware_id() {
+  // Changes when the body, the parts or any default of the live settings change, so a new
+  // upload with other defaults never keeps the old saved settings
+  float defaults[] = { VOLTAGE_MIN, VOLTAGE_LOW, VOLTAGE_MAX, (float)VOLTAGE_DIVIDER_FACTOR,
+                       (float)NO_PHONE_MODE, (float)default_parts_off() };
+  uint32_t id = 2166136261UL ^ (OPENBOT * 31 + PARTS_BUILT) ^ ((uint32_t)sizeof(LiveSettings) << 24);
+  const uint8_t *bytes = (const uint8_t *)defaults;
+  for (unsigned int i = 0; i < sizeof(defaults); i++) {
+    id = (id ^ bytes[i]) * 16777619UL;
+  }
+  for (const char *c = BLE_NAME; *c; c++) {
+    id = (id ^ (uint8_t)*c) * 16777619UL;
+  }
+  return id;
+}
+
+#if (HAS_BLUETOOTH)
+// Takes the name if it is valid (up to MAX_BLE_NAME letters, digits, spaces, - or _)
+bool set_ble_name(const char *name) {
+  size_t length = strlen(name);
+  if (length > MAX_BLE_NAME) return false;
+  for (size_t i = 0; i < length; i++) {
+    char c = name[i];
+    if (!isalnum(c) && c != ' ' && c != '-' && c != '_') return false;
+  }
+  strcpy(live.ble_name, name);
+  return true;
+}
+
+String ble_name() {
+  if (live.ble_name[0]) return String(live.ble_name);
+  return String("OpenBot: ") + robot_type;
+}
+#endif
+
+void reset_live_settings() {
+  live.firmware_id = firmware_id();
+  live.parts_off = default_parts_off();
+  live.no_phone = NO_PHONE_MODE;
+  live.voltage_min = VOLTAGE_MIN;
+  live.voltage_low = VOLTAGE_LOW;
+  live.voltage_max = VOLTAGE_MAX;
+  live.voltage_divider_factor = VOLTAGE_DIVIDER_FACTOR;
+#if (HAS_BLUETOOTH)
+  live.ble_name[0] = '\0';
+  set_ble_name(BLE_NAME);
+#endif
+}
+
+void load_live_settings() {
+#if (MCU == ESP32)
+  EEPROM.begin(sizeof(LiveSettings));
+#endif
+  EEPROM.get(0, live);
+  if (live.firmware_id != firmware_id()) {
+    reset_live_settings();
+  }
+#if (HAS_BLUETOOTH)
+  live.ble_name[MAX_BLE_NAME] = '\0';
+#endif
+  apply_live_settings();
+}
+
+// Settings that take effect beyond a single reading
+void apply_live_settings() {
+#if (HAS_GAMEPAD)
+  live.no_phone = 1;  // the gamepad drives in no phone mode
+#endif
+#if (HAS_SONAR)
+  sonar_interval = live.no_phone ? 100 : 1000;
+  if (!part_on(PART_SONAR)) {
+    distance_estimate = MAX_SONAR_DISTANCE;  // turned off live: nothing in front
+  }
+#endif
+  // A new driving mode starts with the motors stopped, not with the old mode's last command
+  static int8_t applied_no_phone = -1;
+  if (live.no_phone != applied_no_phone) {
+    ctrl_left = 0;
+    ctrl_right = 0;
+    applied_no_phone = live.no_phone;
+  }
+#if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
+  // Start counting afresh, so a pair turned back on doesn't report ticks from while it was off
+  counter_lf = counter_rf = counter_lb = counter_rb = counter_lm = counter_rm = 0;
+  wheel_time = millis();
+#endif
+#if (HAS_INDICATORS)
+  if (!part_on(PART_INDICATORS)) {
+    // Turned off live: back to off, or to the rear light where they share a pin
+    indicator_left = 0;
+    indicator_right = 0;
+    update_indicator();
+  }
+#endif
+  ctrl_min = (int)255.0 * live.voltage_min / live.voltage_max;
+}
+
+void save_live_settings() {
+  EEPROM.put(0, live);
+#if (MCU == ESP32)
+  EEPROM.commit();
+#endif
+}
+
+bool part_on(uint8_t part) {
+  return (PARTS_BUILT & ~live.parts_off) & bit(part);
+}
+
+// "p" shows the live settings, "p<key>:<value>:..." changes them, "preset" restores the defaults.
+// Keys: off (parts turned off, bit mask), vlow, vmax, vmin, vdiv, nophone; "pname:<name>" sets the
+// Bluetooth name
+void process_live_settings_msg() {
+#if (HAS_BLUETOOTH)
+  // "pname:<name>" sets the Bluetooth name, "pname:*" the default; Bluetooth takes it at startup
+  if (strncmp(msg_buf, "name:", 5) == 0) {
+    const char *name = strcmp(msg_buf + 5, "*") == 0 ? "" : msg_buf + 5;
+    bool changed = strcmp(name, live.ble_name) != 0;
+    if (set_ble_name(name) && changed) {
+      save_live_settings();
+      sendData(String("pname:") + ble_name());
+      Serial.flush();
+      delay(100);
+      ESP.restart();
+    }
+    sendData(String("pname:") + ble_name());
+    return;
+  }
+#endif
+  if (strcmp(msg_buf, "reset") == 0) {
+    reset_live_settings();
+    save_live_settings();
+  } else if (msg_buf[0] != '\0') {
+    char *key = strtok(msg_buf, ":");
+    while (key != NULL) {
+      char *value = strtok(NULL, ":");
+      if (value == NULL) {
+        break;
+      }
+      float number = atof(value);
+      if (strcmp(key, "off") == 0) {
+        live.parts_off = atol(value) & PARTS_BUILT;
+      } else if (number > 0 && strcmp(key, "vlow") == 0) {
+        live.voltage_low = number;
+      } else if (number > 0 && strcmp(key, "vmax") == 0) {
+        live.voltage_max = number;
+      } else if (number > 0 && strcmp(key, "vmin") == 0) {
+        live.voltage_min = number;
+      } else if (number > 0 && strcmp(key, "vdiv") == 0) {
+        live.voltage_divider_factor = number;
+      } else if (strcmp(key, "nophone") == 0) {
+        live.no_phone = atoi(value) != 0;
+      }
+      key = strtok(NULL, ":");
+    }
+    save_live_settings();
+  }
+  apply_live_settings();
+#if (HAS_LEDS_FRONT || HAS_LEDS_BACK)
+  update_light();
+#endif
+#if (HAS_LEDS_STATUS)
+  if (!part_on(PART_LEDS_STATUS)) {
+    digitalWrite(PIN_LED_Y, LOW);
+    digitalWrite(PIN_LED_G, LOW);
+    digitalWrite(PIN_LED_B, LOW);
+  }
+#endif
+  sendData(String("pboard:") + (MCU == NANO ? "nano" : "esp32") + ":have:" + String(PARTS_BUILT) + ":off:" + String(live.parts_off)
+           + ":vlow:" + String(live.voltage_low, 2) + ":vmax:" + String(live.voltage_max, 2)
+           + ":vmin:" + String(live.voltage_min, 2) + ":vdiv:" + String(live.voltage_divider_factor, 2)
+           + ":nophone:" + String(live.no_phone)
+#if (HAS_BLUETOOTH)
+           + ":name:" + ble_name()
+#endif
+  );
+  print_config();  // the parts that are on now
+}
 
 //------------------------------------------------------//
 // SETUP
@@ -1009,10 +1315,6 @@ void setup() {
 #endif
 
 #if (MCU == ESP32)
-  esp_wifi_deinit();
-#endif
-
-#if (MCU == ESP32)
 #if (HAS_LEDS_BACK)
   ledcSetup(CH_LED_LB, FREQ, RES);
   ledcSetup(CH_LED_RB, FREQ, RES);
@@ -1035,6 +1337,7 @@ void setup() {
   // SERIAL_8N1 - 8 data bits, no parity, 1 stop bit
   // Serial.setTimeout(10);
   Serial.println('r');
+  load_live_settings();
   print_config();
 #if __has_include("openbot_settings.h")
   Serial.println(F("OpenBot settings: openbot_settings.h"));
@@ -1043,8 +1346,7 @@ void setup() {
 #endif
 
 #if (HAS_BLUETOOTH)
-  String ble_name = "OpenBot: " + robot_type;
-  BLEDevice::init(ble_name.c_str());
+  BLEDevice::init(ble_name().c_str());
   bleServer = BLEDevice::createServer();
   bleServer->setCallbacks(new MyServerCallbacks());
   BLEService *pService = bleServer->createService(BLEUUID(SERVICE_UUID));
@@ -1087,44 +1389,42 @@ void print_config() {
   Serial.print(robot_type);
   Serial.print(MCU == NANO ? F(" (Nano):") : F(" (ESP32):"));
 #if (HAS_VOLTAGE_DIVIDER)
-  print_item(F("voltage"), first);
+  if (part_on(PART_VOLTAGE_DIVIDER)) print_item(F("voltage"), first);
 #endif
 #if (HAS_INDICATORS)
-  print_item(F("indicators"), first);
+  if (part_on(PART_INDICATORS)) print_item(F("indicators"), first);
 #endif
 #if (HAS_SONAR)
-  print_item(F("sonar"), first);
+  if (part_on(PART_SONAR)) print_item(F("sonar"), first);
 #endif
 #if (HAS_BUMPER)
-  print_item(F("bumper"), first);
+  if (part_on(PART_BUMPER)) print_item(F("bumper"), first);
 #endif
 #if (HAS_SPEED_SENSORS_FRONT)
-  print_item(F("speed sensors front"), first);
+  if (part_on(PART_SPEED_SENSORS_FRONT)) print_item(F("speed sensors front"), first);
 #endif
 #if (HAS_SPEED_SENSORS_BACK)
-  print_item(F("speed sensors back"), first);
+  if (part_on(PART_SPEED_SENSORS_BACK)) print_item(F("speed sensors back"), first);
 #endif
 #if (HAS_SPEED_SENSORS_MIDDLE)
-  print_item(F("speed sensors middle"), first);
+  if (part_on(PART_SPEED_SENSORS_MIDDLE)) print_item(F("speed sensors middle"), first);
 #endif
 #if (HAS_LEDS_FRONT)
-  print_item(F("front lights"), first);
+  if (part_on(PART_LEDS_FRONT)) print_item(F("front lights"), first);
 #endif
 #if (HAS_LEDS_BACK)
-  print_item(F("rear lights"), first);
+  if (part_on(PART_LEDS_BACK)) print_item(F("rear lights"), first);
 #endif
 #if (HAS_LEDS_STATUS)
-  print_item(F("status LEDs"), first);
+  if (part_on(PART_LEDS_STATUS)) print_item(F("status LEDs"), first);
 #endif
 #if (HAS_OLED)
-  print_item(F("OLED"), first);
+  if (part_on(PART_OLED)) print_item(F("OLED"), first);
 #endif
 #if (HAS_BLUETOOTH)
   print_item(F("Bluetooth"), first);
 #endif
-#if (NO_PHONE_MODE)
-  print_item(F("no phone mode"), first);
-#endif
+  if (live.no_phone) print_item(F("no phone mode"), first);
 #if (HAS_GAMEPAD)
   print_item(F("gamepad"), first);
 #endif
@@ -1132,9 +1432,9 @@ void print_config() {
     Serial.print(F(" none"));
   }
   Serial.println();
-#if (NO_PHONE_MODE && !HAS_SONAR)
-  Serial.println(F("OpenBot warning: no sonar, so the robot drives straight ahead"));
-#endif
+  if (live.no_phone && !part_on(PART_SONAR)) {
+    Serial.println(F("OpenBot warning: no sonar, so the robot drives straight ahead"));
+  }
 }
 
 //------------------------------------------------------//
@@ -1160,34 +1460,37 @@ void loop() {
   update_gamepad();
 #endif
 
-#if (NO_PHONE_MODE)
-  if (gamepad_driving) {
-#if (HAS_GAMEPAD)
-    ctrl_left = gamepad_left;
-    ctrl_right = gamepad_right;
-    if (gamepad_obstacle_stop) {
-      stop_at_obstacle();
-    }
-#endif
-  } else if (explore_enabled) {
-    update_explore();
-  } else {
-    ctrl_left = 0;
-    ctrl_right = 0;
-  }
-#else  // Check for messages from the phone
+  // Messages from the phone; in no phone mode only the live settings matter,
+  // the controls below overwrite any motor command
   if (Serial.available() > 0) {
     on_serial_rx();
   }
-  stop_at_obstacle();
-  if ((millis() - heartbeat_time) >= heartbeat_interval) {
-    ctrl_left = 0;
-    ctrl_right = 0;
-  }
+
+  if (live.no_phone) {
+    if (gamepad_driving) {
+#if (HAS_GAMEPAD)
+      ctrl_left = gamepad_left;
+      ctrl_right = gamepad_right;
+      if (gamepad_obstacle_stop) {
+        stop_at_obstacle();
+      }
 #endif
+    } else if (explore_enabled) {
+      update_explore();
+    } else {
+      ctrl_left = 0;
+      ctrl_right = 0;
+    }
+  } else {
+    stop_at_obstacle();
+    if ((millis() - heartbeat_time) >= heartbeat_interval) {
+      ctrl_left = 0;
+      ctrl_right = 0;
+    }
+  }
 
 #if HAS_BUMPER
-  if (analogRead(PIN_BUMPER) > BUMPER_NOISE && !bumper_event) {
+  if (part_on(PART_BUMPER) && analogRead(PIN_BUMPER) > BUMPER_NOISE && !bumper_event) {
     delayMicroseconds(500);
     for (unsigned int i = 0; i < bumper_array_sz; i++) {
       bumper_array[i] = analogRead(PIN_BUMPER);
@@ -1217,14 +1520,16 @@ void loop() {
 
 #if HAS_SONAR
   // Check for successful sonar reading
-  if (!sonar_sent && ping_success) {
+  if (!part_on(PART_SONAR)) {
+    // turned off live: no readings, nothing in front
+  } else if (!sonar_sent && ping_success) {
     distance = echo_time * US_TO_CM;
     update_distance_estimate();
     send_sonar_reading();
     sonar_sent = true;
   }
   // Measure distance every sonar_interval
-  if ((millis() - sonar_time) >= max(sonar_interval, MAX_SONAR_TIME)) {
+  if (part_on(PART_SONAR) && (millis() - sonar_time) >= max(sonar_interval, MAX_SONAR_TIME)) {
     if (!sonar_sent && !ping_success) {  // Send max val if last ping was not returned
       distance = MAX_SONAR_DISTANCE;
       update_distance_estimate();
@@ -1239,7 +1544,7 @@ void loop() {
 
 #if HAS_INDICATORS
   // Check indicator signal every indicator_interval
-  if ((millis() - indicator_time) >= indicator_interval) {
+  if (part_on(PART_INDICATORS) && (millis() - indicator_time) >= indicator_interval) {
     update_indicator();
     indicator_time = millis();
   }
@@ -1254,14 +1559,15 @@ void loop() {
 #endif
 #if HAS_VOLTAGE_DIVIDER
   // Send voltage reading via serial
-  if ((millis() - voltage_time) >= voltage_interval) {
+  if (part_on(PART_VOLTAGE_DIVIDER) && (millis() - voltage_time) >= voltage_interval) {
     send_voltage_reading();
     voltage_time = millis();
   }
 #endif
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
   // Send wheel odometry reading via serial
-  if ((millis() - wheel_time) >= wheel_interval) {
+  if ((part_on(PART_SPEED_SENSORS_FRONT) || part_on(PART_SPEED_SENSORS_BACK) || part_on(PART_SPEED_SENSORS_MIDDLE))
+      && (millis() - wheel_time) >= wheel_interval) {
     send_wheel_reading(millis() - wheel_time);
     wheel_time = millis();
   }
@@ -1286,13 +1592,12 @@ float get_voltage() {
   for (unsigned int index = 0; index < array_size; index++) {
     array_sum += vin_array[index];
   }
-  return float(array_sum) / array_size * ADC_FACTOR * VOLTAGE_DIVIDER_FACTOR;
+  return float(array_sum) / array_size * ADC_FACTOR * live.voltage_divider_factor;
 }
 
 #endif
 
-#if (NO_PHONE_MODE)
-// Drive forward and avoid obstacles with the sonar sensor
+// Drive forward and avoid obstacles with the sonar sensor (no phone mode)
 void update_explore() {
   if ((millis() - turn_direction_time) >= turn_direction_interval) {
     turn_direction_time = millis();
@@ -1336,7 +1641,6 @@ void update_explore() {
   ctrl_left = ctrl_left > 0 ? max(ctrl_min, min(ctrl_left, ctrl_max)) : min(-ctrl_min, max(ctrl_left, -ctrl_max));
   ctrl_right = ctrl_right > 0 ? max(ctrl_min, min(ctrl_right, ctrl_max)) : min(-ctrl_min, max(ctrl_right, -ctrl_max));
 }
-#endif
 
 void update_vehicle() {
 #if (OPENBOT == RC_CAR)
@@ -1482,6 +1786,7 @@ void coast_right_motors() {
 // Set the indicator LEDs directly (no phone mode); does nothing without indicators
 void set_indicator_leds(int left, int right) {
 #if (HAS_INDICATORS)
+  if (!part_on(PART_INDICATORS)) return;
   digitalWrite(PIN_LED_LI, left);
   digitalWrite(PIN_LED_RI, right);
 #endif
@@ -1836,6 +2141,9 @@ void process_notification_msg() {
   char led = tmp[0];
   tmp = strtok(NULL, ",:");  // continues where the previous call left off
   int state = atoi(tmp);     // convert to int
+  if (!part_on(PART_LEDS_STATUS)) {
+    state = LOW;  // turned off in the live settings
+  }
   switch (led) {
     case 'y':
       digitalWrite(PIN_LED_Y, state);
@@ -1872,9 +2180,9 @@ void process_voltage_msg() {
 #if HAS_VOLTAGE_DIVIDER
   voltage_interval = atol(msg_buf);  // convert to long
 #endif
-  sendData(String("vmin:") + String(VOLTAGE_MIN, 2));
-  sendData(String("vlow:") + String(VOLTAGE_LOW, 2));
-  sendData(String("vmax:") + String(VOLTAGE_MAX, 2));
+  sendData(String("vmin:") + String(live.voltage_min, 2));
+  sendData(String("vlow:") + String(live.voltage_low, 2));
+  sendData(String("vmax:") + String(live.voltage_max, 2));
 }
 
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
@@ -1888,34 +2196,34 @@ void process_wheel_msg() {
 void process_feature_msg() {
   String msg = "f" + robot_type + ":";
 #if HAS_VOLTAGE_DIVIDER
-  msg += "v:";
+  if (part_on(PART_VOLTAGE_DIVIDER)) msg += "v:";
 #endif
 #if HAS_INDICATORS
-  msg += "i:";
+  if (part_on(PART_INDICATORS)) msg += "i:";
 #endif
 #if HAS_SONAR
-  msg += "s:";
+  if (part_on(PART_SONAR)) msg += "s:";
 #endif
 #if HAS_BUMPER
-  msg += "b:";
+  if (part_on(PART_BUMPER)) msg += "b:";
 #endif
 #if HAS_SPEED_SENSORS_FRONT
-  msg += "wf:";
+  if (part_on(PART_SPEED_SENSORS_FRONT)) msg += "wf:";
 #endif
 #if HAS_SPEED_SENSORS_BACK
-  msg += "wb:";
+  if (part_on(PART_SPEED_SENSORS_BACK)) msg += "wb:";
 #endif
 #if HAS_SPEED_SENSORS_MIDDLE
-  msg += "wm:";
+  if (part_on(PART_SPEED_SENSORS_MIDDLE)) msg += "wm:";
 #endif
 #if HAS_LEDS_FRONT
-  msg += "lf:";
+  if (part_on(PART_LEDS_FRONT)) msg += "lf:";
 #endif
 #if HAS_LEDS_BACK
-  msg += "lb:";
+  if (part_on(PART_LEDS_BACK)) msg += "lb:";
 #endif
 #if HAS_LEDS_STATUS
-  msg += "ls:";
+  if (part_on(PART_LEDS_STATUS)) msg += "ls:";
 #endif
   sendData(msg);
 }
@@ -1943,9 +2251,11 @@ void process_header(char inChar) {
 }
 
 void process_body(char inChar) {
-  // Add the incoming byte to the buffer
-  msg_buf[msg_idx] = inChar;
-  msg_idx++;
+  // Add the incoming byte to the buffer; bytes beyond its size are dropped
+  if (msg_idx < MAX_MSG_SZ - 1) {
+    msg_buf[msg_idx] = inChar;
+    msg_idx++;
+  }
 }
 
 void parse_msg() {
@@ -1994,6 +2304,9 @@ void parse_msg() {
       process_wheel_msg();
       break;
 #endif
+    case 'p':
+      process_live_settings_msg();
+      break;
   }
   msg_idx = 0;
   msgPart = HEADER;
@@ -2055,12 +2368,12 @@ void display_vehicle_data() {
   Serial.println("------------------");
 #endif
 #if HAS_OLED
-  // Set display information
-  drawString(
-    voltage_str,
-    left_rpm_str,
-    right_rpm_str,
-    distance_str);
+  // Set display information; a blank display when turned off live
+  if (part_on(PART_OLED)) {
+    drawString(voltage_str, left_rpm_str, right_rpm_str, distance_str);
+  } else {
+    drawString("", "", "", "");
+  }
 #endif
 }
 
@@ -2077,22 +2390,41 @@ void send_voltage_reading() {
 #if (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
 
 void send_wheel_reading(long duration) {
+  // Average over the sensor pairs that are on; pairs turned off live don't count
   float rpm_factor = 60.0 * 1000.0 / duration / TICKS_PER_REV;
-  rpm_left = (counter_lf + counter_lb + counter_lm) * rpm_factor;
-  rpm_right = (counter_rf + counter_rb + counter_rm) * rpm_factor;
+  long left = 0, right = 0;
+  int pairs = 0;
+#if (HAS_SPEED_SENSORS_FRONT)
+  if (part_on(PART_SPEED_SENSORS_FRONT)) {
+    left += counter_lf;
+    right += counter_rf;
+    pairs++;
+  }
+#endif
+#if (HAS_SPEED_SENSORS_BACK)
+  if (part_on(PART_SPEED_SENSORS_BACK)) {
+    left += counter_lb;
+    right += counter_rb;
+    pairs++;
+  }
+#endif
+#if (HAS_SPEED_SENSORS_MIDDLE)
+  if (part_on(PART_SPEED_SENSORS_MIDDLE)) {
+    left += counter_lm;
+    right += counter_rm;
+    pairs++;
+  }
+#endif
   counter_lf = 0;
   counter_rf = 0;
   counter_lb = 0;
   counter_rb = 0;
   counter_lm = 0;
   counter_rm = 0;
-#if (HAS_SPEED_SENSORS_FRONT and HAS_SPEED_SENSORS_BACK and HAS_SPEED_SENSORS_MIDDLE)
-  sendData("w" + String(rpm_left / 3) + "," + String(rpm_right / 3));
-#elif ((HAS_SPEED_SENSORS_FRONT and HAS_SPEED_SENSORS_BACK) or (HAS_SPEED_SENSORS_FRONT and HAS_SPEED_SENSORS_MIDDLE) or (HAS_SPEED_SENSORS_MIDDLE and HAS_SPEED_SENSORS_BACK))
-  sendData("w" + String(rpm_left / 2) + "," + String(rpm_right / 2));
-#elif (HAS_SPEED_SENSORS_FRONT or HAS_SPEED_SENSORS_BACK or HAS_SPEED_SENSORS_MIDDLE)
+  if (pairs == 0) return;
+  rpm_left = left * rpm_factor / pairs;
+  rpm_right = right * rpm_factor / pairs;
   sendData("w" + String(rpm_left) + "," + String(rpm_right));
-#endif
 }
 
 #endif
@@ -2107,7 +2439,7 @@ void update_indicator() {
     digitalWrite(PIN_LED_LI, !digitalRead(PIN_LED_LI));
   } else {
 #if (HAS_LEDS_BACK)
-    digitalWrite(PIN_LED_LI, PIN_LED_LI == PIN_LED_LB ? light_back : LOW);
+    digitalWrite(PIN_LED_LI, PIN_LED_LI == PIN_LED_LB && part_on(PART_LEDS_BACK) ? light_back : LOW);
 #else
     digitalWrite(PIN_LED_LI, LOW);
 #endif
@@ -2122,7 +2454,7 @@ void update_indicator() {
     digitalWrite(PIN_LED_RI, !digitalRead(PIN_LED_RI));
   } else {
 #if (HAS_LEDS_BACK)
-    digitalWrite(PIN_LED_RI, PIN_LED_RI == PIN_LED_RB ? light_back : LOW);
+    digitalWrite(PIN_LED_RI, PIN_LED_RI == PIN_LED_RB && part_on(PART_LEDS_BACK) ? light_back : LOW);
 #else
     digitalWrite(PIN_LED_RI, LOW);
 #endif
@@ -2137,22 +2469,24 @@ void update_indicator() {
 #if (HAS_LEDS_FRONT || HAS_LEDS_BACK)
 void update_light() {
 #if (HAS_LEDS_FRONT)
+  int front = part_on(PART_LEDS_FRONT) ? light_front : 0;
 #if (MCU == ESP32)
-  analogWrite(CH_LED_LF, light_front);
-  analogWrite(CH_LED_RF, light_front);
+  analogWrite(CH_LED_LF, front);
+  analogWrite(CH_LED_RF, front);
 #else
-  analogWrite(PIN_LED_LF, light_front);
-  analogWrite(PIN_LED_RF, light_front);
+  analogWrite(PIN_LED_LF, front);
+  analogWrite(PIN_LED_RF, front);
 #endif
 #endif
 
 #if (HAS_LEDS_BACK)
+  int back = part_on(PART_LEDS_BACK) ? light_back : 0;
 #if (MCU == ESP32)
-  analogWrite(CH_LED_LB, light_back);
-  analogWrite(CH_LED_RB, light_back);
+  analogWrite(CH_LED_LB, back);
+  analogWrite(CH_LED_RB, back);
 #else
-  analogWrite(PIN_LED_LB, light_back);
-  analogWrite(PIN_LED_RB, light_back);
+  analogWrite(PIN_LED_LB, back);
+  analogWrite(PIN_LED_RB, back);
 #endif
 #endif
 }
@@ -2196,12 +2530,14 @@ void send_ping() {
 
 void update_distance_estimate() {
 #if SONAR_MEDIAN
-  distance_array[distance_counter % distance_array_sz] = distance;
-  distance_counter++;
-  distance_estimate = get_median(distance_array, distance_array_sz);
-#else
-  distance_estimate = distance;
+  if (part_on(PART_SONAR_MEDIAN)) {
+    distance_array[distance_counter % distance_array_sz] = distance;
+    distance_counter++;
+    distance_estimate = get_median(distance_array, distance_array_sz);
+    return;
+  }
 #endif
+  distance_estimate = distance;
 }
 
 #endif
@@ -2212,11 +2548,8 @@ Serial.print(data);
 Serial.println();
 #if (HAS_BLUETOOTH)
   if (deviceConnected) {
-    char outData[MAX_MSG_SZ] = "";
-    for (int i = 0; i < data.length(); i++) {
-      outData[i] = data[i];
-    }
-    pTxCharacteristic->setValue(outData);
+    // No fixed-size copy: long messages like the settings reply must not overflow
+    pTxCharacteristic->setValue((uint8_t *)data.c_str(), data.length());
     pTxCharacteristic->notify();
   }
 #endif
