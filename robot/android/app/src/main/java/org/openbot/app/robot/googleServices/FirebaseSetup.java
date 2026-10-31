@@ -7,8 +7,8 @@ import org.openbot.app.robot.R;
 
 /**
  * The repository has a dummy google-services.json, so builds from source and pull request builds
- * start without the project's Firebase configuration. Google sign-in, and with it everything
- * that needs it, only works with the real one.
+ * start without the project's Firebase configuration. Google sign-in, and with it everything that
+ * needs it, only works with the real one.
  */
 public final class FirebaseSetup {
 
