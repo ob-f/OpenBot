@@ -213,6 +213,9 @@ class profileFragment: UIViewController {
      Function to call Authentication class constructor.
      */
     @objc func signIn() {
+        guard FirebaseSetup.checkSignIn(from: self) else {
+            return
+        }
         Authentication();
     }
 

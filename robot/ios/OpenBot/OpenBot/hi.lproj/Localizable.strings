@@ -200,3 +200,6 @@
 
 /* Data Collection / Autopilot server dropdown default state */
 "noServer" = "कोई सर्वर नहीं";
+
+/* Sign-in without the project's Firebase configuration */
+"firebaseNotConfigured" = "इस बिल्ड में Google साइन-इन सेट अप नहीं है। इसके लिए प्रोजेक्ट का अपना Firebase कॉन्फ़िगरेशन (GoogleService-Info.plist) चाहिए।";

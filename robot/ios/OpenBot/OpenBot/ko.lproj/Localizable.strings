@@ -200,3 +200,6 @@
 
 /* Data Collection / Autopilot server dropdown default state */
 "noServer" = "서버 없음";
+
+/* Sign-in without the project's Firebase configuration */
+"firebaseNotConfigured" = "이 빌드에는 Google 로그인이 설정되어 있지 않습니다. 프로젝트의 Firebase 구성(GoogleService-Info.plist)이 필요합니다.";

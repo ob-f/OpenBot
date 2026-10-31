@@ -176,4 +176,5 @@
     <string name="ble_connecting">연결 중</string>
     <string name="ble_disconnect">연결 해제</string>
     <string name="ble_connect">연결</string>
+    <string name="firebase_not_configured">이 빌드에는 Google 로그인이 설정되어 있지 않습니다. 프로젝트의 Firebase 구성(google-services.json)이 필요합니다.</string>
 </resources>
