@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import UIKit
 import GoogleSignIn
 import FirebaseCore
 import GoogleAPIClientForREST
@@ -560,3 +561,28 @@ class Authentication {
     }
 }
 
+/// The repository has a dummy GoogleService-Info.plist, so builds from source start without the
+/// project's Firebase configuration. Google sign-in, and with it everything that needs it, only
+/// works with the real one.
+enum FirebaseSetup {
+    /// Project ID of the dummy GoogleService-Info.plist.
+    private static let dummyProjectID = "example-project"
+
+    static var isConfigured: Bool {
+        guard let projectID = FirebaseApp.app()?.options.projectID else {
+            return false
+        }
+        return projectID != dummyProjectID
+    }
+
+    /// Explains why sign-in isn't available. Returns false if sign-in shouldn't start.
+    static func checkSignIn(from viewController: UIViewController) -> Bool {
+        if isConfigured {
+            return true
+        }
+        let alert = UIAlertController(title: nil, message: Strings.firebaseNotConfigured, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.okAction, style: .default))
+        viewController.present(alert, animated: true)
+        return false
+    }
+}

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import org.openbot.app.robot.R;
 import org.openbot.app.robot.databinding.FragmentProfileBinding;
 import org.openbot.app.robot.env.SharedPreferencesManager;
+import org.openbot.app.robot.googleServices.FirebaseSetup;
 import org.openbot.app.robot.googleServices.GoogleServices;
 import org.openbot.app.robot.projects.GoogleSignInCallback;
 
@@ -51,6 +52,7 @@ public class ProfileFragment extends Fragment {
 
   /** launch activity to choose google account for google signIn. */
   private void signIn() {
+    if (!FirebaseSetup.checkSignIn(requireContext())) return;
     Intent signInIntent = googleServices.mGoogleSignInClient.getSignInIntent();
     googleLogInActivityResultLauncher.launch(signInIntent);
   }

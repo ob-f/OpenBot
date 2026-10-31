@@ -200,3 +200,6 @@
 
 /* Data Collection / Autopilot server dropdown default state */
 "noServer" = "No Server";
+
+/* Sign-in without the project's Firebase configuration */
+"firebaseNotConfigured" = "Google sign-in isn't set up in this build. It needs the project's own Firebase configuration (GoogleService-Info.plist).";
