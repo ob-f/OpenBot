@@ -176,4 +176,5 @@
     <string name="ble_connecting">Connexion en cours</string>
     <string name="ble_disconnect">Déconnecter</string>
     <string name="ble_connect">Connecter</string>
+    <string name="firebase_not_configured">La connexion Google n\'est pas configurée dans cette version. Elle nécessite la configuration Firebase du projet (google-services.json).</string>
 </resources>

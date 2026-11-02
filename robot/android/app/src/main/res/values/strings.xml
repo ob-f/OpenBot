@@ -255,4 +255,5 @@
     <string name="ble_connecting">Connecting</string>
     <string name="ble_disconnect">Disconnect</string>
     <string name="ble_connect">Connect</string>
+    <string name="firebase_not_configured">Google sign-in isn\'t set up in this build. It needs the project\'s own Firebase configuration (google-services.json).</string>
 </resources>
