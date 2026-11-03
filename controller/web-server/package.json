@@ -26,7 +26,7 @@
     "eslint-plugin-promise": "^5.2.0",
     "http2-proxy": "^5.0.53",
     "npm-run-all": "^4.1.5",
-    "vite": "^5.0.0"
+    "vite": "^8.2.2"
   },
   "dependencies": {
     "@firebase/firestore": "^4.12.0",
