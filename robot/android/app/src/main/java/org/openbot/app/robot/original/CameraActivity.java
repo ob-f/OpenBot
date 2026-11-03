@@ -944,20 +944,20 @@ public abstract class CameraActivity extends AppCompatActivity
 
   private void connectPhoneController() {
     phoneController.connect(this);
-    DriveMode oldDriveMode = driveMode;
+    DriveMode savedDriveMode = DriveMode.getByID(preferencesManager.getDriveMode());
     setDriveMode(DriveMode.DUAL);
     driveModeSpinner.setAlpha(0.5f);
     driveModeSpinner.setEnabled(false);
-    preferencesManager.setDriveMode(oldDriveMode.getValue());
+    preferencesManager.setDriveMode(savedDriveMode.getValue());
   }
 
   private void connectWebController() {
     phoneController.connectWebServer();
-    DriveMode oldDriveMode = driveMode;
+    DriveMode savedDriveMode = DriveMode.getByID(preferencesManager.getDriveMode());
     setDriveMode(DriveMode.GAME);
     driveModeSpinner.setAlpha(0.5f);
     driveModeSpinner.setEnabled(false);
-    preferencesManager.setDriveMode(oldDriveMode.getValue());
+    preferencesManager.setDriveMode(savedDriveMode.getValue());
   }
 
   private void disconnectPhoneController() {

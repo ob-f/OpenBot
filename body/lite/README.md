@@ -9,7 +9,7 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-ITE's eSpace has developed a [curriculum](#curriculum) for economical and scalable AI and robotics education around the OpenBot software stack. It comes in the form of [step-by-step YouTube videos](#step-by-step-video-guides) which guides you through the assembly of the [OpenBot Lite](#openbot-lite-arduino), installing the necessary software, using the person following and training and deploying your own autonomous driving policy.
+ITE's eSpace has developed a [curriculum](#curriculum) for economical and scalable AI and robotics education around the OpenBot software stack. It comes in the form of [step-by-step YouTube videos](#step-by-step-video-guides) which guides you through the assembly of the [OpenBot Lite](#openbot-lite), installing the necessary software, using the person following and training and deploying your own autonomous driving policy.
 
 ## OpenBot Lite
 

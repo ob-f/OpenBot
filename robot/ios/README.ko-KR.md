@@ -14,7 +14,7 @@
 아래 링크를 클릭하여 앱의 기능에 대해 알아보세요.
 
 - [로봇 앱](OpenBot/README.ko-KR.md)
-- 컨트롤러 앱 (곧 출시 예정)
+- [컨트롤러 앱](../../controller/flutter/README.ko-KR.md)
 
 ## 앱 설치
 
@@ -26,9 +26,11 @@
 
 - [Xcode iOS 13 이상](https://developer.apple.com/xcode/)이 필요합니다.
 - 시스템에 [Cocoapods](https://cocoapods.org/)가 설치되어 있어야 합니다.
+- [Firebase 프로젝트](./OpenBot/OpenBot/Authentication/README.ko-KR.md)를 설정합니다.
 - 현재 iOS 배포 대상 버전은 15.5로 설정되어 있습니다.
 - 프로젝트는 "자동으로 서명 관리"로 구성되어 있어, 앱 빌드를 위해 독립적인 계정을 설정할 수 있습니다:
   <img alt="iOS App" width="100%" src="../../docs/images/ios_automatically_manage_signing.png" />
+- 자신의 팀을 설정하려면 XCode > Settings > Accounts에서 또는 위의 Team 메뉴에서 바로 iCloud 계정을 추가하세요.
 - iOS 13 이상을 실행하는 iOS 기기가 필요합니다. [지원 기기 목록](https://support.apple.com/en-in/guide/iphone/iphe3fa5df43/ios).
 - [개발자 모드](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)가 iOS 기기에서 활성화되어 있어야 합니다.
 - 추가된 iCloud 계정은 [iOS 기기에서 신뢰를 받아야](https://developer.apple.com/forums/thread/685271) 합니다.

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenBot Tools</title>
+  <meta name="description" content="Tools for building and setting up OpenBot robots.">
+  <link rel="icon" href="firmware/img/logo.png">
+  <style>
+    @font-face { font-family: "Gilroy"; font-weight: 400; src: url("firmware/fonts/Gilroy-Regular.woff") format("woff"); font-display: swap; }
+    @font-face { font-family: "Gilroy"; font-weight: 500; src: url("firmware/fonts/Gilroy-Medium.woff") format("woff"); font-display: swap; }
+    @font-face { font-family: "Gilroy"; font-weight: 600; src: url("firmware/fonts/Gilroy-SemiBold.woff") format("woff"); font-display: swap; }
+    :root { --blue: #0071c5; --paper: #f8f9fb; --panel: #fff; --ink: #303030; --muted: #687c9e; --line: #e1e6ee; color-scheme: light; }
+    @media (prefers-color-scheme: dark) {
+      :root { --blue: #2b8ad8; --paper: #202020; --panel: #303030; --ink: #fff; --muted: #a7b0bf; --line: #414141; color-scheme: dark; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.5 "Gilroy", system-ui, sans-serif; }
+    .top { background: #0071c5; color: #fff; }
+    .top-inner { display: flex; align-items: center; max-width: 1200px; margin: 0 auto; padding: 14px 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; }
+    .brand img { width: 40px; height: 40px; }
+    .brand span { font-size: 19px; line-height: 1.15; font-weight: 500; }
+    main { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+    h1 { font-size: 30px; line-height: 1.2; font-weight: 600; margin: 0 0 8px; }
+    p { margin: 0; color: var(--muted); }
+    .tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 28px; }
+    .tool { display: block; padding: 18px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: inherit; text-decoration: none; }
+    .tool:hover { border-color: var(--blue); }
+    .tool:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+    .tool strong { display: block; font-weight: 600; font-size: 18px; margin-bottom: 4px; color: var(--blue); }
+    @media (max-width: 600px) { .top-inner, main { padding-left: 16px; padding-right: 16px; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="https://www.openbot.org"><img src="firmware/img/logo.png" alt=""><span>OpenBot<br>Tools</span></a>
+    </div>
+  </header>
+  <main>
+    <h1>Tools for your OpenBot</h1>
+    <p>Set up and update your robot from the browser.</p>
+    <div class="tools">
+      <a class="tool" href="firmware/">
+        <strong>Firmware setup</strong>
+        <p>Choose your robot and its parts, then flash the firmware over USB or download a settings file for the Arduino IDE.</p>
+      </a>
+    </div>
+  </main>
+</body>
+</html>

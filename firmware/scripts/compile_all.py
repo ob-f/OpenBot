@@ -18,6 +18,9 @@ settings would be ambiguous.
 """
 
 import argparse
+import concurrent.futures
+import os
+import threading
 import itertools
 import json
 import pathlib
@@ -31,9 +34,43 @@ SKETCH = pathlib.Path(__file__).resolve().parents[1] / "openbot" / "openbot.ino"
 
 BOARDS = {
     "nano": ("arduino:avr", "arduino:avr:nano"),
+    # Default partitions, as in the Arduino IDE: two 1.25 MB app slots (see app_too_big)
     "esp32": ("esp32:esp32@2.0.17", "esp32:esp32:esp32"),
     "bluepad32": ("esp32-bluepad32:esp32@4.1.0", "esp32-bluepad32:esp32:esp32"),
 }
+
+
+def app_size(build_dir: pathlib.Path) -> tuple[int, int] | None:
+    """(app image size, size of the partition it boots from) of an ESP32 build, else None."""
+    app = build_dir / "openbot.ino.bin"
+    table = build_dir / "openbot.ino.partitions.bin"
+    if not app.exists() or not table.exists():
+        return None
+    data = table.read_bytes()
+    for i in range(0, len(data) - 31, 32):
+        entry = data[i : i + 32]
+        if entry[:2] != b"\xaa\x50":
+            break
+        kind = entry[2]
+        offset = int.from_bytes(entry[4:8], "little")
+        if kind == 0 and offset == 0x10000:  # the app the bootloader starts
+            return app.stat().st_size, int.from_bytes(entry[8:12], "little")
+    return app.stat().st_size, 0
+
+
+def app_too_big(build_dir: pathlib.Path) -> str:
+    """Why the ESP32 app image doesn't fit its flash partition ("" if it fits or isn't ESP32).
+
+    The compiler's size check uses an estimate a few KB below the real image, and an app
+    bigger than its partition flashes fine but never starts, so check the real files."""
+    sizes = app_size(build_dir)
+    if sizes is None:
+        return ""
+    used, size = sizes
+    if used > size:
+        return f"the app is {used} bytes, but its flash partition holds only {size}"
+    return ""
+
 
 ERR_GAMEPAD_PHONE = "HAS_GAMEPAD is for no phone mode"
 ERR_GAMEPAD_NANO = "HAS_GAMEPAD needs an ESP32 body"
@@ -176,6 +213,9 @@ def tmp_prefix(line: str) -> str:
     return m.group(1) if m else ""
 
 
+PRINT_LOCK = threading.Lock()
+
+
 def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
     label = " ".join(f"{k}={v}" for k, v in settings.items())
     with tempfile.TemporaryDirectory() as tmp:
@@ -188,6 +228,7 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
         sketch.write_text(
             configure(sketch.read_text(encoding="utf-8"), settings), encoding="utf-8"
         )
+        build_dir = pathlib.Path(tmp) / "build"
         result = subprocess.run(
             [
                 "arduino-cli",
@@ -196,11 +237,18 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
                 fqbn,
                 "--warnings",
                 "default",
+                "--output-dir",
+                str(build_dir),
                 str(sketch_dir),
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+        )
+        too_big = app_too_big(build_dir) if result.returncode == 0 else ""
+    if too_big:
+        result = subprocess.CompletedProcess(
+            result.args, 1, result.stdout + f"\nerror: {too_big}\n"
         )
     if expect_error is None:
         ok = result.returncode == 0
@@ -210,21 +258,36 @@ def compile_one(fqbn: str, settings: dict, expect_error: str | None) -> bool:
         verdict = (
             "failed as expected" if ok else f"FAILED (expected error: {expect_error})"
         )
+    with PRINT_LOCK:
+        report(fqbn, label, verdict, ok, result.stdout, settings)
+    return ok
+
+
+def report(fqbn, label, verdict, ok, output, settings):
     print(f"::group::{verdict:>18} | {fqbn} | {label}", flush=True)
-    print(result.stdout)
+    print(output)
     print("::endgroup::", flush=True)
     if not ok:
         print(f"::error::{fqbn} {label}: {verdict}", flush=True)
         # Show the first compiler errors as annotations, so they appear without opening the log
-        errors = [
-            line.strip() for line in result.stdout.splitlines() if "error:" in line
-        ]
+        errors = [line.strip() for line in output.splitlines() if "error:" in line]
         for line in errors[:5]:
             print(
                 f"::error::{robot_label(settings)}: {line.replace(tmp_prefix(line), '')}",
                 flush=True,
             )
-    return ok
+
+
+def compile_many(jobs: list, workers: int) -> list:
+    """Compile in parallel; the first build of each board runs alone to fill the core cache."""
+    first, rest, seen = [], [], set()
+    for job in jobs:
+        (rest if job[0] in seen else first).append(job)
+        seen.add(job[0])
+    results = [compile_one(*job) for job in first]
+    with concurrent.futures.ThreadPoolExecutor(workers) as pool:
+        results += list(pool.map(lambda job: compile_one(*job), rest))
+    return results
 
 
 def main() -> int:
@@ -233,7 +296,8 @@ def main() -> int:
     )
     parser.add_argument("--list-robots", action="store_true")
     parser.add_argument("--check-defaults", action="store_true")
-    parser.add_argument("--cores", metavar="ROBOT")
+    parser.add_argument("--cores", metavar="ROBOT", help="a body, or all")
+    parser.add_argument("--jobs", type=int, default=os.cpu_count() or 2)
     parser.add_argument("--robot")
     parser.add_argument("--fqbn")
     parser.add_argument("--set", action="append", default=[], metavar="NAME=VALUE")
@@ -258,8 +322,11 @@ def main() -> int:
         return 0
 
     if args.cores:
+        selected = list(types) if args.cores == "all" else [args.cores]
         boards = {
-            board for board, _, _ in combinations(source, args.cores, types[args.cores])
+            board
+            for robot in selected
+            for board, _, _ in combinations(source, robot, types[robot])
         }
         print(" ".join(sorted(BOARDS[b][0] for b in boards)))
         return 0
@@ -277,10 +344,12 @@ def main() -> int:
     for robot in selected:
         if robot not in types:
             sys.exit(f"Unknown robot {robot!r}, known: {', '.join(types)}")
-    results = []
-    for robot in selected:
-        for board, settings, error in combinations(source, robot, types[robot]):
-            results.append(compile_one(BOARDS[board][1], settings, error))
+    jobs = [
+        (BOARDS[board][1], settings, error)
+        for robot in selected
+        for board, settings, error in combinations(source, robot, types[robot])
+    ]
+    results = compile_many(jobs, args.jobs)
     failed = results.count(False)
     print(f"{len(results) - failed}/{len(results)} combinations as expected")
     return 1 if failed else 0

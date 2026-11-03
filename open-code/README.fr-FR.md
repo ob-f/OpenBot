@@ -45,12 +45,13 @@ npm start
 4. Dans les applications mobiles OpenBot, après vous être connecté, vous pouvez récupérer les fichiers sauvegardés depuis Google Drive et les charger en un seul clic.
 5. Concevez les instructions pour OpenBot sans écrire de code.
 6. Design entièrement réactif optimisé pour la navigation sur mobile et tablette.
+7. Des blocs OpenBot Playground à [explorer](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA).
 
 ### Stockage du Projet
 
 Ce projet permet aux utilisateurs de stocker leurs données à la fois localement et sur `Google Drive`. Lorsque le projet est créé, il est automatiquement stocké dans le `stockage local` de l'appareil de l'utilisateur. Au fur et à mesure que des modifications sont apportées au projet, le stockage local est mis à jour en temps réel.
 
-De plus, les utilisateurs peuvent télécharger leur projet sur Google Drive en cliquant sur le [bouton de téléchargement](#generate-Code). Cela permet aux utilisateurs d'accéder à leur projet depuis n'importe quel appareil avec accès à Internet, facilitant ainsi le travail sur le projet depuis différents endroits.
+De plus, les utilisateurs peuvent télécharger leur projet sur Google Drive en cliquant sur le [bouton de téléchargement](#générer-du-code). Cela permet aux utilisateurs d'accéder à leur projet depuis n'importe quel appareil avec accès à Internet, facilitant ainsi le travail sur le projet depuis différents endroits.
 
 - #### Stockage Local
   Le stockage local est une technologie web intégrée qui permet aux applications web de stocker des données localement dans le navigateur de l'utilisateur. Cela signifie que le projet est stocké sur l'appareil de l'utilisateur et peut être accessible sans connexion Internet.
@@ -62,7 +63,7 @@ De plus, les utilisateurs peuvent télécharger leur projet sur Google Drive en 
 
   Dans ce projet, les utilisateurs peuvent télécharger leur projet sur Google Drive en cliquant sur l'icône de téléchargement lorsqu'ils sont connectés au site web. Le projet est alors stocké sur le compte Google Drive de l'utilisateur, ce qui signifie qu'il peut être accessible depuis n'importe quel appareil avec accès à Internet.
 
-  Pour accéder à leur projet depuis Google Drive, les utilisateurs peuvent simplement se connecter à leur compte Google et naviguer vers [mes projets](#project-section), où tous leurs projets stockés seront affichés.
+  Pour accéder à leur projet depuis Google Drive, les utilisateurs peuvent simplement se connecter à leur compte Google et naviguer vers [mes projets](#section-projet), où tous leurs projets stockés seront affichés.
 
 ## Écrans de OpenBot Playground
 
@@ -70,17 +71,17 @@ De plus, les utilisateurs peuvent télécharger leur projet sur Google Drive en 
 
 Le `OpenBot Playground` commence par une page d'accueil qui contient les composants suivants :
 
-- [En-tête](#header) : L'en-tête contient les deux sections suivantes, changer de thème et se connecter.
-- [Carrousel](#Carousal) : Le contenu du carrousel explique comment fonctionne le Playground.
-- [Section Projet](#project-section) : La section projet contient la liste des projets et le bouton Créer un nouveau projet.
+- [En-tête](#en-tête) : L'en-tête contient les deux sections suivantes, changer de thème et se connecter.
+- [Carrousel](#carrousel) : Le contenu du carrousel explique comment fonctionne le Playground.
+- [Section Projet](#section-projet) : La section projet contient la liste des projets et le bouton Créer un nouveau projet.
 
 ### Page Playground
 
 La page `Playground` est une fonctionnalité clé de la plateforme `OpenBot Playground` qui fournit une variété de blocs de codage pour que les utilisateurs puissent créer différents types de fonctionnalités, telles que le contrôle, les boucles, le mouvement, les opérateurs, les capteurs, et bien plus encore.
 
-- [En-tête](#header) : L'en-tête contient le nom du projet, le centre d'aide, l'AutoSync, le changement de thème et la section de connexion.
-- [Espace de Travail](#workSpace) : Espace où les utilisateurs peuvent glisser-déposer les blocs de codage pour générer leur code, qui peut être converti en JavaScript et en Python.
-- [Barre Inférieure du Playground](#Playground-Bottom-Bar) : La barre inférieure contient des boutons pour générer du code, télécharger le projet sur le drive, zoomer et dézoomer les blocs, ajouter un modèle, annuler et refaire les modifications dans l'espace de travail.
+- [En-tête](#en-tête) : L'en-tête contient le nom du projet, le centre d'aide, l'AutoSync, le changement de thème et la section de connexion.
+- [Espace de Travail](#espace-de-travail) : Espace où les utilisateurs peuvent glisser-déposer les blocs de codage pour générer leur code, qui peut être converti en JavaScript et en Python.
+- [Barre Inférieure du Playground](#barre-inférieure-du-playground) : La barre inférieure contient des boutons pour générer du code, télécharger le projet sur le drive, zoomer et dézoomer les blocs, ajouter un modèle, annuler et refaire les modifications dans l'espace de travail.
 
 ### En-tête
 
@@ -203,4 +204,4 @@ Pour générer du code, les utilisateurs peuvent glisser-déposer des blocs de c
 
 ## Suivant (optionnel)
 
-Dépannage de l'authentification Firebase [Firebase](src/services/README.fr-FR.md#troubleshooting)
+Dépannage de l'authentification Firebase [Firebase](src/services/README.fr-FR.md#dépannage)

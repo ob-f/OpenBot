@@ -40,7 +40,7 @@ Ajusta `OPENBOT` a tu cuerpo de robot y selecciona en el Arduino IDE una placa c
 
 ### Conducción
 
-Por defecto, conduces el robot con la aplicación del teléfono. Para el [modo sin teléfono](#modo-sin-teléfono), ajusta `NO_PHONE_MODE 1`; con un ESP32 también puedes conducir con un [gamepad](#control-con-gamepad) (`HAS_GAMEPAD 1`). `COAST_MODE` define si los motores ruedan libres (1) o frenan (0) cuando no hay control, y `DEBUG 1` muestra información de depuración en el Monitor Serie.
+Por defecto, conduces el robot con la aplicación del teléfono. Para el [modo sin teléfono](#modo-sin-teléfono), ajusta `NO_PHONE_MODE 1`; con un ESP32 también puedes conducir con un [gamepad](#control-con-gamepad) (`HAS_GAMEPAD 1`). `COAST_MODE` define si los motores ruedan libres (1) o frenan (0) cuando no hay control, y `DEBUG 1` muestra información de depuración en el Monitor Serie. Con el enlace Bluetooth al teléfono, `BLE_NAME` define el nombre con el que aparece el robot en la app, por ejemplo `#define BLE_NAME "Team 3"` (hasta 20 letras, dígitos, espacios, - o _).
 
 ### Componentes
 
@@ -81,6 +81,8 @@ El indicador de batería de la aplicación va de `VOLTAGE_LOW` (vacía) a `VOLTA
 | 8 × AA | 8.0f | 12.0f |
 
 Si tu divisor de voltaje es distinto al del cuerpo, ajusta también `VOLTAGE_DIVIDER_FACTOR` a (R1 + R2) / R2. `VOLTAGE_MIN` es el voltaje más bajo al que los motores aún giran; el firmware solo lo usa en el modo sin teléfono.
+
+**El robot deja de responder a toda velocidad.** A gran velocidad, y sobre todo al arrancar en el suelo, los motores consumen mucha corriente. Con pilas AA débiles o alcalinas, el voltaje puede bajar tanto que la placa se reinicia y la app o el gamepad pierde la conexión. Usa pilas nuevas o recargables (NiMH o Li-ion), o conduce en un modo de velocidad más lento. Después, puede que tengas que [emparejar el gamepad de nuevo](#emparejamiento).
 
 ### Comprobar la configuración
 
@@ -242,7 +244,7 @@ Antes de continuar, asegúrate de que los neumáticos estén removidos. Necesita
 
 Antes de probar el coche con un smartphone que tenga la aplicación OpenBot instalada, también puedes probar el coche sin un teléfono primero. Simplemente ajusta `NO_PHONE_MODE 1` en los ajustes. El coche ahora conducirá a _velocidad normal_ (75% PWM) y disminuirá la velocidad a medida que detecte obstáculos con el sensor ultrasónico. Una vez que se acerque al `TURN_THRESHOLD` (por defecto: 50 cm), comenzará a girar en una dirección aleatoria y encenderá el LED en ese lado. Si el espacio libre estimado frente al coche cae por debajo del `TURN_THRESHOLD`, retrocederá lentamente y ambos LEDs se encenderán. Ten en cuenta que tanto el coche como el Arduino necesitan estar alimentados. El Arduino se puede alimentar conectando el pin de 5V a la salida de 5V del controlador de motor L298N, o conectando el cable USB a una fuente de alimentación (por ejemplo, teléfono).
 
-Antes de hacer funcionar el coche, recomendamos quitar los neumáticos, conectar el Arduino a una computadora y observar el monitor serial como en la sección [Pruebas](#testing). La salida en el monitor serial es un poco más fácil de analizar (igual que el OLED) y muestra el voltaje de la batería, el rpm para los motores izquierdo y derecho y el espacio libre estimado frente al coche. Puedes mover un objeto grande hacia adelante y hacia atrás frente al sensor ultrasónico y observar el cambio de velocidad de los motores.
+Antes de hacer funcionar el coche, recomendamos quitar los neumáticos, conectar el Arduino a una computadora y observar el monitor serial como en la sección [Pruebas](#pruebas). La salida en el monitor serial es un poco más fácil de analizar (igual que el OLED) y muestra el voltaje de la batería, el rpm para los motores izquierdo y derecho y el espacio libre estimado frente al coche. Puedes mover un objeto grande hacia adelante y hacia atrás frente al sensor ultrasónico y observar el cambio de velocidad de los motores.
 
 :warning: ADVERTENCIA: Si no tienes un sensor ultrasónico instalado o si está deshabilitado, el coche simplemente avanzará a _velocidad normal_ (75% PWM) y eventualmente colisionará. Incluso con el sensor instalado, el coche puede colisionar ocasionalmente debido a lecturas ruidosas.
 
@@ -272,6 +274,10 @@ Enciende el robot y pon el gamepad en modo de emparejamiento. Se conecta en poco
 | Switch Pro, Joy-Con, 8BitDo y otros | Usa el modo de emparejamiento Bluetooth del gamepad (consulta su manual). |
 
 La [lista de gamepads compatibles de Bluepad32](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) incluye más modelos, entre ellos el PS3 DualShock 3, que necesita configuración adicional. Con `DEBUG 1`, el monitor serie muestra el nombre de cada gamepad que se conecta.
+
+Si un gamepad que ya estaba emparejado no toma el control, por ejemplo un mando de PS4 o PS5 cuya barra de luz se queda en azul en lugar de ponerse verde, naranja o roja, ponlo de nuevo en modo de emparejamiento y reinicia el robot.
+
+Si aun así no se conecta, marca **Forget paired gamepads** al flashear en la [página de configuración](https://tools.openbot.org/firmware/). El robot olvida entonces todos los gamepads emparejados.
 
 #### Controles
 

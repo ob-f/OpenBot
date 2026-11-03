@@ -373,7 +373,157 @@ Le corps de notre robot repose sur des composants électroniques de loisir facil
             <td>O13</td>
             <td>Mini interrupteur à bascule (20 pcs)</td>
             <td><p align="center"> <img src="../../docs/images/MTV/O13.jpg" width="150" alt="App GUI" /></p></td>
-            <td>  <a href="https://www.amazon.com/DaierTek-250VAC-Rocker-KCD1-101-Plastic/dp/B07S2QJKTX/ref=sr_1_4?keywords=RUNCCI-YUN+20Pcs+Mini+Rocker+Switch&qid=1650638471&sr=8-4">US</a> | <a href="https://www.amazon.de/-/en/RUNCCI-Rocker-Switches-Household-Appliances/dp/B07MW92CW8/ref=sr_1_2?keywords=RUNCCI-YUN+20+St%C3%
+            <td>  <a href="https://www.amazon.com/DaierTek-250VAC-Rocker-KCD1-101-Plastic/dp/B07S2QJKTX/ref=sr_1_4?keywords=RUNCCI-YUN+20Pcs+Mini+Rocker+Switch&qid=1650638471&sr=8-4">US</a> | <a href="https://www.amazon.de/-/en/RUNCCI-Rocker-Switches-Household-Appliances/dp/B07MW92CW8/ref=sr_1_2?keywords=RUNCCI-YUN+20+St%C3%BCck+Mini-Wippschalter&qid=1650638352&sr=8-2">EU</a></td>
+            <td>$15.98 | €9.44</td>
+            <td>0.15</td>
+            <td>$2.4 | €1.42</td>
+        </tr>
+        <tr>
+            <td>O14</td>
+            <td>Câble Micro USB Duttek pour montage sur panneau</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O14.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Duttek-Angled-Extension-Motorcycle-Dashboard/dp/B08RSGYV1S/ref=sr_1_1?keywords=Duttek+90+Degree+Micro+USB+Panel+Mount+Cable+Micro+USB+Mount+Extension+Cable+Male+to+Female+for+Car+Boat+Motorcycle+Truck+Dashboard+30cm&qid=1650638585&sr=8-1">US</a> | <a href="https://www.amazon.de/-/en/Duttek-Degree-Extension-Motorcycle-Dashboard/dp/B08RSGYV1S/ref=psdc_1365661031_t1_B07ZCZ8NL1">EU</a></td>
+            <td>$10.68 | €11.44</td>
+            <td>1</td>
+            <td>$10.68 | €11.44</td>
+        </tr>
+        <tr>
+            <td>O15</td>
+            <td>PCB personnalisé</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O15.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.eurocircuits.de/">US</a> | <a href="https://www.eurocircuits.de/">EU</a></td>
+            <td>$10.00 | €10.00</td>
+            <td>1</td>
+            <td>$10.00 | €10.00</td>
+        </tr>
+        <tr>
+            <td>O16</td>
+            <td>Pilote de moteur DC à balais Cytron 30A 5-30V (un canal)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O16.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.robotshop.com/en/cytron-30a-5-30v-single-brushed-dc-motor-driver.html">US</a> | <a href="https://www.robotshop.com/eu/en/cytron-30a-5-30v-single-brushed-dc-motor-driver.html">EU </a></td>
+            <td>$34.38 | €37.15</td>
+            <td>2</td>
+            <td>$68.76 | €74.30</td>
+        </tr>
+        <tr>
+            <td>O17</td>
+            <td>Convertisseur DC-DC LM2596S 12V-36V vers 5V | 2A (4 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O17.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Adjustable-Converter-Step-Down-Regulator-Stabilizer/dp/B081N6WWJS/ref=sr_1_3?keywords=4+pieces+adjustable+LM2596S+DC-DC+down+converter&qid=1650638822&sr=8-3">US</a> | <a href="https://www.amazon.de/-/en/adjustable-converter-regulator-stabiliser-voltmeter/dp/B081N6WWJS/ref=pd_sbs_6/262-3535180-9041508?pd_rd_w=m3EIw&pf_rd_p=7cf49d79-ae26-401a-94b7-1dec7a725ba4&pf_rd_r=KEN7A8F4YCHEBXB3ZK9B&pd_rd_r=b6829a4e-476a-48dd-8821-a64b9945da1d&pd_rd_wg=m3HQp&pd_rd_i=B081N6WWJS&psc=1">EU</a></td>
+            <td>$15.99 | €16.99</td>
+            <td>0.25</td>
+            <td>$3.99 | €4.25</td>
+        </tr>
+        <tr>
+            <td>O18</td>
+            <td>Batterie LiPo 4500mAh 3S-25C 11.1V en boîtier rigide</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O18.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/HRB-50C-100C-Quadcopter-Helicopter-Airplane/dp/B06XNTHQRZ?ref_=ast_sto_dp&th=1&psc=1">US</a> | <a href="https://www.amazon.de/-/en/Roaring-Battery-Deans-Connection-Aeroplane/dp/B08Z3JYK1X/ref=sr_1_5?crid=3TW2SFFYW1BQY&keywords=4500%2Bmah%2B3s%2B11%2C1v%2B55c%2Blipo&qid=1644164015&sprefix=4500mah%2B3s%2B11.1v%2B55c%2Blipo%2Caps%2C82&sr=8-5&th=1">EU</a></td>
+            <td>$46.99 | €29.97</td>
+            <td>1</td>
+            <td>$46.99 | €29.97</td>
+        </tr>
+        <tr>
+            <td>O19</td>
+            <td>Carte de développement AITRIP ESP32-DevKitC (3 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O19.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Development-Microcontroller-Integrated-Antenna-Amplifiers/dp/B09GK74F7N/ref=sr_1_2?crid=2SK0PFZJXONGJ&keywords=3pcs+ESP32+DevKitC+Core&qid=1650638989&sprefix=3pcs+esp32+devkitc+core%2Caps%2C162&sr=8-2">US</a> | <a href="https://www.amazon.de/-/en/DevKitC-Development-ESP32-WROOM-32D-Bluetooth-Arduino/dp/B09LS6SCF7/ref=sr_1_2?crid=8EUG1EBFJ9AX&keywords=aitrip+esp32-devkitc&qid=1644164236&sprefix=aitrip+esp32-devkitc+core%2Caps%2C192&sr=8-2">EU</a></td>
+            <td>$19.99 | €21.00</td>
+            <td>0.33</td>
+            <td>$6.66 | €7.00</td>
+        </tr>
+        <tr>
+            <td>O20</td>
+            <td>Borniers pour PCB 5.08mm (11 x 2 broches + 11 x 4 broches)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O20.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/LuoQiuFa10-4-Pin-5-08mm-Female-Terminal/dp/B093DNBV5D/ref=sr_1_2?crid=1W2RRUJFR1XY2&keywords=Cococity+22+Pairs+5.08+mm+2+Pins+PCB+Screw+Terminal+Connector+Pluggable+%2B+2+Pins+Plug+in+Screw+PCB+Terminal+Block+Plug+Right+Angle+%282+Pin+11+Pairs+4+Pin+11+Pairs%29+300V+10A+%28Green%29&qid=1650639050&sprefix=3pcs+esp32+devkitc+core%2Caps%2C186&sr=8-2">US</a> | <a href="https://www.amazon.de/-/en/Cococity-Pairs-Terminal-Connector-Pluggable/dp/B083GNB8BY/ref=sr_1_7?crid=SJKL0W8ANGUI&keywords=4-polige+leiterplatten-schraubklemmleiste%2C+5%2C08+mm&qid=1644165018&sprefix=4+pin+5.08mm+pitch+pcb+screw+terminal+block%2Caps%2C82&sr=8-7">EU</a></td>
+            <td>$7.99 | €11.99</td>
+            <td>1</td>
+            <td>$7.99 | €11.99</td>
+        </tr>
+        <tr>
+            <td>O21</td>
+            <td>Tige filetée M6 x 1m (1000mm) zinguée</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/O22.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Threaded-Plated-Thread-Length-Threads/dp/B00G3QM076/ref=sr_1_18?crid=1MBLSICIHE3FX&keywords=M6+x+1m+%281000mm%29+Zinc+Plated+Threaded+Rod%2FBar&qid=1650639302&sprefix=m6+x+1m+1000mm+zinc+plated+threaded+rod%2Fbar%2Caps%2C306&sr=8-18">US</a> | <a href="https://www.amazon.de/-/en/Threaded-quality-galvanised-standard-parts/dp/B07X3LX6RX/ref=sr_1_21?crid=3UFFWWONRN5FQ&keywords=gewindestange%2C%2Bverzinkt%2C%2Bm6%2Bx%2B1%2Bm%2B(1000%2Bmm)%2C%2B10%2Bst%C3%BCck&qid=1644165235&sprefix=pack%2Bof%2B10%2Bm6%2Bx%2B1m%2B1000mm%2Bzinc%2Bplated%2Bthreaded%2Brod%2Fbar%2Caps%2C170&sr=8-21&th=1">EU</a></td>
+            <td>$22.73 | €4.31</td>
+            <td>1</td>
+            <td>$22.73 | €4.31</td>
+        </tr>
+        <tr>
+            <td>O23</td>
+            <td>Vis M4 x 50mm (30 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/M4x50.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/MroMax-M4x50mm-Machine-Stainless-Phillips/dp/B07ZPSWW24/ref=sr_1_2?crid=6FFC31FUFZC&keywords=M4+x+50mm+screws+30pcs&qid=1650639360&sprefix=m4+x+50mm+screws+30pc%2Caps%2C175&sr=8-2">US</a> | <a href="https://www.amazon.de/-/en/M4-50-stainless-cylinder-DIN912/dp/B07YW6Q5VT/ref=sr_1_10?crid=24VLWXHS6RUKJ&keywords=m4x50%2Bmm%2Bsechskant&qid=1644166982&sprefix=m4%2Bx%2B50mm%2Bhex%2B%2Caps%2C94&sr=8-10&th=1">EU</a></td>
+            <td>$11.39 | €9.83</td>
+            <td>1</td>
+            <td>$11.39 | €9.83</td>
+        </tr>
+        <tr>
+            <td>O24</td>
+            <td>Vis M4 x 40mm (30 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/M4x40.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Uxcell-a15111200ux1682-Cabinet-Handles-Phillips/dp/B019ZESG9I/ref=sr_1_5?crid=3FFNS1NMT4XPE&keywords=m4+x+40mm+screws+30+pcs&qid=1650639393&sprefix=m4+x+40mm+screws+30pcs%2Caps%2C163&sr=8-5">US</a> | <a href="https://www.amazon.de/-/en/M4-50-stainless-cylinder-DIN912/dp/B07YWDJS99/ref=sr_1_10?crid=24VLWXHS6RUKJ&keywords=m4x50%2Bmm%2Bsechskant&qid=1644166982&sprefix=m4%2Bx%2B50mm%2Bhex%2B%2Caps%2C94&sr=8-10&th=1">EU</a></td>
+            <td>$10.56 | €9.13</td>
+            <td>1</td>
+            <td>$10.56 | €9.13</td>
+        </tr>
+        <tr>
+            <td>O25</td>
+            <td>Assortiment de vis et écrous M3 (440 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/M3.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Shapenty-100PCS-Stainless-Female-Fastener/dp/B071NLDW56/ref=sr_1_9?crid=I0ZQA6TBI3N9&keywords=M3+screws+and+nuts+sets+%28440+pcs%29&qid=1650639424&sprefix=m3+screws+and+nuts+sets+440+pcs+%2Caps%2C257&sr=8-9">US</a> | <a href="https://www.amazon.de/-/en/pieces-screws-stainless-hexagon-socket/dp/B093GNHWKR/ref=sr_1_3?crid=36NK6MT1K8LSC&keywords=satz+m3+innensechskant&qid=1644166735&s=diy&sprefix=set+m3+hex+socket%2Cdiy%2C87&sr=1-3">EU</a></td>
+            <td>$6.49 | €11.99</td>
+            <td>1</td>
+            <td>$6.49 | €11.99</td>
+        </tr>
+        <tr>
+            <td>O26</td>
+            <td>Vis M4 x 120mm (15 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/M4x120.jpg" width="150" alt="App GUI" /></p></td>
+            <td> <a href="https://www.amazon.com/XunLiu-Socket-Screws-Wrench-Knurled/dp/B07CHJ7ZPP/ref=sr_1_38?crid=1U3GJUWD14XQB&keywords=screw%2BM4%2Bx%2B120mm&qid=1650753655&sprefix=screw%2Bm4%2Bx%2B120mm%2Caps%2C167&sr=8-38&th=1">US</a> | <a href="https://www.amazon.de/-/en/sourcing-Phillips-Furniture-Hanging-External/dp/B08JYCP7TD/ref=sr_1_64?crid=25999O4GLCN83&keywords=m4+x+120+mm&qid=1644165946&sprefix=m4+x+120mm+socket%2Caps%2C109&sr=8-64">EU</a></td>
+            <td>$15.29 | €15.64</td>
+            <td>1</td>
+            <td>$15.29 | €15.64</td>
+        </tr>
+        <tr>
+            <td>O27</td>
+            <td>Vis M6 x 100mm (2 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/M6.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/MroMax-Machine-Stainless-Phillips-Cabinet/dp/B07YFMN8FP/ref=sr_1_5?crid=3GFYNNIBEO5UA&keywords=M6+x+100mm+screws&qid=1650639588&sprefix=m6+x+100mm+screws+2+pcs+%2Caps%2C161&sr=8-5">US</a> | <a href="https://www.amazon.de/-/en/AG-BOX%C2%AE-Cylinder-Screws-Stainless-Steel/dp/B09N3DNDZK/ref=sr_1_5?crid=1NROTQHUR7F2K&keywords=m6x100+mm&qid=1644171138&sprefix=m6+x+100mm%2Caps%2C90&sr=8-5">EU</a></td>
+            <td>$3.84 | €4.18</td>
+            <td>1</td>
+            <td>$3.84 | €4.18</td>
+        </tr>
+        <tr>
+            <td>O28</td>
+            <td>Assortiment d'écrous (normaux et autobloquants) et de rondelles M3, M4 et M5 (45 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/M3M4M5nuts.jpg" width="150" alt="App GUI" /></p></td>
+            <td> <a href="https://www.amazon.com/Assortment-AETTL-Stainless-Assorted-Wrenches/dp/B098ND1GW8/ref=sr_1_2?crid=3AFZPJ5SIBJD9&keywords=Assorted+Nuts+%28Full+and+Self+Locking%29+and+Washers+M3%2C+M4+%26+M5+%2845+pcs%29&qid=1650639662&sprefix=assorted+nuts+full+and+self+locking+and+washers+m3%2C+m4+%26+m5+45+pcs+%2Caps%2C226&sr=8-2">US</a> |  <a href="https://www.amazon.de/-/en/Assorted-Locking-Washers-Stainless-Steel/dp/B01CO9S1RI/ref=sr_1_98?crid=P8DDSVM9ZTG1&keywords=m3+m4+muttern+unterlegscheiben&qid=1644172060&sprefix=m3+m4+nuts+washers%2Caps%2C101&sr=8-98">EU</a></td>
+            <td>$25.64 | €23.01</td>
+            <td>1</td>
+            <td>$25.64 | €23.01</td>
+        </tr>
+        <tr>
+            <td>O29</td>
+            <td>Jeu d'écrous/rondelles M6 (40 pcs)</td>
+            <td><p align="center"> <img src="../../docs/images/MTV/M6nuts.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Stainless-Washer-Machine-Thread-Assortment/dp/B09HNJBX1G/ref=sr_1_3?crid=1N4R1D32PS8W6&keywords=40-Piece+Nuts%2FWashers+Set+for+M6&qid=1650639826&sprefix=40-piece+nuts%2Fwashers+set+for+m6+threaded+rods+a2+stainless+steel%2Caps%2C227&sr=8-3">US</a> | <a href="https://www.amazon.de/-/en/40-Piece-Washers-Threaded-Stainless-Steel/dp/B01G77C0DY/ref=sr_1_31?crid=EUR5CW3K5BLD&keywords=m6+muttern+und+unterlegscheiben&qid=1644172515&refinements=p_36%3A118557031&rnid=118555031&s=diy&sprefix=m6+nuts+and+washers%2Caps%2C87&sr=1-31">EU</a></td>
+            <td>$13.99 | €8.99</td>
+            <td>1</td>
+            <td>€$13.99 | €8.99</td>
+        </tr>
+      <tr>
+            <td>O30</td>
+            <td>Assortiment de rondelles plates et rondelles élastiques en inox </td>
+            <td><p align="center"> <img src="../../docs/images/MTV/washers2.jpg" width="150" alt="App GUI" /></p></td>
+            <td>  <a href="https://www.amazon.com/Split-Washer-Assortment-Stainless-Silver/dp/B08QN3ZR23/ref=sr_1_35?keywords=Stainless+Steel+Flat+and+Spring+Washers+Assortment+Kit&qid=1650753391&sr=8-35">US</a> | <a href="https://www.amazon.de/-/en/300-pieces-Stainless-Washers-Assortment-M2-M3-M4-M5-M6/dp/B07CQX6NPP/ref=sr_1_15?keywords=m4+federscheibe&qid=1650753193&sr=8-15">EU</a></td>
+            <td>$12.49 | €10.38</td>
+            <td>1</td>
+            <td>€$12.49 | €10.38</td>
+        </tr>
+    </tbody>
+</table>
 
 Le coût total des composants externes est estimé à environ **500€**, ce qui donne un coût total d'environ **600€** pour MTV.
 
@@ -429,7 +579,7 @@ La jambe gauche du MTV se compose des pièces suivantes :
 
 - 1 x <a href="cad/Joints/90deg_Joint.stl">Joint à 90 degrés</a> imprimé en 3D (A4)
 - 1 x <a href="cad/Joints/End_Joint.stl">Joint de Fin</a> imprimé en 3D (A7)
-- 1 x <a href="cad/Joints/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
+- 1 x <a href="cad/BearingCover/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
 - 1 x <a href="cad/Joints/100deg_Joint.stl">Joint à 100 degrés</a> imprimé en 3D (A5)
 - 2 x <a href="cad/Legs/Front_Leg.stl">Jambe Avant</a> imprimé en 3D (A8)
 - 1 x <a href="cad/Legs/Mid_Leg.stl">Jambe Milieu</a> imprimé en 3D (A9)
@@ -442,7 +592,7 @@ La jambe droite du MTV se compose des pièces suivantes :
 
 - 1 x <a href="cad/Joints/90deg_Joint.stl">Joint à 90 degrés</a> imprimé en 3D (A4)
 - 1 x <a href="cad/Joints/End_Joint.stl">Joint de Fin</a> imprimé en 3D (A7)
-- 1 x <a href="cad/Joints/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
+- 1 x <a href="cad/BearingCover/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
 - 1 x <a href="cad/Joints/100deg_Joint_Mirror.stl">Joint à 100 degrés Miroir</a> imprimé en 3D (A6)
 - 2 x <a href="cad/Legs/Front_Leg.stl">Jambe Avant</a> imprimé en 3D (A8)
 - 1 x <a href="cad/Legs/Mid_Leg.stl">Jambe Milieu</a> imprimé en 3D (A9)
@@ -476,7 +626,7 @@ Complétez l'assemblage du châssis, y compris la fixation du conduit de câble 
 
 Le compartiment principal se compose des pièces suivantes :
 
-- 2 x <a href="cad/Joints/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
+- 2 x <a href="cad/BearingCover/BearingCover.stl">Couvercle de Roulement</a> imprimé en 3D (A11)
 - 1 x <a href="cad/PhoneMount/Phone_Mount.stl">Plateforme de Montage Téléphone</a> imprimé en 3D (A12)
 - 1 x <a href="cad/Buffer/Name_Front.stl">Nom Avant</a> imprimé en 3D (A13)
 - 1 x <a href="cad/Buffer/Name_Back.stl">Nom Arrière</a> imprimé en 3D (A14)
@@ -548,6 +698,29 @@ Remplacez les ressorts d'origine des amortisseurs par le jeu de ressorts de conf
 </p>
 
 Fixez l'affichage de la tension (O12), les interrupteurs de contrôle de puissance (O13) et le câble de montage de panneau Micro USB (O14) dans les emplacements désignés du toit arrière. Sortez les phares et feux arrière (O8 & O9) à travers les découpes du toit et fixez le toit avant (A19) et le toit arrière (A20) à l'assemblage du compartiment. Insérez les phares (O8) dans la prise de phare (A23) et les feux arrière (O9) dans la prise de feu arrière (A24) et fixez-les aux emplacements respectifs dans le toit avant (A19) et le toit arrière (A20). Scellez les prises de lumière avec les embouts de lumière (A22) comme indiqué sur la figure ci-dessous et utilisez de la super glue pour les fixer. Insérez les plaques de nom personnalisées
+
+<p align="center">
+  <img src="../../docs/images/MTV/V_disp.jpg" width="500" alt="App GUI"/>
+</p>
+
+### II.3. Assemblage de l'électronique 
+
+Cette partie traite uniquement de l'intégration des cartes électroniques dans le véhicule. Vous trouverez plus de détails sur l'architecture et les composants des différents PCB via le [lien suivant](./pcb). Les prototypes des PCB sont présentés dans les figures suivantes : 
+
+<p align="center">
+  <img src="../../docs/images/MTV/PCB_4.jpg" width="600" alt="App GUI"/>
+</p>
+
+#### II.3.1. Connexion batterie – PCB 
+La batterie LiPo rechargeable choisie pour le MTV est reliée au PCB de distribution d'énergie par des connecteurs dédiés. Un interrupteur évite les dégâts dus aux étincelles sur les connecteurs de la batterie. Comme cet interrupteur est monté sur le couvercle du MTV, des connecteurs de raccordement peuvent être utilisés pour la maintenance :
+
+<p align="center">
+  <img src="../../docs/images/MTV/Bat.jpg" width="500" alt="App GUI"/>
+</p>
+
+#### II.3.2. Connexion PCB – afficheur de tension 
+
+Un afficheur de tension dédié indique l'état de la batterie. Il se branche sur le PCB de distribution d'énergie.
 
 <p align="center">
   <img src="../../docs/images/MTV/V_disp.jpg" width="500" alt="App GUI"/>

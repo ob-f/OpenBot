@@ -176,4 +176,5 @@
     <string name="ble_connecting">Verbinde …</string>
     <string name="ble_disconnect">Trennen</string>
     <string name="ble_connect">Verbinden</string>
+    <string name="firebase_not_configured">Die Google-Anmeldung ist in diesem Build nicht eingerichtet. Dafür wird die Firebase-Konfiguration des Projekts benötigt (google-services.json).</string>
 </resources>

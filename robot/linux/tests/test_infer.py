@@ -1,9 +1,11 @@
 import pytest
 from infer import InferNetwork
 import os
+from pathlib import Path
 from download_data import get_data
 
-PATH_TO_OPENBOT = "/home/yuankai/code/github/OpenBot"  # Replace with path to root directory of OpenBot repository
+# Root of the OpenBot repository
+PATH_TO_OPENBOT = str(Path(__file__).resolve().parents[3])
 CUR_DIR = os.path.join(os.path.dirname(__file__))
 DATASET_PATH = (
     f"{CUR_DIR}/test_data/logs1/data/"  # this dataset is acquired by running get_data

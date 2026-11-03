@@ -14,6 +14,8 @@
 1. **Sicherheit:** Stellen Sie immer sicher, dass Sie in einer sicheren Umgebung arbeiten. Denken Sie daran, dass Ihr Telefon bei einer Kollision beschädigt werden könnte! Besondere Vorsicht ist geboten, wenn Sie automatisierte Steuerungen verwenden (z.B. Personenverfolgung oder Fahrmodus). Stellen Sie sicher, dass Sie immer einen Game-Controller angeschlossen haben und mit der Tastenbelegung vertraut sind, damit Sie das Fahrzeug jederzeit stoppen können. Nutzung auf eigene Gefahr!
 2. **App in Entwicklung:** Die Anwendung befindet sich in der Entwicklung und kann je nach Telefonmodell und Betriebssystemversion abstürzen oder unerwartetes Verhalten zeigen. Testen Sie alle Funktionen ohne angeschlossene Räder. Nutzung auf eigene Gefahr!
 
+3. **Die App wird bald im `App Store` `verfügbar` sein.**
+
 ## App-Bildschirme
 
 ### Hauptmenü
@@ -113,6 +115,8 @@ Einfache Benutzeroberfläche zur Sammlung von Datensätzen.
 
 - **Modellauflösung**: Wird verwendet, um zwischen den Auflösungen der für das Training verschiedener Modelle gespeicherten Bilder zu wechseln.
 
+- **Server**: Die Server-Funktion ist noch in Entwicklung.
+
 - **Gesammelte Daten protokollieren**: Der Datenerfassungsprozess kann vom Bildschirm oder aus der Ferne, z.B. von einem Bluetooth-Controller, gesteuert werden. Bei Verwendung eines Bluetooth-Controllers können Sie:
 
     - die **A-Taste** drücken, um den Datenerfassungsprozess zu **starten**
@@ -151,6 +155,12 @@ Einfache Benutzeroberfläche zum Ausführen von Autopilot-Modellen.
 <img src="../../../docs/images/ios_autopilot_screen.jpg" alt="Autopilot" width="50%" />
 </p>
 
+- **Server**: Wenn die [Web-App](../../../policy/README.de-DE.md#web-app) für das Training läuft, können Sie sie hier auswählen und trainierte Autopilot-Modelle an den Roboter senden.
+- **Modell**: Wählen Sie ein trainiertes Modell für den Autopilot-Modus.
+- **Gerät**: CPU, GPU oder NNAPI für die Inferenz (mehr dazu [hier](../../android/app/README.de-DE.md#gerät)).
+- **Threads**: Anzahl der Threads (wirkt sich nur aus, wenn als Gerät die CPU gewählt ist).
+- **Steuerung**: Controller, Fahrmodus und Geschwindigkeit stellen den Roboter ein, wie im [Abschnitt Steuerung](#steuerung) beschrieben.
+
 ### Objektverfolgung
 
 Einfache Benutzeroberfläche zur Verfolgung von Objekten aus 80 verschiedenen Klassen. Eine kurze Beschreibung der verschiedenen KI-Modelle zur Objektverfolgung und Leistungsbenchmarks finden Sie im Abschnitt [Modellverwaltung](#modellverwaltung).
@@ -158,6 +168,15 @@ Einfache Benutzeroberfläche zur Verfolgung von Objekten aus 80 verschiedenen Kl
 <p align="left">
 <img src="../../../docs/images/ios_object_tracking_screen.jpg" alt="Objektverfolgung" width="50%" />
 </p>
+
+- **Dynamische Geschwindigkeit**: verringert im „Auto-Modus“ die Geschwindigkeit, je näher der Roboter dem verfolgten Objekt kommt.
+  Die Geschwindigkeit richtet sich nach der Fläche des Begrenzungsrahmens (funktioniert am besten im Querformat).
+- **Modell**: Wählen Sie einen Objektdetektor passend zur Leistung Ihres Telefons.
+- **Objekt**: Wählen Sie das Objekt, das Sie verfolgen möchten. Die Modelle erkennen die 80 COCO-[Objektklassen](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/).
+- **Konfidenz**: Schwellwert, ab dem Erkennungen akzeptiert werden. Erhöhen Sie ihn bei Fehlerkennungen, verringern Sie ihn, wenn das gesuchte Objekt nicht erkannt wird.
+- **Gerät**: CPU, GPU oder NNAPI für die Inferenz (mehr dazu [hier](../../android/app/README.de-DE.md#gerät)).
+- **Threads**: Anzahl der Threads (wirkt sich nur aus, wenn als Gerät die CPU gewählt ist).
+- **Steuerung**: Controller, Fahrmodus und Geschwindigkeit stellen den Roboter ein, wie im [Abschnitt Steuerung](#steuerung) beschrieben.
 
 ### Modellverwaltung
 
@@ -167,6 +186,87 @@ Alle Modelle sind quantisiert, um eine bessere Leistung auf eingebetteten Gerät
 <img src="../../../docs/images/ios_screen_model_management.gif" alt="Modellverwaltung" width="25%" />
 </p>
 
+### Navigation
+
+Auf dem Bildschirm `Point Goal Navigation` legen Sie ein Ziel fest, zu dem der Roboter fährt, angegeben mit Werten für vorwärts und links im 3D-Raum. Tippen Sie dazu in der App auf die entsprechende Schaltfläche.
+
+Danach erscheint ein Pop-up mit zwei Eingabefeldern, `Forward` und `Left`. Geben Sie dort die Werte für das Ziel ein. Das Pop-up hat außerdem zwei Schaltflächen: `Cancel` und `Start`.
+
+- Schaltfläche `Cancel`: bringt Sie zurück zum Startbildschirm und bricht die Navigation ab.
+
+
+- Schaltfläche `Start`: legt aus den eingegebenen Werten für vorwärts und links einen Punkt im 3D-Raum fest und startet die Navigation. Der Roboter fährt auf das Ziel zu und passt Richtung und Geschwindigkeit an, um es zu erreichen.
+
+Erreicht der Roboter das Ziel, erscheint eine Meldung, und der Roboter hält an.
+
+Diese Funktion nutzt `ARKit`, das Augmented-Reality-Framework von Apple. Sie brauchen dafür ein ARKit-fähiges Gerät.
+
+<p align="left">
+<img src="../../../docs/images/ios_set_navigation_screen.jpg" alt="Model Management" width="25%" />
+<img src="../../../docs/images/ios_navigation_screen.jpg" alt="Model Management" width="25%" />
+</p>
+
+
+### Projekte
+
+Der Bildschirm Projekte zeigt Ihre Projekte aus dem OpenBot Playground, wenn Sie mit Ihrem Google-Konto angemeldet sind. Sie können diese Projekte ausführen, um Ihren OpenBot zu steuern, oder ihre QR-Codes über das Scanner-Symbol oben rechts scannen. Wenn Sie nicht angemeldet sind, zeigt der Bildschirm eine Schaltfläche für die Google-Anmeldung, Sie können den QR-Code Ihres Projekts aber trotzdem scannen. Erscheint nach der Anmeldung `Oops, no project found`, prüfen Sie, ob das Konto Projekte in Google Drive gespeichert hat.
+
+Wenn Ihre neuesten Projekte nicht in der Liste stehen, ziehen Sie den Bildschirm nach unten, um sie neu zu laden.
+
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen_ios.gif" alt="Project Screen" width="25%"/>
+<img src="../../../docs/images/no_projects_found_ios.jpg" alt="No project screen" style="padding-left: 0.3%" width="26.5%"/>
+<img src="../../../docs/images/reload_projects_ios.gif" alt="Reload project screen" width="25%"/>
+</p>
+
+- **Google-Drive-Projekte**: Um ein Projekt aus Google Drive auszuführen, tippen Sie darauf und warten Sie, bis die Projektdatei gelesen ist. Klappt das ohne Fehler, erscheint ein Pop-up mit dem Namen des Projekts und den Schaltflächen `Start` und `Cancel`. Mit Start führen Sie das Projekt aus, mit Cancel brechen Sie ab. Erscheint die Meldung `Something went wrong`, gibt es vermutlich ein Problem mit der Datei in Google Drive. Laden Sie den Bildschirm dann durch Herunterziehen neu und versuchen Sie es noch einmal.
+
+
+- **QR-Code-Scanner**: Um den QR-Code eines Playground-Projekts zu scannen, tippen Sie auf das QR-Code-Symbol oben rechts. Erlauben Sie der App den Zugriff auf die Kamera. Nach dem Scannen wird die Datei gelesen. Klappt das ohne Fehler, erscheint ein Pop-up mit dem Namen des Projekts und den Schaltflächen `Start` und `Cancel`. Mit Start führen Sie das Projekt aus, mit Cancel brechen Sie ab. Erscheint die Meldung `Something went wrong`, gibt es vermutlich ein Problem mit der Datei in Google Drive. Erzeugen Sie dann im Playground einen neuen QR-Code und versuchen Sie es noch einmal.
+
+
+- **Projekt ausführen**: Läuft Ihr Projekt erfolgreich, zeigt der Bildschirm die Namen der Code-Blöcke und eine Stopp-Schaltfläche, mit der Sie die Ausführung beenden können.
+
+
+- **Projekt löschen**: Um ein Projekt zu löschen, halten Sie es lange gedrückt. Bestätigen Sie die Abfrage mit „Yes“.
+
+<p align="left">
+<img src="../../../docs/images/google_drive_projects_execute_ios.gif" alt="Google Drive project execute" width="25%" />
+<img src="../../../docs/images/ios_qr_scan.gif" alt="Qr code scanner project execute" width="25%" />
+<img src="../../../docs/images/delete_project_ios.jpg" alt="Delete project popup" style="padding-right: 1.2%" width="26%" />
+</p>
+
+
+### Profil
+Der Bildschirm Profil bietet verschiedene Optionen, je nachdem, ob Sie angemeldet sind.
+Wenn Sie nicht angemeldet sind, erscheint eine Schaltfläche `Google Sign-in`, mit der Sie sich mit Ihrem Google-Konto anmelden. Danach haben Sie Zugriff auf Ihr Profil und die anderen Funktionen.
+Wenn Sie angemeldet sind, zeigt der Tab `Profile` zwei Schaltflächen: `Edit Profile` und `Logout`.
+
+<p align="left">
+<img src="../../../docs/images/logged_out_profile_screen_ios.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/logged_in_profile_screen_ios.jpg" alt="Logged in profile screen" width="25%"/>
+</p>
+
+- **Edit Profile**: öffnet einen Bildschirm, auf dem Sie Ihre Profildaten ändern, etwa Ihren Namen und Ihr Profilbild.
+
+
+- **Logout**: meldet Sie von Ihrem Konto ab und bringt Sie zurück zum Anmeldebildschirm.
+
+<p align="left">
+<img src="../../../docs/images/ios_edit_profile_screen.jpg" alt="Edit profile screen" width="25%"/>
+<img src="../../../docs/images/logout_dialog_box_ios.jpg" alt="Logout dialog box" width="25%"/>
+</p>
+
+
+### OpenBot PlayGround
+
+Die Dienste des OpenBot Playground erreichen Sie über das OpenBot-Playground-Symbol oben in der Werkzeugleiste des Bildschirms Projekte. Mehr über den OpenBot Playground erfahren Sie [hier](../../../open-code/README.de-DE.md).
+
+<p align="left">
+<img src="../../../docs/images/playground_services_ios.gif" alt="Playground Services" width="25%" />
+<img src="../../../docs/images/playground_sign-in_ios.gif" alt="Playground sign-in" width="25%" />
+</p>
+
 ## Code-Struktur
 
 Die [TensorFlow Lite Object Detection iOS Demo](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/ios) wurde als Ausgangspunkt verwendet, um TFLite-Modelle zu integrieren und den Kamerafeed zu erhalten. Der [tflite](OpenBot/tflite)-Ordner enthält die Modelldefinitionen für die [Autopilot](OpenBot/tflite/Autopilot.swift)- und [Detektor](OpenBot/tflite/Detector.swift)-Netzwerke.
@@ -174,3 +274,5 @@ Die [TensorFlow Lite Object Detection iOS Demo](https://github.com/tensorflow/ex
 ## Nächstes (optional)
 
 Trainieren Sie Ihre eigene [Fahrstrategie](../../../policy/README.md)
+
+Firebase-Authentifizierung [Firebase](../OpenBot/OpenBot/Authentication/README.de-DE.md)

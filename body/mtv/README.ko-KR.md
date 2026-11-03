@@ -577,7 +577,7 @@ MTV의 왼쪽 다리는 다음 부품들로 구성되어 있어요:
 
 - 1 x 3D 프린트된 <a href="cad/Joints/90deg_Joint.stl">90도 조인트</a> (A4)
 - 1 x 3D 프린트된 <a href="cad/Joints/End_Joint.stl">끝 조인트</a> (A7)
-- 1 x 3D 프린트된 <a href="cad/Joints/BearingCover.stl">베어링 커버</a> (A11)
+- 1 x 3D 프린트된 <a href="cad/BearingCover/BearingCover.stl">베어링 커버</a> (A11)
 - 1 x 3D 프린트된 <a href="cad/Joints/100deg_Joint.stl">100도 조인트</a> (A5)
 - 2 x 3D 프린트된 <a href="cad/Legs/Front_Leg.stl">앞 다리</a> (A8)
 - 1 x 3D 프린트된 <a href="cad/Legs/Mid_Leg.stl">중간 다리</a> (A9)
@@ -590,7 +590,7 @@ MTV의 오른쪽 다리는 다음 부품들로 구성되어 있어요:
 
 - 1 x 3D 프린트된 <a href="cad/Joints/90deg_Joint.stl">90도 조인트</a> (A4)
 - 1 x 3D 프린트된 <a href="cad/Joints/End_Joint.stl">끝 조인트</a> (A7)
-- 1 x 3D 프린트된 <a href="cad/Joints/BearingCover.stl">베어링 커버</a> (A11)
+- 1 x 3D 프린트된 <a href="cad/BearingCover/BearingCover.stl">베어링 커버</a> (A11)
 - 1 x 3D 프린트된 <a href="cad/Joints/100deg_Joint_Mirror.stl">100도 조인트 미러</a> (A6)
 - 2 x 3D 프린트된 <a href="cad/Legs/Front_Leg.stl">앞 다리</a> (A8)
 - 1 x 3D 프린트된 <a href="cad/Legs/Mid_Leg.stl">중간 다리</a> (A9)
@@ -624,7 +624,7 @@ MTV의 오른쪽 다리는 다음 부품들로 구성되어 있어요:
 
 메인 컴파트먼트는 다음 부품들로 구성됩니다:
 
-- 2 x 3D 프린트 <a href="cad/Joints/BearingCover.stl">베어링 커버</a> (A11)
+- 2 x 3D 프린트 <a href="cad/BearingCover/BearingCover.stl">베어링 커버</a> (A11)
 - 1 x 3D 프린트 <a href="cad/PhoneMount/Phone_Mount.stl">폰 마운트 플랫폼</a> (A12)
 - 1 x 3D 프린트 <a href="cad/Buffer/Name_Front.stl">이름 앞면</a> (A13)
 - 1 x 3D 프린트 <a href="cad/Buffer/Name_Back.stl">이름 뒷면</a> (A14)

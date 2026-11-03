@@ -53,6 +53,34 @@ Beginnen Sie mit der Installation von [Flutter](https://flutter.dev/) auf Ihrem 
     <img src="../../docs/images/run_editor.jpg" width="50%" />
   </p>
 
+## Signierte Release-Version bauen (Android)
+Release-Builds (`flutter build apk --release` / `flutter build appbundle --release`) werden mit einem Keystore signiert, auf den `android/key.properties` verweist. Diese Datei ist **in .gitignore** und wird nie committet – jeder Entwickler muss seine eigene lokale Kopie anlegen. Debug-Builds (`flutter build apk --debug`, `flutter run`) brauchen nichts davon.
+
+### 1. Keystore erzeugen (einmalig)
+```bash
+keytool -genkey -v -keystore ~/release.keystore -alias upload -keyalg RSA -keysize 2048 -validity 10000
+```
+Bewahren Sie die erzeugte `.keystore`/`.jks`-Datei und ihre Passwörter sicher außerhalb des Repositorys auf – wenn Sie sie verlieren, können Sie keine Updates mit derselben App-Signatur mehr veröffentlichen.
+
+### 2. `android/key.properties` anlegen
+`android/app/build.gradle` liest diese Datei unter `controller/flutter/android/key.properties`, legen Sie sie also dort an mit:
+```properties
+storePassword=<your keystore password>
+keyPassword=<your key password>
+keyAlias=upload
+storeFile=/absolute/path/to/release.keystore
+```
+`storeFile` muss ein absoluter Pfad (oder ein von `controller/flutter/android/app/` aus auflösbarer Pfad) zu dem in Schritt 1 erzeugten Keystore sein.
+
+### 3. Bauen
+```bash
+cd controller/flutter
+flutter build appbundle --release   # für den Upload in den Play Store (.aab)
+# oder
+flutter build apk --release         # für eine signierte, installierbare APK
+```
+`app/build.gradle` lädt `key.properties` automatisch, wenn die Datei vorhanden ist, und verwendet sie für die `release`-Signierung; fehlt die Datei, hat die Release-Konfiguration keine Signaturwerte und das Signieren schlägt fehl (Debug-Builds sind nicht betroffen).
+
 ## Verbindung
 
 Controller- und Roboter-Smartphone müssen sich im selben WLAN befinden, oder ein Smartphone muss mit dem Hotspot des anderen verbunden sein. Ein Internetzugang ist nicht erforderlich.
@@ -111,5 +139,19 @@ Verwenden Sie die `Gaspedal`- und `Bremse`-Tasten, um vorwärts/rückwärts zu f
 - Durch Drücken des `Gaspedals` beschleunigt der Roboter innerhalb von 2 Sekunden auf volle Geschwindigkeit. Wenn Sie die Taste loslassen, verlangsamt der Roboter bis zum Stillstand (Stoppgeschwindigkeit auf 0% der maximalen Geschwindigkeit eingestellt, kann angepasst werden).
 - Durch Drücken der `Bremse`-Taste wird der Roboter sofort gestoppt. Wenn wir die Bremse eine weitere Sekunde gedrückt halten, beginnt der Roboter rückwärts zu fahren, bis er innerhalb einer Sekunde die maximale Rückwärtsgeschwindigkeit erreicht. Wenn wir die Bremse loslassen, kommt der Roboter zum Stillstand.
 - Der Roboter wird durch Kippen des Controller-Telefons nach links oder rechts gesteuert.
+
+### Controller-Einstellungen
+
+Hier ist ein Bild des Bildschirms `Controller Settings`:
+
+- Controller-Auswahl: Wechseln Sie mit den Symbolen zwischen verschiedenen Controller-Typen (z. B. Smartphone, Joystick).
+ 
+- Server: Zeigt den aktuellen Serverstatus mit einem Dropdown-Menü, um den Server auszuwählen oder zu wechseln.
+ 
+- Rauschen: Schalten Sie die Rauschsimulation mit dem Schalter ein oder aus.
+
+<p float="left">
+  <img src="../../docs/images/flutter_controller_setting.jpg" width="50%" />
+</p>
 
 Hier ist eine [Technische Übersicht](../../docs/technical/OpenBotController.pdf) der Controller-App.

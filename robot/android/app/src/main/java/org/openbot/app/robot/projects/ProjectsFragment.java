@@ -23,6 +23,7 @@ import java.util.List;
 import org.openbot.app.robot.R;
 import org.openbot.app.robot.databinding.FragmentProjectsBinding;
 import org.openbot.app.robot.env.SharedPreferencesManager;
+import org.openbot.app.robot.googleServices.FirebaseSetup;
 import org.openbot.app.robot.googleServices.GoogleServices;
 import org.openbot.app.robot.main.CommonRecyclerViewAdapter;
 import org.openbot.app.robot.utils.BotFunctionUtils;
@@ -76,6 +77,7 @@ public class ProjectsFragment extends Fragment {
   }
 
   private void signIn() {
+    if (!FirebaseSetup.checkSignIn(requireContext())) return;
     Intent signInIntent = googleServices.mGoogleSignInClient.getSignInIntent();
     googleLogInActivityResultLauncher.launch(signInIntent);
   }

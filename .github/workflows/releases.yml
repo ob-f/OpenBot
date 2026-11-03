@@ -78,6 +78,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -110,6 +115,7 @@ jobs:
       - name: Build Release Apk
         run: |
           flutter build apk --release \
+            --target-platform android-arm,android-arm64 \
             --build-name=${{ steps.version.outputs.build_name }} \
             --build-number=${{ steps.version.outputs.build_number }}
       - name: Upload release APK

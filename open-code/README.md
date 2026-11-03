@@ -57,7 +57,7 @@ This project allows users to store their data both locally and on `Google Drive`
 automatically stored in the `local storage` of the user's device. As changes are made to the project, the local storage
 is updated in real-time.
 
-Additionally, users can upload their project to Google Drive by clicking on the [upload button](#generate-Code). This
+Additionally, users can upload their project to Google Drive by clicking on the [upload button](#generate-code). This
 allows users to access their project from any device with internet access, making it easier to work on the project from
 different locations.
 
@@ -87,7 +87,7 @@ different locations.
 The `OpenBot Playground` starts with homepage that contains following component:
 
 - [Header](#header) : Header contains the following two sections, change theme and sign-in user.
-- [Carousel](#Carousel): Carousel's Content Explains how the Playground works.
+- [Carousel](#carousel): Carousel's Content Explains how the Playground works.
 - [Project Section](#project-section) :Project section contains List of Projects and Create new Project button.
 
 ### Playground Page
@@ -96,9 +96,9 @@ The `Playground` page is a key feature of the `OpenBot Playground` platform that
 users to create different types of functionality, such as Control, Loops, Movement, Operators, Sensors, and many more.
 
 - [Header](#header) : Header contains project name, help centre, AutoSync ,change theme and signIn user section.
-- [Workspace](#workSpace): Space where users can drag and drop the coding blocks to generate their code, which can be
+- [Workspace](#workspace): Space where users can drag and drop the coding blocks to generate their code, which can be
   converted into both JavaScript and Python.
-- [Playground Bottom Bar](#Playground-Bottom-Bar) : Bottom bar Contains buttons to generate code ,upload project in
+- [Playground Bottom Bar](#playground-bottom-bar) : Bottom bar Contains buttons to generate code ,upload project in
   drive, zoom in and out blocks ,Add model ,undo and redo changes in workspace.
 
 ### Header
