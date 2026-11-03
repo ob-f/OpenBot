@@ -9,7 +9,7 @@
   <a href="README.ko-KR.md">한국어</a>
 </p>
 
-eSpace de l'ITE a développé un [programme](#curriculum) pour une éducation économique et évolutive en IA et robotique autour de la pile logicielle OpenBot. Il se présente sous la forme de [vidéos YouTube étape par étape](#step-by-step-video-guides) qui vous guident à travers l'assemblage de l'[OpenBot Lite](#openbot-lite-arduino), l'installation des logiciels nécessaires, l'utilisation du suivi de personne et la formation et le déploiement de votre propre politique de conduite autonome.
+eSpace de l'ITE a développé un [programme](#programme) pour une éducation économique et évolutive en IA et robotique autour de la pile logicielle OpenBot. Il se présente sous la forme de [vidéos YouTube étape par étape](#guides-vidéo-étape-par-étape) qui vous guident à travers l'assemblage de l'[OpenBot Lite](#openbot-lite), l'installation des logiciels nécessaires, l'utilisation du suivi de personne et la formation et le déploiement de votre propre politique de conduite autonome.
 
 ## OpenBot Lite
 

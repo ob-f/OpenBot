@@ -46,6 +46,7 @@ npm start
 4. OpenBot 모바일 앱에서 로그인 후, Google Drive에서 저장된 파일을 한 번의 클릭으로 불러올 수 있어요.
 5. 코딩 없이 OpenBot에 대한 명령을 디자인할 수 있어요.
 6. 모바일과 태블릿 브라우징에 최적화된 완전 반응형 디자인이에요.
+7. [살펴볼](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA) 수 있는 OpenBot Playground 블록.
 
 ### 프로젝트 저장소
 
@@ -85,7 +86,7 @@ npm start
 
 - [헤더](#헤더): 헤더에는 프로젝트 이름, 도움말 센터, 자동 동기화, 테마 변경, 사용자 로그인 섹션이 있어요.
 - [워크스페이스](#워크스페이스): 사용자가 코딩 블록을 드래그 앤 드롭하여 코드를 생성할 수 있는 공간이에요. 생성된 코드는 JavaScript와 Python으로 변환할 수 있어요.
-- [Playground 하단 바](#Playground-하단-바): 하단 바에는 코드 생성, 프로젝트 업로드, 블록 확대/축소, 모델 추가, 워크스페이스에서 변경 사항 되돌리기 및 다시 실행 버튼이
+- [Playground 하단 바](#playground-하단-바): 하단 바에는 코드 생성, 프로젝트 업로드, 블록 확대/축소, 모델 추가, 워크스페이스에서 변경 사항 되돌리기 및 다시 실행 버튼이
   있어요.
 
 ### 헤더
@@ -219,5 +220,5 @@ Playground 화면이 열려요. 만약 이미 다른 프로젝트에 할당된 �
 
 ## 다음 (선택 사항)
 
-Firebase 인증 문제 해결 [Firebase](src/services/README.ko-KR.md#troubleshooting)
+Firebase 인증 문제 해결 [Firebase](src/services/README.ko-KR.md#문제-해결)
 

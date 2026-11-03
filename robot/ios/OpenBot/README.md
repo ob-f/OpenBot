@@ -226,7 +226,7 @@ Simple UI for running autopilot models.
 
 - **Server**: If you have the [web app](../../../policy#web-app) for policy training running, you can select it here and send trained autopilot models to the robot.
 - **Model**: Choose a trained model to use for autopilot mode.
-- **Device**: Use CPU, GPU or NNAPI for inference (more details [here](#device)).
+- **Device**: Use CPU, GPU or NNAPI for inference (more details [here](../../android/app/README.md#device)).
 - **Threads**: Number of threads to use (only makes a difference when CPU is selected as device).
 - **Control**: Controller, Drive Mode and Speed are used to control robot settings as described in the [control section](#control).
 
@@ -245,7 +245,7 @@ Simple UI for tracking objects of 80 different classes. A short description of t
 - **Model**: Choose an object detector based on your phone performance.
 - **Object**: Pick the object you want to track. The models can detect the 80 COCO [object classes](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/).
 - **Confidence**: Confidence threshold to determine if detections are accepted. Increase if you get false detections, decrease if the object of interest it not detected.
-- **Device**: Use CPU, GPU or NNAPI for inference (more details [here](#device)).
+- **Device**: Use CPU, GPU or NNAPI for inference (more details [here](../../android/app/README.md#device)).
 - **Threads**: Number of threads to use (only makes a difference when CPU is selected as device).
 - **Control**: Controller, Drive Mode and Speed are used to control robot settings as described in the [control section](#control).
 

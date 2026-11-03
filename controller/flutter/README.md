@@ -70,7 +70,7 @@ keyPassword=<your key password>
 keyAlias=upload
 storeFile=/absolute/path/to/release.keystore
 ```
-`storeFile` must be an absolute path (or a path resolvable from `controller/flutter/android/`) to the keystore you generated in step 1.
+`storeFile` must be an absolute path (or a path resolvable from `controller/flutter/android/app/`) to the keystore you generated in step 1.
 
 ### 3. Build
 ```bash

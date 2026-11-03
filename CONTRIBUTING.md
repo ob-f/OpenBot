@@ -38,7 +38,7 @@
 ## Guidelines
 
 - Use same style and formatting as rest of code.
-  - For the Java (Android) and Python code see [below](#Formatting).
+  - For the Java (Android) and Python code see [below](#formatting).
   - For any other code, just try to blend in.
 - Update documentation associated with code changes you made.
 - If you want to include 3rd party dependencies, please discuss this in the issue first.

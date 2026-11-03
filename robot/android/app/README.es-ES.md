@@ -266,4 +266,200 @@ Versión pequeña de [YoloV4](https://arxiv.org/abs/2004.10934) con resolución 
 
 [YoloV5](https://github.com/ultralytics/yolov5) con resolución de entrada de 640x640.
 
-|teléfono/dispositivo (fps)|
+|teléfono/dispositivo (fps)| CPU | GPU | NNAPI |
+|------------------|-----|-----|-------|
+| Samsung S22 Ultra| 5.5 | 4.9 |  5.0  |
+| Xiaomi Mi9       | 4.1 | 4.6 |   -   |
+| Google Pixel 4XL | 3.7 | 4.6 |  4.6  |
+
+#### YoloV5m-320 - mAP: 35%
+
+[YoloV5](https://github.com/ultralytics/yolov5) con resolución de entrada de 320x320.
+
+|teléfono/dispositivo (fps)| CPU | GPU | NNAPI |
+|------------------|-----|-----|-------|
+| Samsung S22 Ultra|  13 | 8.2 |   11  |
+| Xiaomi Mi9       | 9.7 | 9.9 |   -   |
+| Google Pixel 4XL | 7.9 | 9.2 |   15  |
+
+#### YoloV5l-320 - mAP: 38%
+
+[YoloV5](https://github.com/ultralytics/yolov5) con resolución de entrada de 320x320.
+
+|teléfono/dispositivo (fps)| CPU | GPU | NNAPI |
+|------------------|-----|-----|-------|
+| Samsung S22 Ultra| 7.6 | 3.4 |  7.6  |
+| Xiaomi Mi9       | 5.5 | 5.0 |   -   |
+| Google Pixel 4XL | 5.3 | 4.0 |  5.3  |
+
+#### EfficientDet-L0-320 - mAP: 26%
+
+[EfficientDet-L0](https://tfhub.dev/tensorflow/lite-model/efficientdet/lite0/detection/metadata/1) con resolución de entrada de 320x320. Nota: el rendimiento del modelo empeora en modo horizontal; puede que haya que ajustar el umbral de confianza.
+
+|teléfono/dispositivo (fps)| CPU | GPU | NNAPI |
+|------------------|-----|-----|-------|
+| Samsung S22 Ultra|  18 |  10 |   16  |
+| Xiaomi Mi9       |  16 |  20 |  1.2  |
+| Google Pixel 4XL |  17 |  17 |   16  |
+
+#### EfficientDet-L1-384 - mAP: 31%
+
+[EfficientDet-L1](https://tfhub.dev/tensorflow/lite-model/efficientdet/lite1/detection/metadata/1) con resolución de entrada de 384x384. Nota: el rendimiento del modelo empeora en modo horizontal; puede que haya que ajustar el umbral de confianza.
+
+|teléfono/dispositivo (fps)| CPU | GPU | NNAPI |
+|------------------|-----|-----|-------|
+| Samsung S22 Ultra|  12 | 9.2 |   10  |
+| Xiaomi Mi9       |  10 |  13 |    -  |
+| Google Pixel 4XL |  11 |  11 |   10  |
+
+#### EfficientDet-L2-448 - mAP: 34%
+
+[EfficientDet-L2](https://tfhub.dev/tensorflow/lite-model/efficientdet/lite2/detection/metadata/1) con resolución de entrada de 448x448. Nota: el rendimiento del modelo empeora en modo horizontal; puede que haya que ajustar el umbral de confianza.
+
+|teléfono/dispositivo (fps)| CPU | GPU | NNAPI |
+|------------------|-----|-----|-------|
+| Samsung S22 Ultra| 9.8 | 8.4 |  8.2  |
+| Xiaomi Mi9       | 6.4 | 9.4 |   -   |
+| Google Pixel 4XL | 7.7 | 8.3 |  7.6  |
+
+### Predeterminado
+
+La [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivity.java) reúne las funciones más importantes de la aplicación OpenBot en una sola pantalla. Muestra el estado de la conexión con el vehículo y las mediciones de sus sensores. El robot se puede controlar con mandos de juego BT estándar o con otro smartphone que tenga la [aplicación de control](../../../controller/flutter/README.es-ES.md) de OpenBot. También hemos implementado un registrador de datos para recopilar conjuntos de datos con el robot. Actualmente registramos lecturas de los siguientes sensores: cámara, giroscopio, acelerómetro, magnetómetro, sensor de luz ambiental y barómetro. Con la API de Android obtenemos estas lecturas: imágenes RGB, velocidad angular, aceleración lineal, gravedad, intensidad del campo magnético, intensidad de la luz, presión atmosférica, latitud, longitud, altitud, rumbo y velocidad. Además de los sensores del teléfono, registramos las lecturas de los sensores del cuerpo (odometría de las ruedas, distancia a obstáculos y voltaje de la batería), que llegan por la conexión serie. También registramos, con marca de tiempo, las señales de control recibidas de un controlador conectado, si lo hay. Por último, integramos varias redes neuronales para seguir personas y para la navegación autónoma.
+
+<p align="left">
+  <img src="../../../docs/images/screen_default.jpg" alt="App GUI" width="50%"/>
+</p>
+
+#### Conexión USB
+
+Igual que en el [menú de ajustes](#menú-de-configuración).
+
+#### Estado del vehículo
+
+El campo **Battery** muestra el voltaje de la batería medido por el Arduino a través del divisor de voltaje. El campo **Speed (l,r)** indica la velocidad de las ruedas (delanteras) izquierda y derecha en rpm. La mide el Arduino con los sensores ópticos de velocidad de las ruedas. El campo **Sonar** muestra el espacio libre delante del coche en centímetros. Lo mide el Arduino con el sensor ultrasónico. Ten en cuenta que solo recibirás valores unos segundos después de establecer la conexión USB.
+
+#### Control
+
+El primer botón sirve para elegir el **modo de control**. Hay dos modos de control:
+
+- **Gamepad**: la aplicación recibe los controles de un mando BT conectado.
+- **Phone**: el robot se puede controlar con otro smartphone que tenga instalada la aplicación de control, o con un script de Python en un ordenador conectado a la misma red.
+
+El segundo botón sirve para elegir el **modo de conducción**. Con un mando de juego (p. ej., PS4) hay tres modos de conducción:
+
+- **Game**: usa los gatillos derecho e izquierdo (R2, L2) para acelerar hacia delante y hacia atrás, y cualquiera de los joysticks para girar. Este modo imita el control de los videojuegos de carreras.
+- **Joystick**: usa cualquiera de los joysticks para controlar el robot.
+- **Dual**: usa los joysticks izquierdo y derecho para controlar los lados izquierdo y derecho del coche. Es dirección diferencial pura.
+
+El tercer botón sirve para elegir el **modo de velocidad**. Hay tres modos de velocidad:
+
+- **Slow**: el voltaje aplicado a los motores se limita al 50 % del voltaje de entrada (~6V).
+- **Normal**: el voltaje aplicado a los motores se limita al 75 % del voltaje de entrada (~9V).
+- **Fast**: sin límite. Con el acelerador a fondo, los motores reciben todo el voltaje de entrada (~12V). *Es el ajuste predeterminado para ejecutar las redes neuronales.*
+
+Ir más rápido reduce la vida útil de los motores, pero es más divertido. Los controles que se envían al robot se muestran a la derecha. Con el mando de juego, el modo de velocidad sube pulsando el joystick derecho (R3) y baja pulsando el joystick izquierdo (L3).
+
+#### Registro de datos
+
+Hay cuatro modos de registro:
+
+- **only_sensors**: se guardan todos los datos de los sensores, pero ninguna imagen.
+- **crop_img**: se guardan todos los datos de los sensores e imágenes recortadas al tamaño de entrada de la red. Es el ajuste predeterminado y el que se debe usar para recopilar datos.
+- **preview_img**: se guardan todos los datos de los sensores e imágenes a tamaño completo. Necesita mucha memoria y puede ser lento, pero viene bien para montar vídeos FPV.
+- **all_imgs**: se guardan todos los datos de los sensores y las imágenes recortadas y a tamaño completo. Necesita mucha memoria y puede ser lento.
+
+El interruptor de la derecha activa y desactiva el registro. En el mando de juego se puede cambiar con el botón X.
+
+#### Cámara
+
+El primer elemento muestra la resolución de la vista previa. El segundo muestra la resolución del recorte, que es la imagen que se usa como entrada de las redes neuronales. Verás que esta resolución cambia según el modelo que elijas abajo. Si entrenas tu propio piloto automático, elige el modelo `AUTOPILOT_F`. La resolución del recorte debería ser `256x96`. El interruptor de la derecha cambia entre la cámara trasera y la delantera.
+
+#### Modelo
+
+La aplicación incluye dos modelos:
+
+- **MobileNetV1-300**: este modelo se usa para seguir personas. Usa un detector de objetos SSD con base MobileNet V1. El modelo está cuantizado para rendir mejor en dispositivos integrados. Viene con la aplicación.
+- **CIL-Mobile**: este modelo se usa para la navegación autónoma. Predice los controles directamente a partir de la imagen de la cámara. Lo más probable es que no funcione en tu entorno. Sigue nuestras instrucciones para entrenar tu propia [política de conducción](../../../policy/README.es-ES.md) y reemplazarlo.
+
+Se pueden descargar más modelos desde la pantalla de gestión de modelos.
+
+El interruptor de la derecha enciende y apaga la red. Mientras la red funciona, genera los controles del robot y el mando de juego queda desactivado. Aun así puedes usar los botones del mando, por ejemplo para cambiar este interruptor con el gatillo R1 y recuperar el control del robot.
+
+#### Dispositivo
+
+Usa el menú desplegable para elegir el dispositivo en el que se ejecuta la red neuronal. Tienes estas opciones:
+
+- **CPU**: la CPU funciona en la mayoría de los teléfonos y es la opción predeterminada. Puedes ajustar el número de hilos para optimizar el rendimiento.
+- **GPU**: la mayoría de los smartphones tienen GPU. Las redes con entradas grandes, como imágenes, suelen ir más rápido en la GPU.
+- **NNAPI**: usa el [delegado NNAPI de TensorFlow Lite](https://www.tensorflow.org/lite/performance/nnapi). Los smartphones modernos suelen tener aceleradores de IA dedicados. La [Neural Network API](https://developer.android.com/ndk/guides/neuralnetworks) (NNAPI) acelera los modelos de TensorFlow Lite en dispositivos Android con unidad de procesamiento gráfico (GPU), procesador de señal digital (DSP) y unidad de procesamiento neuronal (NPU). ¡Ten en cuenta que en algunos teléfonos antiguos puede ser muy lento!
+
+Si hay un modelo activo, la velocidad de inferencia en [ms] se muestra junto al dispositivo que lo ejecuta.
+
+### Pantalla de proyectos
+
+La pantalla de proyectos muestra tus proyectos de OpenBot Playground si has iniciado sesión con tu cuenta de Google. Puedes ejecutarlos para controlar tu OpenBot o escanear sus códigos QR con el icono del escáner arriba a la derecha. Si no has iniciado sesión, la pantalla muestra un botón para iniciar sesión con Google, pero aun así puedes escanear el código QR de tu proyecto. Si aparece `Oops, no project found` después de iniciar sesión, comprueba que la cuenta tiene proyectos guardados en Google Drive.
+
+Si tus últimos proyectos no aparecen en la lista, desliza la pantalla hacia abajo para recargarlos.
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen.gif" alt="Project Screen" width="24.7%"/>
+<img src="../../../docs/images/no_projects_found.jpg" alt="No project screen" width="25%"/>
+<img src="../../../docs/images/reload_projects.gif" altq="Reload project screen" width="24.5%"/>
+</p>
+
+- **Proyectos de Google Drive**: para ejecutar un proyecto de Google Drive, tócalo y espera a que se lea el archivo del proyecto. Si todo va bien, aparece una ventana con el nombre del proyecto y dos botones: `Start` y `Cancel`. Start ejecuta el proyecto y Cancel lo cancela. Si aparece el mensaje `Something went wrong`, probablemente hay un problema con el archivo de Google Drive: recarga la pantalla deslizándola hacia abajo y vuelve a intentarlo.
+
+
+- **Escáner de códigos QR**: para escanear el código QR de un proyecto de Playground, toca el icono del código QR arriba a la derecha. Permite que la aplicación use la cámara. Después de escanear el código, se lee el archivo. Si todo va bien, aparece una ventana con el nombre del proyecto y dos botones: `Start` y `Cancel`. Start ejecuta el proyecto y Cancel lo cancela. Si aparece el mensaje `Something went wrong`, probablemente hay un problema con el archivo de Google Drive: genera un nuevo código QR en Playground y vuelve a intentarlo.
+
+
+- **Ejecución del proyecto**: si el proyecto se ejecuta correctamente, la pantalla muestra los nombres de los bloques de código y un botón para detener la ejecución.
+
+
+- **Borrar un proyecto**: mantén pulsado el proyecto que quieres borrar y confirma con «Yes».
+
+<p align="left">
+<img src="../../../docs/images/android_google_drive_projects_execute.gif" alt="Google Drive project execute" width="25%"/>
+<img src="../../../docs/images/android_qr_code_scanning.gif" alt="Qr code scanner project execute" width="25%"/>
+<img src="../../../docs/images/android_delete_project.jpg" alt="Delete Project" width="24.7%"/>
+</p>
+
+### Pantalla de perfil
+La pantalla de perfil ofrece distintas opciones según hayas iniciado sesión o no.
+Si no has iniciado sesión, aparece un botón `Google Sign-in` para iniciar sesión con tu cuenta de Google. Una vez dentro, tendrás acceso a tu perfil y a las demás funciones.
+Si has iniciado sesión, la pestaña `Profile` muestra dos botones: `Edit Profile` y `Logout`.
+
+<p align="left">
+<img src="../../../docs/images/android_logged_out_profile_screen.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/android_logged_in_profile_screen.jpg" alt="Logged in profile screen" width="24.9%"/>
+</p>
+
+- **Edit Profile**: abre una pantalla donde puedes cambiar los datos de tu perfil, como tu nombre y tu foto.
+
+
+- **Logout**: cierra la sesión de tu cuenta y vuelve a la pantalla de inicio de sesión.
+
+  <p align="left">
+  <img src="../../../docs/images/android_edit_profile.jpg" alt="Edit profile screen" width="25%"/>
+  <img src="../../../docs/images/android_logout_dialog_box.jpg" alt="Logout dialog box" width="24.4%"/>
+  </p>
+
+### Pantalla de OpenBot PlayGround
+
+Para acceder a los servicios de OpenBot Playground, toca el icono de OpenBot Playground arriba, en la barra de herramientas. Para saber más sobre OpenBot Playground, [haz clic aquí](../../../open-code/README.es-ES.md).
+
+<p align="left">
+<img src="../../../docs/images/android_playground_sign-in.gif" alt="openBot playground Sign-in" width="25%"/>
+<img src="../../../docs/images/android_playground_services.gif" alt="openBot playground Services" width="25%"/>
+</p>
+
+## Añade tu propio fragmento
+
+Consulta la [guía de contribución](ContributionGuide.md) para aprender a añadir tus propios fragmentos a la aplicación OpenBot.
+
+## Estructura del código
+
+La [demo de detección de objetos de TensorFlow Lite para Android](https://github.com/tensorflow/examples/tree/master/lite/examples/object_detection/android) sirvió como punto de partida para integrar los modelos TFLite y obtener la imagen de la cámara. La [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivity.java) ejecuta el hilo principal y hereda de la [CameraActivity](src/main/java/org/openbot/app/robot/original/CameraActivity.java), que gestiona la cámara y la interfaz. El [SensorService](src/main/java/org/openbot/app/robot/logging/SensorService.java) lee todos los demás sensores del teléfono y los registra. [ServerCommunication](src/main/java/org/openbot/app/robot/server/ServerCommunication.java) y [NsdService](src/main/java/org/openbot/app/robot/server/NsdService.java) establecen la conexión con un [servidor Python](../../../policy/README.es-ES.md#aplicación-web) local con interfaz React. Si recopilas datos, se pueden subir automáticamente para visualizarlos, entrenar modelos de ML y descargar los modelos entrenados al robot. La carpeta [env](src/main/java/org/openbot/app/robot/env) contiene clases de utilidad, como la interfaz [Vehicle](src/main/java/org/openbot/app/robot/vehicle/Vehicle.java), la interfaz [GameController](src/main/java/org/openbot/app/robot/env/GameController.java), la interfaz [PhoneController](src/main/java/org/openbot/app/robot/env/PhoneController.java) y un [AudioPlayer](src/main/java/org/openbot/app/robot/env/AudioPlayer.java) para las indicaciones sonoras. La carpeta [tflite](src/main/java/org/openbot/app/robot/tflite) contiene las definiciones de los modelos de las redes [Autopilot](src/main/java/org/openbot/app/robot/tflite/Autopilot.java) y [Detector](src/main/java/org/openbot/app/robot/tflite/Detector.java).
+
+## Siguiente (opcional)
+
+Entrena tu propia [política de conducción](../../../policy/README.es-ES.md)

@@ -340,6 +340,9 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
      function to handle sign in and calling authentication class constructor
      */
     @objc func signIn() {
+        guard FirebaseSetup.checkSignIn(from: self) else {
+            return
+        }
         _ = Authentication.init()
     }
 

@@ -88,7 +88,7 @@ Le mode libre offre un contrôle simple du robot avec des mises à jour en temps
   Le volant tourne proportionnellement à l'angle de direction.
 - **Vitesse** : Le compteur de vitesse affiche la vitesse du robot.
 - **Sonar** : La distance libre devant le robot en cm.
-- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#control).
+- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#contrôle).
 
 ### Collecte de Données
 
@@ -136,13 +136,13 @@ Interface utilisateur simple pour exécuter des modèles de pilote automatique.
 
 - **Serveur** : Si vous avez l'[application web](../../../policy/README.md#web-app) pour l'entraînement des politiques en cours d'exécution, vous pouvez la sélectionner ici et envoyer des modèles de pilote automatique entraînés au robot.
 - **Modèle** : Choisissez un modèle entraîné à utiliser pour le mode pilote automatique.
-- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#device)).
+- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#appareil)).
 - **Threads** : Nombre de threads à utiliser (fait une différence uniquement lorsque le CPU est sélectionné comme appareil).
-- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#control).
+- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#contrôle).
 
 ### Suivi d'Objets
 
-Interface utilisateur simple pour suivre des objets de 80 classes différentes. Une brève description des différents modèles d'IA pour le suivi d'objets et des benchmarks de performance peut être trouvée dans [Gestion des Modèles](#model-management).
+Interface utilisateur simple pour suivre des objets de 80 classes différentes. Une brève description des différents modèles d'IA pour le suivi d'objets et des benchmarks de performance peut être trouvée dans [Gestion des Modèles](#gestion-des-modèles).
 
 <p align="left">
 <img src="../../../docs/images/screen_object_tracking_1.jpg" alt="Texte alternatif" width="49%" />
@@ -154,9 +154,9 @@ Interface utilisateur simple pour suivre des objets de 80 classes différentes. 
 - **Modèle** : Choisissez un détecteur d'objets en fonction des performances de votre téléphone (voir ci-dessous pour les [résultats des benchmarks](#benchmark)).
 - **Objet** : Choisissez l'objet que vous souhaitez suivre. Les modèles peuvent détecter les 80 [classes d'objets COCO](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/).
 - **Confiance** : Seuil de confiance pour déterminer si les détections sont acceptées. Augmentez si vous obtenez de fausses détections, diminuez si l'objet d'intérêt n'est pas détecté.
-- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#device)).
+- **Appareil** : Utilisez le CPU, le GPU ou le NNAPI pour l'inférence (plus de détails [ici](#appareil)).
 - **Threads** : Nombre de threads à utiliser (fait une différence uniquement lorsque le CPU est sélectionné comme appareil).
-- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#control).
+- **Contrôle** : Le contrôleur, le mode de conduite et la vitesse sont utilisés pour contrôler les paramètres du robot comme décrit dans la [section de contrôle](#contrôle).
 
 ### Navigation vers un Point
 
@@ -259,7 +259,12 @@ Version réduite de [YoloV4](https://arxiv.org/abs/2004.10934) avec une résolut
 |téléphone/appareil (fps)| CPU | GPU | NNAPI |
 |------------------------|-----|-----|-------|
 | Samsung S22 Ultra      |  21 |  10 |   21  |
-| Xiaomi Mi9             |  13 |  15 |
+| Xiaomi Mi9             |  13 |  15 |  0.8  |
+| Google Pixel 4XL       |  12 |  17 |   18  |
+
+#### YoloV5s-640 - mAP : 34%
+
+[YoloV5](https://github.com/ultralytics/yolov5) avec une résolution d'entrée de 640x640.
 
 |téléphone/appareil (fps)| CPU | GPU | NNAPI |
 |-----------------------|-----|-----|-------|
@@ -327,7 +332,7 @@ La [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivit
 
 #### Connexion USB
 
-Identique à celle du [menu des paramètres](#settings-menu).
+Identique à celle du [menu des paramètres](#menu-paramètres).
 
 #### État du véhicule
 
@@ -389,6 +394,63 @@ Utilisez le menu déroulant pour sélectionner l'appareil sur lequel le réseau 
 - **NNAPI** : Cela utilisera le [délégué NNAPI de TensorFlow Lite](https://www.tensorflow.org/lite/performance/nnapi). Les smartphones modernes sont souvent équipés d'accélérateurs AI dédiés. L'[API de réseau neuronal](https://developer.android.com/ndk/guides/neuralnetworks) (NNAPI) fournit une accélération pour les modèles TensorFlow Lite sur les appareils Android avec unité de traitement graphique (GPU), processeur de signal numérique (DSP) et unité de traitement neuronal (NPU). Notez que sur certains téléphones plus anciens, cela peut être très lent !
 
 Si un modèle est actif, la vitesse d'inférence en [ms] sera affichée à côté de l'appareil exécutant le modèle.
+
+### Écran Projets
+
+L'écran Projets affiche la liste de vos projets OpenBot Playground si vous êtes connecté avec votre compte Google. Vous pouvez exécuter ces projets pour piloter votre OpenBot, ou scanner leur code QR avec l'icône du scanner en haut à droite. Si vous n'êtes pas connecté, l'écran affiche un bouton de connexion Google, mais vous pouvez quand même scanner le code QR de votre projet. Si le message `Oops, no project found` s'affiche après la connexion, vérifiez que le compte a des projets enregistrés sur Google Drive.
+
+Si vos derniers projets n'apparaissent pas dans la liste, tirez l'écran vers le bas pour les recharger.
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen.gif" alt="Project Screen" width="24.7%"/>
+<img src="../../../docs/images/no_projects_found.jpg" alt="No project screen" width="25%"/>
+<img src="../../../docs/images/reload_projects.gif" altq="Reload project screen" width="24.5%"/>
+</p>
+
+- **Projets Google Drive** : pour exécuter un projet Google Drive, touchez-le et attendez que le fichier du projet soit lu. Si tout se passe bien, une fenêtre apparaît avec le nom du projet et deux boutons : `Start` et `Cancel`. Start exécute le projet, Cancel l'annule. Si le message `Something went wrong` s'affiche, le fichier Google Drive pose probablement problème : rechargez l'écran en le tirant vers le bas et recommencez.
+
+
+- **Scanner de code QR** : pour scanner le code QR d'un projet Playground, touchez l'icône du code QR en haut à droite. Autorisez l'application à utiliser la caméra. Une fois le code scanné, le fichier est lu. Si tout se passe bien, une fenêtre apparaît avec le nom du projet et deux boutons : `Start` et `Cancel`. Start exécute le projet, Cancel l'annule. Si le message `Something went wrong` s'affiche, le fichier Google Drive pose probablement problème : générez un nouveau code QR dans le Playground et recommencez.
+
+
+- **Exécution du projet** : si votre projet s'exécute correctement, l'écran affiche le nom des blocs de code et un bouton d'arrêt pour stopper l'exécution.
+
+
+- **Supprimer un projet** : appuyez longuement sur le projet à supprimer, puis confirmez avec « Yes ».
+
+<p align="left">
+<img src="../../../docs/images/android_google_drive_projects_execute.gif" alt="Google Drive project execute" width="25%"/>
+<img src="../../../docs/images/android_qr_code_scanning.gif" alt="Qr code scanner project execute" width="25%"/>
+<img src="../../../docs/images/android_delete_project.jpg" alt="Delete Project" width="24.7%"/>
+</p>
+
+### Écran Profil
+L'écran Profil propose différentes options selon que vous êtes connecté ou non.
+Si vous n'êtes pas connecté, un bouton `Google Sign-in` vous invite à vous connecter avec votre compte Google. Une fois connecté, vous avez accès à votre profil et aux autres fonctionnalités.
+Si vous êtes connecté, l'onglet `Profile` affiche deux boutons : `Edit Profile` et `Logout`.
+
+<p align="left">
+<img src="../../../docs/images/android_logged_out_profile_screen.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/android_logged_in_profile_screen.jpg" alt="Logged in profile screen" width="24.9%"/>
+</p>
+
+- **Edit Profile** : ouvre un écran où vous pouvez modifier les informations de votre profil, comme votre nom et votre photo.
+
+
+- **Logout** : vous déconnecte de votre compte et vous ramène à l'écran de connexion.
+
+  <p align="left">
+  <img src="../../../docs/images/android_edit_profile.jpg" alt="Edit profile screen" width="25%"/>
+  <img src="../../../docs/images/android_logout_dialog_box.jpg" alt="Logout dialog box" width="24.4%"/>
+  </p>
+
+### Écran OpenBot PlayGround
+
+Pour accéder aux services de l'OpenBot Playground, touchez l'icône OpenBot Playground en haut de l'écran, dans la barre d'outils. Pour en savoir plus sur l'OpenBot Playground, [cliquez ici](../../../open-code/README.fr-FR.md).
+
+<p align="left">
+<img src="../../../docs/images/android_playground_sign-in.gif" alt="openBot playground Sign-in" width="25%"/>
+<img src="../../../docs/images/android_playground_services.gif" alt="openBot playground Services" width="25%"/>
+</p>
 
 ## Ajouter votre propre fragment
 

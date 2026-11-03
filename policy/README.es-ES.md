@@ -98,7 +98,7 @@ pip install -r requirements.txt
 
 También puedes instalar pydot (`pip install pydot`) y graphviz ([ver instrucciones](https://graphviz.gitlab.io/download/)) si deseas visualizar la arquitectura de la red.
 
-Si deseas usar la [WebApp](#web-app) para la recolección de datos y el entrenamiento, necesitas instalar las siguientes dependencias adicionales. (En Mac, el paquete `brotlipy` está actualmente roto en pip, por lo que necesitas instalarlo primero usando conda: `conda install brotlipy=0.7`)
+Si deseas usar la [WebApp](#aplicación-web) para la recolección de datos y el entrenamiento, necesitas instalar las siguientes dependencias adicionales. (En Mac, el paquete `brotlipy` está actualmente roto en pip, por lo que necesitas instalarlo primero usando conda: `conda install brotlipy=0.7`)
 
 ```bash
 pip install -r requirements_web.txt
@@ -144,7 +144,7 @@ El cuaderno de Jupyter espera una carpeta llamada `dataset` en la misma carpeta.
 
 <img src="../docs/images/folder_structure.png" width="200" alt="estructura de carpetas" />
 
-En lugar de copiar todos los archivos manualmente desde el teléfono, también puedes subir los registros automáticamente a un [servidor Python](#web-app) en tu computadora. En este caso, los archivos zip se subirán y desempaquetarán en la carpeta `dataset/uploaded`. Aún necesitarás moverlos a la estructura de carpetas para el entrenamiento. Puedes simplemente tratar la carpeta `uploaded` como una sesión de grabación y moverla a `train_data`. Las grabaciones serán entonces reconocidas como datos de entrenamiento por el cuaderno de Jupyter. Si aún no tienes una sesión de grabación en la carpeta `test_data`, también necesitas mover al menos una grabación de `train_data/uploaded` a `test_data/uploaded`.
+En lugar de copiar todos los archivos manualmente desde el teléfono, también puedes subir los registros automáticamente a un [servidor Python](#aplicación-web) en tu computadora. En este caso, los archivos zip se subirán y desempaquetarán en la carpeta `dataset/uploaded`. Aún necesitarás moverlos a la estructura de carpetas para el entrenamiento. Puedes simplemente tratar la carpeta `uploaded` como una sesión de grabación y moverla a `train_data`. Las grabaciones serán entonces reconocidas como datos de entrenamiento por el cuaderno de Jupyter. Si aún no tienes una sesión de grabación en la carpeta `test_data`, también necesitas mover al menos una grabación de `train_data/uploaded` a `test_data/uploaded`.
 
 ### Conversión de Datos (opcional)
 
@@ -225,7 +225,7 @@ Al final del proceso de entrenamiento, se generan dos archivos tflite: uno corre
   <img src="../docs/images/android_studio_tflite_dir.jpg" width="200" alt="App GUI" />
 </p>
 
-Si estás buscando la carpeta en tu directorio local, la encontrarás en: `app/src/main/assets/networks`.
+Si estás buscando la carpeta en tu directorio local, la encontrarás en: `robot/android/app/src/main/assets/networks`.
 
 ## Aplicación Web
 

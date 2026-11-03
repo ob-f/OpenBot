@@ -14,7 +14,7 @@
 点击下面的链接阅读应用程序的功能。
 
 - [机器人应用](OpenBot/README.md)
-- 控制器应用（即将推出）
+- [控制器应用](../../controller/flutter/README.zh-CN.md)
 
 ## 安装应用程序
 目前，在您的手机上运行 iOS 应用程序的唯一方法是通过开发者构建，如下节所述。
@@ -25,6 +25,7 @@
 
 - [Xcode iOS 13 或更高版本](https://developer.apple.com/xcode/) 用于构建和安装应用程序。
 - 系统上安装了 [Cocoapods](https://cocoapods.org/)。
+- 设置 [Firebase 项目](./OpenBot/OpenBot/Authentication/README.zh-CN.md)。
 - 目前，我们使用的 iOS 部署目标版本是 15.5。
 - 项目配置为“自动管理签名”，因此您可以配置自己的独立帐户来构建应用程序 -
   <img alt="iOS App" width="100%" src="../../docs/images/ios_automatically_manage_signing.png" />

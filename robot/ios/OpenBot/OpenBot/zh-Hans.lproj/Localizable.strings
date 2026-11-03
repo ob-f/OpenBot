@@ -200,3 +200,6 @@
 
 /* Data Collection / Autopilot server dropdown default state */
 "noServer" = "无服务器";
+
+/* Sign-in without the project's Firebase configuration */
+"firebaseNotConfigured" = "此版本未设置 Google 登录。需要项目自己的 Firebase 配置（GoogleService-Info.plist）。";

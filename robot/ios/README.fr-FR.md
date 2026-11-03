@@ -14,7 +14,7 @@
 Cliquez sur les liens ci-dessous pour lire les fonctionnalités des applications.
 
 - [Application Robot](OpenBot/README.md)
-- Application Contrôleur (Bientôt Disponible)
+- [Application de contrôle](../../controller/flutter/README.fr-FR.md)
 
 ## Installer les applications
 Actuellement, la seule façon de faire fonctionner les applications iOS sur vos téléphones est via les versions développeur, comme décrit dans la section ci-dessous.
@@ -25,6 +25,7 @@ Actuellement, la seule façon de faire fonctionner les applications iOS sur vos 
 
 - [Xcode iOS 13 ou ultérieur](https://developer.apple.com/xcode/) pour construire et installer les applications.
 - [Cocoapods](https://cocoapods.org/) installé sur votre système.
+- Configurez le [projet Firebase](./OpenBot/OpenBot/Authentication/README.fr-FR.md).
 - Actuellement, nous utilisons la version 15.5 de la cible de déploiement iOS.
 - Le projet est configuré en "Gestion automatique de la signature", vous pouvez donc configurer votre propre compte indépendant pour construire l'application -
   <img alt="Application iOS" width="100%" src="../../docs/images/ios_automatically_manage_signing.png" />

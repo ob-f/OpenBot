@@ -57,7 +57,7 @@ Pour toutes les pièces ci-dessus, votre plateau d'impression doit mesurer au mo
 Comme beaucoup d'imprimantes 3D courantes ont un volume de construction plus petit (généralement 220mmx220mm), il existe deux autres options qui peuvent fonctionner.
 La première option consiste à imprimer le ```main_frame``` à 45 degrés avec du matériel de support supplémentaire.
 La deuxième option nécessite de modifier la pièce originale ```main_frame```. Nous recommandons d'utiliser [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) pour de telles modifications CAO (Fusion 360 dispose d'une licence académique gratuite d'un an). 
-Pour cette option, nous mettons à disposition son fichier [STEP](/body/cad/rc_truck_body/main_frame.step), que vous pouvez découper en deux/trois pièces plus petites. 
+Pour cette option, nous mettons à disposition son fichier [STEP](cad/rc_truck_body/main_frame.step), que vous pouvez découper en deux/trois pièces plus petites. 
 Les sous-pièces résultantes s'adapteront alors à un plateau de construction standard (c'est-à-dire 220mmx220mm) et pourront être assemblées après impression. 
 À l'avenir, nous pourrions également publier une version modulaire du ```main_frame``` ici. Toutes les autres pièces nécessitent un plateau de construction minimum de 220mmx60mm.
 
@@ -84,7 +84,7 @@ Avant de procéder à l'assemblage, vous devrez peut-être nettoyer l'impression
 
 ## Assemblage
 
-Bien qu'il soit possible de construire votre OpenBot RC-Truck avec une approche DIY similaire à l'OpenBot classique (voir les composants et instructions de construction DIY pour OpenBot [ici](/body/README.md)), nous recommandons d'utiliser le [PCB personnalisé](/body/pcb) d'OpenBot pour construire et assembler l'OpenBot RC-Truck. Cette option est recommandée si vous souhaitez une construction plus propre ou si vous souhaitez construire plusieurs OpenBot RC-Trucks. Un avantage supplémentaire de l'utilisation de notre [PCB personnalisé](/body/pcb) est que vous pouvez utiliser les mêmes composants pour construire et passer d'un corps OpenBot à un autre.
+Bien qu'il soit possible de construire votre OpenBot RC-Truck avec une approche DIY similaire à l'OpenBot classique (voir les composants et instructions de construction DIY pour OpenBot [ici](/body/README.md)), nous recommandons d'utiliser le [PCB personnalisé](../diy/pcb/README.fr-FR.md) d'OpenBot pour construire et assembler l'OpenBot RC-Truck. Cette option est recommandée si vous souhaitez une construction plus propre ou si vous souhaitez construire plusieurs OpenBot RC-Trucks. Un avantage supplémentaire de l'utilisation de notre [PCB personnalisé](../diy/pcb/README.fr-FR.md) est que vous pouvez utiliser les mêmes composants pour construire et passer d'un corps OpenBot à un autre.
 
 ### Liste des matériaux
 
@@ -94,7 +94,7 @@ L'OpenBot RC-Truck repose principalement sur des composants électroniques de lo
 
 - 1x camion/buggy RC ([EU](https://www.amazon.de/dp/B00M3J7DJW), [EU](https://www.amazon.de/dp/B088FGVYNW), [US](https://www.amazon.com/gp/product/B09C8XMPQ9))
 - 1x Arduino Nano ([EU](https://www.amazon.de/dp/B01MS7DUEM), [US](https://www.amazon.com/dp/B00NLAMS9C), [AE](https://www.aliexpress.com/item/32866959979.html))
-- 1x [PCB personnalisé](/body/pcb) OpenBot
+- 1x [PCB personnalisé](../diy/pcb/README.fr-FR.md) OpenBot
 - 1x câble USB OTG ([EU](https://www.amazon.de/gp/product/B075M4CQHZ), [US](https://www.amazon.com/dp/B07LBHKTMM), [AE](https://www.aliexpress.com/item/10000330515850.html))
 - 1x ressort ou élastique ([EU](https://www.amazon.de/gp/product/B01N30EAZO/), [US](https://www.amazon.com/dp/B008RFVWU2), [AE](https://www.aliexpress.com/item/33043769059.html))
 - 6x vis M3x25 ([EU](https://www.amazon.de/dp/B07KFL3SSV), [US](https://www.amazon.com/dp/B07WJL3P3X), [AE](https://www.aliexpress.com/item/4000173341865.html))
@@ -120,7 +120,7 @@ L'OpenBot RC-Truck repose principalement sur des composants électroniques de lo
       <img src="/docs/images/rc_truck_disassembly_2.JPG" width="32%" /> 
       <img src="/docs/images/rc_truck_disassembly_3.JPG" width="32%" />
     </p>
-2. Notez que les deux dimensions d1 et d2 (comme indiqué ci-dessous) sur le ```main_frame``` dépendent du modèle de camion jouet RC utilisé. Nous avons conçu notre pièce ```main_frame``` pour [ce modèle](https://www.amazon.de/dp/B00M3J7DJW) de camion jouet RC. En fonction du camion à l'échelle 1:16 que vous utilisez, vous devrez peut-être ajuster légèrement ces dimensions en utilisant le fichier ```main_frame``` [STEP](/body/cad/rc_truck_body/main_frame.step). Nous recommandons d'utiliser [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) pour de telles modifications CAO (Fusion 360 dispose d'une licence académique gratuite d'un an). Notez également que le petit coin/triangle sur le ```main_frame``` représente la direction avant.
+2. Notez que les deux dimensions d1 et d2 (comme indiqué ci-dessous) sur le ```main_frame``` dépendent du modèle de camion jouet RC utilisé. Nous avons conçu notre pièce ```main_frame``` pour [ce modèle](https://www.amazon.de/dp/B00M3J7DJW) de camion jouet RC. En fonction du camion à l'échelle 1:16 que vous utilisez, vous devrez peut-être ajuster légèrement ces dimensions en utilisant le fichier ```main_frame``` [STEP](cad/rc_truck_body/main_frame.step). Nous recommandons d'utiliser [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) pour de telles modifications CAO (Fusion 360 dispose d'une licence académique gratuite d'un an). Notez également que le petit coin/triangle sur le ```main_frame``` représente la direction avant.
     <p float="left">
       <img src="/docs/images/main-frame-dimensions.png" width="32%" />
       <img src="/docs/images/main-frame-direction.png" width="32%" />

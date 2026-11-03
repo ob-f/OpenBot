@@ -332,7 +332,7 @@ Die [DefaultActivity](src/main/java/org/openbot/app/robot/original/DefaultActivi
 
 #### USB-Verbindung
 
-Wie im [Einstellungsmenü](#settings-menu) beschrieben.
+Wie im [Einstellungsmenü](#einstellungsmenü) beschrieben.
 
 #### Fahrzeugstatus
 
@@ -394,6 +394,63 @@ Verwenden Sie das Dropdown-Menü, um das Gerät auszuwählen, auf dem das neuron
 - **NNAPI**: Dies wird den [TensorFlow Lite NNAPI-Delegaten](https://www.tensorflow.org/lite/performance/nnapi) verwenden. Moderne Smartphones sind oft mit dedizierten KI-Beschleunigern ausgestattet. Die [Neural Network API](https://developer.android.com/ndk/guides/neuralnetworks) (NNAPI) bietet Beschleunigung für TensorFlow Lite-Modelle auf Android-Geräten mit Graphics Processing Unit (GPU), Digital Signal Processor (DSP) und Neural Processing Unit (NPU). Beachten Sie, dass dies auf einigen älteren Telefonen sehr langsam sein kann!
 
 Wenn ein Modell aktiv ist, wird die Inferenzgeschwindigkeit in [ms] neben dem Gerät angezeigt, auf dem das Modell ausgeführt wird.
+
+### Projekte
+
+Der Bildschirm Projekte zeigt Ihre Projekte aus dem OpenBot Playground, wenn Sie mit Ihrem Google-Konto angemeldet sind. Sie können diese Projekte ausführen, um Ihren OpenBot zu steuern, oder ihre QR-Codes über das Scanner-Symbol oben rechts scannen. Wenn Sie nicht angemeldet sind, zeigt der Bildschirm eine Schaltfläche für die Google-Anmeldung, Sie können den QR-Code Ihres Projekts aber trotzdem scannen. Erscheint nach der Anmeldung `Oops, no project found`, prüfen Sie, ob das Konto Projekte in Google Drive gespeichert hat.
+
+Wenn Ihre neuesten Projekte nicht in der Liste stehen, ziehen Sie den Bildschirm nach unten, um sie neu zu laden.
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen.gif" alt="Project Screen" width="24.7%"/>
+<img src="../../../docs/images/no_projects_found.jpg" alt="No project screen" width="25%"/>
+<img src="../../../docs/images/reload_projects.gif" altq="Reload project screen" width="24.5%"/>
+</p>
+
+- **Google-Drive-Projekte**: Um ein Projekt aus Google Drive auszuführen, tippen Sie darauf und warten Sie, bis die Projektdatei gelesen ist. Klappt das ohne Fehler, erscheint ein Pop-up mit dem Namen des Projekts und den Schaltflächen `Start` und `Cancel`. Mit Start führen Sie das Projekt aus, mit Cancel brechen Sie ab. Erscheint die Meldung `Something went wrong`, gibt es vermutlich ein Problem mit der Datei in Google Drive. Laden Sie den Bildschirm dann durch Herunterziehen neu und versuchen Sie es noch einmal.
+
+
+- **QR-Code-Scanner**: Um den QR-Code eines Playground-Projekts zu scannen, tippen Sie auf das QR-Code-Symbol oben rechts. Erlauben Sie der App den Zugriff auf die Kamera. Nach dem Scannen wird die Datei gelesen. Klappt das ohne Fehler, erscheint ein Pop-up mit dem Namen des Projekts und den Schaltflächen `Start` und `Cancel`. Mit Start führen Sie das Projekt aus, mit Cancel brechen Sie ab. Erscheint die Meldung `Something went wrong`, gibt es vermutlich ein Problem mit der Datei in Google Drive. Erzeugen Sie dann im Playground einen neuen QR-Code und versuchen Sie es noch einmal.
+
+
+- **Projekt ausführen**: Läuft Ihr Projekt erfolgreich, zeigt der Bildschirm die Namen der Code-Blöcke und eine Stopp-Schaltfläche, mit der Sie die Ausführung beenden können.
+
+
+- **Projekt löschen**: Um ein Projekt zu löschen, halten Sie es lange gedrückt. Bestätigen Sie die Abfrage mit „Yes“.
+
+<p align="left">
+<img src="../../../docs/images/android_google_drive_projects_execute.gif" alt="Google Drive project execute" width="25%"/>
+<img src="../../../docs/images/android_qr_code_scanning.gif" alt="Qr code scanner project execute" width="25%"/>
+<img src="../../../docs/images/android_delete_project.jpg" alt="Delete Project" width="24.7%"/>
+</p>
+
+### Profil
+Der Bildschirm Profil bietet verschiedene Optionen, je nachdem, ob Sie angemeldet sind.
+Wenn Sie nicht angemeldet sind, erscheint eine Schaltfläche `Google Sign-in`, mit der Sie sich mit Ihrem Google-Konto anmelden. Danach haben Sie Zugriff auf Ihr Profil und die anderen Funktionen.
+Wenn Sie angemeldet sind, zeigt der Tab `Profile` zwei Schaltflächen: `Edit Profile` und `Logout`.
+
+<p align="left">
+<img src="../../../docs/images/android_logged_out_profile_screen.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/android_logged_in_profile_screen.jpg" alt="Logged in profile screen" width="24.9%"/>
+</p>
+
+- **Edit Profile**: öffnet einen Bildschirm, auf dem Sie Ihre Profildaten ändern, etwa Ihren Namen und Ihr Profilbild.
+
+
+- **Logout**: meldet Sie von Ihrem Konto ab und bringt Sie zurück zum Anmeldebildschirm.
+
+  <p align="left">
+  <img src="../../../docs/images/android_edit_profile.jpg" alt="Edit profile screen" width="25%"/>
+  <img src="../../../docs/images/android_logout_dialog_box.jpg" alt="Logout dialog box" width="24.4%"/>
+  </p>
+
+### OpenBot PlayGround
+
+Die Dienste des OpenBot Playground erreichen Sie über das OpenBot-Playground-Symbol oben in der Werkzeugleiste. Mehr über den OpenBot Playground erfahren Sie [hier](../../../open-code/README.de-DE.md).
+
+<p align="left">
+<img src="../../../docs/images/android_playground_sign-in.gif" alt="openBot playground Sign-in" width="25%"/>
+<img src="../../../docs/images/android_playground_services.gif" alt="openBot playground Services" width="25%"/>
+</p>
 
 ## Fügen Sie Ihr eigenes Fragment hinzu
 

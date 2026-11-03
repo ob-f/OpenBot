@@ -88,7 +88,7 @@
   方向盘会根据转向角度比例旋转。
 - **速度**: 速度表显示机器人的速度。
 - **声纳**: 机器人前方的自由距离，以厘米为单位。
-- **控制**: 控制器、驾驶模式和速度用于控制机器人设置，如[控制部分](#control)所述。
+- **控制**: 控制器、驾驶模式和速度用于控制机器人设置，如[控制部分](#控制)所述。
 
 ### 数据收集
 
@@ -136,13 +136,13 @@
 
 - **服务器**: 如果您正在运行用于策略训练的[web应用程序](../../../policy/README.md#web-app)，可以在此选择它并将训练好的自动驾驶模型发送到机器人。
 - **模型**: 选择一个训练好的模型用于自动驾驶模式。
-- **设备**: 使用CPU、GPU或NNAPI进行推理（更多详情见[这里](#device)）。
+- **设备**: 使用CPU、GPU或NNAPI进行推理（更多详情见[这里](#设备)）。
 - **线程**: 使用的线程数（仅在选择CPU作为设备时有所不同）。
-- **控制**: 控制器、驾驶模式和速度用于控制机器人设置，如[控制部分](#control)所述。
+- **控制**: 控制器、驾驶模式和速度用于控制机器人设置，如[控制部分](#控制)所述。
 
 ### 物体跟踪
 
-用于跟踪80种不同类别物体的简单UI。关于物体跟踪的不同AI模型和性能基准的简短描述可以在[模型管理](#model-management)中找到。
+用于跟踪80种不同类别物体的简单UI。关于物体跟踪的不同AI模型和性能基准的简短描述可以在[模型管理](#模型管理)中找到。
 
 <p align="left">
 <img src="../../../docs/images/screen_object_tracking_1.jpg" alt="物体跟踪" width="49%" />
@@ -150,12 +150,12 @@
 </p>
 
 - **动态速度**: 在“自动模式”下，如果机器人接近被跟踪物体，会减少速度。速度根据边界框的面积进行缩放（在横向模式下效果最佳）。
-- **模型**: 根据您的手机性能选择一个物体检测器（见下文[基准测试结果](#benchmark)）。
+- **模型**: 根据您的手机性能选择一个物体检测器（见下文[基准测试结果](#基准测试)）。
 - **物体**: 选择您要跟踪的物体。模型可以检测80种COCO[物体类别](https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/)。
 - **置信度**: 确定是否接受检测结果的置信度阈值。如果出现误检，请增加；如果未检测到感兴趣的物体，请减少。
-- **设备**: 使用CPU、GPU或NNAPI进行推理（更多详情见[这里](#device)）。
+- **设备**: 使用CPU、GPU或NNAPI进行推理（更多详情见[这里](#设备)）。
 - **线程**: 使用的线程数（仅在选择CPU作为设备时有所不同）。
-- **控制**: 控制器、驾驶模式和速度用于控制机器人设置，如[控制部分](#control)所述。
+- **控制**: 控制器、驾驶模式和速度用于控制机器人设置，如[控制部分](#控制)所述。
 
 ### 目标导航
 
@@ -331,7 +331,7 @@
 
 #### USB连接
 
-与[设置菜单](#settings-menu)相同。
+与[设置菜单](#设置菜单)相同。
 
 #### 车辆状态
 
@@ -393,6 +393,63 @@
 - **NNAPI**：这将使用[TensorFlow Lite NNAPI委托](https://www.tensorflow.org/lite/performance/nnapi)。现代智能手机通常配有专用的AI加速器。[神经网络API](https://developer.android.com/ndk/guides/neuralnetworks)（NNAPI）为具有图形处理单元（GPU）、数字信号处理器（DSP）和神经处理单元（NPU）的Android设备上的TensorFlow Lite模型提供加速。注意，在一些较旧的手机上，这可能会非常慢！
 
 如果模型处于活动状态，运行模型的设备旁边将显示推理速度（单位：毫秒）。
+
+### 项目界面
+
+如果您已使用 Google 帐号登录，项目界面会列出您的 OpenBot Playground 项目。您可以运行这些项目来控制 OpenBot，也可以点击右上角的扫描图标扫描它们的二维码。如果未登录，界面会显示 Google 登录按钮，但您仍然可以在不登录的情况下扫描项目二维码。如果登录后界面显示 `Oops, no project found`，请确认该帐号在 Google Drive 中存有项目。
+
+如果列表中没有显示最新的项目，可以在项目界面向下拉动来重新加载。
+<p align="left">
+<img src="../../../docs/images/projects_tab_screen.gif" alt="Project Screen" width="24.7%"/>
+<img src="../../../docs/images/no_projects_found.jpg" alt="No project screen" width="25%"/>
+<img src="../../../docs/images/reload_projects.gif" altq="Reload project screen" width="24.5%"/>
+</p>
+
+- **Google Drive 项目**：要运行 Google Drive 项目，点击该项目并等待读取项目文件。如果顺利读取且没有错误，会弹出一个窗口，显示项目名称以及 `Start` 和 `Cancel` 两个按钮。点击 Start 运行项目，点击 Cancel 取消。如果弹出 `Something went wrong` 的提示，可能是 Google Drive 文件有问题。请向下拉动刷新项目界面后重试。
+
+
+- **二维码扫描**：要扫描 Playground 项目的二维码，点击界面右上角的二维码图标，并允许应用访问相机。扫描后等待读取文件。如果顺利读取且没有错误，会弹出一个窗口，显示项目名称以及 `Start` 和 `Cancel` 两个按钮。点击 Start 运行项目，点击 Cancel 取消。如果弹出 `Something went wrong` 的提示，可能是 Google Drive 文件有问题。请在 Playground 中生成新的二维码后重试。
+
+
+- **运行项目**：如果 OpenBot Playground 项目运行成功，界面会显示代码块名称以及一个停止按钮，可用于停止执行 Playground 积木命令。
+
+
+- **删除项目**：长按要删除的项目，会弹出确认删除的窗口。点击“Yes”即可删除。
+
+<p align="left">
+<img src="../../../docs/images/android_google_drive_projects_execute.gif" alt="Google Drive project execute" width="25%"/>
+<img src="../../../docs/images/android_qr_code_scanning.gif" alt="Qr code scanner project execute" width="25%"/>
+<img src="../../../docs/images/android_delete_project.jpg" alt="Delete Project" width="24.7%"/>
+</p>
+
+### 个人资料界面
+个人资料界面会根据用户是否已登录提供不同的选项。
+如果未登录，会显示 `Google Sign-in` 按钮，提示用户登录 Google 帐号。登录后即可访问个人资料和其他功能。
+如果已登录，`Profile` 标签页中会显示两个按钮：`Edit Profile` 和 `Logout`。
+
+<p align="left">
+<img src="../../../docs/images/android_logged_out_profile_screen.jpg" alt="Logged out profile screen" width="25%"/>
+<img src="../../../docs/images/android_logged_in_profile_screen.jpg" alt="Logged in profile screen" width="24.9%"/>
+</p>
+
+- **Edit Profile**：点击后会打开一个新界面，用户可以在其中更新个人资料信息，例如姓名和头像。
+
+
+- **Logout**：退出当前帐号并返回登录界面。
+
+  <p align="left">
+  <img src="../../../docs/images/android_edit_profile.jpg" alt="Edit profile screen" width="25%"/>
+  <img src="../../../docs/images/android_logout_dialog_box.jpg" alt="Logout dialog box" width="24.4%"/>
+  </p>
+
+### OpenBot PlayGround 界面
+
+要使用 OpenBot Playground 服务，请点击屏幕顶部工具栏中的 OpenBot Playground 图标。想了解更多关于 OpenBot Playground 的信息，请[点击这里](../../../open-code/README.zh-CN.md)。
+
+<p align="left">
+<img src="../../../docs/images/android_playground_sign-in.gif" alt="openBot playground Sign-in" width="25%"/>
+<img src="../../../docs/images/android_playground_services.gif" alt="openBot playground Services" width="25%"/>
+</p>
 
 ## 添加您自己的片段
 

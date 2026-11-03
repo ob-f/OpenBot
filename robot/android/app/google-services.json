@@ -15,32 +15,32 @@
       },
       "oauth_client": [
         {
-          "client_id": "000000000000-0000000000000000000000000000.apps.googleusercontent.com",
+          "client_id": "000000000000-00000000000000000000000000000000.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "org.openbot.app.robot",
-            "certificate_hash": "0000000000000000000000000000000000000"
+            "certificate_hash": "0000000000000000000000000000000000000000"
           }
         },
         {
-          "client_id": "000000000000-1111111111111111111111111111.apps.googleusercontent.com",
+          "client_id": "000000000000-11111111111111111111111111111111.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDUMMYDUMMYDUMMYDUMMYDUMMYDUMMYD"
+          "current_key": "AIzaSyDUMMYDUMMYDUMMYDUMMYDUMMYDUMMYDUM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "000000000000-1111111111111111111111111111.apps.googleusercontent.com",
+              "client_id": "000000000000-11111111111111111111111111111111.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "000000000000-2222222222222222222222222222.apps.googleusercontent.com",
+              "client_id": "000000000000-22222222222222222222222222222222.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "org.openbot.app.robot"

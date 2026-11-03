@@ -2,6 +2,8 @@ pyserial
 pyrealsense2
 pygame
 opencv-python
-openvino-dev[tensorflow2]
+openvino<2026  # openvino.runtime was removed in 2026
+openvino-dev[tensorflow2]<2025
+pandas
 pytest
 tflite-runtime

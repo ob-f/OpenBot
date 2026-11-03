@@ -73,6 +73,7 @@
   Voici quelques exemples :
     - Indicateurs : Bloc utilisé pour activer les indicateurs en les allumant/éteignant.
     - Luminosité : Utilisé pour définir la luminosité des LED avant et arrière en prenant des valeurs dynamiques.
+    - [Vidéo de démonstration](https://www.youtube.com/watch?v=ICSi-1ip22U&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=3)
 
   REMARQUE : Garder la luminosité à zéro désactivera le mode luminosité et si la luminosité est au maximum, c'est-à-dire 100, cela activera le mode luminosité.
 
@@ -99,6 +100,7 @@
 
     - Vitesse : Aide à jouer le son comme lent, moyen et rapide.
     - Mode : Aide à jouer le son comme double, joystick ou jeu.
+    - [Vidéo de démonstration](https://www.youtube.com/watch?v=8oPbCGZmwTU&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=1)
 
 - ### Capteurs :
 
@@ -109,6 +111,7 @@
   Aperçu :
     - Capteurs de téléphone : Aident à mesurer les lectures du gyroscope, de l'accélération et du magnétisme sur différents axes (3D).
     - Capteurs de voiture : Aident à fournir différentes lectures comme le sonar, la vitesse. De plus, ils vérifieront si le pare-chocs entre en collision avec un obstacle.
+    - [Vidéo de démonstration](https://www.youtube.com/watch?v=Ubcb1bTgfuc&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=2)
 
 - ### Mouvement :
 
@@ -120,6 +123,7 @@
 
     - Définir la vitesse : Aide à définir la vitesse comme lente, moyenne et rapide.
     - Mouvement : Aide à effectuer le mouvement en avant ou en arrière et à gauche ou à droite à la vitesse requise.
+    - [Vidéo de démonstration](https://www.youtube.com/watch?v=X7M45-PGOVg&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=4)
 
   Points clés :
     - Si la valeur de la vitesse gauche est inférieure à celle de la droite, le robot se déplacera dans le sens antihoraire, ou vice versa.
@@ -136,6 +140,7 @@
     - ``Suivi d'objet`` : Sa fonction principale tourne autour de la détection d'objets. Ce fragment d'IA vous permet de choisir n'importe quel objet à suivre. En fonction des performances de votre téléphone, vous avez la flexibilité de choisir un modèle de détecteur d'objets. Par défaut, ce bloc est équipé du modèle "MobileNetV1-300". De plus, vous avez la possibilité d'ajouter manuellement n'importe quel modèle de votre choix.
     - ``Pilote automatique`` : Ce fragment est également disponible via OpenBot Playground, utilisant la collecte de données, où un ensemble de données pré-entraîné (modèle ML CIL-Mobile-Cmd) est déjà intégré. Ensuite, le fragment de la caméra est affiché à l'écran, initiant le suivi du chemin capturé.
     - ``Navigation vers un point`` : L'objectif principal de ce bloc est d'atteindre un point désigné par la navigation. Vous pouvez configurer les valeurs avant et gauche en vue tridimensionnelle en utilisant les modèles de navigation à l'intérieur. Lorsque le projet est exécuté sur un téléphone, le fragment de navigation vers un point sera affiché à l'écran avec une vue en réalité augmentée (AR). Ensuite, le robot commencera à se déplacer jusqu'à ce qu'il atteigne avec succès le but.
+    - [Vidéo de démonstration](https://www.youtube.com/watch?v=MPzbwUoG97Q&list=PLXGqaCYqUFZDK6CWP1bP3J6upNOFDbvkA&index=6)
 
    <p style="color: yellow"> ASTUCE : Si vous avez incorporé un modèle externe, assurez-vous d'activer AutoSync dans le playground. Cette fonctionnalité vous aidera à afficher le nouveau modèle ajouté dans le bloc et à vérifier la disponibilité et le téléchargement réussi du modèle dans l'application robot.</p>
 
