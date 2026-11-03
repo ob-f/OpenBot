@@ -1,5 +1,11 @@
 import os
 
+# Force the legacy Keras (Keras 2) backend so this code, which targets the
+# Keras 2 model API, also works on TensorFlow >= 2.16 (which switched to Keras 3
+# by default and would otherwise raise "the layer ... has never been called"
+# during model building). Must be set before TensorFlow is imported.
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+
 
 def mkdir(path):
     if not (os.path.exists(path)):
