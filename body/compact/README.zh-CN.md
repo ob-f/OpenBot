@@ -236,7 +236,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 ### 5. 连接电源和信号线
 
 <p align="center">
-  <img src="../../docs/images/compact/wiring_diagram.png" alt="接线图" width="80%" />
+  <img src="../../docs/images/compact/wiring_diagram.svg" alt="接线图" width="80%" />
 </p>
 
 使用 ESP32 上印的 GPIO 编号。所有 GND 必须连在一起。走线时远离齿轮、编码器码盘、螺丝尖和顶盖接缝，并扎好以防振动。
@@ -246,18 +246,19 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 | L298N IN1 / IN2（左侧电机） | 32 / 33 | |
 | L298N IN3 / IN4（右侧电机） | 25 / 26 | |
 | L298N ENA / ENB | – | 保留使能跳线帽（速度由 IN 引脚上的 PWM 设定） |
-| 编码器 左前 / 右前 | 35 / 22 | |
+| 编码器 左前 / 右前 | 35 / 39 | |
 | 编码器 左后 / 右后 *(可选)* | 34 / 23 | |
 | 超声波 TRIG | 5 | |
-| 超声波 ECHO | 18 | 经过 10 k（ECHO → GPIO18）/ 20 k（GPIO18 → GND）分压 |
+| 超声波 ECHO | 18 | 3.3 V 超声波模块直接连接；5 V 模块经过 10 k（ECHO → GPIO18）/ 20 k（GPIO18 → GND）分压 |
 | 电池电压 | 4 | 从开关后的电池正极到 GPIO4 接 30 k，从 GPIO4 到 GND 接 10 k |
-| 前灯 左 / 右 *(可选)* | 19 / 21 | 经过 NPN 三极管驱动 |
-| 尾灯 左 / 右 *(可选)* | 16 / 17 | 经过 NPN 三极管驱动，需要修改固件 |
+| 前灯 左 / 右 *(可选)* | 19 / 12 | 经过 NPN 三极管驱动 |
+| 尾灯 左 / 右 *(可选)* | 16 / 17 | 经过 NPN 三极管驱动；也作为转向灯闪烁 |
+| OLED 显示屏 SDA / SCL *(可选)* | 21 / 22 | 128 × 64 SSD1306（I2C），3.3 V 供电 |
 
 - **电机：**将两个左侧电机并联接到 OUT1/OUT2，+（红）接 OUT2，−（黑）接 OUT1。将两个右侧电机接到 OUT3/OUT4，+（红）接 OUT3，−（黑）接 OUT4。两侧电机是镜像安装的，这样两侧都会向前转。如果某一侧仍然转向相反，调换该侧的两根电机线。
-- **编码器：**LM393 电路板用 **3.3 V** 供电，不要用 5 V。这样板载上拉电阻会让输出保持在 ESP32 可安全接受的电平。GPIO34 和 GPIO35 只能作输入，且没有内部上拉。
-- **超声波：**标准 HC-SR04 需要 5 V，在 3.3 V 下无法可靠工作。请由 5 V 转换器供电，并通过 10 k / 20 k 分压器连接 ECHO，因为其 5 V 回波信号可能损坏 ESP32。或者使用支持 3.3 V 的版本（如 HC-SR04P 或 RCWL-1601），由 3.3 V 供电并直接连接 ECHO。
-- **指示灯：**每个灯由一个 NPN 三极管开关（基极电阻 1 k，基极到发射极下拉 100 k）。切勿直接用 ESP32 引脚驱动面板指示灯。
+- **编码器：**LM393 电路板用 **3.3 V** 供电，不要用 5 V。这样板载上拉电阻会让输出保持在 ESP32 可安全接受的电平。GPIO34、GPIO35 和 GPIO39 只能作输入，且没有内部上拉。
+- **超声波：**最简单的是支持 3.3 V 的模块（如 HC-SR04P 或 RCWL-1601）：由 3.3 V 供电并直接连接 ECHO。标准 5 V HC-SR04 需要 5 V 转换器，并在 ECHO 上接 10 k / 20 k 分压器，因为其 5 V 回波信号可能损坏 ESP32。切勿直接连接 5 V 的 ECHO。
+- **指示灯：**每个灯由一个 NPN 三极管开关（基极电阻 1 k，基极到发射极下拉 100 k）。切勿直接用 ESP32 引脚驱动面板指示灯。下拉电阻还会在 ESP32 启动时把 GPIO 12（右前灯）保持为低电平，这是 ESP32 所需要的（见[第 6 步](#6-配置固件和台架测试)）。
 
 #### 电源
 
@@ -267,45 +268,39 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 
 ### 6. 配置固件和台架测试
 
-从[固件文件夹](../../firmware/README.zh-CN.md)获取固件，打开 `firmware/openbot/openbot.ino`。
+最简单的方法是在 Chrome 或 Edge 中使用[固件设置页面](https://tools.openbot.org/firmware/)。选择 **DIY** 和 **ESP32 Dev Module**，保留**手机应用**，选择你的电池（**2S Li-ion** 或 **3S Li-ion**，见下表）和已安装的部件，然后点击 **Flash firmware**。以后更改电池或部件（例如加装灯）只需 **Update settings only**，无需重新烧录。
 
-1. 设置机器人类型，并保持手机模式开启：
+如需使用 Arduino IDE，从[固件文件夹](../../firmware/README.zh-CN.md)获取固件，打开 `firmware/openbot/openbot.ino`。所有设置都在顶部的 SETTINGS 部分（或在设置页面下载设置文件，放在 `openbot.ino` 旁边）：
+
+1. 设置机器人类型：
 
    ```cpp
    #define OPENBOT DIY
-   #define NO_PHONE_MODE 0
    ```
 
-2. 在 `OPENBOT == DIY` 代码块的 ESP32 部分（`#else  // ESP32` 之后）中**关闭指示器**。它们的默认引脚（5 和 18）在本方案中是超声波引脚：
-
-   ```cpp
-   #define HAS_INDICATORS 0   // default is 1
-   ```
-
-3. 在同一代码块中，按电池方案设置电池阈值。分压系数保持不变。
+2. 按电池方案设置电池阈值。分压系数保持不变。
 
    | 方案 | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
    |---|---:|---:|
    | A – 2S 18650 或 2S LiPo | 6.8f | 8.4f |
    | B – 3S 18650 或 3S LiPo | 10.2f | 12.6f |
 
-   应用的电量显示从 `VOLTAGE_LOW`（空）到 `VOLTAGE_MAX`（满）。`VOLTAGE_MIN` 保持不变：固件只在开启 `NO_PHONE_MODE` 时将其用于电机最低速度。固件在低电压时从不切断电机，因此必须由保护板（方案 A 和 B）或 LiPo 电压报警器（方案 C）保护电芯。
+   应用的电量显示从 `VOLTAGE_LOW`（空）到 `VOLTAGE_MAX`（满）。固件在低电压时从不切断电机，因此必须由保护板（方案 A 和 B）或 LiPo 电压报警器（方案 C）保护电芯。
 
-4. 可选，在同一代码块中：
+3. 可选部件（如已安装）：
 
    ```cpp
-   #define HAS_SPEED_SENSORS_BACK 1   // read the rear encoders as well
-   #define HAS_LEDS_FRONT 1           // white lights on GPIO19/21 (default pins)
-   #define HAS_LEDS_BACK 1            // red lights, and change their pins:
-   const int PIN_LED_LB = 16;         // default 5
-   const int PIN_LED_RB = 17;         // default 18
+   #define HAS_SPEED_SENSORS_BACK 1   // 后编码器
+   #define HAS_LEDS_FRONT 1           // 白色灯，GPIO 19 / 12
+   #define HAS_LEDS_BACK 1            // 红色灯，GPIO 16 / 17
+   #define HAS_OLED 1                 // OLED 显示屏，GPIO 21 / 22
    ```
 
-5. 在 Arduino IDE 中安装 **esp32 开发板包 2.0.17**。固件使用了 `ledcSetup`/`ledcAttachPin`，它们在 3.x 中已被移除。然后选择 **ESP32 Dev Module** 并上传。
+4. 在 Arduino IDE 中安装 **esp32 开发板包 2.0.17**。固件使用了 `ledcSetup`/`ledcAttachPin`，它们在 3.x 中已被移除。然后选择 **ESP32 Dev Module** 并上传。
 
 **USB 接口。** ESP32 倒装在托架中，所以它的 USB 口在电路板下方，正对约 8.5 mm 外的 L298N 电源端子。装上驱动板后，只有弯头插头能插入，线缆从两块板之间向上引出。请在安装 L298N 之前烧录，或使用 90° 数据线。
 
-电机引脚不是 ESP32 的启动引脚，因此上电时电机不会转动。只有 GPIO 5（超声波触发）是启动引脚。如果全部接好后电路板无法启动或烧录，请断开超声波触发线后重试。
+电机引脚不是 ESP32 的启动引脚，因此上电时电机不会转动。GPIO 5（超声波触发）和 GPIO 12（右前灯）是启动引脚。ESP32 启动时 GPIO 12 必须保持低电平；三极管电路的 100 k 下拉电阻会保持它为低，切勿将其上拉。如果全部接好后电路板无法启动或烧录，请断开超声波触发线和右前灯后重试。
 
 **台架测试**（拆下车轮、垫高底盘，串口监视器 115200 波特）：
 
@@ -318,7 +313,7 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 
 车轮转动时，检查编码器计数是否变化。如果码盘摩擦、导线发热或 ESP32 重启，请立即停止。
 
-安装安卓应用 **OpenBot Robot**。选择 **Bluetooth**，授予它请求的权限，搜索 `OpenBot` 并连接。如需有线连接，请看下一步。
+安装安卓应用 **OpenBot Robot**。选择 **Bluetooth**，授予它请求的权限，搜索 `OpenBot: DIY`（或你在设置页面设置的蓝牙名称）并连接。如需有线连接，请看下一步。
 
 ### 7. 安装电池、手机支架和顶盖
 
@@ -373,9 +368,9 @@ OpenBot Compact 是一款紧凑的四轮 [OpenBot](../../README.zh-CN.md) 车身
 |---|---|
 | 编译时出现 `ledcSetup` / `ledcAttachPin` 相关错误 | esp32 内核是 3.x。请安装 2.0.17。 |
 | USB 插头插不进 ESP32 | 被 L298N 挡住了。使用 90° 插头，或拆下驱动板后烧录。 |
-| 接线后 ESP32 无法启动或烧录 | GPIO 5（超声波触发）上有负载。断开后重试。 |
+| 接线后 ESP32 无法启动或烧录 | GPIO 5（超声波触发）上有负载，或有东西把 GPIO 12（右前灯）拉高。断开它们后重试。 |
 | 电机启动时 ESP32 重启 | 电池电量不足或已耗尽，或 5 V 转换器在 2S 电压下无法稳压。在负载下测量 5 V 电源。 |
-| 超声波读数始终为 0 或不稳定 | `HAS_INDICATORS` 仍为 1，或回波分压缺失或接错 |
+| 超声波读数始终为 0 或不稳定 | 5 V 模块：回波分压缺失或接错；3.3 V 模块：检查其供电 |
 | 某个编码器没有计数 | 传感器没有接 3.3 V、码盘不在槽中，或码盘不是不透光的 |
 | 应该直行时机器人在转弯 | 一侧的电机线接反了；调换 OUT1/OUT2 或 OUT3/OUT4 上的那对线 |
 | 电池读数错误或应用显示“低” | 分压必须是 30 k（上）/ 10 k（下），且电压阈值必须与所选方案一致 |

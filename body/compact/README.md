@@ -236,7 +236,7 @@ Put the four 2.4 mm printed spacers on the L298N bosses, set the driver on them,
 ### 5. Wire power and signals
 
 <p align="center">
-  <img src="../../docs/images/compact/wiring_diagram.png" alt="Wiring diagram" width="80%" />
+  <img src="../../docs/images/compact/wiring_diagram.svg" alt="Wiring diagram" width="80%" />
 </p>
 
 Use the GPIO numbers printed on the ESP32. All grounds must be connected together. Keep wiring clear of gears, encoder disks, screw tips and the lid seam, and tie it down against vibration.
@@ -246,18 +246,19 @@ Use the GPIO numbers printed on the ESP32. All grounds must be connected togethe
 | L298N IN1 / IN2 (left motors) | 32 / 33 | |
 | L298N IN3 / IN4 (right motors) | 25 / 26 | |
 | L298N ENA / ENB | – | Leave the enable jumpers fitted (speed is set by PWM on the IN pins) |
-| Encoder front left / front right | 35 / 22 | |
+| Encoder front left / front right | 35 / 39 | |
 | Encoder rear left / rear right *(optional)* | 34 / 23 | |
 | Ultrasonic TRIG | 5 | |
-| Ultrasonic ECHO | 18 | through a 10 k (ECHO → GPIO18) / 20 k (GPIO18 → GND) divider |
+| Ultrasonic ECHO | 18 | directly with a 3.3 V sonar; through a 10 k (ECHO → GPIO18) / 20 k (GPIO18 → GND) divider with a 5 V sonar |
 | Battery voltage | 4 | 30 k from switched battery + to GPIO4, 10 k from GPIO4 to GND |
-| Front lights L / R *(optional)* | 19 / 21 | through NPN transistor stages |
-| Rear lights L / R *(optional)* | 16 / 17 | through NPN transistor stages, firmware edit needed |
+| Front lights L / R *(optional)* | 19 / 12 | through NPN transistor stages |
+| Rear lights L / R *(optional)* | 16 / 17 | through NPN transistor stages; they also blink as indicators |
+| OLED display SDA / SCL *(optional)* | 21 / 22 | 128 × 64 SSD1306 (I2C), powered from 3.3 V |
 
 - **Motors:** wire both left motors in parallel to OUT1/OUT2, + (red) to OUT2 and − (black) to OUT1. Wire both right motors to OUT3/OUT4, + (red) to OUT3 and − (black) to OUT4. The two sides are mirrored, so this makes both drive forward. If a side still turns the wrong way, swap that side's two motor wires.
-- **Encoders:** power the LM393 boards from **3.3 V**, not 5 V. Their on-board pull-ups then keep the outputs at a safe level for the ESP32. GPIO34 and GPIO35 are input-only and have no internal pull-ups.
-- **Sonar:** the standard HC-SR04 needs 5 V and doesn't work reliably at 3.3 V. Power it from the 5 V converter and connect ECHO through the 10 k / 20 k divider, because its 5 V echo signal can damage the ESP32. Or use a 3.3 V-capable version (e.g. HC-SR04P or RCWL-1601). Power it from 3.3 V and connect ECHO directly.
-- **Lights:** each lamp is switched by an NPN transistor (1 k base resistor, 100 k base-to-emitter pull-down). Never drive a panel lamp directly from an ESP32 pin.
+- **Encoders:** power the LM393 boards from **3.3 V**, not 5 V. Their on-board pull-ups then keep the outputs at a safe level for the ESP32. GPIO34, GPIO35 and GPIO39 are input-only and have no internal pull-ups.
+- **Sonar:** a 3.3 V-capable sonar (e.g. HC-SR04P or RCWL-1601) is simplest: power it from 3.3 V and connect ECHO directly. A standard 5 V HC-SR04 needs the 5 V converter and the 10 k / 20 k divider on ECHO, because its 5 V echo signal can damage the ESP32. Never connect a 5 V ECHO directly.
+- **Lights:** each lamp is switched by an NPN transistor (1 k base resistor, 100 k base-to-emitter pull-down). Never drive a panel lamp directly from an ESP32 pin. The pull-down also keeps GPIO 12 (right front light) low while the ESP32 starts, which it needs (see [step 6](#6-configure-firmware-and-bench-test)).
 
 #### Power
 
@@ -267,45 +268,39 @@ With option A (2S), the motors see about 6.4 V, which suits common 3–6 V TT mo
 
 ### 6. Configure firmware and bench test
 
-Get the firmware from the [firmware folder](../../firmware/README.md) and open `firmware/openbot/openbot.ino`.
+The easiest way is the [firmware setup page](https://tools.openbot.org/firmware/) in Chrome or Edge. Choose **DIY** and **ESP32 Dev Module**, keep **Phone app**, choose your battery (**2S Li-ion** or **3S Li-ion**, see the table below) and the parts you fitted, then press **Flash firmware**. Later changes to the battery or the parts, for example adding the lights, only need **Update settings only**, without flashing.
 
-1. Set the robot type and keep phone mode on:
+To use the Arduino IDE instead, get the firmware from the [firmware folder](../../firmware/README.md) and open `firmware/openbot/openbot.ino`. All settings are in the SETTINGS section at the top (or download a settings file from the setup page and put it next to `openbot.ino`):
+
+1. Set the robot type:
 
    ```cpp
    #define OPENBOT DIY
-   #define NO_PHONE_MODE 0
    ```
 
-2. In the ESP32 part of the `OPENBOT == DIY` block (after `#else  // ESP32`), **turn off the indicators**. Their default pins (5 and 18) are the sonar pins in this build:
-
-   ```cpp
-   #define HAS_INDICATORS 0   // default is 1
-   ```
-
-3. In the same block, set the battery limits for your battery option. The divider factor stays as it is.
+2. Set the battery limits for your battery option. The divider factor stays as it is.
 
    | Option | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
    |---|---:|---:|
    | A – 2S 18650, or 2S LiPo | 6.8f | 8.4f |
    | B – 3S 18650, or 3S LiPo | 10.2f | 12.6f |
 
-   The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full). Leave `VOLTAGE_MIN` as it is: the firmware only uses it for the minimum motor speed when `NO_PHONE_MODE` is on. The firmware never cuts the motors on low voltage, so the protection board (options A and B) or a LiPo voltage alarm (option C) has to protect the cells.
+   The app's battery gauge runs from `VOLTAGE_LOW` (empty) to `VOLTAGE_MAX` (full). The firmware never cuts the motors on low voltage, so the protection board (options A and B) or a LiPo voltage alarm (option C) has to protect the cells.
 
-4. Optional, in the same block:
+3. Optional parts, if you fitted them:
 
    ```cpp
-   #define HAS_SPEED_SENSORS_BACK 1   // read the rear encoders as well
-   #define HAS_LEDS_FRONT 1           // white lights on GPIO19/21 (default pins)
-   #define HAS_LEDS_BACK 1            // red lights, and change their pins:
-   const int PIN_LED_LB = 16;         // default 5
-   const int PIN_LED_RB = 17;         // default 18
+   #define HAS_SPEED_SENSORS_BACK 1   // rear encoders
+   #define HAS_LEDS_FRONT 1           // white lights on GPIO 19 / 12
+   #define HAS_LEDS_BACK 1            // red lights on GPIO 16 / 17
+   #define HAS_OLED 1                 // OLED display on GPIO 21 / 22
    ```
 
-5. In the Arduino IDE, install the **esp32 board package 2.0.17**. The firmware uses `ledcSetup`/`ledcAttachPin`, which were removed in core 3.x. Then select **ESP32 Dev Module** and upload.
+4. In the Arduino IDE, install the **esp32 board package 2.0.17**. The firmware uses `ledcSetup`/`ledcAttachPin`, which were removed in core 3.x. Then select **ESP32 Dev Module** and upload.
 
 **USB access.** The ESP32 sits upside down in its carrier, so its USB socket is underneath the board and faces the L298N's power terminal only about 8.5 mm away. With the driver installed, only a right-angle plug fits, with the cable leaving upward between the two boards. Either flash before fitting the L298N, or use a 90° cable.
 
-The motor pins are not ESP32 boot pins, so the motors stay off at power-on. Only GPIO 5 (sonar trigger) is a boot pin. If the board won't boot or flash with everything connected, disconnect the sonar trigger and retry.
+The motor pins are not ESP32 boot pins, so the motors stay off at power-on. GPIO 5 (sonar trigger) and GPIO 12 (right front light) are boot pins. GPIO 12 must stay low while the ESP32 starts; the transistor stage's 100 k pull-down keeps it low, so never pull it up. If the board won't boot or flash with everything connected, disconnect the sonar trigger and the right front light and retry.
 
 **Bench test** (wheels off, chassis propped up, Serial Monitor at 115200 baud):
 
@@ -318,7 +313,7 @@ The motor pins are not ESP32 boot pins, so the motors stay off at power-on. Only
 
 While the wheels turn, check that the encoder counts change. Stop straight away if a disk rubs, a wire gets warm or the ESP32 resets.
 
-Install the **OpenBot Robot** Android app. Choose **Bluetooth**, grant the permissions it asks for, scan for `OpenBot` and connect. For a wired link instead, see the next step.
+Install the **OpenBot Robot** Android app. Choose **Bluetooth**, grant the permissions it asks for, scan and connect to `OpenBot: DIY` (or the Bluetooth name you set on the setup page). For a wired link instead, see the next step.
 
 ### 7. Fit the battery, phone holder and lid
 
@@ -373,9 +368,9 @@ Order the board from the [PCB V2 manufacturing files and BOM](../diy/pcb/v2), fo
 |---|---|
 | Compile errors about `ledcSetup` / `ledcAttachPin` | The esp32 core is 3.x. Install 2.0.17. |
 | USB plug won't go into the ESP32 | The L298N is in the way. Use a 90° plug or remove the driver to flash. |
-| ESP32 won't boot or flash once wired | Loading on GPIO 5 (sonar trigger). Disconnect it and retry. |
+| ESP32 won't boot or flash once wired | Loading on GPIO 5 (sonar trigger), or something pulling GPIO 12 (right front light) high. Disconnect them and retry. |
 | ESP32 resets when the motors start | Weak or flat battery, or a 5 V converter that can't regulate from 2S. Check the 5 V rail under load. |
-| Sonar always 0 or erratic | `HAS_INDICATORS` is still 1, or the echo divider is missing or wrong |
+| Sonar always 0 or erratic | With a 5 V sonar, the echo divider is missing or wrong; with a 3.3 V sonar, check its supply |
 | No counts from an encoder | Sensor not on 3.3 V, disk not in the slot, or disk not opaque |
 | Robot turns when it should go straight | One side's motor wires are swapped, so swap the pair on OUT1/OUT2 or OUT3/OUT4 |
 | Battery reading wrong or app shows "low" | Divider must be 30 k (top) / 10 k (bottom), and the voltage limits must match your option |

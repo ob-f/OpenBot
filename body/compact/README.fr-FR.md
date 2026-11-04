@@ -236,7 +236,7 @@ Placez les quatre entretoises imprimées de 2,4 mm sur les bossages du L298N, po
 ### 5. Câbler l'alimentation et les signaux
 
 <p align="center">
-  <img src="../../docs/images/compact/wiring_diagram.png" alt="Schéma de câblage" width="80%" />
+  <img src="../../docs/images/compact/wiring_diagram.svg" alt="Schéma de câblage" width="80%" />
 </p>
 
 Utilisez les numéros de GPIO imprimés sur l'ESP32. Toutes les masses doivent être reliées entre elles. Éloignez les fils des engrenages, des disques d'encodeur, des pointes de vis et du joint du couvercle, et attachez-les contre les vibrations.
@@ -246,18 +246,19 @@ Utilisez les numéros de GPIO imprimés sur l'ESP32. Toutes les masses doivent �
 | L298N IN1 / IN2 (moteurs gauches) | 32 / 33 | |
 | L298N IN3 / IN4 (moteurs droits) | 25 / 26 | |
 | L298N ENA / ENB | – | Laissez les cavaliers d'activation en place (la vitesse est réglée par PWM sur les broches IN) |
-| Encodeur avant gauche / avant droit | 35 / 22 | |
+| Encodeur avant gauche / avant droit | 35 / 39 | |
 | Encodeur arrière gauche / arrière droit *(optionnel)* | 34 / 23 | |
 | Ultrasons TRIG | 5 | |
-| Ultrasons ECHO | 18 | via un diviseur 10 k (ECHO → GPIO18) / 20 k (GPIO18 → GND) |
+| Ultrasons ECHO | 18 | directement avec un sonar 3,3 V ; avec un sonar 5 V, via un diviseur 10 k (ECHO → GPIO18) / 20 k (GPIO18 → GND) |
 | Tension de la batterie | 4 | 30 k du + batterie après interrupteur vers GPIO4, 10 k de GPIO4 vers GND |
-| Voyants avant G / D *(optionnel)* | 19 / 21 | via des étages à transistor NPN |
-| Voyants arrière G / D *(optionnel)* | 16 / 17 | via des étages à transistor NPN, modification du firmware nécessaire |
+| Voyants avant G / D *(optionnel)* | 19 / 12 | via des étages à transistor NPN |
+| Voyants arrière G / D *(optionnel)* | 16 / 17 | via des étages à transistor NPN ; clignotent aussi comme indicateurs |
+| Écran OLED SDA / SCL *(optionnel)* | 21 / 22 | SSD1306 128 × 64 (I2C), alimenté en 3,3 V |
 
 - **Moteurs :** câblez les deux moteurs gauches en parallèle sur OUT1/OUT2, + (rouge) sur OUT2 et − (noir) sur OUT1. Câblez les deux moteurs droits sur OUT3/OUT4, + (rouge) sur OUT3 et − (noir) sur OUT4. Les deux côtés sont en miroir, ainsi les deux avancent. Si un côté tourne encore dans le mauvais sens, inversez les deux fils moteur de ce côté.
-- **Encodeurs :** alimentez les cartes LM393 en **3,3 V**, pas en 5 V. Leurs résistances de tirage intégrées maintiennent alors les sorties à un niveau sûr pour l'ESP32. GPIO34 et GPIO35 sont des entrées uniquement et n'ont pas de tirage interne.
-- **Sonar :** le HC-SR04 standard a besoin de 5 V et ne fonctionne pas de manière fiable en 3,3 V. Alimentez-le depuis le convertisseur 5 V et reliez ECHO via le diviseur 10 k / 20 k, car son signal d'écho de 5 V peut endommager l'ESP32. Ou utilisez une version compatible 3,3 V (par ex. HC-SR04P ou RCWL-1601). Alimentez-la en 3,3 V et reliez ECHO directement.
-- **Voyants :** chaque voyant est commuté par un transistor NPN (résistance de base de 1 k, tirage de 100 k entre base et émetteur). Ne pilotez jamais un voyant directement depuis une broche de l'ESP32.
+- **Encodeurs :** alimentez les cartes LM393 en **3,3 V**, pas en 5 V. Leurs résistances de tirage intégrées maintiennent alors les sorties à un niveau sûr pour l'ESP32. GPIO34, GPIO35 et GPIO39 sont des entrées uniquement et n'ont pas de tirage interne.
+- **Sonar :** le plus simple est un sonar compatible 3,3 V (par ex. HC-SR04P ou RCWL-1601) : alimentez-le en 3,3 V et reliez ECHO directement. Un HC-SR04 standard en 5 V a besoin du convertisseur 5 V et du diviseur 10 k / 20 k sur ECHO, car son signal d'écho de 5 V peut endommager l'ESP32. Ne reliez jamais un ECHO 5 V directement.
+- **Voyants :** chaque voyant est commuté par un transistor NPN (résistance de base de 1 k, tirage de 100 k entre base et émetteur). Ne pilotez jamais un voyant directement depuis une broche de l'ESP32. Le tirage vers le bas maintient aussi le GPIO 12 (voyant avant droit) à l'état bas au démarrage de l'ESP32, comme celui-ci l'exige (voir l'[étape 6](#6-configurer-le-firmware-et-test-sur-table)).
 
 #### Alimentation
 
@@ -267,45 +268,39 @@ Avec l'option A (2S), les moteurs reçoivent environ 6,4 V, ce qui convient aux 
 
 ### 6. Configurer le firmware et test sur table
 
-Récupérez le firmware dans le [dossier firmware](../../firmware/README.fr-FR.md) et ouvrez `firmware/openbot/openbot.ino`.
+Le plus simple est la [page de configuration du firmware](https://tools.openbot.org/firmware/) dans Chrome ou Edge. Choisissez **DIY** et **ESP32 Dev Module**, gardez **Application téléphone**, choisissez votre batterie (**2S Li-ion** ou **3S Li-ion**, voir le tableau ci-dessous) et les pièces montées, puis appuyez sur **Flash firmware**. Les changements ultérieurs de batterie ou de pièces, par exemple l'ajout des voyants, ne demandent que **Update settings only**, sans flasher.
 
-1. Définissez le type de robot et laissez le mode téléphone activé :
+Pour utiliser l'IDE Arduino, récupérez le firmware dans le [dossier firmware](../../firmware/README.fr-FR.md) et ouvrez `firmware/openbot/openbot.ino`. Tous les réglages sont dans la section SETTINGS en haut (ou téléchargez un fichier de réglages sur la page de configuration et placez-le à côté de `openbot.ino`) :
+
+1. Définissez le type de robot :
 
    ```cpp
    #define OPENBOT DIY
-   #define NO_PHONE_MODE 0
    ```
 
-2. Dans la partie ESP32 du bloc `OPENBOT == DIY` (après `#else  // ESP32`), **désactivez les indicateurs**. Leurs broches par défaut (5 et 18) sont celles du sonar dans ce montage :
-
-   ```cpp
-   #define HAS_INDICATORS 0   // default is 1
-   ```
-
-3. Dans le même bloc, réglez les limites de batterie pour votre option. Le facteur du diviseur reste inchangé.
+2. Réglez les limites de batterie pour votre option. Le facteur du diviseur reste inchangé.
 
    | Option | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
    |---|---:|---:|
    | A – 18650 2S ou LiPo 2S | 6.8f | 8.4f |
    | B – 18650 3S ou LiPo 3S | 10.2f | 12.6f |
 
-   La jauge de batterie de l'application va de `VOLTAGE_LOW` (vide) à `VOLTAGE_MAX` (pleine). Laissez `VOLTAGE_MIN` inchangé : le firmware ne l'utilise que pour la vitesse minimale des moteurs lorsque `NO_PHONE_MODE` est activé. Le firmware ne coupe jamais les moteurs en cas de tension faible ; la carte de protection (options A et B) ou une alarme de tension LiPo (option C) doit donc protéger les cellules.
+   La jauge de batterie de l'application va de `VOLTAGE_LOW` (vide) à `VOLTAGE_MAX` (pleine). Le firmware ne coupe jamais les moteurs en cas de tension faible ; la carte de protection (options A et B) ou une alarme de tension LiPo (option C) doit donc protéger les cellules.
 
-4. Optionnel, dans le même bloc :
+3. Pièces optionnelles, si vous les avez montées :
 
    ```cpp
-   #define HAS_SPEED_SENSORS_BACK 1   // read the rear encoders as well
-   #define HAS_LEDS_FRONT 1           // white lights on GPIO19/21 (default pins)
-   #define HAS_LEDS_BACK 1            // red lights, and change their pins:
-   const int PIN_LED_LB = 16;         // default 5
-   const int PIN_LED_RB = 17;         // default 18
+   #define HAS_SPEED_SENSORS_BACK 1   // encodeurs arrière
+   #define HAS_LEDS_FRONT 1           // voyants blancs sur GPIO 19 / 12
+   #define HAS_LEDS_BACK 1            // voyants rouges sur GPIO 16 / 17
+   #define HAS_OLED 1                 // écran OLED sur GPIO 21 / 22
    ```
 
-5. Dans l'IDE Arduino, installez le **paquet de cartes esp32 2.0.17**. Le firmware utilise `ledcSetup`/`ledcAttachPin`, supprimés dans la version 3.x. Sélectionnez ensuite **ESP32 Dev Module** et téléversez.
+4. Dans l'IDE Arduino, installez le **paquet de cartes esp32 2.0.17**. Le firmware utilise `ledcSetup`/`ledcAttachPin`, supprimés dans la version 3.x. Sélectionnez ensuite **ESP32 Dev Module** et téléversez.
 
 **Accès USB.** L'ESP32 est monté à l'envers dans son support : sa prise USB se trouve sous la carte, face à la borne d'alimentation du L298N, à seulement 8,5 mm environ. Une fois le pilote monté, seule une fiche coudée rentre, avec le câble qui remonte entre les deux cartes. Flashez avant de monter le L298N ou utilisez un câble à 90°.
 
-Les broches des moteurs ne sont pas des broches de démarrage de l'ESP32 ; les moteurs restent donc arrêtés à la mise sous tension. Seul le GPIO 5 (déclencheur du sonar) est une broche de démarrage. Si la carte ne démarre pas ou ne se flashe pas une fois tout branché, débranchez le déclencheur du sonar et réessayez.
+Les broches des moteurs ne sont pas des broches de démarrage de l'ESP32 ; les moteurs restent donc arrêtés à la mise sous tension. Le GPIO 5 (déclencheur du sonar) et le GPIO 12 (voyant avant droit) sont des broches de démarrage. Le GPIO 12 doit rester à l'état bas au démarrage de l'ESP32 ; le tirage de 100 k de l'étage à transistor l'y maintient, ne le tirez donc jamais vers le haut. Si la carte ne démarre pas ou ne se flashe pas une fois tout branché, débranchez le déclencheur du sonar et le voyant avant droit et réessayez.
 
 **Test sur table** (roues démontées, châssis surélevé, moniteur série à 115200 bauds) :
 
@@ -318,7 +313,7 @@ Les broches des moteurs ne sont pas des broches de démarrage de l'ESP32 ; les m
 
 Pendant que les roues tournent, vérifiez que les comptages des encodeurs changent. Arrêtez immédiatement si un disque frotte, si un fil chauffe ou si l'ESP32 redémarre.
 
-Installez l'application Android **OpenBot Robot**. Choisissez **Bluetooth**, accordez les autorisations demandées, recherchez `OpenBot` et connectez-vous. Pour une liaison filaire, voir l'étape suivante.
+Installez l'application Android **OpenBot Robot**. Choisissez **Bluetooth**, accordez les autorisations demandées, recherchez `OpenBot: DIY` (ou le nom Bluetooth défini sur la page de configuration) et connectez-vous. Pour une liaison filaire, voir l'étape suivante.
 
 ### 7. Monter la batterie, le support de téléphone et le couvercle
 
@@ -373,9 +368,9 @@ Commandez la carte à partir des [fichiers de fabrication et de la nomenclature 
 |---|---|
 | Erreurs de compilation sur `ledcSetup` / `ledcAttachPin` | Le cœur esp32 est en 3.x. Installez la 2.0.17. |
 | La fiche USB n'entre pas dans l'ESP32 | Le L298N gêne. Utilisez une fiche à 90° ou démontez le pilote pour flasher. |
-| L'ESP32 ne démarre pas ou ne se flashe pas une fois câblé | Charge sur le GPIO 5 (déclencheur du sonar). Débranchez-le et réessayez. |
+| L'ESP32 ne démarre pas ou ne se flashe pas une fois câblé | Charge sur le GPIO 5 (déclencheur du sonar), ou quelque chose qui tire le GPIO 12 (voyant avant droit) vers le haut. Débranchez-les et réessayez. |
 | L'ESP32 redémarre quand les moteurs démarrent | Batterie faible ou vide, ou convertisseur 5 V incapable de réguler à partir de 2S. Mesurez le rail 5 V en charge. |
-| Sonar toujours à 0 ou instable | `HAS_INDICATORS` est encore à 1, ou le diviseur d'écho manque ou est faux |
+| Sonar toujours à 0 ou instable | Avec un sonar 5 V, le diviseur d'écho manque ou est faux ; avec un sonar 3,3 V, vérifiez son alimentation |
 | Aucun comptage d'un encodeur | Capteur non alimenté en 3,3 V, disque hors de la fente ou disque non opaque |
 | Le robot tourne alors qu'il devrait aller droit | Les fils moteur d'un côté sont inversés ; inversez la paire sur OUT1/OUT2 ou OUT3/OUT4 |
 | Lecture de batterie fausse ou l'application affiche « faible » | Le diviseur doit être 30 k (haut) / 10 k (bas), et les limites de tension doivent correspondre à votre option |
