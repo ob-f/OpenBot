@@ -347,14 +347,21 @@ public class ArCore implements GLSurfaceView.Renderer {
     float floor = floorFound ? knownFloorY : cameraPos[1] - cameraHeightM;
 
     float[][] ray = tapRay(tapX, tapY);
-    float[] surfaceHit = surfaceHit(frame, tapX, tapY);
+    HitResult hit = surfaceHit(frame, tapX, tapY);
+    float[] surfaceHit = hit == null ? null : hit.getHitPose().getTranslation();
+    boolean depthHit = hit != null && hit.getTrackable() instanceof DepthPoint;
     float[] goal =
         GoalValidator.goalOnFloor(
-            ray == null ? null : ray[0], ray == null ? null : ray[1], surfaceHit, floor);
+            ray == null ? null : ray[0],
+            ray == null ? null : ray[1],
+            surfaceHit,
+            depthHit,
+            floor,
+            floorFound);
 
     GoalValidator.Result result = GoalValidator.validate(cameraPos, goal);
     Timber.d(
-        "goal tap (%.0f, %.0f): camera=%s floor=%.3f (%s, height %.3f %s) hit=%s goal=%s -> %s",
+        "goal tap (%.0f, %.0f): camera=%s floor=%.3f (%s, height %.3f %s) hit=%s (%s) goal=%s -> %s",
         tapX,
         tapY,
         Arrays.toString(cameraPos),
@@ -363,6 +370,7 @@ public class ArCore implements GLSurfaceView.Renderer {
         cameraHeightM,
         cameraHeightMeasured ? "measured" : "starting",
         Arrays.toString(surfaceHit),
+        depthHit ? "depth" : "plane",
         Arrays.toString(goal),
         result);
     if (result != GoalValidator.Result.OK) {
@@ -387,19 +395,19 @@ public class ArCore implements GLSurfaceView.Renderer {
     }
   }
 
-  /** First plane or depth point the tap hits, {x, y, z}; feature points are too noisy to use. */
+  /** First plane or depth point the tap hits; feature points are too noisy to use. */
   @Nullable
-  private static float[] surfaceHit(Frame frame, float tapX, float tapY) {
+  private static HitResult surfaceHit(Frame frame, float tapX, float tapY) {
     for (HitResult hit : frame.hitTest(tapX, tapY)) {
       Trackable trackable = hit.getTrackable();
       if (trackable.getTrackingState() != TrackingState.TRACKING) continue;
       if (trackable instanceof Plane) {
         Plane plane = (Plane) trackable;
         if (plane.getSubsumedBy() == null && plane.isPoseInPolygon(hit.getHitPose())) {
-          return hit.getHitPose().getTranslation();
+          return hit;
         }
       } else if (trackable instanceof DepthPoint) {
-        return hit.getHitPose().getTranslation();
+        return hit;
       }
     }
     return null;

@@ -47,6 +47,9 @@ public final class GoalValidator {
   /** A hit more than this above the floor is furniture or a wall, not the floor. */
   public static final float FLOOR_TOLERANCE_M = 0.05f;
 
+  /** Depth hits get less accurate with distance (~10 cm high at 3-4 m); plane hits don't. */
+  public static final float DEPTH_TOLERANCE_PER_M = 0.04f;
+
   public enum Result {
     OK,
     NOT_FLOOR,
@@ -69,18 +72,25 @@ public final class GoalValidator {
   }
 
   /**
-   * Floor hit: that exact spot. Hit above the floor: null. No hit, or one below the floor (a
-   * reflection): where the tap ray meets the floor.
+   * Floor hit: that exact spot. Hit above the floor: null. No hit, or one below a detected floor (a
+   * reflection): where the tap ray meets the floor. An estimated floor can be too high (robot held
+   * up), so a hit below it is used.
    */
   @Nullable
   public static float[] goalOnFloor(
       @Nullable float[] origin,
       @Nullable float[] direction,
       @Nullable float[] surfaceHit,
-      float floorY) {
+      boolean depthHit,
+      float floorY,
+      boolean floorFound) {
     if (surfaceHit != null) {
-      if (surfaceHit[1] > floorY + FLOOR_TOLERANCE_M) return null;
-      if (surfaceHit[1] >= floorY - FLOOR_TOLERANCE_M) {
+      float tolerance =
+          origin == null
+              ? FLOOR_TOLERANCE_M
+              : floorTolerance(depthHit, distance(origin, surfaceHit));
+      if (surfaceHit[1] > floorY + tolerance) return null;
+      if (!floorFound || surfaceHit[1] >= floorY - tolerance) {
         if (origin != null && horizontalDistance(origin, surfaceHit) > MAX_RAY_DISTANCE_M) {
           return null;
         }
@@ -126,6 +136,20 @@ public final class GoalValidator {
       }
     }
     return floorY;
+  }
+
+  /** How far a hit may be from the floor and still count as the floor. */
+  public static float floorTolerance(boolean depthHit, float distanceM) {
+    return depthHit
+        ? Math.max(FLOOR_TOLERANCE_M, DEPTH_TOLERANCE_PER_M * distanceM)
+        : FLOOR_TOLERANCE_M;
+  }
+
+  private static float distance(float[] a, float[] b) {
+    float dx = a[0] - b[0];
+    float dy = a[1] - b[1];
+    float dz = a[2] - b[2];
+    return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   public static float horizontalDistance(float[] a, float[] b) {
