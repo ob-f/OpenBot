@@ -133,32 +133,32 @@ class PointGoalMathTests: XCTestCase {
 
     func testTapHittingTheFloorUsesTheExactHitPoint() {
         let hit = simd_float3(0.05, 0.01, -1.95)
-        XCTAssertEqual(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: hit, floorY: 0), hit)
+        XCTAssertEqual(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: hit, floorY: 0, floorFound: true), hit)
     }
 
     func testTapOnFurnitureIsNotFloor() {
         let sofa = simd_float3(0, 0.4, -1)
-        XCTAssertNil(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: sofa, floorY: 0))
+        XCTAssertNil(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: sofa, floorY: 0, floorFound: true))
     }
 
     func testTapOnAWallIsNotFloor() {
         let wall = simd_float3(0, 0.3, -1.5)
-        XCTAssertNil(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: wall, floorY: 0))
+        XCTAssertNil(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: wall, floorY: 0, floorFound: true))
     }
 
     func testHitJustAboveTheFloorIsStillFloor() {
         let hit = simd_float3(0, PointGoalMath.floorTolerance - 0.01, -2)
-        XCTAssertEqual(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: hit, floorY: 0), hit)
+        XCTAssertEqual(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: hit, floorY: 0, floorFound: true), hit)
     }
 
     func testHitBelowTheFloorIsIgnored() {
-        let goal = PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: simd_float3(0, -0.5, -3), floorY: 0)
+        let goal = PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: simd_float3(0, -0.5, -3), floorY: 0, floorFound: true)
         XCTAssertEqual(goal!.y, 0, accuracy: 1e-5)
         XCTAssertEqual(goal!.z, -2, accuracy: 1e-4)
     }
 
     func testNoHitUsesTheRayOnTheFloor() {
-        let goal = PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: nil, floorY: 0)
+        let goal = PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: nil, floorY: 0, floorFound: true)
         XCTAssertEqual(goal!.y, 0, accuracy: 1e-5)
         XCTAssertEqual(goal!.z, -2, accuracy: 1e-4)
     }
@@ -166,7 +166,7 @@ class PointGoalMathTests: XCTestCase {
     func testRobotHeldUpGoalStaysOnTheDetectedFloor() {
         let lifted = simd_float3(0, 1, 0)
         let direction = simd_normalize(simd_float3(0, 0, -2) - lifted)
-        let goal = PointGoalMath.goalOnFloor(origin: lifted, direction: direction, surfaceHit: nil, floorY: 0)
+        let goal = PointGoalMath.goalOnFloor(origin: lifted, direction: direction, surfaceHit: nil, floorY: 0, floorFound: true)
         XCTAssertEqual(goal!.y, 0, accuracy: 1e-5)
         XCTAssertEqual(goal!.z, -2, accuracy: 1e-4)
         XCTAssertEqual(PointGoalMath.validate(camera: lifted, goal: goal), .ok)
@@ -174,7 +174,27 @@ class PointGoalMathTests: XCTestCase {
 
     func testHitOnTheFloorTooFarAwayIsRejected() {
         let far = simd_float3(0, 0, -8)
-        XCTAssertNil(PointGoalMath.goalOnFloor(origin: phone, direction: simd_normalize(far - phone), surfaceHit: far, floorY: 0))
+        XCTAssertNil(PointGoalMath.goalOnFloor(origin: phone, direction: simd_normalize(far - phone), surfaceHit: far, floorY: 0, floorFound: true))
+    }
+
+    func testRobotHeldUpFloorNotFoundUsesDepthHit() {
+        // Phone lifted to 1 m, so the estimated floor is in the air at 0.88 m; depth hits the real floor.
+        let lifted = simd_float3(0, 1, 0)
+        let floorHit = simd_float3(0, 0, -2)
+        let goal = PointGoalMath.goalOnFloor(origin: lifted, direction: simd_normalize(floorHit - lifted), surfaceHit: floorHit, floorY: 0.88, floorFound: false)
+        XCTAssertEqual(goal, floorHit)
+        XCTAssertEqual(PointGoalMath.validate(camera: lifted, goal: goal), .ok)
+    }
+
+    func testFloorNotFoundHitAboveTheEstimateIsNotFloor() {
+        let sofa = simd_float3(0, 0.4, -1)
+        XCTAssertNil(PointGoalMath.goalOnFloor(origin: phone, direction: twoMetersAhead, surfaceHit: sofa, floorY: 0, floorFound: false))
+    }
+
+    func testFloorNotFoundDepthHitTooFarAwayIsRejected() {
+        let lifted = simd_float3(0, 1, 0)
+        let far = simd_float3(0, 0, -8)
+        XCTAssertNil(PointGoalMath.goalOnFloor(origin: lifted, direction: simd_normalize(far - lifted), surfaceHit: far, floorY: 0.88, floorFound: false))
     }
 
     // Phone mounted in landscape: rolled 90 degrees around its forward axis.

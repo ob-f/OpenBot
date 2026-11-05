@@ -72,7 +72,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal]
+        configuration.planeDetection = [.horizontal, .vertical]
         usesSceneDepth = ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth)
         if usesSceneDepth {
             configuration.frameSemantics.insert(.sceneDepth)
@@ -178,7 +178,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
         let floorFound = floorY != nil
         let floor = floorY ?? cameraPosition.y - cameraHeight
         let hit = surfaceHit(at: point)
-        let goal = PointGoalMath.goalOnFloor(origin: origin, direction: direction, surfaceHit: hit, floorY: floor)
+        let goal = PointGoalMath.goalOnFloor(origin: origin, direction: direction, surfaceHit: hit, floorY: floor, floorFound: floorFound)
         let result = PointGoalMath.validate(camera: cameraPosition, goal: goal)
         print("goal tap \(point): camera=\(cameraPosition) floor=\(floor) (\(floorFound ? "plane" : "estimated"), height \(cameraHeight) \(cameraHeightMeasured ? "measured" : "starting")) hit=\(String(describing: hit)) goal=\(String(describing: goal)) -> \(result)")
 
@@ -603,14 +603,15 @@ enum PointGoalMath {
     /// A hit more than this above the floor is furniture or a wall, not the floor.
     static let floorTolerance: Float = 0.05
 
-    /// Floor hit: that exact spot. Hit above the floor: nil. No hit, or one below the floor (a
-    /// reflection): where the tap ray meets the floor.
-    static func goalOnFloor(origin: simd_float3, direction: simd_float3, surfaceHit: simd_float3?, floorY: Float) -> simd_float3? {
+    /// Floor hit: that exact spot. Hit above the floor: nil. No hit, or one below a detected floor (a
+    /// reflection): where the tap ray meets the floor. An estimated floor can be too high (robot held
+    /// up), so a hit below it is used.
+    static func goalOnFloor(origin: simd_float3, direction: simd_float3, surfaceHit: simd_float3?, floorY: Float, floorFound: Bool) -> simd_float3? {
         if let hit = surfaceHit {
             if hit.y > floorY + floorTolerance {
                 return nil
             }
-            if hit.y >= floorY - floorTolerance {
+            if !floorFound || hit.y >= floorY - floorTolerance {
                 return horizontalDistance(origin, hit) <= maxRayDistance ? hit : nil
             }
         }

@@ -262,7 +262,7 @@ All models are quantized for better performance on embedded devices. Note that m
 
 The `Point Goal Navigation` screen lets you pick a spot on the floor for the robot to drive to. To access this screen, simply tap on the corresponding button in the app.
 
-Mount the phone on the robot, put the robot on the floor and move it a little until ARKit finds the floor. Then tap the spot on the floor in the camera view where the robot should go; a marker shows the goal. Taps on furniture or other objects above the floor are rejected.
+Mount the phone on the robot, put the robot on the floor and move it a little until ARKit finds the floor. Then tap the spot on the floor in the camera view where the robot should go; a marker shows the goal. Taps on furniture, walls or other objects above the floor are rejected.
 
 - `Start` button: starts the navigation. The robot drives towards the goal and adjusts its trajectory and speed as needed to reach it.
 - `Stop` button: stops the robot at any time.

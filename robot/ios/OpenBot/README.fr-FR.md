@@ -194,7 +194,7 @@ Tous les modèles sont quantifiés pour de meilleures performances sur les appar
 
 L'écran `Point Goal Navigation` permet de choisir un endroit du sol où le robot doit aller. Pour l'ouvrir, touchez le bouton correspondant dans l'application.
 
-Fixez le téléphone sur le robot, posez le robot au sol et déplacez-le un peu jusqu'à ce qu'ARKit détecte le sol. Touchez ensuite, dans la vue de la caméra, l'endroit du sol où le robot doit aller ; un marqueur indique la destination. Les touches sur des meubles ou d'autres objets au-dessus du sol sont refusées.
+Fixez le téléphone sur le robot, posez le robot au sol et déplacez-le un peu jusqu'à ce qu'ARKit détecte le sol. Touchez ensuite, dans la vue de la caméra, l'endroit du sol où le robot doit aller ; un marqueur indique la destination. Les touches sur des meubles, des murs ou d'autres objets au-dessus du sol sont refusées.
 
 - Bouton `Start` : lance la navigation. Le robot se dirige vers la destination et ajuste sa trajectoire et sa vitesse pour l'atteindre.
 - Bouton `Stop` : arrête le robot à tout moment.

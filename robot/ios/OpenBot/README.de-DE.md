@@ -190,7 +190,7 @@ Alle Modelle sind quantisiert, um eine bessere Leistung auf eingebetteten Gerät
 
 Auf dem Bildschirm `Point Goal Navigation` wählen Sie eine Stelle am Boden, zu der der Roboter fährt. Tippen Sie dazu in der App auf die entsprechende Schaltfläche.
 
-Befestigen Sie das Handy am Roboter, stellen Sie den Roboter auf den Boden und bewegen Sie ihn etwas, bis ARKit den Boden erkennt. Tippen Sie dann im Kamerabild auf die Stelle am Boden, zu der der Roboter fahren soll; eine Markierung zeigt das Ziel. Tippen auf Möbel oder andere Objekte über dem Boden wird abgelehnt.
+Befestigen Sie das Handy am Roboter, stellen Sie den Roboter auf den Boden und bewegen Sie ihn etwas, bis ARKit den Boden erkennt. Tippen Sie dann im Kamerabild auf die Stelle am Boden, zu der der Roboter fahren soll; eine Markierung zeigt das Ziel. Tippen auf Möbel, Wände oder andere Objekte über dem Boden wird abgelehnt.
 
 - Schaltfläche `Start`: startet die Navigation. Der Roboter fährt auf das Ziel zu und passt Richtung und Geschwindigkeit an, um es zu erreichen.
 - Schaltfläche `Stop`: hält den Roboter jederzeit an.
