@@ -9,7 +9,7 @@ import ARKit
 import simd
 
 /// Point goal navigation: tap a spot on the floor, press Start, and the robot drives there.
-class PointGoalFragment: UIViewController, ARSCNViewDelegate {
+class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognizerDelegate {
     var sceneView: ARSCNView!
     var navigation: Navigation?
     let bluetooth = bluetoothDataController.shared
@@ -27,6 +27,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     private var safetyTimer: Timer?
     private var runGeneration = 0
     private var lastControl: Control?
+    private var floorY: Float?
+    private var usesSceneDepth = false
     private var cameraHeight: Float = PointGoalMath.defaultCameraHeight
     private var cameraHeightMeasured = false
     // When ARKit tracking went "limited" during the current drive, or nil while it's normal.
@@ -57,6 +59,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         setupHintLabel()
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tap.delegate = self
         sceneView.addGestureRecognizer(tap)
 
         // Leaving the app (home button, call, app switcher) must never leave the robot driving.
@@ -69,8 +72,13 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let configuration = ARWorldTrackingConfiguration()
-        // Only used to measure the camera height above the floor.
         configuration.planeDetection = [.horizontal]
+        usesSceneDepth = ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth)
+        if usesSceneDepth {
+            configuration.frameSemantics.insert(.sceneDepth)
+        }
+        // The world may be re-founded after a pause, so find the floor again.
+        floorY = nil
         sceneView.session.run(configuration)
     }
 
@@ -147,9 +155,11 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
 
     // MARK: - Setting the goal
 
-    /// The goal is where the tap ray meets the floor, with the floor at the known camera height
-    /// below the phone. This only needs the camera's orientation (gravity is exact from the IMU), so
-    /// it's correct from the first frame; image depth would be guessed until the robot moves.
+    /// A touch that began while driving is never a goal tap, even if the robot stops before it ends.
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        !isRunning
+    }
+
     @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
         guard !isRunning, let camera = sceneView.pointOfView else {
             return
@@ -165,9 +175,12 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
         if !cameraHeightMeasured {
             cameraHeight = PointGoalMath.startingCameraHeight(robotInfo: bluetooth.robotInfo)
         }
-        let goal = PointGoalMath.intersectFloor(origin: origin, direction: direction, floorY: cameraPosition.y - cameraHeight)
+        let floorFound = floorY != nil
+        let floor = floorY ?? cameraPosition.y - cameraHeight
+        let hit = surfaceHit(at: point)
+        let goal = PointGoalMath.goalOnFloor(origin: origin, direction: direction, surfaceHit: hit, floorY: floor)
         let result = PointGoalMath.validate(camera: cameraPosition, goal: goal)
-        print("goal tap \(point): camera=\(cameraPosition) height=\(cameraHeight) (\(cameraHeightMeasured ? "measured" : "starting")) goal=\(String(describing: goal)) -> \(result)")
+        print("goal tap \(point): camera=\(cameraPosition) floor=\(floor) (\(floorFound ? "plane" : "estimated"), height \(cameraHeight) \(cameraHeightMeasured ? "measured" : "starting")) hit=\(String(describing: hit)) goal=\(String(describing: goal)) -> \(result)")
 
         switch result {
         case .notFloor:
@@ -180,9 +193,30 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
             }
             placeGoal(at: goal)
             let distance = PointGoalMath.horizontalDistance(cameraPosition, goal)
-            showHint(String(format: Strings.pointGoalSet, distance))
+            showHint(String(format: floorFound ? Strings.pointGoalSet : Strings.pointGoalSetFloorNotFound, distance))
             startButton.isHidden = false
         }
+    }
+
+    private func surfaceHit(at point: CGPoint) -> simd_float3? {
+        // Without LiDAR, estimated planes come from noisy feature points, so only planes are used.
+        var targets: [ARRaycastQuery.Target] = [.existingPlaneGeometry]
+        if usesSceneDepth {
+            targets.append(.estimatedPlane)
+        }
+        var nearest: (distance: Float, point: simd_float3)?
+        for target in targets {
+            guard let query = sceneView.raycastQuery(from: point, allowing: target, alignment: .any),
+                  let result = sceneView.session.raycast(query).first else {
+                continue
+            }
+            let position = simd_make_float3(result.worldTransform.columns.3)
+            let distance = simd_distance(position, query.origin)
+            if distance < nearest?.distance ?? .greatestFiniteMagnitude {
+                nearest = (distance, position)
+            }
+        }
+        return nearest?.point
     }
 
     private func placeGoal(at position: simd_float3) {
@@ -409,11 +443,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
             return
         }
         lastCalibration = time
-        calibrateCameraHeight()
+        measureFloor()
     }
 
-    /// Measures the camera height from ARKit's floor plane, if it sees one.
-    private func calibrateCameraHeight() {
+    private func measureFloor() {
         guard let frame = sceneView.session.currentFrame, let camera = sceneView.pointOfView?.presentation else {
             return
         }
@@ -429,16 +462,21 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate {
                 floors.append(plane)
             }
         }
-        guard let floorY = PointGoalMath.pickFloorY(planes: floors.isEmpty ? planes : floors, cameraY: cameraY) else {
+        guard let planeY = PointGoalMath.pickFloorY(planes: floors.isEmpty ? planes : floors, cameraY: cameraY) else {
             return
         }
-        let height = cameraY - floorY
+        let height = cameraY - planeY
         // Only heights a phone on the robot can have; not while someone holds it up by hand.
-        guard height >= PointGoalMath.minMountHeight, height <= PointGoalMath.maxMountHeight else {
-            return
-        }
+        let onRobot = height >= PointGoalMath.minMountHeight && height <= PointGoalMath.maxMountHeight
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
+                return
+            }
+            if self.floorY.map({ abs(planeY - $0) > 0.005 }) ?? true {
+                print("floor found at y=\(planeY) m")
+            }
+            self.floorY = planeY
+            guard onRobot else {
                 return
             }
             if !self.cameraHeightMeasured || abs(height - self.cameraHeight) > 0.005 {
@@ -562,6 +600,22 @@ enum PointGoalMath {
     static let maxRayDistance: Float = 6
     /// Size of the goal pin in meters.
     static let markerSize: Float = 0.1
+    /// A hit more than this above the floor is furniture or a wall, not the floor.
+    static let floorTolerance: Float = 0.05
+
+    /// Floor hit: that exact spot. Hit above the floor: nil. No hit, or one below the floor (a
+    /// reflection): where the tap ray meets the floor.
+    static func goalOnFloor(origin: simd_float3, direction: simd_float3, surfaceHit: simd_float3?, floorY: Float) -> simd_float3? {
+        if let hit = surfaceHit {
+            if hit.y > floorY + floorTolerance {
+                return nil
+            }
+            if hit.y >= floorY - floorTolerance {
+                return horizontalDistance(origin, hit) <= maxRayDistance ? hit : nil
+            }
+        }
+        return intersectFloor(origin: origin, direction: direction, floorY: floorY)
+    }
 
     static func validate(camera: simd_float3, goal: simd_float3?) -> Result {
         guard let goal = goal else {

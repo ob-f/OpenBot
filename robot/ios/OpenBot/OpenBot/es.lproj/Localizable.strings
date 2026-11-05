@@ -192,6 +192,7 @@
 "goalReachedMessage" = "Meta alcanzada";
 "pointGoalTapHint" = "Toca el suelo donde quieres que vaya el robot y luego pulsa Iniciar.";
 "pointGoalSet" = "Objetivo fijado a %.1f m. Pulsa Iniciar.";
+"pointGoalSetFloorNotFound" = "Objetivo fijado a unos %.1f m, pero aún no se ha detectado el suelo. Deja el robot en el suelo o mueve un poco el teléfono y vuelve a tocar.";
 "pointGoalNotFloor" = "Eso no es el suelo. Toca el suelo por donde el robot pueda moverse.";
 "pointGoalTooClose" = "Demasiado cerca. Toca un punto a al menos %.1f m.";
 "pointGoalWatchdog" = "El robot se detuvo porque la aplicación dejó de responder.";

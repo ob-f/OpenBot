@@ -260,14 +260,12 @@ All models are quantized for better performance on embedded devices. Note that m
 
 ### Navigation
 
-The `Point Goal Navigation` screen allows the user to set a goal location for the robot to navigate to using forward and left values in 3D space. To access this screen, simply tap on the corresponding button in the app.
+The `Point Goal Navigation` screen lets you pick a spot on the floor for the robot to drive to. To access this screen, simply tap on the corresponding button in the app.
 
-Upon tapping, a popup will appear with two input fields labeled `Forward` and `Left`. The user can enter values into these fields to set the goal location for the robot to navigate to. The popup also contains two buttons: `Cancel` and `Start`.
+Mount the phone on the robot, put the robot on the floor and move it a little until ARKit finds the floor. Then tap the spot on the floor in the camera view where the robot should go; a marker shows the goal. Taps on furniture or other objects above the floor are rejected.
 
-- `Cancel` button: This button will return the user to the home screen and cancel the navigation process.
-
-
-- `Start` button: This button will create a point in 3D space using the forward and left values entered by the user and start the navigation process. The robot will begin moving towards the goal location and adjusting its trajectory and speed as needed to reach the destination.
+- `Start` button: starts the navigation. The robot drives towards the goal and adjusts its trajectory and speed as needed to reach it.
+- `Stop` button: stops the robot at any time.
 
 If the robot successfully reaches the goal location, a message will appear indicating that the goal has been reached, and the robot will stop moving.
 

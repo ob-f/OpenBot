@@ -269,6 +269,7 @@ struct Strings {
     static var pointGoalTapHint: String { L10n.string("pointGoalTapHint") }
     /// Format string with one %.1f placeholder for the distance in meters.
     static var pointGoalSet: String { L10n.string("pointGoalSet") }
+    static var pointGoalSetFloorNotFound: String { L10n.string("pointGoalSetFloorNotFound") }
     static var pointGoalNotFloor: String { L10n.string("pointGoalNotFloor") }
     /// Format string with one %.1f placeholder for the minimum distance in meters.
     static var pointGoalTooClose: String { L10n.string("pointGoalTooClose") }
