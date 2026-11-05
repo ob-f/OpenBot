@@ -160,7 +160,7 @@ Interfaz simple para el seguimiento de objetos de 80 clases diferentes. Una brev
 
 ### Navegación a Punto de Destino
 
-Ten en cuenta que este fragmento requiere ARCore y permiso de cámara. Si tu dispositivo no es compatible con ARCore y continúas de todos modos, la aplicación se bloqueará. En esta pantalla puedes especificar un objetivo a través de un vector 2D con respecto a la posición y orientación actual del robot. El vector 2D contiene la distancia al frente y a la izquierda del robot en metros. Ambos valores también pueden ser negativos y corresponder a la parte trasera y derecha del robot en ese caso. Después de especificar el objetivo y presionar `Iniciar`, el robot ejecutará una política de IA que intentará alcanzar el objetivo mientras evita obstáculos.
+Ten en cuenta que este fragmento requiere ARCore y permiso de cámara. Si tu dispositivo no es compatible con ARCore y continúas de todos modos, la aplicación se bloqueará. Monta el teléfono en el robot, pon el robot en el suelo y muévelo un poco hasta que ARCore detecte el suelo. Luego toca en la vista de la cámara el punto del suelo al que debe ir el robot; un marcador muestra el objetivo. Los toques sobre muebles, paredes u otros objetos por encima del suelo se rechazan. Después de presionar `Iniciar`, el robot ejecutará una política de IA que intentará alcanzar el objetivo mientras evita obstáculos. Pulsa `Detener` en cualquier momento para parar el robot.
 
 <p align="left">
 <img src="../../../docs/images/screen_point_goal_nav.gif" alt="Texto alternativo" width="50%" />
