@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.util.Size;
+import androidx.annotation.Nullable;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Camera;
 import com.google.ar.core.CameraConfig;
@@ -17,10 +18,13 @@ import com.google.ar.core.Config;
 import com.google.ar.core.Config.InstantPlacementMode;
 import com.google.ar.core.Config.LightEstimationMode;
 import com.google.ar.core.Config.PlaneFindingMode;
+import com.google.ar.core.DepthPoint;
 import com.google.ar.core.Frame;
+import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
+import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingFailureReason;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
@@ -73,9 +77,10 @@ public class ArCore implements GLSurfaceView.Renderer {
   // The marker quad reaches this far below its center; lift it so the pin tip touches the floor.
   private static final float MARKER_TIP_OFFSET_M = 0.1f;
 
-  private static final int CALIBRATE_EVERY_FRAMES = 15;
-  // Re-measured from ARCore's floor plane; never saved.
-  // Written by the UI thread and the GL thread.
+  private static final int MEASURE_FLOOR_EVERY_FRAMES = 15;
+  // World height of the detected floor; doesn't move when the robot is lifted. GL thread only.
+  @Nullable private Float floorY = null;
+  // Fallback until the floor is found. Written by the UI and GL threads.
   private volatile float cameraHeightM = GoalValidator.DEFAULT_CAMERA_HEIGHT_M;
   private volatile boolean cameraHeightMeasured = false;
   private int frameCount = 0;
@@ -251,14 +256,14 @@ public class ArCore implements GLSurfaceView.Renderer {
         targetPose = target.getPose();
       }
 
-      if (goalPlacementEnabled && frameCount++ % CALIBRATE_EVERY_FRAMES == 0) {
-        calibrateCameraHeight();
+      if (goalPlacementEnabled && frameCount++ % MEASURE_FLOOR_EVERY_FRAMES == 0) {
+        measureFloor();
       }
 
       float[] tap = pendingTap;
       if (tap != null) {
         pendingTap = null;
-        placeGoalFromTap(tap[0], tap[1]);
+        placeGoalFromTap(frame, tap[0], tap[1]);
       }
 
       // Get image.
@@ -334,29 +339,30 @@ public class ArCore implements GLSurfaceView.Renderer {
     }
   }
 
-  /**
-   * The goal is where the tap ray meets the floor, with the floor at the known camera height below
-   * the phone. This only needs the camera's orientation (gravity is exact from the IMU), so it's
-   * correct from the first frame. Image depth is not used: a phone standing still on the robot has
-   * no parallax yet, so early depth guesses are off and get corrected as it drives, which made the
-   * goal jump.
-   */
-  private void placeGoalFromTap(float tapX, float tapY) {
+  /** Goal on the detected (or estimated) floor; taps above the floor are rejected. */
+  private void placeGoalFromTap(Frame frame, float tapX, float tapY) {
     float[] cameraPos = currentPose.getTranslation();
+    Float knownFloorY = floorY;
+    boolean floorFound = knownFloorY != null;
+    float floor = floorFound ? knownFloorY : cameraPos[1] - cameraHeightM;
+
     float[][] ray = tapRay(tapX, tapY);
+    float[] surfaceHit = surfaceHit(frame, tapX, tapY);
     float[] goal =
-        ray == null
-            ? null
-            : GoalValidator.intersectFloor(ray[0], ray[1], cameraPos[1] - cameraHeightM);
+        GoalValidator.goalOnFloor(
+            ray == null ? null : ray[0], ray == null ? null : ray[1], surfaceHit, floor);
 
     GoalValidator.Result result = GoalValidator.validate(cameraPos, goal);
     Timber.d(
-        "goal tap (%.0f, %.0f): camera=%s height=%.3f (%s) goal=%s -> %s",
+        "goal tap (%.0f, %.0f): camera=%s floor=%.3f (%s, height %.3f %s) hit=%s goal=%s -> %s",
         tapX,
         tapY,
         Arrays.toString(cameraPos),
+        floor,
+        floorFound ? "plane" : "estimated",
         cameraHeightM,
         cameraHeightMeasured ? "measured" : "starting",
+        Arrays.toString(surfaceHit),
         Arrays.toString(goal),
         result);
     if (result != GoalValidator.Result.OK) {
@@ -374,19 +380,42 @@ public class ArCore implements GLSurfaceView.Renderer {
       float distance = GoalValidator.horizontalDistance(cameraPos, goal);
       runOnMainThread(
           () -> {
-            if (arCoreListener != null) arCoreListener.onGoalPlaced(distance);
+            if (arCoreListener != null) arCoreListener.onGoalPlaced(distance, floorFound);
           });
     } catch (NotTrackingException e) {
       Timber.d(e, "ARCore lost tracking while placing goal anchor.");
     }
   }
 
-  /** Measures the camera height from ARCore's floor plane, if it sees one. */
-  private void calibrateCameraHeight() {
+  /** First plane or depth point the tap hits, {x, y, z}; feature points are too noisy to use. */
+  @Nullable
+  private static float[] surfaceHit(Frame frame, float tapX, float tapY) {
+    for (HitResult hit : frame.hitTest(tapX, tapY)) {
+      Trackable trackable = hit.getTrackable();
+      if (trackable.getTrackingState() != TrackingState.TRACKING) continue;
+      if (trackable instanceof Plane) {
+        Plane plane = (Plane) trackable;
+        if (plane.getSubsumedBy() == null && plane.isPoseInPolygon(hit.getHitPose())) {
+          return hit.getHitPose().getTranslation();
+        }
+      } else if (trackable instanceof DepthPoint) {
+        return hit.getHitPose().getTranslation();
+      }
+    }
+    return null;
+  }
+
+  /** Updates the floor height, and the fallback camera height while the phone is on the robot. */
+  private void measureFloor() {
     float cameraY = currentPose.ty();
-    Float floorY = GoalValidator.pickFloorY(collectUpwardPlanes(), cameraY);
-    if (floorY == null) return;
-    float height = cameraY - floorY;
+    Float planeY = GoalValidator.pickFloorY(collectUpwardPlanes(), cameraY);
+    if (planeY == null) return;
+    if (floorY == null || Math.abs(planeY - floorY) > 0.005f) {
+      Timber.d("floor found at y=%.3f m", planeY);
+    }
+    floorY = planeY;
+
+    float height = cameraY - planeY;
     // Only heights a phone on the robot can have; not while someone holds it up by hand.
     if (height < GoalValidator.MIN_MOUNT_HEIGHT_M || height > GoalValidator.MAX_MOUNT_HEIGHT_M) {
       return;
@@ -483,6 +512,9 @@ public class ArCore implements GLSurfaceView.Renderer {
         throw e;
       }
     }
+
+    // The world may be re-founded after a pause, so find the floor again.
+    surfaceView.queueEvent(() -> floorY = null);
 
     // Note that order matters - see the note in onPause(), the reverse applies here.
     session.resume();
@@ -586,8 +618,12 @@ public class ArCore implements GLSurfaceView.Renderer {
             .setUpdateMode(Config.UpdateMode.BLOCKING);
 
     if (goalPlacementEnabled) {
-      // Only used to measure the camera height above the floor.
-      config.setPlaneFindingMode(PlaneFindingMode.HORIZONTAL);
+      // Horizontal planes find the floor; vertical ones let a tap on a wall hit the wall.
+      config.setPlaneFindingMode(PlaneFindingMode.HORIZONTAL_AND_VERTICAL);
+      // Depth lets a tap hit any surface (furniture, walls), not only detected planes.
+      if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+        config.setDepthMode(Config.DepthMode.AUTOMATIC);
+      }
     }
 
     session.configure(config);

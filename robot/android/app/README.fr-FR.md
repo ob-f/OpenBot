@@ -160,7 +160,7 @@ Interface utilisateur simple pour suivre des objets de 80 classes différentes. 
 
 ### Navigation vers un Point
 
-Notez que ce fragment nécessite ARCore et la permission de la caméra. Si votre appareil ne prend pas en charge ARCore et que vous continuez quand même, l'application plantera. Dans cet écran, vous pouvez spécifier un objectif via un vecteur 2D par rapport à la position et à l'orientation actuelles du robot. Le vecteur 2D contient la distance à l'avant et à gauche du robot en mètres. Les deux valeurs peuvent également être négatives et correspondent alors à l'arrière et à la droite du robot. Après avoir spécifié l'objectif et appuyé sur `Start`, le robot exécutera une politique d'IA qui tentera d'atteindre l'objectif tout en évitant les obstacles.
+Notez que ce fragment nécessite ARCore et la permission de la caméra. Si votre appareil ne prend pas en charge ARCore et que vous continuez quand même, l'application plantera. Fixez le téléphone sur le robot, posez le robot au sol et déplacez-le un peu jusqu'à ce qu'ARCore détecte le sol. Touchez ensuite, dans la vue de la caméra, l'endroit du sol où le robot doit aller ; un marqueur indique l'objectif. Les touches sur des meubles, des murs ou d'autres objets au-dessus du sol sont refusées. Après avoir appuyé sur `Start`, le robot exécutera une politique d'IA qui tentera d'atteindre l'objectif tout en évitant les obstacles. Appuyez sur `Stop` à tout moment pour arrêter le robot.
 
 <p align="left">
 <img src="../../../docs/images/screen_point_goal_nav.gif" alt="Texte alternatif" width="50%" />

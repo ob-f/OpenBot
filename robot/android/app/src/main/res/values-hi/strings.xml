@@ -76,6 +76,7 @@
     <string name="tracking_lost">ट्रैकिंग खो गई।</string>
     <string name="point_goal_tap_hint">फ़र्श पर वहाँ टैप करें जहाँ रोबोट को जाना है, फिर स्टार्ट दबाएँ।</string>
     <string name="point_goal_set">लक्ष्य %1$.1f मी दूर सेट हुआ। चलाने के लिए स्टार्ट दबाएँ।</string>
+    <string name="point_goal_set_floor_not_found">लक्ष्य लगभग %1$.1f मी दूर सेट हुआ, लेकिन फ़र्श अभी तक नहीं मिला। रोबोट को फ़र्श पर रखें, या फ़ोन को थोड़ा हिलाएँ और फिर से टैप करें।</string>
     <string name="point_goal_not_floor">यह फ़र्श नहीं है। फ़र्श पर वहाँ टैप करें जहाँ रोबोट चल सकता है।</string>
     <string name="point_goal_not_tracking">ट्रैकिंग अभी शुरू नहीं हुई। फ़र्श मिलने तक फ़ोन को धीरे-धीरे हिलाएँ, फिर दोबारा टैप करें।</string>
     <string name="point_goal_too_close">बहुत पास। कम से कम %1$.1f मी दूर की जगह पर टैप करें।</string>

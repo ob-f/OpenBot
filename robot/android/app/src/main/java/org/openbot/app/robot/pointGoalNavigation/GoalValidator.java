@@ -44,6 +44,9 @@ public final class GoalValidator {
    */
   public static final float MAX_RAY_DISTANCE_M = 6f;
 
+  /** A hit more than this above the floor is furniture or a wall, not the floor. */
+  public static final float FLOOR_TOLERANCE_M = 0.05f;
+
   public enum Result {
     OK,
     NOT_FLOOR,
@@ -63,6 +66,29 @@ public final class GoalValidator {
     if (hit[1] > camera[1] - MIN_CAMERA_HEIGHT_M) return Result.NOT_FLOOR;
     if (horizontalDistance(camera, hit) < MIN_GOAL_DISTANCE_M) return Result.TOO_CLOSE;
     return Result.OK;
+  }
+
+  /**
+   * Floor hit: that exact spot. Hit above the floor: null. No hit, or one below the floor (a
+   * reflection): where the tap ray meets the floor.
+   */
+  @Nullable
+  public static float[] goalOnFloor(
+      @Nullable float[] origin,
+      @Nullable float[] direction,
+      @Nullable float[] surfaceHit,
+      float floorY) {
+    if (surfaceHit != null) {
+      if (surfaceHit[1] > floorY + FLOOR_TOLERANCE_M) return null;
+      if (surfaceHit[1] >= floorY - FLOOR_TOLERANCE_M) {
+        if (origin != null && horizontalDistance(origin, surfaceHit) > MAX_RAY_DISTANCE_M) {
+          return null;
+        }
+        return surfaceHit;
+      }
+    }
+    if (origin == null || direction == null) return null;
+    return intersectFloor(origin, direction, floorY);
   }
 
   /**

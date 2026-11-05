@@ -76,6 +76,7 @@
     <string name="tracking_lost">跟踪丢失。</string>
     <string name="point_goal_tap_hint">点击地面上希望机器人前往的位置，然后按开始。</string>
     <string name="point_goal_set">目标已设置在 %1$.1f 米外。按开始出发。</string>
+    <string name="point_goal_set_floor_not_found">目标已设置在约 %1$.1f 米外，但尚未找到地面。请让机器人保持在地面上，或稍微移动手机后再点一次。</string>
     <string name="point_goal_not_floor">这不是地面。请点击机器人可以行驶的地面。</string>
     <string name="point_goal_not_tracking">尚未开始追踪。请缓慢移动手机直到识别出地面，然后再次点击。</string>
     <string name="point_goal_too_close">太近了。请点击至少 %1$.1f 米外的位置。</string>

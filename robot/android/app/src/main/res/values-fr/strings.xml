@@ -76,6 +76,7 @@
     <string name="tracking_lost">Suivi perdu.</string>
     <string name="point_goal_tap_hint">Touchez le sol à l\'endroit où le robot doit aller, puis appuyez sur Démarrer.</string>
     <string name="point_goal_set">Objectif placé à %1$.1f m. Appuyez sur Démarrer.</string>
+    <string name="point_goal_set_floor_not_found">Objectif placé à environ %1$.1f m, mais le sol n\'est pas encore détecté. Laissez le robot au sol, ou bougez un peu le téléphone et touchez à nouveau.</string>
     <string name="point_goal_not_floor">Ce n\'est pas le sol. Touchez le sol où le robot peut rouler.</string>
     <string name="point_goal_not_tracking">Pas encore de suivi. Déplacez lentement le téléphone jusqu\'à ce que le sol soit détecté, puis touchez à nouveau.</string>
     <string name="point_goal_too_close">Trop proche. Touchez un point à au moins %1$.1f m.</string>

@@ -55,6 +55,8 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   // Read by the watchdog thread.
   private volatile boolean isRunning = false;
   private volatile long lastNavUpdateMs = 0;
+  // Whether the current touch on the camera view began while the robot was driving.
+  private boolean touchStartedWhileDriving = false;
   private final ArrivalCheck arrivalCheck = new ArrivalCheck();
   private HandlerThread watchdogThread;
   private Handler watchdogHandler;
@@ -134,37 +136,57 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
   private void setupTapToSetGoal() {
     binding.surfaceView.setOnTouchListener(
         (v, event) -> {
-          if (event.getAction() == MotionEvent.ACTION_UP) {
-            v.performClick();
-            if (!isRunning) {
-              arCore.setStartingCameraHeight(
-                  GoalValidator.startingCameraHeight(
-                      vehicle == null ? null : vehicle.getVehicleType()));
-              arCore.requestTapAt(event.getX(), event.getY());
-            }
+          switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+              touchStartedWhileDriving = isRunning;
+              break;
+            case MotionEvent.ACTION_UP:
+              v.performClick();
+              // A touch that began while driving is never a goal tap.
+              if (!isRunning && !touchStartedWhileDriving) {
+                arCore.setStartingCameraHeight(
+                    GoalValidator.startingCameraHeight(
+                        vehicle == null ? null : vehicle.getVehicleType()));
+                arCore.requestTapAt(event.getX(), event.getY());
+              }
+              break;
+            default:
+              break;
           }
           return true;
         });
     binding.start.setOnClickListener(v -> startDriving());
-    // Stop on finger down, not on release, so the robot stops the moment the button is touched.
+    // Stop on finger down; consume the whole touch so it can't become a goal tap.
     binding.stop.setOnTouchListener(
         (v, event) -> {
-          if (event.getAction() == MotionEvent.ACTION_DOWN && isRunning) {
-            Timber.d("nav: stopped by user");
-            stop();
-            showHint(getString(R.string.point_goal_tap_hint));
+          if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            stopByUser();
+          } else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+            v.performClick();
           }
-          return false;
+          return true;
         });
+    // For accessibility services, which click instead of touching.
+    binding.stop.setOnClickListener(v -> stopByUser());
 
     showHint(getString(R.string.point_goal_tap_hint));
   }
 
+  private void stopByUser() {
+    if (!isRunning) return;
+    Timber.d("nav: stopped by user");
+    stop();
+    showHint(getString(R.string.point_goal_tap_hint));
+  }
+
   @Override
-  public void onGoalPlaced(float distanceM) {
+  public void onGoalPlaced(float distanceM, boolean floorFound) {
     if (binding == null || isRunning) return;
     binding.start.setVisibility(View.VISIBLE);
-    showHint(getString(R.string.point_goal_set, distanceM));
+    showHint(
+        getString(
+            floorFound ? R.string.point_goal_set : R.string.point_goal_set_floor_not_found,
+            distanceM));
   }
 
   @Override
