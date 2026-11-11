@@ -80,6 +80,8 @@ public class ArCore implements GLSurfaceView.Renderer {
   private static final int MEASURE_FLOOR_EVERY_FRAMES = 15;
   // World height of the detected floor; doesn't move when the robot is lifted. GL thread only.
   @Nullable private Float floorY = null;
+  // Locked once the floor is seen under the robot.
+  private boolean floorLocked = false;
   // Fallback until the floor is found. Written by the UI and GL threads.
   private volatile float cameraHeightM = GoalValidator.DEFAULT_CAMERA_HEIGHT_M;
   private volatile boolean cameraHeightMeasured = false;
@@ -416,7 +418,8 @@ public class ArCore implements GLSurfaceView.Renderer {
   /** Updates the floor height, and the fallback camera height while the phone is on the robot. */
   private void measureFloor() {
     float cameraY = currentPose.ty();
-    Float planeY = GoalValidator.pickFloorY(collectUpwardPlanes(), cameraY);
+    Float planeY =
+        GoalValidator.pickFloorY(collectUpwardPlanes(), cameraY, floorLocked ? floorY : null);
     if (planeY == null) return;
     if (floorY == null || Math.abs(planeY - floorY) > 0.005f) {
       Timber.d("floor found at y=%.3f m", planeY);
@@ -428,6 +431,7 @@ public class ArCore implements GLSurfaceView.Renderer {
     if (height < GoalValidator.MIN_MOUNT_HEIGHT_M || height > GoalValidator.MAX_MOUNT_HEIGHT_M) {
       return;
     }
+    floorLocked = true;
     if (!cameraHeightMeasured || Math.abs(height - cameraHeightM) > 0.005f) {
       Timber.d("camera height measured: %.3f m", height);
     }
@@ -522,7 +526,11 @@ public class ArCore implements GLSurfaceView.Renderer {
     }
 
     // The world may be re-founded after a pause, so find the floor again.
-    surfaceView.queueEvent(() -> floorY = null);
+    surfaceView.queueEvent(
+        () -> {
+          floorY = null;
+          floorLocked = false;
+        });
 
     // Note that order matters - see the note in onPause(), the reverse applies here.
     session.resume();

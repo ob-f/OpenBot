@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.openbot.app.robot.pointGoalNavigation.GoalValidator.Result;
 
@@ -109,21 +110,27 @@ public class GoalValidatorTest {
     assertEquals(5f, d, 1e-5f);
   }
 
+  // Floor at 0 m, larger table at 0.7 m.
+  private static final List<float[]> FLOOR_AND_LARGER_TABLE =
+      Arrays.asList(new float[] {0f, 1f}, new float[] {0.7f, 3f});
+
   @Test
-  public void floorIsLargestPlaneBelowCamera() {
-    Float floorY =
-        GoalValidator.pickFloorY(
-            Arrays.asList(
-                new float[] {-0.15f, 6f}, // floor
-                new float[] {0.45f, 1f}, // table above the camera
-                new float[] {-0.5f, 0.5f}), // small reflection under a shiny floor
-            0f);
-    assertEquals(-0.15f, floorY, 1e-5f);
+  public void robotHeldUp_floorAndLargerTable_picksFloor() {
+    assertEquals(0f, GoalValidator.pickFloorY(FLOOR_AND_LARGER_TABLE, 1.2f, null), 1e-6f);
+  }
+
+  @Test
+  public void robotOnFloor_floorAndLargerTable_locksFloor() {
+    Float floorY = GoalValidator.pickFloorY(FLOOR_AND_LARGER_TABLE, 0.12f, null);
+    assertEquals(0f, floorY, 1e-6f);
+    // Lifted over the table: floor stays locked.
+    List<float[]> tableOnly = Collections.singletonList(new float[] {0.7f, 5f});
+    assertEquals(0f, GoalValidator.pickFloorY(tableOnly, 1.2f, floorY), 1e-6f);
   }
 
   @Test
   public void noPlanes_noFloor() {
-    assertNull(GoalValidator.pickFloorY(Collections.emptyList(), 0f));
+    assertNull(GoalValidator.pickFloorY(Collections.emptyList(), 0f, null));
   }
 
   // Robot on the floor at y = 0, phone 12 cm up, looking 2 m ahead.

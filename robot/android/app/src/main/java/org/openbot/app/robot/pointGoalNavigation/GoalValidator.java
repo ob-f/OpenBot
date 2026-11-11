@@ -118,24 +118,57 @@ public final class GoalValidator {
     return hit;
   }
 
+  /** Smaller planes are ignored when picking the lowest plane. */
+  private static final float MIN_FLOOR_AREA_M2 = 0.25f;
+
+  /** A locked floor only moves this much. */
+  private static final float FLOOR_UPDATE_M = 0.05f;
+
   /**
-   * Floor height from the tracked upward-facing planes: the largest one below the camera. The
-   * lowest one would pick up false planes reflected in shiny floors.
+   * Floor height from the tracked upward-facing planes.
    *
    * @param planes each entry is {y, area}
+   * @param lockedFloorY the locked floor, or null
    */
   @Nullable
-  public static Float pickFloorY(List<float[]> planes, float cameraY) {
-    Float floorY = null;
+  public static Float pickFloorY(
+      List<float[]> planes, float cameraY, @Nullable Float lockedFloorY) {
+    // Locked floor: only follow planes within 5 cm.
+    if (lockedFloorY != null) {
+      Float refined =
+          largestPlaneY(planes, lockedFloorY - FLOOR_UPDATE_M, lockedFloorY + FLOOR_UPDATE_M);
+      return refined != null ? refined : lockedFloorY;
+    }
+    // Robot on the floor: plane 4-40 cm below the camera.
+    Float underRobot =
+        largestPlaneY(planes, cameraY - MAX_MOUNT_HEIGHT_M, cameraY - MIN_MOUNT_HEIGHT_M);
+    if (underRobot != null) return underRobot;
+    // Else the lowest large plane (the largest may be a table).
+    return lowestPlaneY(planes, cameraY - MIN_CAMERA_HEIGHT_M, MIN_FLOOR_AREA_M2);
+  }
+
+  @Nullable
+  private static Float largestPlaneY(List<float[]> planes, float minY, float maxY) {
+    Float largest = null;
     float bestArea = 0f;
     for (float[] plane : planes) {
-      if (plane[0] > cameraY - MIN_CAMERA_HEIGHT_M) continue;
-      if (plane[1] > bestArea) {
+      if (plane[0] >= minY && plane[0] <= maxY && plane[1] > bestArea) {
         bestArea = plane[1];
-        floorY = plane[0];
+        largest = plane[0];
       }
     }
-    return floorY;
+    return largest;
+  }
+
+  @Nullable
+  private static Float lowestPlaneY(List<float[]> planes, float maxY, float minArea) {
+    Float lowest = null;
+    for (float[] plane : planes) {
+      if (plane[0] <= maxY && plane[1] >= minArea && (lowest == null || plane[0] < lowest)) {
+        lowest = plane[0];
+      }
+    }
+    return lowest;
   }
 
   /** How far a hit may be from the floor and still count as the floor. */
