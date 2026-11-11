@@ -28,6 +28,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
     private var runGeneration = 0
     private var lastControl: Control?
     private var floorY: Float?
+    // Locked once the floor is seen under the robot.
+    private var floorLocked = false
     private var usesSceneDepth = false
     private var cameraHeight: Float = PointGoalMath.defaultCameraHeight
     private var cameraHeightMeasured = false
@@ -79,6 +81,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
         }
         // The world may be re-founded after a pause, so find the floor again.
         floorY = nil
+        floorLocked = false
         sceneView.session.run(configuration)
     }
 
@@ -462,23 +465,25 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
                 floors.append(plane)
             }
         }
-        guard let planeY = PointGoalMath.pickFloorY(planes: floors.isEmpty ? planes : floors, cameraY: cameraY) else {
-            return
-        }
-        let height = cameraY - planeY
-        // Only heights a phone on the robot can have; not while someone holds it up by hand.
-        let onRobot = height >= PointGoalMath.minMountHeight && height <= PointGoalMath.maxMountHeight
+        let candidates = floors.isEmpty ? planes : floors
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
+                return
+            }
+            guard let planeY = PointGoalMath.pickFloorY(planes: candidates, cameraY: cameraY, lockedFloorY: self.floorLocked ? self.floorY : nil) else {
                 return
             }
             if self.floorY.map({ abs(planeY - $0) > 0.005 }) ?? true {
                 print("floor found at y=\(planeY) m")
             }
             self.floorY = planeY
+            let height = cameraY - planeY
+            // Only heights a phone on the robot can have; not while someone holds it up by hand.
+            let onRobot = height >= PointGoalMath.minMountHeight && height <= PointGoalMath.maxMountHeight
             guard onRobot else {
                 return
             }
+            self.floorLocked = true
             if !self.cameraHeightMeasured || abs(height - self.cameraHeight) > 0.005 {
                 print("camera height measured: \(height) m")
             }
@@ -602,6 +607,10 @@ enum PointGoalMath {
     static let markerSize: Float = 0.1
     /// A hit more than this above the floor is furniture or a wall, not the floor.
     static let floorTolerance: Float = 0.05
+    /// Smaller planes are ignored when picking the lowest plane as the floor.
+    static let minFloorArea: Float = 0.25
+    /// Once the floor is locked, it only moves this much.
+    static let floorUpdate: Float = 0.05
 
     /// Floor hit: that exact spot. Hit above the floor: nil. No hit, or one below a detected floor (a
     /// reflection): where the tap ray meets the floor. An estimated floor can be too high (robot held
@@ -648,13 +657,20 @@ enum PointGoalMath {
         return simd_float3(hit.x, floorY, hit.z)
     }
 
-    /// Floor height from horizontal planes: the largest one below the camera. The lowest one would
-    /// pick up false planes reflected in shiny floors.
-    static func pickFloorY(planes: [(y: Float, area: Float)], cameraY: Float) -> Float? {
+    /// Floor height from horizontal planes. Once the floor is locked it only moves to a plane within
+    /// 5 cm, so a table can't replace it. Until then: the lowest plane of at least 0.25 m2, not the
+    /// largest (that may be a table).
+    static func pickFloorY(planes: [(y: Float, area: Float)], cameraY: Float, lockedFloorY: Float?) -> Float? {
         var floorY: Float?
-        var bestArea: Float = 0
-        for plane in planes where plane.y <= cameraY - minCameraHeight && plane.area > bestArea {
-            bestArea = plane.area
+        if let lockedY = lockedFloorY {
+            var bestArea: Float = 0
+            for plane in planes where abs(plane.y - lockedY) <= floorUpdate && plane.area > bestArea {
+                bestArea = plane.area
+                floorY = plane.y
+            }
+            return floorY ?? lockedY
+        }
+        for plane in planes where plane.y <= cameraY - minCameraHeight && plane.area >= minFloorArea && plane.y < (floorY ?? .infinity) {
             floorY = plane.y
         }
         return floorY

@@ -269,4 +269,23 @@ class ArrivalCheckTests: XCTestCase {
         XCTAssertFalse(check.hasArrived(distance: 0.20, deltaYaw: 0.2))
         XCTAssertFalse(check.hasArrived(distance: 0.21, deltaYaw: 0.2))
     }
+
+    // Floor at 0 m, larger table at 0.7 m.
+    private let floorAndLargerTable: [(y: Float, area: Float)] = [(0, 1), (0.7, 3)]
+
+    func testRobotHeldUpFloorAndLargerTablePicksFloor() {
+        XCTAssertEqual(PointGoalMath.pickFloorY(planes: floorAndLargerTable, cameraY: 1.2, lockedFloorY: nil)!, 0, accuracy: 1e-6)
+    }
+
+    func testRobotOnFloorFloorAndLargerTableLocksFloor() {
+        let floorY = PointGoalMath.pickFloorY(planes: floorAndLargerTable, cameraY: 0.12, lockedFloorY: nil)
+        XCTAssertEqual(floorY!, 0, accuracy: 1e-6)
+        // Lifted over the table: floor stays locked.
+        let tableOnly: [(y: Float, area: Float)] = [(0.7, 5)]
+        XCTAssertEqual(PointGoalMath.pickFloorY(planes: tableOnly, cameraY: 1.2, lockedFloorY: floorY)!, 0, accuracy: 1e-6)
+    }
+
+    func testNoPlanesNoFloor() {
+        XCTAssertNil(PointGoalMath.pickFloorY(planes: [], cameraY: 0, lockedFloorY: nil))
+    }
 }
