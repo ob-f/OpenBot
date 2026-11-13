@@ -269,6 +269,8 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
     /// Function to load the subviews, manage anything on the screen when screen view updates.
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        widthConstraint?.constant = view.bounds.width
+        heightConstraint?.constant = view.bounds.height
         configureVideoOrientation()
     }
 
