@@ -10,6 +10,7 @@ import DropDown
 class ObjectTrackingSettings: UIView {
     let autoModeButton = UISwitch()
     var autoModeLabel = UILabel()
+    var bottomConstraint: NSLayoutConstraint?
     var speedTitleLabel = UILabel()
     var speedLabel = UILabel()
     var inputTitleLabel = UILabel()
@@ -183,21 +184,11 @@ class ObjectTrackingSettings: UIView {
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
             switch swipeGesture.direction {
             case .down:
-                UIView.animate(withDuration: 0.25) {
-                    if currentOrientation == .portrait {
-                        self.frame.origin.y = height - adapted(dimensionSize: 50, to: .height)
-                    } else {
-                        self.frame.origin.y = width - adapted(dimensionSize: 50, to: .height)
-                    }
-                }
+                bottomConstraint?.constant = width - adapted(dimensionSize: 50, to: .height) + 5
+                UIView.animate(withDuration: 0.25) { self.superview?.layoutIfNeeded() }
             case .up:
-                UIView.animate(withDuration: 0.25) {
-                    if currentOrientation == .portrait {
-                        self.frame.origin.y = height - width;
-                    } else {
-                        self.frame.origin.y = adapted(dimensionSize: 20, to: .height)
-                    }
-                }
+                bottomConstraint?.constant = 5
+                UIView.animate(withDuration: 0.25) { self.superview?.layoutIfNeeded() }
             default:
                 break
             }

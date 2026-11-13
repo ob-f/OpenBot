@@ -272,6 +272,14 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
         configureVideoOrientation()
     }
 
+    /// Resizes the camera view on rotation.
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        DeviceCurrentOrientation.shared.findDeviceOrientation()
+        widthConstraint?.constant = size.width
+        heightConstraint?.constant = size.height
+    }
+
     /// Function to apply the constraints on the screen view and also manage the rotation of the camera view
     func applyConstraints() {
         if currentOrientation == .portrait || currentOrientation == .portraitUpsideDown {

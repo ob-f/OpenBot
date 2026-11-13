@@ -24,6 +24,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     var secondView = UIScrollView()
     var leadingConstraint: NSLayoutConstraint!
     var topConstraint: NSLayoutConstraint!
+    var landscapeTopConstraint: NSLayoutConstraint!
     var widthConstraint: NSLayoutConstraint!
     var heightConstraint: NSLayoutConstraint!
     var preview = UIButton()
@@ -286,7 +287,17 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         topConstraint.identifier = Strings.expendSetting
         widthConstraint.identifier = Strings.expendSetting
         heightConstraint.identifier = Strings.expendSetting
-        NSLayoutConstraint.activate([leadingConstraint, topConstraint, widthConstraint, heightConstraint])
+        landscapeTopConstraint = secondView.topAnchor.constraint(equalTo: topAnchor, constant: 10)
+        landscapeTopConstraint.identifier = Strings.expendSetting
+        NSLayoutConstraint.activate([leadingConstraint, widthConstraint, heightConstraint])
+        updateTopConstraint()
+    }
+
+    /// Landscape panel starts at the top edge so all rows fit.
+    func updateTopConstraint() {
+        let isPortrait = currentOrientation == .portrait
+        topConstraint.isActive = isPortrait
+        landscapeTopConstraint.isActive = !isPortrait
     }
 
     /// UI Function to to update the constraints
@@ -301,11 +312,12 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         } else {
             frame.size.width = height
             leadingConstraint.constant = height / 2 - 50
-            topConstraint.constant = 30
+            landscapeTopConstraint.constant = 10
             widthConstraint.constant = height / 2
-            heightConstraint.constant = width;
+            heightConstraint.constant = width - 10;
             dropdownTopAnchor.constant = 150;
         }
+        updateTopConstraint()
     }
 
     /// UI Function to create button for images
@@ -622,7 +634,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         if currentOrientation == .portrait {
             topConstraint.constant = 260
         } else {
-            topConstraint.constant = 10
+            landscapeTopConstraint.constant = -10
         }
     }
 
@@ -630,7 +642,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         if currentOrientation == .portrait {
             topConstraint.constant = 290
         } else {
-            topConstraint.constant = 30
+            landscapeTopConstraint.constant = 10
         }
     }
 

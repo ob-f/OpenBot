@@ -383,3 +383,16 @@ class openCodeRunBottomSheet: UIView {
 
 
 }
+
+/// Navigation bar that passes touches through, except on its buttons.
+class PassthroughNavigationBar: UINavigationBar {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard let hit = super.hitTest(point, with: event) else { return nil }
+        var view: UIView? = hit
+        while let current = view, current !== self {
+            if current is UIControl { return hit }
+            view = current.superview
+        }
+        return nil
+    }
+}
