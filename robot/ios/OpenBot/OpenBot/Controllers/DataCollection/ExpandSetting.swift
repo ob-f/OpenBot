@@ -78,7 +78,14 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         createImagesButton()
         createSecondViewLabel(value: Strings.sensorData, leadingAnchor: 10, topAnchor: 130, labelWidth: 200, labelHeight: 40).font = UIFont.boldSystemFont(ofSize: 16.0)
         createSensorButtons()
-        _ = createSecondViewLabel(value: Strings.delay, leadingAnchor: 230, topAnchor: 230, labelWidth: 60, labelHeight: 40)
+        // Two-line label starts higher to stay level with the field.
+        let delayFont = UIFont.systemFont(ofSize: 15)
+        let delayWords = Strings.delay.split(separator: " ")
+        let delayLongestWord = delayWords.map { measuredWidth(of: String($0), font: delayFont) }.max() ?? 0
+        let delayNeedsTwoLines = measuredWidth(of: Strings.delay, font: delayFont) > 75 && delayWords.count > 1 && delayLongestWord <= 75
+        let delayLabel = createSecondViewLabel(value: Strings.delay, leadingAnchor: 230, topAnchor: delayNeedsTwoLines ? 220 : 230, labelWidth: 60, labelHeight: 40)
+        delayLabel.widthAnchor.constraint(equalToConstant: 75).isActive = true
+        delayLabel.wrapOrTruncate(width: 75)
         createDelayField()
         let vehicleControls = VehicleControl();
         createLeftSpeed()
@@ -109,6 +116,9 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     /// UI Function to create button for logs
     func createLogDataButton() {
         let label = createLabels(value: Strings.logData, leadingAnchor: 10, topAnchor: 13, labelWidth: 100, labelHeight: 40)
+        label.widthAnchor.constraint(lessThanOrEqualToConstant: 150).isActive = true
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         logData.isOn = false
         logData.setOn(false, animated: true)
         logData.onTintColor = Colors.title
@@ -468,7 +478,8 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         btn.leadingAnchor.constraint(equalTo: secondView.leadingAnchor, constant: leadingAnchor).isActive = true
         btn.widthAnchor.constraint(equalToConstant: buttonWidth).isActive = true
         btn.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        text.frame = CGRect(x: 10, y: 0, width: buttonWidth, height: 40)
+        text.frame = CGRect(x: 10, y: 0, width: buttonWidth - 20, height: 40)
+        text.wrapOrTruncate(width: buttonWidth - 20)
         btn.addSubview(text)
         return btn
     }

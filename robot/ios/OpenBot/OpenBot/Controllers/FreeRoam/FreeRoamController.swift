@@ -281,9 +281,9 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
     }
 
     func createLabels() {
-        createLabel(value: Strings.controller, x: 35, y: 20, width: 100, height: 40)
-        createLabel(value: Strings.speed, x: 35, y: 207, width: 100, height: 40)
-        createLabel(value: Strings.driveMode, x: 35, y: 110, width: 100, height: 40)
+        createLabel(value: Strings.controller, x: 35, y: 20, width: 250, height: 40)
+        createLabel(value: Strings.speed, x: 35, y: 207, width: 250, height: 40)
+        createLabel(value: Strings.driveMode, x: 35, y: 110, width: 250, height: 40)
     }
 
     func createVoltageLabel() {
@@ -541,10 +541,11 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
     func createMode(x: Int, y: Int, width: Int, label: String, icon: String, action: Selector?) -> UIView {
         let modeRectangle = createRectangle(x: x, y: y, width: width, height: 55, borderColor: "noColor", isBorderRequire: false)
         modeRectangle.backgroundColor = Colors.freeRoamButtonsColor
-        let modeRectangleLabel = UILabel(frame: CGRect(x: 10, y: 4, width: 100, height: 50))
+        let modeRectangleLabel = UILabel(frame: CGRect(x: 10, y: 4, width: modeRectangle.frame.width * 0.62, height: 50))
         modeRectangleLabel.text = label
         modeRectangleLabel.textColor = .white
         modeRectangleLabel.font = modeRectangleLabel.font.withSize(13)
+        modeRectangleLabel.wrapOrTruncate(width: modeRectangle.frame.width * 0.62)
         modeRectangle.addSubview(modeRectangleLabel)
         let modeIcon = UIImageView(frame: CGRect(x: modeRectangle.frame.width - 12.8 - modeRectangle.frame.width / 10, y: modeRectangle.frame.height / 3, width: 19, height: 19))
         if let image = UIImage(named: icon)?.withRenderingMode(.alwaysTemplate) {

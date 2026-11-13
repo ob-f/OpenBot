@@ -57,14 +57,15 @@ class ObjectTrackingSettings: UIView {
         createBluetoothIcon()
         createCameraIcon()
         createSwitchButton()
-        addSubview(createLabel(text: Strings.dynamicSpeed, leadingAnchor: Int(adapted(dimensionSize: 150, to: .height)), topAnchor: Int(adapted(dimensionSize: 40, to: .height))))
+        let dynamicSpeedTitle = createLabel(text: Strings.dynamicSpeed, leadingAnchor: Int(adapted(dimensionSize: 150, to: .height)), topAnchor: Int(adapted(dimensionSize: 40, to: .height)))
+        dynamicSpeedTitle.frame.size.width = min(dynamicSpeedTitle.frame.width, max(width - dynamicSpeedTitle.frame.origin.x - 20, 60))
+        dynamicSpeedTitle.lineBreakMode = .byTruncatingTail
+        addSubview(dynamicSpeedTitle)
         setDynamicSpeed()
         addSubview(createLabel(text: Strings.model, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 60, to: .height))))
         createModelDropDown()
         speedTitleLabel = createLabel(text: Strings.speed, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 90, to: .height)))
         speedTitleLabel.numberOfLines = 1
-        speedTitleLabel.adjustsFontSizeToFitWidth = true
-        speedTitleLabel.minimumScaleFactor = 0.5
         speedTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(speedTitleLabel)
         speedTitleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: adapted(dimensionSize: 20, to: .height)).isActive = true
@@ -84,7 +85,10 @@ class ObjectTrackingSettings: UIView {
         setupObjectDropDown()
         addSubview(createLabel(text: Strings.confidence, leadingAnchor: 180, topAnchor: Int(adapted(dimensionSize: 120, to: .height))))
         setupConfidence()
-        addSubview(createLabel(text: Strings.device, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 150, to: Dimension.height))))
+        let deviceLabel = createLabel(text: Strings.device, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 150, to: Dimension.height)))
+        deviceLabel.frame.size.width = 58
+        deviceLabel.lineBreakMode = .byTruncatingTail
+        addSubview(deviceLabel)
         createDeviceDropDown()
         addSubview(createLabel(text: Strings.threads, leadingAnchor: 180, topAnchor: Int(adapted(dimensionSize: 150, to: .height))))
         setupThreads();
