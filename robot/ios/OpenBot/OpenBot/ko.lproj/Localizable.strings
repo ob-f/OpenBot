@@ -190,6 +190,14 @@
 
 /* Point Goal Navigation */
 "goalReachedMessage" = "목표 도달";
+"pointGoalTapHint" = "로봇이 갈 바닥 위치를 탭한 다음 시작을 누르세요.";
+"pointGoalSet" = "%.1f m 거리에 목표가 설정되었습니다. 시작을 누르세요.";
+"pointGoalSetFloorNotFound" = "약 %.1f m 거리에 목표가 설정되었지만 아직 바닥을 찾지 못했습니다. 로봇을 바닥에 두거나 휴대폰을 조금 움직인 후 다시 탭하세요.";
+"pointGoalNotFloor" = "바닥이 아닙니다. 로봇이 주행할 수 있는 바닥을 탭하세요.";
+"pointGoalTooClose" = "너무 가깝습니다. 최소 %.1f m 떨어진 곳을 탭하세요.";
+"pointGoalWatchdog" = "앱이 응답하지 않아 로봇을 정지했습니다.";
+"pointGoalTrackingLost" = "추적이 끊겨 로봇을 정지했습니다.";
+"pointGoalModelFailure" = "내비게이션 정책을 초기화할 수 없습니다.";
 
 /* Model Management filter dropdown */
 "modelFilterAll" = "전체";

@@ -192,14 +192,12 @@ Todos los modelos están cuantizados para un mejor rendimiento en dispositivos i
 
 ### Navegación
 
-La pantalla `Point Goal Navigation` permite fijar un destino al que irá el robot, con valores hacia delante y hacia la izquierda en el espacio 3D. Para abrirla, toca el botón correspondiente en la aplicación.
+La pantalla `Point Goal Navigation` permite elegir un punto del suelo al que irá el robot. Para abrirla, toca el botón correspondiente en la aplicación.
 
-Aparece una ventana con dos campos, `Forward` y `Left`. Escribe en ellos los valores del destino. La ventana también tiene dos botones: `Cancel` y `Start`.
+Monta el teléfono en el robot, pon el robot en el suelo y muévelo un poco hasta que ARKit detecte el suelo. Luego toca en la vista de la cámara el punto del suelo al que debe ir el robot; un marcador muestra el destino. Los toques sobre muebles, paredes u otros objetos por encima del suelo se rechazan.
 
-- Botón `Cancel`: vuelve a la pantalla de inicio y cancela la navegación.
-
-
-- Botón `Start`: crea un punto en el espacio 3D con los valores introducidos e inicia la navegación. El robot avanza hacia el destino y ajusta su trayectoria y velocidad para llegar.
+- Botón `Start`: inicia la navegación. El robot avanza hacia el destino y ajusta su trayectoria y velocidad para llegar.
+- Botón `Stop`: detiene el robot en cualquier momento.
 
 Si el robot llega al destino, aparece un mensaje que lo indica y el robot se detiene.
 

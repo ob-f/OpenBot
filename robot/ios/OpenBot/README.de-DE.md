@@ -188,14 +188,12 @@ Alle Modelle sind quantisiert, um eine bessere Leistung auf eingebetteten Gerät
 
 ### Navigation
 
-Auf dem Bildschirm `Point Goal Navigation` legen Sie ein Ziel fest, zu dem der Roboter fährt, angegeben mit Werten für vorwärts und links im 3D-Raum. Tippen Sie dazu in der App auf die entsprechende Schaltfläche.
+Auf dem Bildschirm `Point Goal Navigation` wählen Sie eine Stelle am Boden, zu der der Roboter fährt. Tippen Sie dazu in der App auf die entsprechende Schaltfläche.
 
-Danach erscheint ein Pop-up mit zwei Eingabefeldern, `Forward` und `Left`. Geben Sie dort die Werte für das Ziel ein. Das Pop-up hat außerdem zwei Schaltflächen: `Cancel` und `Start`.
+Befestigen Sie das Handy am Roboter, stellen Sie den Roboter auf den Boden und bewegen Sie ihn etwas, bis ARKit den Boden erkennt. Tippen Sie dann im Kamerabild auf die Stelle am Boden, zu der der Roboter fahren soll; eine Markierung zeigt das Ziel. Tippen auf Möbel, Wände oder andere Objekte über dem Boden wird abgelehnt.
 
-- Schaltfläche `Cancel`: bringt Sie zurück zum Startbildschirm und bricht die Navigation ab.
-
-
-- Schaltfläche `Start`: legt aus den eingegebenen Werten für vorwärts und links einen Punkt im 3D-Raum fest und startet die Navigation. Der Roboter fährt auf das Ziel zu und passt Richtung und Geschwindigkeit an, um es zu erreichen.
+- Schaltfläche `Start`: startet die Navigation. Der Roboter fährt auf das Ziel zu und passt Richtung und Geschwindigkeit an, um es zu erreichen.
+- Schaltfläche `Stop`: hält den Roboter jederzeit an.
 
 Erreicht der Roboter das Ziel, erscheint eine Meldung, und der Roboter hält an.
 
