@@ -269,7 +269,17 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
     /// Function to load the subviews, manage anything on the screen when screen view updates.
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        widthConstraint?.constant = view.bounds.width
+        heightConstraint?.constant = view.bounds.height
         configureVideoOrientation()
+    }
+
+    /// Resizes the camera view on rotation.
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        DeviceCurrentOrientation.shared.findDeviceOrientation()
+        widthConstraint?.constant = size.width
+        heightConstraint?.constant = size.height
     }
 
     /// Function to apply the constraints on the screen view and also manage the rotation of the camera view

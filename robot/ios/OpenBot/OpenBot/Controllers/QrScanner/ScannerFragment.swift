@@ -294,6 +294,7 @@ class scannerFragment: CameraController,autopilotDelegate {
         let scanQr = UIButton(frame: CGRect(x: 19, y: 120, width: 120, height: 40));
         scanQr.backgroundColor = Colors.title;
         scanQr.setTitle(Strings.scanQrButton, for: .normal);
+        scanQr.titleLabel?.wrapOrTruncate(width: 112)
         scanQr.addTarget(nil, action: #selector(scan), for: .touchUpInside);
         scanQr.layer.cornerRadius = 10;
         bottomSheet.addSubview(scanQr);

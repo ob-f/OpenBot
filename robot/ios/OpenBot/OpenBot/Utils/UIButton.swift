@@ -31,6 +31,7 @@ class CustomButton: UIButton {
     convenience init(text: String, frame: CGRect,selector :Selector) {
         self.init(frame: frame)
         setTitle(text, for: .normal);
+        titleLabel?.wrapOrTruncate(width: frame.width - 16)
         layer.cornerRadius = 10;
         layer.borderColor = Colors.title?.cgColor
         layer.borderWidth = 2;

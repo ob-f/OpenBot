@@ -80,6 +80,7 @@ class BottomSheet: UIViewController, UITableViewDataSource, UITableViewDelegate,
         btn.backgroundColor = color
         btn.layer.cornerRadius = 5
         btn.setTitle(title, for: .normal);
+        btn.titleLabel?.wrapOrTruncate(width: 72)
         btn.titleLabel?.textColor = Colors.border;
         btn.addTarget(self, action: action, for: .touchUpInside);
     }
@@ -90,6 +91,7 @@ class BottomSheet: UIViewController, UITableViewDataSource, UITableViewDelegate,
         label.frame = CGRect(x: width / 2 - 50, y: 0, width: 120, height: 50);
         label.textColor = Colors.border
         label.font = label.font.withSize(15)
+        label.wrapOrTruncate(width: 120)
         view.addSubview(label)
     }
 

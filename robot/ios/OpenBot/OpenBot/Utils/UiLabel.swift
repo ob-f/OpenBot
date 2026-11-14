@@ -23,5 +23,6 @@ class CustomLabel : UILabel {
         self.frame = frame
         font = font.withSize(fontSize)
         textColor = fontColor
+        wrapOrTruncate(width: frame.width)
     }
 }

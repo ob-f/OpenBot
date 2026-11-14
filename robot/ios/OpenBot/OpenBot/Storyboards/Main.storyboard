@@ -22,7 +22,7 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="PA5-nf-qH0" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="iB7-Za-Tcy">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="iB7-Za-Tcy" customClass="PassthroughNavigationBar" customModule="OpenBot" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="48" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" systemColor="tertiaryLabelColor"/>
@@ -586,7 +586,7 @@
         <scene sceneID="P0B-f1-O2o">
             <objects>
                 <navigationController id="SWT-9V-gJg" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="u2p-yE-tGG">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="u2p-yE-tGG" customClass="PassthroughNavigationBar" customModule="OpenBot" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="48" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
