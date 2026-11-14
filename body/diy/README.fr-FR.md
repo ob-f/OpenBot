@@ -25,6 +25,7 @@ Il existe plusieurs options pour le corps du robot en fonction de vos besoins et
 - [Corps mince](cad/slim_body/README.md) : Comme beaucoup d'imprimantes 3D courantes ont un volume de construction plus petit, nous avons également conçu une version plus petite sans pare-chocs qui tient sur une plaque de construction de 220mmx220mm à 45 degrés.
 - [Corps collable](cad/glue_body/README.md) : Pour l'impression sur des imprimantes 3D avec des volumes de construction encore plus petits, il existe également un corps modulaire conçu par @sloretz avec plusieurs pièces à coller ensemble ; il tient sur une plaque de construction de 150mmx140mm.
 - [Corps bloc](cad/block_body/README.md) : Ce corps conçu par @Christos-Ps propose plusieurs variantes avec des options pour plus d'espace à l'intérieur de la coque et un dessus compatible avec les Lego tout en conservant une petite empreinte nécessitant seulement 221mmx150mm pour l'impression.
+- [OpenBot Compact](../compact/README.fr-FR.md) : Pour un montage avec ESP32, voir OpenBot Compact, un corps compact distinct pour l'ESP32 DevKit V1 avec un pilote de moteurs L298N et un couvercle compatible avec les Lego ; toutes les pièces tiennent sur un plateau de 180mmx180mm.
 
 #### Support de téléphone
 
@@ -32,6 +33,8 @@ De plus, vous devrez imprimer un support de téléphone à fixer au corps du rob
 
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
+
+Pour incliner le téléphone vers le haut jusqu'à 30°, imprimez la version inclinable de [body/phone_mount](../phone_mount/README.fr-FR.md) à la place de `phone_mount_bottom`.
 
 #### Nettoyage
 

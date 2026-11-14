@@ -25,6 +25,7 @@ Es gibt mehrere Optionen für den Roboterkörper, abhängig von Ihren Bedürfnis
 - [Schlanker Körper](cad/slim_body/README.md): Da viele gängige 3D-Drucker ein kleineres Bauvolumen haben, haben wir auch eine kleinere Version ohne Stoßfänger entworfen, die auf eine 220mmx220mm Bauplatte bei 45 Grad passt.
 - [Klebbarer Körper](cad/glue_body/README.md): Für den Druck auf 3D-Druckern mit noch kleineren Bauvolumen gibt es auch einen modularen Körper, der von @sloretz entworfen wurde und aus mehreren Teilen besteht, die zusammengeklebt werden müssen; er passt auf eine 150mmx140mm Bauplatte.
 - [Blockiger Körper](cad/block_body/README.md): Dieser Körper, entworfen von @Christos-Ps, bietet mehrere Varianten mit Optionen für zusätzlichen Platz im Inneren der Hülle und einer lego-kompatiblen Oberseite, während er eine kleine Stellfläche beibehält, die nur 221mmx150mm für den Druck benötigt.
+- [OpenBot Compact](../compact/README.de-DE.md): Für einen Aufbau mit ESP32 siehe OpenBot Compact, einen eigenen kompakten Körper für das ESP32 DevKit V1 mit L298N-Motortreiber und lego-kompatiblem Deckel; alle Teile passen auf eine 180mmx180mm Druckplatte.
 
 #### Handyhalterung
 
@@ -32,6 +33,8 @@ Zusätzlich müssen Sie eine Handyhalterung drucken, die am Roboterkörper befes
 
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
+
+Um das Handy um bis zu 30° nach oben zu neigen, drucken Sie statt `phone_mount_bottom` die neigbare Version aus [body/phone_mount](../phone_mount/README.de-DE.md).
 
 #### Reinigung
 
