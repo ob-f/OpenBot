@@ -30,6 +30,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
     private var floorY: Float?
     // Locked once the floor is seen under the robot.
     private var floorLocked = false
+    // Last above-floor tap; tapping it again places the goal below.
+    private var aboveFloorTap: (point: CGPoint, time: TimeInterval)?
     private var usesSceneDepth = false
     private var cameraHeight: Float = PointGoalMath.defaultCameraHeight
     private var cameraHeightMeasured = false
@@ -82,6 +84,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
         // The world may be re-founded after a pause, so find the floor again.
         floorY = nil
         floorLocked = false
+        aboveFloorTap = nil
         sceneView.session.run(configuration)
     }
 
@@ -180,12 +183,23 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
         }
         let floorFound = floorY != nil
         let floor = floorY ?? cameraPosition.y - cameraHeight
-        let hit = surfaceHit(at: point)
-        let goal = PointGoalMath.goalOnFloor(origin: origin, direction: direction, surfaceHit: hit, floorY: floor, floorFound: floorFound)
+        let hit = surfaceHit(at: point, camera: cameraPosition)
+        var goal = PointGoalMath.goalOnFloor(origin: origin, direction: direction, surfaceHit: hit?.position, hitType: hit?.type ?? .otherPlane, floorY: floor, floorFound: floorFound)
+
+        let now = Date.timeIntervalSinceReferenceDate
+        let aboveFloor = goal == nil && (hit.map { $0.position.y > floor } ?? false)
+        let override = aboveFloor && (aboveFloorTap.map { PointGoalMath.isRepeatTap(from: $0.point, at: $0.time, to: point, at: now) } ?? false)
+        aboveFloorTap = nil
+        if override, let hit = hit {
+            goal = PointGoalMath.onFloor(hit.position, floorY: floor)
+        }
         let result = PointGoalMath.validate(camera: cameraPosition, goal: goal)
-        print("goal tap \(point): camera=\(cameraPosition) floor=\(floor) (\(floorFound ? "plane" : "estimated"), height \(cameraHeight) \(cameraHeightMeasured ? "measured" : "starting")) hit=\(String(describing: hit)) goal=\(String(describing: goal)) -> \(result)")
+        print("goal tap \(point): camera=\(cameraPosition) floor=\(floor) (\(floorFound ? "plane" : "estimated"), height \(cameraHeight) \(cameraHeightMeasured ? "measured" : "starting")) hit=\(String(describing: hit)) goal=\(String(describing: goal))\(override ? " (override)" : "") -> \(result)")
 
         switch result {
+        case .notFloor where aboveFloor && !override:
+            aboveFloorTap = (point, now)
+            showHint(Strings.pointGoalTapAgain)
         case .notFloor:
             showHint(Strings.pointGoalNotFloor)
         case .tooClose:
@@ -201,25 +215,32 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UIGestureRecognize
         }
     }
 
-    private func surfaceHit(at point: CGPoint) -> simd_float3? {
+    private func surfaceHit(at point: CGPoint, camera: simd_float3) -> (position: simd_float3, type: PointGoalMath.HitType)? {
         // Without LiDAR, estimated planes come from noisy feature points, so only planes are used.
         var targets: [ARRaycastQuery.Target] = [.existingPlaneGeometry]
         if usesSceneDepth {
             targets.append(.estimatedPlane)
         }
-        var nearest: (distance: Float, point: simd_float3)?
+        var nearest: (distance: Float, position: simd_float3, type: PointGoalMath.HitType)?
         for target in targets {
-            guard let query = sceneView.raycastQuery(from: point, allowing: target, alignment: .any),
-                  let result = sceneView.session.raycast(query).first else {
+            guard let query = sceneView.raycastQuery(from: point, allowing: target, alignment: .any) else {
+                continue
+            }
+            // Skip far junk hits.
+            let results = sceneView.session.raycast(query).filter {
+                PointGoalMath.horizontalDistance(camera, simd_make_float3($0.worldTransform.columns.3)) <= PointGoalMath.maxRayDistance
+            }
+            guard let result = results.first else {
                 continue
             }
             let position = simd_make_float3(result.worldTransform.columns.3)
             let distance = simd_distance(position, query.origin)
+            let type: PointGoalMath.HitType = target == .estimatedPlane ? .depth : (result.targetAlignment == .horizontal ? .upwardPlane : .otherPlane)
             if distance < nearest?.distance ?? .greatestFiniteMagnitude {
-                nearest = (distance, position)
+                nearest = (distance, position, type)
             }
         }
-        return nearest?.point
+        return nearest.map { ($0.position, $0.type) }
     }
 
     private func placeGoal(at position: simd_float3) {
@@ -611,20 +632,41 @@ enum PointGoalMath {
     static let minFloorArea: Float = 0.25
     /// Once the floor is locked, it only moves this much.
     static let floorUpdate: Float = 0.05
+    // Horizontal planes this close to the floor count as floor.
+    static let upwardPlaneTolerance: Float = 0.10
+    // A repeat tap within this distance and time overrides a rejection.
+    static let repeatTapRadius: CGFloat = 50
+    static let repeatTapWindow: TimeInterval = 3
 
-    /// Floor hit: that exact spot. Hit above the floor: nil. No hit, or one below a detected floor (a
-    /// reflection): where the tap ray meets the floor. An estimated floor can be too high (robot held
-    /// up), so a hit below it is used.
-    static func goalOnFloor(origin: simd_float3, direction: simd_float3, surfaceHit: simd_float3?, floorY: Float, floorFound: Bool) -> simd_float3? {
-        if let hit = surfaceHit {
-            if hit.y > floorY + floorTolerance {
+    enum HitType {
+        case upwardPlane
+        case otherPlane
+        case depth
+    }
+
+    // Floor hit is the goal, a hit above the floor is nil, otherwise the tap ray on the floor.
+    static func goalOnFloor(origin: simd_float3, direction: simd_float3, surfaceHit: simd_float3?, hitType: HitType, floorY: Float, floorFound: Bool) -> simd_float3? {
+        // Far hits are junk: use the floor ray.
+        if let hit = surfaceHit, horizontalDistance(origin, hit) <= maxRayDistance {
+            let tolerance = hitType == .upwardPlane ? upwardPlaneTolerance : floorTolerance
+            if hit.y > floorY + tolerance {
                 return nil
             }
-            if !floorFound || hit.y >= floorY - floorTolerance {
-                return horizontalDistance(origin, hit) <= maxRayDistance ? hit : nil
+            if !floorFound || hit.y >= floorY - tolerance {
+                // Snap only to a detected floor; an estimate can be in the air.
+                return hitType == .upwardPlane && floorFound ? onFloor(hit, floorY: floorY) : hit
             }
         }
         return intersectFloor(origin: origin, direction: direction, floorY: floorY)
+    }
+
+    static func onFloor(_ point: simd_float3, floorY: Float) -> simd_float3 {
+        simd_float3(point.x, floorY, point.z)
+    }
+
+    // Within 50 pt and 3 s of the first tap.
+    static func isRepeatTap(from first: CGPoint, at firstTime: TimeInterval, to point: CGPoint, at time: TimeInterval) -> Bool {
+        time - firstTime <= repeatTapWindow && hypot(point.x - first.x, point.y - first.y) <= repeatTapRadius
     }
 
     static func validate(camera: simd_float3, goal: simd_float3?) -> Result {
