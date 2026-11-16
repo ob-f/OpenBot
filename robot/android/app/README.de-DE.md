@@ -160,7 +160,7 @@ Einfache Benutzeroberfläche zur Verfolgung von Objekten aus 80 verschiedenen Kl
 
 ### Punktziel-Navigation
 
-Beachten Sie, dass dieses Fragment ARCore und Kameraberechtigung erfordert. Wenn Ihr Gerät ARCore nicht unterstützt und Sie trotzdem fortfahren, stürzt die App ab. Befestigen Sie das Handy am Roboter, stellen Sie den Roboter auf den Boden und bewegen Sie ihn etwas, bis ARCore den Boden erkennt. Tippen Sie dann im Kamerabild auf die Stelle am Boden, zu der der Roboter fahren soll; eine Markierung zeigt das Ziel. Tippen auf Möbel, Wände oder andere Objekte über dem Boden wird abgelehnt. Nach dem Drücken von `Start` führt der Roboter eine KI-Richtlinie aus, die versucht, das Ziel zu erreichen und dabei Hindernisse zu vermeiden. Mit `Stop` können Sie den Roboter jederzeit anhalten.
+Beachten Sie, dass dieses Fragment ARCore und Kameraberechtigung erfordert. Wenn Ihr Gerät ARCore nicht unterstützt und Sie trotzdem fortfahren, stürzt die App ab. Befestigen Sie das Handy am Roboter, stellen Sie den Roboter auf den Boden und bewegen Sie ihn etwas, bis ARCore den Boden erkennt. Tippen Sie dann im Kamerabild auf die Stelle am Boden, zu der der Roboter fahren soll; eine Markierung zeigt das Ziel. Tippen auf Möbel, Wände oder andere Objekte über dem Boden wird abgelehnt; tippen Sie erneut auf dieselbe Stelle, um das Ziel auf den Boden darunter zu setzen. Nach dem Drücken von `Start` führt der Roboter eine KI-Richtlinie aus, die versucht, das Ziel zu erreichen und dabei Hindernisse zu vermeiden. Mit `Stop` können Sie den Roboter jederzeit anhalten.
 
 <p align="left">
 <img src="../../../docs/images/screen_point_goal_nav.gif" alt="Alt-Text" width="50%" />

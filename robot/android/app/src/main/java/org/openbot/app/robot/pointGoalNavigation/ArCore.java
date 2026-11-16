@@ -28,6 +28,7 @@ import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingFailureReason;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
+import com.google.ar.core.exceptions.FatalException;
 import com.google.ar.core.exceptions.NotTrackingException;
 import com.google.ar.core.exceptions.NotYetAvailableException;
 import com.google.ar.core.exceptions.SessionPausedException;
@@ -82,6 +83,10 @@ public class ArCore implements GLSurfaceView.Renderer {
   @Nullable private Float floorY = null;
   // Locked once the floor is seen under the robot.
   private boolean floorLocked = false;
+  // Last tap rejected as above the floor; a repeat tap places the goal below it. GL thread only.
+  private boolean aboveFloorTapPending = false;
+  private float aboveFloorTapX, aboveFloorTapY;
+  private long aboveFloorTapMs;
   // Fallback until the floor is found. Written by the UI and GL threads.
   private volatile float cameraHeightM = GoalValidator.DEFAULT_CAMERA_HEIGHT_M;
   private volatile boolean cameraHeightMeasured = false;
@@ -265,7 +270,13 @@ public class ArCore implements GLSurfaceView.Renderer {
       float[] tap = pendingTap;
       if (tap != null) {
         pendingTap = null;
-        placeGoalFromTap(frame, tap[0], tap[1]);
+        try {
+          placeGoalFromTap(frame, tap[0], tap[1]);
+        } catch (FatalException | NotTrackingException e) {
+          // ARCore can fail right after a tracking restart.
+          Timber.w(e, "ARCore failed while placing the goal.");
+          notifyRejected(GoalValidator.Result.NOT_TRACKING);
+        }
       }
 
       // Get image.
@@ -349,21 +360,31 @@ public class ArCore implements GLSurfaceView.Renderer {
     float floor = floorFound ? knownFloorY : cameraPos[1] - cameraHeightM;
 
     float[][] ray = tapRay(tapX, tapY);
-    HitResult hit = surfaceHit(frame, tapX, tapY);
+    HitResult hit = surfaceHit(frame, cameraPos, tapX, tapY);
     float[] surfaceHit = hit == null ? null : hit.getHitPose().getTranslation();
-    boolean depthHit = hit != null && hit.getTrackable() instanceof DepthPoint;
+    GoalValidator.HitType hitType = hitType(hit);
     float[] goal =
         GoalValidator.goalOnFloor(
             ray == null ? null : ray[0],
             ray == null ? null : ray[1],
             surfaceHit,
-            depthHit,
+            hitType,
             floor,
             floorFound);
 
+    long now = SystemClock.uptimeMillis();
+    boolean aboveFloor = goal == null && surfaceHit != null && surfaceHit[1] > floor;
+    boolean override =
+        aboveFloor
+            && aboveFloorTapPending
+            && GoalValidator.isRepeatTap(
+                aboveFloorTapX, aboveFloorTapY, aboveFloorTapMs, tapX, tapY, now);
+    aboveFloorTapPending = false;
+    if (override) goal = GoalValidator.onFloor(surfaceHit, floor);
+
     GoalValidator.Result result = GoalValidator.validate(cameraPos, goal);
     Timber.d(
-        "goal tap (%.0f, %.0f): camera=%s floor=%.3f (%s, height %.3f %s) hit=%s (%s) goal=%s -> %s",
+        "goal tap (%.0f, %.0f): camera=%s floor=%.3f (%s, height %.3f %s) hit=%s (%s) goal=%s%s -> %s",
         tapX,
         tapY,
         Arrays.toString(cameraPos),
@@ -372,37 +393,59 @@ public class ArCore implements GLSurfaceView.Renderer {
         cameraHeightM,
         cameraHeightMeasured ? "measured" : "starting",
         Arrays.toString(surfaceHit),
-        depthHit ? "depth" : "plane",
+        hitType,
         Arrays.toString(goal),
+        override ? " (override)" : "",
         result);
     if (result != GoalValidator.Result.OK) {
-      notifyRejected(result);
+      if (aboveFloor && !override) {
+        aboveFloorTapPending = true;
+        aboveFloorTapX = tapX;
+        aboveFloorTapY = tapY;
+        aboveFloorTapMs = now;
+        notifyRejected(GoalValidator.Result.ABOVE_FLOOR);
+      } else {
+        notifyRejected(result);
+      }
       return;
     }
 
-    try {
-      // A plain anchor at a world position stays fixed; it doesn't follow the screen.
-      Anchor newAnchor = session.createAnchor(Pose.makeTranslation(goal[0], goal[1], goal[2]));
-      Anchor previous = targetAnchor;
-      targetAnchor = newAnchor;
-      if (previous != null) previous.detach();
-      targetPose = newAnchor.getPose();
-      float distance = GoalValidator.horizontalDistance(cameraPos, goal);
-      runOnMainThread(
-          () -> {
-            if (arCoreListener != null) arCoreListener.onGoalPlaced(distance, floorFound);
-          });
-    } catch (NotTrackingException e) {
-      Timber.d(e, "ARCore lost tracking while placing goal anchor.");
+    // A plain anchor at a world position stays fixed; it doesn't follow the screen.
+    Anchor newAnchor = session.createAnchor(Pose.makeTranslation(goal[0], goal[1], goal[2]));
+    Anchor previous = targetAnchor;
+    targetAnchor = newAnchor;
+    if (previous != null) previous.detach();
+    targetPose = newAnchor.getPose();
+    float distance = GoalValidator.horizontalDistance(cameraPos, goal);
+    runOnMainThread(
+        () -> {
+          if (arCoreListener != null) arCoreListener.onGoalPlaced(distance, floorFound);
+        });
+  }
+
+  private static GoalValidator.HitType hitType(@Nullable HitResult hit) {
+    if (hit != null && hit.getTrackable() instanceof DepthPoint) {
+      return GoalValidator.HitType.DEPTH;
     }
+    if (hit != null
+        && hit.getTrackable() instanceof Plane
+        && ((Plane) hit.getTrackable()).getType() == Plane.Type.HORIZONTAL_UPWARD_FACING) {
+      return GoalValidator.HitType.UPWARD_PLANE;
+    }
+    return GoalValidator.HitType.OTHER_PLANE;
   }
 
   /** First plane or depth point the tap hits; feature points are too noisy to use. */
   @Nullable
-  private static HitResult surfaceHit(Frame frame, float tapX, float tapY) {
+  private static HitResult surfaceHit(Frame frame, float[] cameraPos, float tapX, float tapY) {
     for (HitResult hit : frame.hitTest(tapX, tapY)) {
       Trackable trackable = hit.getTrackable();
       if (trackable.getTrackingState() != TrackingState.TRACKING) continue;
+      // Far hits are junk depth, often before the floor is found.
+      float[] point = hit.getHitPose().getTranslation();
+      if (GoalValidator.horizontalDistance(cameraPos, point) > GoalValidator.MAX_RAY_DISTANCE_M) {
+        continue;
+      }
       if (trackable instanceof Plane) {
         Plane plane = (Plane) trackable;
         if (plane.getSubsumedBy() == null && plane.isPoseInPolygon(hit.getHitPose())) {
@@ -530,6 +573,7 @@ public class ArCore implements GLSurfaceView.Renderer {
         () -> {
           floorY = null;
           floorLocked = false;
+          aboveFloorTapPending = false;
         });
 
     // Note that order matters - see the note in onPause(), the reverse applies here.

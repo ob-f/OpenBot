@@ -196,6 +196,9 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
       case NOT_FLOOR:
         showHint(getString(R.string.point_goal_not_floor));
         break;
+      case ABOVE_FLOOR:
+        showHint(getString(R.string.point_goal_tap_again));
+        break;
       case TOO_CLOSE:
         showHint(getString(R.string.point_goal_too_close, GoalValidator.MIN_GOAL_DISTANCE_M));
         break;
@@ -269,6 +272,8 @@ public class PointGoalNavigationFragment extends ControlsFragment implements ArC
         Timber.d(
             "nav: deltaYaw=%.3f control=(%.3f, %.3f)",
             deltaYaw, control.getLeft(), control.getRight());
+        // The watchdog may have stopped the robot during inference.
+        if (!isRunning) return;
         vehicle.setControl(control);
         lastNavUpdateMs = SystemClock.elapsedRealtime();
       }

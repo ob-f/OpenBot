@@ -161,7 +161,7 @@ Simple UI for tracking objects of 80 different classes. A short description of t
 
 ### Point Goal Navigation
 
-Note that this fragment requires ARCore and camera permission. If your device does not support ARCore and you continue anyway, the app will crash. Mount the phone on the robot, put the robot on the floor and move it a little until ARCore finds the floor. Then tap the spot on the floor in the camera view where the robot should go; a marker shows the goal. Taps on furniture, walls or other objects above the floor are rejected. After pressing `Start` the robot will execute an AI policy that attempts to reach the goal while avoiding obstacles. Press `Stop` at any time to stop the robot.
+Note that this fragment requires ARCore and camera permission. If your device does not support ARCore and you continue anyway, the app will crash. Mount the phone on the robot, put the robot on the floor and move it a little until ARCore finds the floor. Then tap the spot on the floor in the camera view where the robot should go; a marker shows the goal. Taps on furniture, walls or other objects above the floor are rejected; tap the same spot again to place the goal on the floor below it. After pressing `Start` the robot will execute an AI policy that attempts to reach the goal while avoiding obstacles. Press `Stop` at any time to stop the robot.
 
 <p align="left">
 <img src="../../../docs/images/screen_point_goal_nav.gif" alt="Alt text" width="50%" />

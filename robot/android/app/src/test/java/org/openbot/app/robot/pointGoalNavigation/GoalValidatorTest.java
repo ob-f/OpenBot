@@ -2,12 +2,15 @@ package org.openbot.app.robot.pointGoalNavigation;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
+import org.openbot.app.robot.pointGoalNavigation.GoalValidator.HitType;
 import org.openbot.app.robot.pointGoalNavigation.GoalValidator.Result;
 
 public class GoalValidatorTest {
@@ -129,6 +132,12 @@ public class GoalValidatorTest {
   }
 
   @Test
+  public void phoneHeldOverTable_lowestLargePlaneWins() {
+    // The table is 30 cm below the phone, inside the 4-40 cm robot range.
+    assertEquals(0f, GoalValidator.pickFloorY(FLOOR_AND_LARGER_TABLE, 1.0f, null), 1e-6f);
+  }
+
+  @Test
   public void noPlanes_noFloor() {
     assertNull(GoalValidator.pickFloorY(Collections.emptyList(), 0f, null));
   }
@@ -149,41 +158,50 @@ public class GoalValidatorTest {
   public void tapHittingTheFloor_usesTheExactHitPoint() {
     float[] hit = {0.05f, 0.01f, -1.95f};
     assertArrayEquals(
-        hit, GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, hit, false, 0f, true), 1e-6f);
+        hit,
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, hit, HitType.OTHER_PLANE, 0f, true),
+        1e-6f);
   }
 
   @Test
   public void tapOnFurniture_isNotFloor() {
     // Sofa seat 40 cm high, in front of where the ray would meet the floor.
     float[] sofa = {0f, 0.4f, -1f};
-    assertNull(GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, sofa, false, 0f, true));
+    assertNull(
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, sofa, HitType.OTHER_PLANE, 0f, true));
   }
 
   @Test
   public void tapOnAWall_isNotFloor() {
     float[] wall = {0f, 0.3f, -1.5f};
-    assertNull(GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, wall, false, 0f, true));
+    assertNull(
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, wall, HitType.OTHER_PLANE, 0f, true));
   }
 
   @Test
   public void hitJustAboveTheFloor_isStillFloor() {
     float[] hit = {0f, GoalValidator.FLOOR_TOLERANCE_M - 0.01f, -2f};
     assertArrayEquals(
-        hit, GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, hit, false, 0f, true), 1e-6f);
+        hit,
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, hit, HitType.OTHER_PLANE, 0f, true),
+        1e-6f);
   }
 
   @Test
   public void hitBelowTheFloor_isIgnored() {
     // A reflection in a shiny floor: use where the ray meets the floor instead.
     float[] reflection = {0f, -0.5f, -3f};
-    float[] goal = GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, reflection, false, 0f, true);
+    float[] goal =
+        GoalValidator.goalOnFloor(
+            PHONE, TWO_METERS_AHEAD, reflection, HitType.OTHER_PLANE, 0f, true);
     assertEquals(0f, goal[1], 1e-5f);
     assertEquals(-2f, goal[2], 1e-4f);
   }
 
   @Test
   public void noHit_usesTheRayOnTheFloor() {
-    float[] goal = GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, null, false, 0f, true);
+    float[] goal =
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, null, HitType.OTHER_PLANE, 0f, true);
     assertEquals(0f, goal[1], 1e-5f);
     assertEquals(-2f, goal[2], 1e-4f);
   }
@@ -194,7 +212,7 @@ public class GoalValidatorTest {
     float[] lifted = {0f, 1f, 0f};
     float[] goal =
         GoalValidator.goalOnFloor(
-            lifted, rayTo(lifted, new float[] {0f, 0f, -2f}), null, false, 0f, true);
+            lifted, rayTo(lifted, new float[] {0f, 0f, -2f}), null, HitType.OTHER_PLANE, 0f, true);
     assertEquals(0f, goal[1], 1e-5f);
     assertEquals(-2f, goal[2], 1e-4f);
     assertEquals(Result.OK, GoalValidator.validate(lifted, goal));
@@ -203,7 +221,8 @@ public class GoalValidatorTest {
   @Test
   public void hitOnTheFloorTooFarAway_isRejected() {
     float[] far = {0f, 0f, -8f};
-    assertNull(GoalValidator.goalOnFloor(PHONE, rayTo(PHONE, far), far, false, 0f, true));
+    assertNull(
+        GoalValidator.goalOnFloor(PHONE, rayTo(PHONE, far), far, HitType.OTHER_PLANE, 0f, true));
   }
 
   @Test
@@ -212,7 +231,8 @@ public class GoalValidatorTest {
     float[] lifted = {0f, 1f, 0f};
     float[] floorHit = {0f, 0f, -2f};
     float[] goal =
-        GoalValidator.goalOnFloor(lifted, rayTo(lifted, floorHit), floorHit, true, 0.88f, false);
+        GoalValidator.goalOnFloor(
+            lifted, rayTo(lifted, floorHit), floorHit, HitType.DEPTH, 0.88f, false);
     assertArrayEquals(floorHit, goal, 1e-6f);
     assertEquals(Result.OK, GoalValidator.validate(lifted, goal));
   }
@@ -220,14 +240,58 @@ public class GoalValidatorTest {
   @Test
   public void floorNotFound_hitAboveTheEstimate_isNotFloor() {
     float[] sofa = {0f, 0.4f, -1f};
-    assertNull(GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, sofa, false, 0f, false));
+    assertNull(
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, sofa, HitType.OTHER_PLANE, 0f, false));
   }
 
   @Test
-  public void floorNotFound_depthHitTooFarAway_isRejected() {
+  public void floorNotFound_junkFarDepthHit_fallsBackToTheRay() {
+    float[] junk = {0f, -17f, -30f};
+    float[] goal =
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, junk, HitType.DEPTH, 0f, false);
+    assertEquals(0f, goal[1], 1e-5f);
+    assertEquals(-2f, goal[2], 1e-4f);
+  }
+
+  @Test
+  public void upwardPlaneJustAboveTheFloor_isFloorAtFloorHeight() {
+    // Seen on the S22: a floor plane 5.2 cm above the floor.
+    float[] plane = {0f, 0.052f, -2f};
+    float[] goal =
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, plane, HitType.UPWARD_PLANE, 0f, true);
+    assertArrayEquals(new float[] {0f, 0f, -2f}, goal, 1e-6f);
+  }
+
+  @Test
+  public void robotHeldUp_floorNotFound_upwardPlaneHit_staysOnThatPlane() {
+    // Estimated floor is in the air at 0.88 m; the small plane is the real floor.
     float[] lifted = {0f, 1f, 0f};
-    float[] far = {0f, 0f, -8f};
-    assertNull(GoalValidator.goalOnFloor(lifted, rayTo(lifted, far), far, true, 0.88f, false));
+    float[] plane = {0f, 0f, -2f};
+    float[] goal =
+        GoalValidator.goalOnFloor(
+            lifted, rayTo(lifted, plane), plane, HitType.UPWARD_PLANE, 0.88f, false);
+    assertArrayEquals(plane, goal, 1e-6f);
+  }
+
+  @Test
+  public void upwardPlaneWellAboveTheFloor_isNotFloor() {
+    float[] seat = {0f, 0.15f, -2f};
+    assertNull(
+        GoalValidator.goalOnFloor(PHONE, TWO_METERS_AHEAD, seat, HitType.UPWARD_PLANE, 0f, true));
+  }
+
+  @Test
+  public void repeatTap_closeAndSoon_overridesOnTheFloorBelow() {
+    assertTrue(GoalValidator.isRepeatTap(100f, 200f, 1000L, 130f, 230f, 3500L));
+    float[] goal = GoalValidator.onFloor(new float[] {0f, 0.4f, -1f}, 0f);
+    assertArrayEquals(new float[] {0f, 0f, -1f}, goal, 1e-6f);
+    assertEquals(Result.OK, GoalValidator.validate(PHONE, goal));
+  }
+
+  @Test
+  public void repeatTap_farOrLate_isNotAnOverride() {
+    assertFalse(GoalValidator.isRepeatTap(100f, 200f, 1000L, 200f, 200f, 1500L));
+    assertFalse(GoalValidator.isRepeatTap(100f, 200f, 1000L, 100f, 200f, 4500L));
   }
 
   @Test
@@ -236,25 +300,26 @@ public class GoalValidatorTest {
     float[] floorHit = {0f, 0.10f, -3f};
     assertArrayEquals(
         floorHit,
-        GoalValidator.goalOnFloor(PHONE, rayTo(PHONE, floorHit), floorHit, true, 0f, true),
+        GoalValidator.goalOnFloor(PHONE, rayTo(PHONE, floorHit), floorHit, HitType.DEPTH, 0f, true),
         1e-6f);
   }
 
   @Test
   public void farTabletopDepthHit_isRejected() {
     float[] table = {0f, 0.40f, -3f};
-    assertNull(GoalValidator.goalOnFloor(PHONE, rayTo(PHONE, table), table, true, 0f, true));
+    assertNull(
+        GoalValidator.goalOnFloor(PHONE, rayTo(PHONE, table), table, HitType.DEPTH, 0f, true));
   }
 
   @Test
   public void floorTolerance_growsWithDistanceForDepthHitsOnly() {
-    assertEquals(0.05f, GoalValidator.floorTolerance(false, 3f), 1e-6f);
-    assertEquals(0.05f, GoalValidator.floorTolerance(true, 1f), 1e-6f);
-    assertEquals(0.12f, GoalValidator.floorTolerance(true, 3f), 1e-6f);
+    assertEquals(0.05f, GoalValidator.floorTolerance(HitType.OTHER_PLANE, 3f), 1e-6f);
+    assertEquals(0.05f, GoalValidator.floorTolerance(HitType.DEPTH, 1f), 1e-6f);
+    assertEquals(0.12f, GoalValidator.floorTolerance(HitType.DEPTH, 3f), 1e-6f);
   }
 
   @Test
   public void noRayAndNoHit_noGoal() {
-    assertNull(GoalValidator.goalOnFloor(null, null, null, false, 0f, true));
+    assertNull(GoalValidator.goalOnFloor(null, null, null, HitType.OTHER_PLANE, 0f, true));
   }
 }

@@ -50,11 +50,28 @@ public final class GoalValidator {
   /** Depth hits get less accurate with distance (~10 cm high at 3-4 m); plane hits don't. */
   public static final float DEPTH_TOLERANCE_PER_M = 0.04f;
 
+  /** An upward-facing plane this close to the floor is the floor. */
+  public static final float UPWARD_PLANE_TOLERANCE_M = 0.10f;
+
+  /** A repeat tap this close, this soon, overrides an above-floor rejection. */
+  public static final float REPEAT_TAP_RADIUS_PX = 50f;
+
+  public static final long REPEAT_TAP_WINDOW_MS = 3000;
+
   public enum Result {
     OK,
     NOT_FLOOR,
+    /** The tap hit something above the floor; tapping again places the goal below it. */
+    ABOVE_FLOOR,
     TOO_CLOSE,
     NOT_TRACKING
+  }
+
+  /** What the tap hit. */
+  public enum HitType {
+    UPWARD_PLANE,
+    OTHER_PLANE,
+    DEPTH
   }
 
   private GoalValidator() {}
@@ -72,29 +89,35 @@ public final class GoalValidator {
   }
 
   /**
-   * Floor hit: that exact spot. Hit above the floor: null. No hit, or one below a detected floor (a
-   * reflection): where the tap ray meets the floor. An estimated floor can be too high (robot held
-   * up), so a hit below it is used.
+   * Floor hit: that spot (upward planes at a detected floor's height). Hit above the floor: null.
+   * No hit, a far hit, or one below a detected floor (a reflection): where the tap ray meets the
+   * floor. An estimated floor can be too high (robot held up), so a hit below it is used.
    */
   @Nullable
   public static float[] goalOnFloor(
       @Nullable float[] origin,
       @Nullable float[] direction,
       @Nullable float[] surfaceHit,
-      boolean depthHit,
+      HitType hitType,
       float floorY,
       boolean floorFound) {
+    // Junk far hits (often before the floor is found): use the floor ray instead.
+    if (surfaceHit != null
+        && origin != null
+        && horizontalDistance(origin, surfaceHit) > MAX_RAY_DISTANCE_M) {
+      surfaceHit = null;
+    }
     if (surfaceHit != null) {
       float tolerance =
           origin == null
               ? FLOOR_TOLERANCE_M
-              : floorTolerance(depthHit, distance(origin, surfaceHit));
+              : floorTolerance(hitType, distance(origin, surfaceHit));
       if (surfaceHit[1] > floorY + tolerance) return null;
       if (!floorFound || surfaceHit[1] >= floorY - tolerance) {
-        if (origin != null && horizontalDistance(origin, surfaceHit) > MAX_RAY_DISTANCE_M) {
-          return null;
-        }
-        return surfaceHit;
+        // Snap only to a detected floor; an estimate can be in the air (robot held up).
+        return hitType == HitType.UPWARD_PLANE && floorFound
+            ? onFloor(surfaceHit, floorY)
+            : surfaceHit;
       }
     }
     if (origin == null || direction == null) return null;
@@ -139,12 +162,11 @@ public final class GoalValidator {
           largestPlaneY(planes, lockedFloorY - FLOOR_UPDATE_M, lockedFloorY + FLOOR_UPDATE_M);
       return refined != null ? refined : lockedFloorY;
     }
-    // Robot on the floor: plane 4-40 cm below the camera.
-    Float underRobot =
-        largestPlaneY(planes, cameraY - MAX_MOUNT_HEIGHT_M, cameraY - MIN_MOUNT_HEIGHT_M);
-    if (underRobot != null) return underRobot;
-    // Else the lowest large plane (the largest may be a table).
-    return lowestPlaneY(planes, cameraY - MIN_CAMERA_HEIGHT_M, MIN_FLOOR_AREA_M2);
+    // Lowest large plane first; a table can be 4-40 cm below a held-up phone.
+    Float lowest = lowestPlaneY(planes, cameraY - MIN_CAMERA_HEIGHT_M, MIN_FLOOR_AREA_M2);
+    if (lowest != null) return lowest;
+    // Else a plane 4-40 cm below the camera: the robot is on it.
+    return largestPlaneY(planes, cameraY - MAX_MOUNT_HEIGHT_M, cameraY - MIN_MOUNT_HEIGHT_M);
   }
 
   @Nullable
@@ -172,10 +194,29 @@ public final class GoalValidator {
   }
 
   /** How far a hit may be from the floor and still count as the floor. */
-  public static float floorTolerance(boolean depthHit, float distanceM) {
-    return depthHit
-        ? Math.max(FLOOR_TOLERANCE_M, DEPTH_TOLERANCE_PER_M * distanceM)
-        : FLOOR_TOLERANCE_M;
+  public static float floorTolerance(HitType hitType, float distanceM) {
+    switch (hitType) {
+      case UPWARD_PLANE:
+        return UPWARD_PLANE_TOLERANCE_M;
+      case DEPTH:
+        return Math.max(FLOOR_TOLERANCE_M, DEPTH_TOLERANCE_PER_M * distanceM);
+      default:
+        return FLOOR_TOLERANCE_M;
+    }
+  }
+
+  /** The point at floor height below the given one. */
+  public static float[] onFloor(float[] point, float floorY) {
+    return new float[] {point[0], floorY, point[2]};
+  }
+
+  /** Whether a tap repeats an earlier one: within 50 px and 3 s. */
+  public static boolean isRepeatTap(
+      float x0, float y0, long timeMs0, float x, float y, long timeMs) {
+    float dx = x - x0;
+    float dy = y - y0;
+    return timeMs - timeMs0 <= REPEAT_TAP_WINDOW_MS
+        && dx * dx + dy * dy <= REPEAT_TAP_RADIUS_PX * REPEAT_TAP_RADIUS_PX;
   }
 
   private static float distance(float[] a, float[] b) {
