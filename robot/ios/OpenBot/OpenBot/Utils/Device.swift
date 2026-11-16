@@ -25,9 +25,7 @@ enum Device {
     // Newer iPhones by screen size, one entry covers every model with that screen:
     // iPhone14Pro = 14 Pro/15/15 Pro/16, iPhone14ProMax = 14 Pro Max/15 Plus/15 Pro Max/16 Plus
     // iPhone16Pro = 16 Pro/17/17 Pro/18 Pro, iPhone16ProMax = 16 Pro Max/17 Pro Max/18 Pro Max
-    // iPhone14Plus = 12 Pro Max/13 Pro Max/14 Plus, iPhone12Mini = 12 mini/13 mini
-    case iPhone12Mini
-    case iPhone12MiniLandscape
+    // iPhone14Plus = 12 Pro Max/13 Pro Max/14 Plus
     case iPhone14Pro
     case iPhone14ProLandscape
     case iPhone14Plus
@@ -76,10 +74,6 @@ extension Device: RawRepresentable {
         case CGSize(width: 844, height: 390):
             self = .iPhone13Landscape
         // Newer iPhones
-        case CGSize(width: 360, height: 780):
-            self = .iPhone12Mini
-        case CGSize(width: 780, height: 360):
-            self = .iPhone12MiniLandscape
         case CGSize(width: 393, height: 852):
             self = .iPhone14Pro
         case CGSize(width: 852, height: 393):
@@ -147,10 +141,6 @@ extension Device: RawRepresentable {
             return CGSize(width: 568, height: 320)
         case .iPhone8PlusLandscape:
             return CGSize(width: 736, height: 414)
-        case .iPhone12Mini:
-            return CGSize(width: 360, height: 780)
-        case .iPhone12MiniLandscape:
-            return CGSize(width: 780, height: 360)
         case .iPhone14Pro:
             return CGSize(width: 393, height: 852)
         case .iPhone14ProLandscape:
