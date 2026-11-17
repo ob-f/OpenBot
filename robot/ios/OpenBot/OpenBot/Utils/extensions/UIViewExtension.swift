@@ -383,3 +383,27 @@ class openCodeRunBottomSheet: UIView {
 
 
 }
+
+extension UILabel {
+    /// App-wide text rule: wraps on spaces (max lines) if every word fits `width`, else one line ending with "…". Call after the font is set.
+    func wrapOrTruncate(width: CGFloat, maxLines: Int = 2) {
+        adjustsFontSizeToFitWidth = false
+        lineBreakMode = .byTruncatingTail
+        let words = (text ?? "").split(separator: " ")
+        let longest = words.map { measuredWidth(of: String($0), font: font) }.max() ?? 0
+        numberOfLines = (words.count > 1 && longest <= width) ? maxLines : 1
+    }
+}
+
+/// Navigation bar that passes touches through, except on its buttons.
+class PassthroughNavigationBar: UINavigationBar {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard let hit = super.hitTest(point, with: event) else { return nil }
+        var view: UIView? = hit
+        while let current = view, current !== self {
+            if current is UIControl { return hit }
+            view = current.superview
+        }
+        return nil
+    }
+}

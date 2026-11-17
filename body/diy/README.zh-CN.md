@@ -25,6 +25,7 @@
 - [纤细主体](cad/slim_body/README.md)：由于许多常见的3D打印机有较小的打印体积，我们还设计了一个没有保险杠的较小版本，可以在45度角的220mmx220mm打印板上打印。
 - [可粘合主体](cad/glue_body/README.md)：对于打印体积更小的3D打印机，还有一个由@sloretz设计的模块化主体，需要将几个部分粘合在一起；适合150mmx140mm的打印板。
 - [块状主体](cad/block_body/README.md)：由@Christos-Ps设计的这个主体提供了多个变体，具有外壳内额外空间和兼容乐高的顶部，同时保持了仅需221mmx150mm的打印面积。
+- [OpenBot Compact](../compact/README.zh-CN.md)：如需使用 ESP32，请参阅 OpenBot Compact。它是一款独立的紧凑型主体，适用于 ESP32 DevKit V1 和 L298N 电机驱动器，带有兼容乐高的顶盖，所有零件均可在180mmx180mm的打印平台上打印。
 
 #### 手机支架
 
@@ -32,6 +33,8 @@
 
 - phone_mount_bottom ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 - phone_mount_top ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
+
+如果想让手机向上倾斜（最多 30°），可以打印 [body/phone_mount](../phone_mount/README.zh-CN.md) 中的可倾斜版本来代替 `phone_mount_bottom`。
 
 #### 清理
 

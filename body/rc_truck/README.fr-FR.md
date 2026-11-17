@@ -43,6 +43,8 @@ Vous devrez imprimer les pièces suivantes pour construire votre OpenBot RC-Truc
 3) ```phone_mount_bottom``` ([STL](../phone_mount/phone_mount_bottom.stl), [STEP](../phone_mount/phone_mount_bottom.step))
 4) ```phone_mount_top``` ([STL](../phone_mount/phone_mount_top.stl), [STEP](../phone_mount/phone_mount_top.step))
 
+Pour incliner le téléphone vers le haut jusqu'à 30°, imprimez la version inclinable de [body/phone_mount](../phone_mount/README.fr-FR.md) à la place de `phone_mount_bottom`.
+
 Notez que \[xN\] indique le nombre de copies (c'est-à-dire N) que vous devez imprimer d'une pièce particulière (le cas échéant).
 
 Les pièces suivantes sont optionnelles (mais recommandées) pour rendre votre OpenBot RC-Truck plus compact et esthétiquement agréable.
