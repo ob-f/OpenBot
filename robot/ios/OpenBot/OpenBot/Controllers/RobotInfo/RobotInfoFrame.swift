@@ -168,7 +168,7 @@ class RobotInfoFrame: UIViewController {
         sonarCheckBox = createCheckbox(leadingAnchor: 170, topAnchor: 300, action: #selector(updateSonarCheckBox(_:)))
         sonarLabel = createLabels(text: Strings.sonarText, topAnchor: 292, leadingAnchor: 205)
         bumperCheckBox = createCheckbox(leadingAnchor: 275, topAnchor: 300, action: #selector(updateBumperCheckBox(_:)))
-        bumperLabel = createLabels(text: Strings.bumperText, topAnchor: 292, leadingAnchor: 310)
+        bumperLabel = createLabels(text: Strings.bumperText, topAnchor: 292, leadingAnchor: 310, maxWidth: 70)
     }
 
     /// creates heading for wheel odometer
@@ -209,7 +209,7 @@ class RobotInfoFrame: UIViewController {
     /// creates labels for readings
     func createReadings() {
         battery = createLabels(text: Strings.battery, topAnchor: 530, leadingAnchor: 20)
-        speed = createLabels(text: Strings.speedText, topAnchor: 530, leadingAnchor: 110)
+        speed = createLabels(text: Strings.speedText, topAnchor: 530, leadingAnchor: 110, maxWidth: 145)
         speed.font = speed.font.withSize(12)
         sonar = createLabels(text: Strings.sonarLabel, topAnchor: 530, leadingAnchor: 255)
     }
@@ -221,7 +221,7 @@ class RobotInfoFrame: UIViewController {
 
     /// creates send command buttons.
     func createSendCommand() {
-        motorLabel = createLabels(text: Strings.motors, topAnchor: 610, leadingAnchor: 20)
+        motorLabel = createLabels(text: Strings.motors, topAnchor: 610, leadingAnchor: 20, maxWidth: 48)
         forwardButton = createButton(width: 80, height: 40, title: Strings.forward, leadingAnchor: 70, topAnchor: 610, action: #selector(forwardButton(_:)))
         backwardButton = createButton(width: 90, height: 40, title: Strings.backward, leadingAnchor: 180, topAnchor: 610, action: #selector(backwardButton(_:)))
         stopButton = createButton(width: 60, height: 40, title: Strings.stopLabel, leadingAnchor: 290, topAnchor: 610, action: #selector(stopButton(_:)))
@@ -266,12 +266,13 @@ class RobotInfoFrame: UIViewController {
     }
 
     /// function to create the labels UI
-    func createLabels(text: String, topAnchor: CGFloat, leadingAnchor: CGFloat) -> UILabel {
+    func createLabels(text: String, topAnchor: CGFloat, leadingAnchor: CGFloat, maxWidth: CGFloat = .greatestFiniteMagnitude) -> UILabel {
         let label = UILabel()
         label.text = text
         label.textColor = Colors.border
         label.font = label.font.withSize(12)
-        label.frame.size.width = measuredWidth(of: text, font: label.font) + 8
+        label.frame.size.width = min(measuredWidth(of: text, font: label.font) + 8, maxWidth)
+        label.wrapOrTruncate(width: label.frame.width - 8)
         label.frame.size.height = 40
         view.addSubview(label)
         label.frame.origin.x = leadingAnchor
@@ -299,6 +300,7 @@ class RobotInfoFrame: UIViewController {
         button.frame.size = CGSize(width: width, height: height)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         button.setTitle(title, for: .normal)
+        button.titleLabel?.wrapOrTruncate(width: CGFloat(width) - 16)
         button.setTitleColor(UIColor.init(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
         button.frame.origin = CGPoint(x: leadingAnchor, y: topAnchor)
         button.backgroundColor = Colors.title

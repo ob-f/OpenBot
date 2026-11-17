@@ -51,15 +51,16 @@ class expandedAutoPilot: UIView {
         addSubview(createLabel(text: Strings.model, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 90, to: .height))))
         speedTitleLabel = createLabel(text: Strings.speed, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 120, to: .height)))
         speedTitleLabel.numberOfLines = 1
-        speedTitleLabel.adjustsFontSizeToFitWidth = true
-        speedTitleLabel.minimumScaleFactor = 0.5
         speedTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(speedTitleLabel)
         speedTitleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: adapted(dimensionSize: 20, to: .height)).isActive = true
         speedTitleLabel.topAnchor.constraint(equalTo: topAnchor, constant: adapted(dimensionSize: 120, to: .height)).isActive = true
         speedTitleLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 100).isActive = true
         setupSpeed()
-        addSubview(createLabel(text: Strings.device, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 160, to: .height))))
+        let deviceLabel = createLabel(text: Strings.device, leadingAnchor: Int(adapted(dimensionSize: 20, to: .height)), topAnchor: Int(adapted(dimensionSize: 160, to: .height)))
+        deviceLabel.frame.size.width = 58
+        deviceLabel.lineBreakMode = .byTruncatingTail
+        addSubview(deviceLabel)
         createDeviceDropDown()
         createServerDropDown()
         serverDropDown.hide()

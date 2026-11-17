@@ -77,6 +77,7 @@ class DataCollectionController: CameraController {
         }
         
         DeviceCurrentOrientation.shared.findDeviceOrientation()
+        expandSettingView.refreshConstraints()
         NotificationCenter.default.addObserver(self, selector: #selector(switchCamera), name: .switchCamera, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(openBluetoothSettings), name: .ble, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(toggleLogging), name: .logData, object: nil)

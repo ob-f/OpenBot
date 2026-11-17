@@ -64,11 +64,17 @@ class ObjectTrackingFragment: CameraController {
         }
         objectTrackingSettings = ObjectTrackingSettings(frame: CGRect(x: 0, y: height - 375, width: width, height: 375), detector: detector, model: currentModel)
         objectTrackingSettings!.backgroundColor = Colors.freeRoamButtonsColor
-        objectTrackingSettings!.layer.cornerRadius = 5
+        objectTrackingSettings!.layer.cornerRadius = 15
         createCameraView()
         view.addSubview(objectTrackingSettings!)
-        bottomAnchorConstraint = objectTrackingSettings!.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -5)
+        objectTrackingSettings!.translatesAutoresizingMaskIntoConstraints = false
+        objectTrackingSettings!.widthAnchor.constraint(equalToConstant: width).isActive = true
+        objectTrackingSettings!.heightAnchor.constraint(equalToConstant: width).isActive = true
+        bottomAnchorConstraint = objectTrackingSettings!.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 5)
         trailingAnchorConstraint = objectTrackingSettings!.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0)
+        bottomAnchorConstraint.isActive = true
+        trailingAnchorConstraint.isActive = true
+        objectTrackingSettings!.bottomConstraint = bottomAnchorConstraint
         NotificationCenter.default.addObserver(self, selector: #selector(openBluetoothSettings), name: .ble, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(switchCamera), name: .switchCamera, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateDevice), name: .updateDevice, object: nil)
@@ -82,26 +88,9 @@ class ObjectTrackingFragment: CameraController {
         setupNavigationBarItem()
         gameController.resetControl = false
         fragmentType.currentFragment = "ObjectDetection";
-        calculateFrame()
         let msg = JSON.toString(FragmentTypeEvent(status: .init(FRAGMENT_TYPE: self.fragmentType.currentFragment)));
         client.send(message: msg);
         super.viewDidLoad()
-    }
-
-    /// Called when the view controller's view's size is changed by its parent (i.e. for the root view controller when its window rotates or is resized).
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        calculateFrame()
-    }
-
-    func calculateFrame() {
-        if currentOrientation == .portrait || currentOrientation == .portraitUpsideDown {
-            objectTrackingSettings?.frame.origin.x = 0
-            objectTrackingSettings?.frame.origin.y = height - 375
-        } else {
-            objectTrackingSettings?.frame.origin.x = height - 375
-            objectTrackingSettings?.frame.origin.y = 30
-        }
     }
 
     @objc func openBluetoothSettings() {
