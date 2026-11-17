@@ -24,6 +24,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     var secondView = UIScrollView()
     var leadingConstraint: NSLayoutConstraint!
     var topConstraint: NSLayoutConstraint!
+    var landscapeTopConstraint: NSLayoutConstraint!
     var widthConstraint: NSLayoutConstraint!
     var heightConstraint: NSLayoutConstraint!
     var preview = UIButton()
@@ -77,7 +78,14 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         createImagesButton()
         createSecondViewLabel(value: Strings.sensorData, leadingAnchor: 10, topAnchor: 130, labelWidth: 200, labelHeight: 40).font = UIFont.boldSystemFont(ofSize: 16.0)
         createSensorButtons()
-        _ = createSecondViewLabel(value: Strings.delay, leadingAnchor: 230, topAnchor: 230, labelWidth: 60, labelHeight: 40)
+        // Two-line label starts higher to stay level with the field.
+        let delayFont = UIFont.systemFont(ofSize: 15)
+        let delayWords = Strings.delay.split(separator: " ")
+        let delayLongestWord = delayWords.map { measuredWidth(of: String($0), font: delayFont) }.max() ?? 0
+        let delayNeedsTwoLines = measuredWidth(of: Strings.delay, font: delayFont) > 75 && delayWords.count > 1 && delayLongestWord <= 75
+        let delayLabel = createSecondViewLabel(value: Strings.delay, leadingAnchor: 230, topAnchor: delayNeedsTwoLines ? 220 : 230, labelWidth: 60, labelHeight: 40)
+        delayLabel.widthAnchor.constraint(equalToConstant: 75).isActive = true
+        delayLabel.wrapOrTruncate(width: 75)
         createDelayField()
         let vehicleControls = VehicleControl();
         createLeftSpeed()
@@ -108,6 +116,9 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     /// UI Function to create button for logs
     func createLogDataButton() {
         let label = createLabels(value: Strings.logData, leadingAnchor: 10, topAnchor: 13, labelWidth: 100, labelHeight: 40)
+        label.widthAnchor.constraint(lessThanOrEqualToConstant: 150).isActive = true
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         logData.isOn = false
         logData.setOn(false, animated: true)
         logData.onTintColor = Colors.title
@@ -286,7 +297,17 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         topConstraint.identifier = Strings.expendSetting
         widthConstraint.identifier = Strings.expendSetting
         heightConstraint.identifier = Strings.expendSetting
-        NSLayoutConstraint.activate([leadingConstraint, topConstraint, widthConstraint, heightConstraint])
+        landscapeTopConstraint = secondView.topAnchor.constraint(equalTo: topAnchor, constant: 10)
+        landscapeTopConstraint.identifier = Strings.expendSetting
+        NSLayoutConstraint.activate([leadingConstraint, widthConstraint, heightConstraint])
+        updateTopConstraint()
+    }
+
+    /// Landscape panel starts at the top edge so all rows fit.
+    func updateTopConstraint() {
+        let isPortrait = currentOrientation == .portrait
+        topConstraint.isActive = isPortrait
+        landscapeTopConstraint.isActive = !isPortrait
     }
 
     /// UI Function to to update the constraints
@@ -301,11 +322,12 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         } else {
             frame.size.width = height
             leadingConstraint.constant = height / 2 - 50
-            topConstraint.constant = 30
+            landscapeTopConstraint.constant = 10
             widthConstraint.constant = height / 2
-            heightConstraint.constant = width;
+            heightConstraint.constant = width - 10;
             dropdownTopAnchor.constant = 150;
         }
+        updateTopConstraint()
     }
 
     /// UI Function to create button for images
@@ -456,7 +478,8 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         btn.leadingAnchor.constraint(equalTo: secondView.leadingAnchor, constant: leadingAnchor).isActive = true
         btn.widthAnchor.constraint(equalToConstant: buttonWidth).isActive = true
         btn.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        text.frame = CGRect(x: 10, y: 0, width: buttonWidth, height: 40)
+        text.frame = CGRect(x: 10, y: 0, width: buttonWidth - 20, height: 40)
+        text.wrapOrTruncate(width: buttonWidth - 20)
         btn.addSubview(text)
         return btn
     }
@@ -622,7 +645,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         if currentOrientation == .portrait {
             topConstraint.constant = 260
         } else {
-            topConstraint.constant = 10
+            landscapeTopConstraint.constant = -10
         }
     }
 
@@ -630,7 +653,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         if currentOrientation == .portrait {
             topConstraint.constant = 290
         } else {
-            topConstraint.constant = 30
+            landscapeTopConstraint.constant = 10
         }
     }
 

@@ -230,6 +230,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         button.setTitleColor(Colors.title, for: .normal)
         button.frame.size = CGSize(width: 100, height: 40)
         button.setTitle(title, for: .normal)
+        button.titleLabel?.wrapOrTruncate(width: 92)
         button.addTarget(self, action: selector, for: .touchUpInside)
         return button
     }

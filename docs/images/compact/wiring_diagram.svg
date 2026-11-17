@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1160" viewBox="0 0 1800 1160">
+<style>.hdr{font-size:22px;font-weight:700;fill:#1d1f23}.sub{font-size:15px;fill:#5b616b}.pin{font-size:16px;fill:#1d1f23}.note{font-size:15px;fill:#5b616b}.leg{font-size:15px;fill:#1d1f23}text{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}</style>
+<rect width="1800" height="1160" fill="#fff"/>
+<text x="40" y="52" font-size="32" font-weight="700" fill="#1d1f23">OpenBot Compact – wiring</text>
+<text x="40" y="82" class="sub">All ⏚ symbols are one common ground. Labels on the ESP32 are GPIO numbers. Lights are optional; one of four identical channels is shown.</text>
+<rect x="40" y="110" width="200" height="110" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="56" y="142" class="hdr">3S Li-ion</text>
+<text x="56" y="166" class="sub">3 × 18650</text>
+<text x="56" y="187" class="sub">11.1 V nom · 12.6 V full</text>
+<rect x="300" y="110" width="170" height="110" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="316" y="142" class="hdr">BMS</text>
+<text x="316" y="166" class="sub">3S protection</text>
+<rect x="530" y="125" width="120" height="80" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="546" y="157" class="hdr">Fuse</text>
+<text x="546" y="181" class="sub">inline</text>
+<rect x="710" y="125" width="140" height="80" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="726" y="157" class="hdr">Switch</text>
+<text x="726" y="181" class="sub">rear panel</text>
+<path d="M240 150 H300" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M470 165 H530" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M650 165 H710" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M850 165 H1740" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M240 190 H300" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="250" y="145" class="note" text-anchor="start">+</text>
+<text x="250" y="217" class="note" text-anchor="start">−</text>
+<path d="M385 220 V234" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="371" y1="234" x2="399" y2="234" stroke="#22252a" stroke-width="3"/>
+<line x1="376" y1="240" x2="394" y2="240" stroke="#22252a" stroke-width="3"/>
+<line x1="381" y1="246" x2="389" y2="246" stroke="#22252a" stroke-width="3"/>
+<text x="1740" y="155" class="pin" text-anchor="end" style="fill:#d1342f;font-weight:700">VBAT</text>
+<rect x="890" y="215" width="250" height="90" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="906" y="247" class="hdr">5 V buck converter</text>
+<text x="906" y="271" class="sub">≥ 2 A, set to 5.0 V</text>
+<path d="M930 165 V225" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="930" cy="165" r="6" fill="#d1342f"/>
+<path d="M1100 305 V319" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1086" y1="319" x2="1114" y2="319" stroke="#22252a" stroke-width="3"/>
+<line x1="1091" y1="325" x2="1109" y2="325" stroke="#22252a" stroke-width="3"/>
+<line x1="1096" y1="331" x2="1104" y2="331" stroke="#22252a" stroke-width="3"/>
+<rect x="380" y="380" width="320" height="360" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="396" y="412" class="hdr">L298N driver</text>
+<text x="396" y="436" class="sub">ENA / ENB jumpers fitted</text>
+<text x="396" y="457" class="sub">5 V terminal: not connected</text>
+<path d="M870 165 V350 H640 V380" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="870" cy="165" r="6" fill="#d1342f"/>
+<text x="650" y="375" class="note" text-anchor="start">+12 V in</text>
+<path d="M540 740 V754" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="526" y1="754" x2="554" y2="754" stroke="#22252a" stroke-width="3"/>
+<line x1="531" y1="760" x2="549" y2="760" stroke="#22252a" stroke-width="3"/>
+<line x1="536" y1="766" x2="544" y2="766" stroke="#22252a" stroke-width="3"/>
+<text x="540" y="731" class="pin" text-anchor="middle">GND</text>
+<text x="396" y="485" class="pin" text-anchor="start">OUT1</text>
+<text x="396" y="515" class="pin" text-anchor="start">OUT2</text>
+<text x="396" y="625" class="pin" text-anchor="start">OUT3</text>
+<text x="396" y="655" class="pin" text-anchor="start">OUT4</text>
+<text x="684" y="625" class="pin" text-anchor="end">IN1</text>
+<text x="684" y="655" class="pin" text-anchor="end">IN2</text>
+<text x="684" y="685" class="pin" text-anchor="end">IN3</text>
+<text x="684" y="715" class="pin" text-anchor="end">IN4</text>
+<rect x="40" y="445" width="220" height="90" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="56" y="477" class="hdr">Left motors</text>
+<text x="56" y="501" class="sub">front + rear in parallel</text>
+<rect x="40" y="590" width="220" height="90" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="56" y="622" class="hdr">Right motors</text>
+<text x="56" y="646" class="sub">front + rear in parallel</text>
+<path d="M380 480 H260" fill="none" stroke="#7a4fb0" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M380 510 H260" fill="none" stroke="#7a4fb0" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M380 620 H260" fill="none" stroke="#7a4fb0" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M380 650 H260" fill="none" stroke="#7a4fb0" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="280" y="469" class="pin" text-anchor="middle">−</text>
+<text x="280" y="499" class="pin" text-anchor="middle" style="fill:#d1342f;font-weight:700">+</text>
+<text x="280" y="609" class="pin" text-anchor="middle" style="fill:#d1342f;font-weight:700">+</text>
+<text x="280" y="639" class="pin" text-anchor="middle">−</text>
+<rect x="1000" y="340" width="300" height="540" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="1016" y="372" class="hdr">ESP32 DevKit V1</text>
+<text x="1016" y="396" class="sub">30-pin</text>
+<text x="1016" y="435" class="pin" text-anchor="start">5V / VIN</text>
+<text x="1016" y="465" class="pin" text-anchor="start">GND</text>
+<text x="1016" y="525" class="pin" text-anchor="start">GPIO4  (ADC)</text>
+<text x="1016" y="625" class="pin" text-anchor="start">GPIO32</text>
+<text x="1016" y="655" class="pin" text-anchor="start">GPIO33</text>
+<text x="1016" y="685" class="pin" text-anchor="start">GPIO25</text>
+<text x="1016" y="715" class="pin" text-anchor="start">GPIO26</text>
+<text x="1016" y="825" class="pin" text-anchor="start">GPIO19 / 12 / 16 / 17</text>
+<text x="1284" y="455" class="pin" text-anchor="end">GPIO5</text>
+<text x="1284" y="485" class="pin" text-anchor="end">GPIO18</text>
+<text x="1284" y="655" class="pin" text-anchor="end">GPIO35</text>
+<text x="1284" y="685" class="pin" text-anchor="end">GPIO39</text>
+<text x="1284" y="715" class="pin" text-anchor="end">GPIO34</text>
+<text x="1284" y="745" class="pin" text-anchor="end">GPIO23</text>
+<text x="1284" y="805" class="pin" text-anchor="end">3V3</text>
+<text x="1284" y="835" class="pin" text-anchor="end">GPIO21  SDA</text>
+<text x="1284" y="861" class="pin" text-anchor="end">GPIO22  SCL</text>
+<path d="M1140 260 H1170 V325 H960 V430 H1000" fill="none" stroke="#e07b1f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1180" y="255" class="pin" text-anchor="start" style="fill:#e07b1f;font-weight:700">+5 V</text>
+<path d="M1000 460 H935" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M935 460 V474" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="921" y1="474" x2="949" y2="474" stroke="#22252a" stroke-width="3"/>
+<line x1="926" y1="480" x2="944" y2="480" stroke="#22252a" stroke-width="3"/>
+<line x1="931" y1="486" x2="939" y2="486" stroke="#22252a" stroke-width="3"/>
+<path d="M700 620 H1000" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M700 650 H1000" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M700 680 H1000" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M700 710 H1000" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="760" y="525" class="pin" text-anchor="end" style="fill:#d1342f;font-weight:700">VBAT</text>
+<path d="M770 520 H1000" fill="none" stroke="#2f9a5a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="792" y="509" width="56" height="22" fill="#fff" stroke="#3b3f46" stroke-width="2"/>
+<text x="820" y="503" class="pin" text-anchor="middle">30 k</text>
+<circle cx="880" cy="520" r="6" fill="#2f9a5a"/>
+<path d="M880 520 V535" fill="none" stroke="#2f9a5a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="869" y="527" width="22" height="56" fill="#fff" stroke="#3b3f46" stroke-width="2"/>
+<text x="898" y="565" class="pin" text-anchor="start">10 k</text>
+<path d="M880 583 V597" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="866" y1="597" x2="894" y2="597" stroke="#22252a" stroke-width="3"/>
+<line x1="871" y1="603" x2="889" y2="603" stroke="#22252a" stroke-width="3"/>
+<line x1="876" y1="609" x2="884" y2="609" stroke="#22252a" stroke-width="3"/>
+<rect x="1450" y="345" width="290" height="195" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="1466" y="377" class="hdr">HC-SR04</text>
+<text x="1466" y="401" class="sub">front sensor, shown at 5 V</text>
+<text x="1466" y="425" class="pin" text-anchor="start">VCC</text>
+<text x="1466" y="455" class="pin" text-anchor="start">TRIG</text>
+<text x="1466" y="485" class="pin" text-anchor="start">ECHO</text>
+<text x="1466" y="515" class="pin" text-anchor="start">GND</text>
+<path d="M1170 260 H1420 V420 H1450" fill="none" stroke="#e07b1f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1170" cy="260" r="6" fill="#e07b1f"/>
+<path d="M1300 450 H1450" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1300 480 H1450" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1372" y="469" width="56" height="22" fill="#fff" stroke="#3b3f46" stroke-width="2"/>
+<text x="1400" y="467" class="pin" text-anchor="middle">10 k</text>
+<circle cx="1340" cy="480" r="6" fill="#2a6fb5"/>
+<path d="M1340 480 V490" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1329" y="487" width="22" height="56" fill="#fff" stroke="#3b3f46" stroke-width="2"/>
+<text x="1358" y="525" class="pin" text-anchor="start">20 k</text>
+<path d="M1340 543 V557" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1326" y1="557" x2="1354" y2="557" stroke="#22252a" stroke-width="3"/>
+<line x1="1331" y1="563" x2="1349" y2="563" stroke="#22252a" stroke-width="3"/>
+<line x1="1336" y1="569" x2="1344" y2="569" stroke="#22252a" stroke-width="3"/>
+<path d="M1740 510 H1765" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1765 510 V524" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1751" y1="524" x2="1779" y2="524" stroke="#22252a" stroke-width="3"/>
+<line x1="1756" y1="530" x2="1774" y2="530" stroke="#22252a" stroke-width="3"/>
+<line x1="1761" y1="536" x2="1769" y2="536" stroke="#22252a" stroke-width="3"/>
+<rect x="1450" y="565" width="290" height="275" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="1466" y="597" class="hdr">4 × LM393 encoders</text>
+<text x="1466" y="621" class="sub">power from 3V3, not 5 V</text>
+<text x="1466" y="655" class="pin" text-anchor="start">front-left DO</text>
+<text x="1466" y="685" class="pin" text-anchor="start">front-right DO</text>
+<text x="1466" y="715" class="pin" text-anchor="start">rear-left DO  (opt.)</text>
+<text x="1466" y="745" class="pin" text-anchor="start">rear-right DO  (opt.)</text>
+<text x="1466" y="805" class="pin" text-anchor="start">VCC</text>
+<path d="M1300 650 H1450" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1300 680 H1450" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1300 710 H1450" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1300 740 H1450" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1300 800 H1450" fill="none" stroke="#c29b00" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1600 840 V854" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1586" y1="854" x2="1614" y2="854" stroke="#22252a" stroke-width="3"/>
+<line x1="1591" y1="860" x2="1609" y2="860" stroke="#22252a" stroke-width="3"/>
+<line x1="1596" y1="866" x2="1604" y2="866" stroke="#22252a" stroke-width="3"/>
+<rect x="380" y="880" width="560" height="240" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="396" y="912" class="hdr">Panel light driver  (×4, optional)</text>
+<text x="396" y="936" class="sub">PN2222A low-side switch per lamp</text>
+<path d="M1000 820 H970 V1010 H880" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="812" y="999" width="56" height="22" fill="#fff" stroke="#3b3f46" stroke-width="2"/>
+<text x="840" y="997" class="pin" text-anchor="middle">1 k</text>
+<path d="M812 1010 H730" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="700" cy="1010" r="30" fill="#fff" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="700" y="1015" class="pin" text-anchor="middle">NPN</text>
+<path d="M770 1010 V1040" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="770" cy="1010" r="6" fill="#2a6fb5"/>
+<rect x="759" y="1037" width="22" height="56" fill="#fff" stroke="#3b3f46" stroke-width="2"/>
+<text x="788" y="1075" class="pin" text-anchor="start">100 k</text>
+<path d="M770 1093 V1107" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="756" y1="1107" x2="784" y2="1107" stroke="#22252a" stroke-width="3"/>
+<line x1="761" y1="1113" x2="779" y2="1113" stroke="#22252a" stroke-width="3"/>
+<line x1="766" y1="1119" x2="774" y2="1119" stroke="#22252a" stroke-width="3"/>
+<path d="M700 1040 V1060" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M700 1060 V1074" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="686" y1="1074" x2="714" y2="1074" stroke="#22252a" stroke-width="3"/>
+<line x1="691" y1="1080" x2="709" y2="1080" stroke="#22252a" stroke-width="3"/>
+<line x1="696" y1="1086" x2="704" y2="1086" stroke="#22252a" stroke-width="3"/>
+<text x="690" y="1058" class="note" text-anchor="end">E</text>
+<path d="M700 980 V960" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="690" y="977" class="note" text-anchor="end">C</text>
+<rect x="560" y="944" width="100" height="32" rx="6" fill="#fff" stroke="#3b3f46" stroke-width="2"/>
+<text x="610" y="965" class="pin" text-anchor="middle">lamp</text>
+<path d="M660 960 H700" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M560 960 H510" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="500" y="965" class="pin" text-anchor="end" style="fill:#d1342f;font-weight:700">VBAT</text>
+<text x="400" y="1075" class="note" text-anchor="start">lamp + → VBAT</text>
+<text x="400" y="1097" class="note" text-anchor="start">lamp − → collector</text>
+<rect x="1180" y="950" width="250" height="120" rx="10" fill="#f6f7f9" stroke="#3b3f46" stroke-width="2.5"/>
+<text x="1196" y="982" class="hdr"></text>
+<text x="1325" y="975" class="note" text-anchor="middle">SDA</text>
+<text x="1365" y="975" class="note" text-anchor="middle">SCL</text>
+<text x="1405" y="975" class="note" text-anchor="middle">VCC</text>
+<text x="1196" y="1022" class="hdr">OLED (optional)</text>
+<text x="1196" y="1046" class="sub">SSD1306 · I2C · 3.3 V</text>
+<path d="M1300 830 H1325 V950" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1300 856 H1365 V950" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1405 800 V950" fill="none" stroke="#c29b00" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1405" cy="800" r="6" fill="#c29b00"/>
+<path d="M1250 1070 V1084" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="1236" y1="1084" x2="1264" y2="1084" stroke="#22252a" stroke-width="3"/>
+<line x1="1241" y1="1090" x2="1259" y2="1090" stroke="#22252a" stroke-width="3"/>
+<line x1="1246" y1="1096" x2="1254" y2="1096" stroke="#22252a" stroke-width="3"/>
+<rect x="1450" y="880" width="290" height="180" rx="10" fill="#fff4e5" stroke="#e07b1f" stroke-width="2"/>
+<text x="1466" y="912" class="hdr" style="fill:#a35400">Before power-up</text>
+<text x="1466" y="942" class="note">• Never connect USB and the</text>
+<text x="1466" y="964" class="note">   5 V converter at the same time</text>
+<text x="1466" y="986" class="note">• Check the motor voltage rating</text>
+<text x="1466" y="1008" class="note">   against 12.6 V full charge</text>
+<text x="1466" y="1030" class="note">• Wheels off for the first tests</text>
+<rect x="40" y="720" width="320" height="140" rx="10" fill="#fff" stroke="#d8dbe0"/>
+<path d="M56 748 H90" fill="none" stroke="#d1342f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="100" y="753" class="leg">Battery (VBAT)</text>
+<path d="M56 776 H90" fill="none" stroke="#e07b1f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="100" y="781" class="leg">+5 V</text>
+<path d="M56 804 H90" fill="none" stroke="#c29b00" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="100" y="809" class="leg">+3.3 V</text>
+<path d="M56 832 H90" fill="none" stroke="#22252a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="100" y="837" class="leg">Ground</text>
+<path d="M226 748 H260" fill="none" stroke="#2a6fb5" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="270" y="753" class="leg">Signal</text>
+<path d="M226 776 H260" fill="none" stroke="#7a4fb0" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="270" y="781" class="leg">Motor</text>
+<path d="M226 804 H260" fill="none" stroke="#2f9a5a" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="270" y="809" class="leg">Battery sense</text>
+</svg>

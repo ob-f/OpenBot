@@ -49,7 +49,7 @@ class VehicleControl: UIView {
         refreshSpeedButton()
         createRpm()
         speedInRpm.text = bluetooth.getFormattedRpmShort()
-        createLabel(text: Strings.controller, bottomAnchor: 0, leadingAnchor: width / 2 - 100, isBoldNeeded: true)
+        createLabel(text: Strings.controller, bottomAnchor: 0, leadingAnchor: width / 2 - 110, isBoldNeeded: true)
         createLabel(text: Strings.driveMode, bottomAnchor: 0, leadingAnchor: width / 2 - 30, isBoldNeeded: true)
         createLabel(text: Strings.speed, bottomAnchor: 0, leadingAnchor: width / 2 + 50, isBoldNeeded: true)
         NotificationCenter.default.addObserver(self, selector: #selector(toggleAutoMode), name: .autoMode, object: nil)
@@ -72,7 +72,7 @@ class VehicleControl: UIView {
     /// UI function to set the constraint
     func setupVehicleControl() {
         widthAnchor.constraint(equalToConstant: width).isActive = true;
-        heightAnchor.constraint(equalToConstant: 80).isActive = true;
+        heightAnchor.constraint(equalToConstant: 92).isActive = true;
     }
 
     /// UI function to create a button with following
@@ -112,7 +112,7 @@ class VehicleControl: UIView {
             if (controlMode == ControlMode.GAMEPAD) {
                 controlMode = ControlMode.PHONE;
                 driveMode = DriveMode.DUAL;
-                createAndUpdateButton(iconName: Images.phoneIcon!, leadingAnchor: width / 2 - 100, topAnchor: 0, action: #selector(updateControlMode(_:)), activated: true);
+                createAndUpdateButton(iconName: Images.phoneIcon!, leadingAnchor: width / 2 - 110, topAnchor: 0, action: #selector(updateControlMode(_:)), activated: true);
                 createAndUpdateButton(iconName: Images.dualDriveIcon!, leadingAnchor: width / 2 - 30, topAnchor: 0, action: #selector(updateDriveMode(_:)), activated: false);
                 client.start();
                 let msg = JSON.toString(ConnectionActiveEvent(status: .init(CONNECTION_ACTIVE: "true")));
@@ -122,7 +122,7 @@ class VehicleControl: UIView {
             else if(controlMode == ControlMode.PHONE) {
                 controlMode = ControlMode.WEB;
                 driveMode = DriveMode.GAME;
-                createAndUpdateButton(iconName: Images.webIcon!.withTintColor(.white), leadingAnchor: width / 2 - 100, topAnchor: 0, action: #selector(updateControlMode(_:)), activated: true);
+                createAndUpdateButton(iconName: Images.webIcon!.withTintColor(.white), leadingAnchor: width / 2 - 110, topAnchor: 0, action: #selector(updateControlMode(_:)), activated: true);
                 createAndUpdateButton(iconName: Images.gameDriveIcon!, leadingAnchor: width / 2 - 30, topAnchor: 0, action: #selector(updateDriveMode(_:)), activated: false);
                 let msg = JSON.toString(ConnectionActiveEvent(status: .init(CONNECTION_ACTIVE: "false")));
                 client.send(message: msg);
@@ -136,7 +136,7 @@ class VehicleControl: UIView {
             }
             else{
                 controlMode = ControlMode.GAMEPAD;
-                createAndUpdateButton(iconName: Images.gamepadIcon!, leadingAnchor: width / 2 - 100, topAnchor: 0, action: #selector(updateControlMode(_:)), activated: true);
+                createAndUpdateButton(iconName: Images.gamepadIcon!, leadingAnchor: width / 2 - 110, topAnchor: 0, action: #selector(updateControlMode(_:)), activated: true);
                 createAndUpdateButton(iconName: Images.gameDriveIcon!, leadingAnchor: width / 2 - 30, topAnchor: 0, action: #selector(updateDriveMode(_:)), activated: true);
                 let msg = JSON.toString(ConnectionActiveEvent(status: .init(CONNECTION_ACTIVE: "false")));
                 client.send(message: msg);
@@ -217,9 +217,14 @@ class VehicleControl: UIView {
         if (isBoldNeeded) {
             label.font = UIFont.boldSystemFont(ofSize: 13.5)
         }
+        label.textAlignment = .center
+        label.wrapOrTruncate(width: 76)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: leadingAnchor).isActive = true
-        label.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: bottomAnchor).isActive = true
+        // Centered under its button.
+        label.widthAnchor.constraint(equalToConstant: 76).isActive = true
+        label.centerXAnchor.constraint(equalTo: self.leadingAnchor, constant: leadingAnchor + 30).isActive = true
+        // Top-aligned so line 1 of every label is level.
+        label.topAnchor.constraint(equalTo: self.topAnchor, constant: 62 + bottomAnchor).isActive = true
     }
 
     /// function to create the RPM message to display.
@@ -230,7 +235,7 @@ class VehicleControl: UIView {
         speedInRpm.font = speedLabel.font.withSize(13.5)
         speedInRpm.translatesAutoresizingMaskIntoConstraints = false
         speedInRpm.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-        speedInRpm.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -40).isActive = true
+        speedInRpm.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -52).isActive = true
     }
 
     /// function to toggle the auto mode.
@@ -269,7 +274,7 @@ class VehicleControl: UIView {
         case .FAST:
             icon = Images.fastIcon!
         }
-        createAndUpdateButton(iconName: icon, leadingAnchor: width / 2 + 40, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true)
+        createAndUpdateButton(iconName: icon, leadingAnchor: width / 2 + 50, topAnchor: 0, action: #selector(updateSpeedMode(_:)), activated: true)
         gameController.selectedSpeedMode = speedMode
     }
 
