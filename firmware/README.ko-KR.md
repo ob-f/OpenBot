@@ -17,7 +17,13 @@ MCU의 주요 작업은 차량의 저수준 제어를 처리하고 차량에 장
 
 ## 설정
 
-모든 설정은 `openbot.ino` 맨 위의 **SETTINGS** 섹션에 있습니다. 그 아래는 바꿀 필요가 없습니다.
+가장 쉬운 방법은 [tools.openbot.org/firmware](https://tools.openbot.org/firmware/)입니다. 로봇과 부품을 선택한 다음 브라우저(컴퓨터의 Chrome 또는 Edge)에서 바로 펌웨어를 플래시하거나 Arduino IDE용 설정 파일을 다운로드하세요. 이 페이지는 배터리, 부품, 휴대폰 사용 여부를 로봇 자체에 설정하므로, 미리 빌드된 펌웨어를 컴파일 없이 로봇에 맞게 사용할 수 있습니다. 이후 변경은 플래시할 필요가 없습니다. **Update settings only**가 로봇으로 보냅니다. ESP32에서는 미리 빌드된 펌웨어에 바디에 핀이 있는 모든 부품이 들어 있으며, 사용하지 않는 부품은 꺼진 상태로 유지됩니다.
+
+<p align="center">
+  <a href="https://tools.openbot.org/firmware/"><img src="../docs/images/firmware_setup_page.jpg" width="800" alt="Firmware setup page" /></a>
+</p>
+
+펌웨어를 직접 설정하는 경우, 모든 설정은 `openbot.ino` 맨 위의 **SETTINGS** 섹션에 있습니다. 그 아래는 바꿀 필요가 없습니다.
 
 펌웨어를 업데이트할 때 설정을 유지하려면 SETTINGS 섹션의 `#else`와 `#endif` 사이 줄을 `openbot.ino` 옆의 새 파일 `openbot_settings.h`에 복사하고 거기서 바꾸세요. `openbot_settings.h`가 있으면 펌웨어는 `openbot.ino`의 섹션 대신 이 파일을 사용하며, git이 이 파일을 무시하므로 실수로 푸시되지 않습니다.
 

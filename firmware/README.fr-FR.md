@@ -17,7 +17,13 @@ La tâche principale du MCU est de gérer le contrôle de bas niveau du véhicul
 
 ## Configuration
 
-Tous les réglages se trouvent dans la section **SETTINGS** en haut de `openbot.ino`. Vous n'avez rien à modifier en dessous.
+Le plus simple est [tools.openbot.org/firmware](https://tools.openbot.org/firmware/) : choisissez votre robot et ses composants, puis flashez le firmware directement depuis le navigateur (Chrome ou Edge sur un ordinateur), ou téléchargez un fichier de réglages pour l'Arduino IDE. La page règle la batterie, les composants et le mode avec ou sans téléphone sur le robot lui-même, de sorte que le firmware prêt à l'emploi convient à votre robot sans compilation. Les modifications ultérieures ne nécessitent pas de flashage : **Update settings only** les envoie au robot. Sur l'ESP32, le firmware prêt à l'emploi intègre tous les composants pour lesquels le corps a des broches ; ceux que vous n'utilisez pas restent désactivés.
+
+<p align="center">
+  <a href="https://tools.openbot.org/firmware/"><img src="../docs/images/firmware_setup_page.jpg" width="800" alt="Firmware setup page" /></a>
+</p>
+
+Pour configurer le firmware vous-même : tous les réglages se trouvent dans la section **SETTINGS** en haut de `openbot.ino`. Vous n'avez rien à modifier en dessous.
 
 Pour conserver vos réglages lors d'une mise à jour du firmware, copiez les lignes de la section SETTINGS entre `#else` et `#endif` dans un nouveau fichier `openbot_settings.h` à côté de `openbot.ino`, et modifiez-les là. Si `openbot_settings.h` existe, le firmware l'utilise à la place de la section de `openbot.ino`, et git l'ignore, il n'est donc pas poussé par erreur.
 
