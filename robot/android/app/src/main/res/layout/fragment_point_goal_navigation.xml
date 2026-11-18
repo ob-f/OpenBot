@@ -11,4 +11,27 @@
     android:layout_height="match_parent"
     android:layout_gravity="center" />
 
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/start"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|center_horizontal"
+    android:layout_marginBottom="24dp"
+    android:contentDescription="@string/start"
+    android:src="@drawable/ic_play_arrow"
+    android:tint="@android:color/white"
+    android:visibility="gone" />
+
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/stop"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|center_horizontal"
+    android:layout_marginBottom="24dp"
+    android:backgroundTint="@android:color/holo_red_dark"
+    android:contentDescription="@string/stop"
+    android:src="@drawable/ic_stop"
+    android:tint="@android:color/white"
+    android:visibility="gone" />
+
 </FrameLayout>
