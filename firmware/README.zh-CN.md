@@ -17,7 +17,13 @@ MCU的主要任务是处理车辆的低级控制，并提供来自车辆安装�
 
 ## 设置
 
-所有设置都在 `openbot.ino` 顶部的 **SETTINGS** 部分。其下方的内容无需修改。
+最简单的方法是使用 [tools.openbot.org/firmware](https://tools.openbot.org/firmware/)：选择您的机器人及其部件，然后直接在浏览器（电脑上的 Chrome 或 Edge）中刷写固件，或下载用于 Arduino IDE 的设置文件。该页面会在机器人上设置电池、部件以及是否使用手机，因此无需编译，预编译固件即可适配您的机器人。之后的更改无需重新刷写：**Update settings only** 会将其发送到机器人。在 ESP32 上，预编译固件包含车身有引脚的所有部件；未使用的部件保持关闭。
+
+<p align="center">
+  <a href="https://tools.openbot.org/firmware/"><img src="../docs/images/firmware_setup_page.jpg" width="800" alt="Firmware setup page" /></a>
+</p>
+
+如需自行设置固件：所有设置都在 `openbot.ino` 顶部的 **SETTINGS** 部分。其下方的内容无需修改。
 
 为了在更新固件时保留您的设置，请将 SETTINGS 部分中 `#else` 和 `#endif` 之间的行复制到 `openbot.ino` 旁边的新文件 `openbot_settings.h` 中，并在那里修改。如果存在 `openbot_settings.h`，固件会使用它代替 `openbot.ino` 中的部分；git 会忽略该文件，因此不会被误推送。
 

@@ -17,7 +17,13 @@ Die Hauptaufgabe der MCU besteht darin, die Steuerung des Fahrzeugs auf niedrige
 
 ## Einrichtung
 
-Alle Einstellungen stehen im Abschnitt **SETTINGS** ganz oben in `openbot.ino`. Darunter müssen Sie nichts ändern.
+Am einfachsten geht es über [tools.openbot.org/firmware](https://tools.openbot.org/firmware/): Wählen Sie Ihren Roboter und seine Teile, flashen Sie die Firmware dann direkt aus dem Browser (Chrome oder Edge auf einem Computer) oder laden Sie eine Einstellungsdatei für die Arduino IDE herunter. Die Seite stellt Akku, Teile und den Modus mit oder ohne Smartphone auf dem Roboter selbst ein, sodass die fertige Firmware ohne Kompilieren zu Ihrem Roboter passt. Spätere Änderungen brauchen kein Flashen: **Update settings only** sendet sie an den Roboter. Auf dem ESP32 enthält die fertige Firmware alle Teile, für die der Körper Pins hat; die nicht genutzten bleiben aus.
+
+<p align="center">
+  <a href="https://tools.openbot.org/firmware/"><img src="../docs/images/firmware_setup_page.jpg" width="800" alt="Firmware setup page" /></a>
+</p>
+
+Um die Firmware selbst einzurichten: Alle Einstellungen stehen im Abschnitt **SETTINGS** ganz oben in `openbot.ino`. Darunter müssen Sie nichts ändern.
 
 Damit Ihre Einstellungen bei einem Firmware-Update erhalten bleiben, kopieren Sie die Zeilen des SETTINGS-Abschnitts zwischen `#else` und `#endif` in eine neue Datei `openbot_settings.h` neben `openbot.ino` und ändern Sie sie dort. Wenn `openbot_settings.h` existiert, verwendet die Firmware sie statt des Abschnitts in `openbot.ino`. Git ignoriert die Datei, sodass sie nicht versehentlich gepusht wird.
 
