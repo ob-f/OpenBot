@@ -41,7 +41,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            // R8 shrinks and obfuscates release code (Play DEX optimization check).
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (project.hasProperty('android.injected.signing.store.file')) {
                 signingConfig signingConfigs.release
