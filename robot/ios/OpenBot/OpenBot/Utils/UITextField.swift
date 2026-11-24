@@ -10,7 +10,7 @@ class CustomTextField: UITextField {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        textColor = UIColor(named: "gamepad")
+        textColor = .label
         // Set the border color and width
         layer.masksToBounds = true
         layer.borderColor = UIColor(red: 0/255, green: 113/255, blue: 197/255, alpha: 0.4).cgColor
