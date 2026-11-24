@@ -631,9 +631,9 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
 
     @objc func updateConnect(_ notification: Notification) {
         if (isBluetoothConnected) {
-            bluetoothIcon.image = Images.bluetoothConnected
+            bluetoothIcon.image = Images.bluetoothConnected_v2
         } else {
-            bluetoothIcon.image = Images.bluetoothDisconnected
+            bluetoothIcon.image = Images.bluetoothDisconnected_v2
         }
     }
 

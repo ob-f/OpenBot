@@ -202,7 +202,7 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
      Function to setup bluetooth icon
      */
     private func setupBluetoothIcon() {
-        bluetoothIcon.image = isBluetoothConnected ? Images.bluetoothConnected : Images.bluetoothDisconnected;
+        bluetoothIcon.image = isBluetoothConnected ? Images.bluetoothConnected_v2 : Images.bluetoothDisconnected_v2;
         bluetoothIcon.isUserInteractionEnabled = true;
         let tap = UITapGestureRecognizer(target: self, action: #selector(ble))
         bluetoothIcon.addGestureRecognizer(tap)
@@ -523,9 +523,9 @@ class projectFragment: UIViewController, UICollectionViewDataSource, UICollectio
     /// - Parameter notification:
     @objc func updateConnect(_ notification: Notification) {
         if (isBluetoothConnected) {
-            bluetoothIcon.image = Images.bluetoothConnected
+            bluetoothIcon.image = Images.bluetoothConnected_v2
         } else {
-            bluetoothIcon.image = Images.bluetoothDisconnected
+            bluetoothIcon.image = Images.bluetoothDisconnected_v2
         }
     }
 
