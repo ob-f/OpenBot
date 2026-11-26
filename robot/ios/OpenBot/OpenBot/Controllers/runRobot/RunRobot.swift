@@ -68,10 +68,12 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
         setUpUI();
         stopRobot.backgroundColor = Colors.title;
         stopRobot.setTitle(Strings.stopRobotButton, for: .normal);
+        stopRobot.setTitleColor(.white, for: .normal);
         stopRobot.addTarget(self, action: #selector(cancel), for: .touchUpInside);
         stopRobot.layer.cornerRadius = 10;
         resetRobot.backgroundColor = Colors.title
         resetRobot.setTitle(Strings.resetRobotButton, for: .normal);
+        resetRobot.setTitleColor(.white, for: .normal);
         resetRobot.addTarget(self, action: #selector(resetRobotFunction), for: .touchUpInside);
         resetRobot.layer.cornerRadius = 10;
         NotificationCenter.default.addObserver(self, selector: #selector(updateCommandMsg), name: .commandName, object: nil);
@@ -160,6 +162,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
      */
     func setUpLabel(){
         commandMessage.text = Strings.codeExecuting;
+        commandMessage.textColor = .white;
         commandMessage.translatesAutoresizingMaskIntoConstraints = false;
         if currentOrientation == .portrait {
             topLabelConstraint = commandMessage.topAnchor.constraint(equalTo: view.topAnchor, constant: 450)
