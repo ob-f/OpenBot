@@ -162,7 +162,6 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
      */
     func setUpLabel(){
         commandMessage.text = Strings.codeExecuting;
-        commandMessage.textColor = .white;
         commandMessage.translatesAutoresizingMaskIntoConstraints = false;
         if currentOrientation == .portrait {
             topLabelConstraint = commandMessage.topAnchor.constraint(equalTo: view.topAnchor, constant: 450)
