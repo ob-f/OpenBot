@@ -239,7 +239,8 @@ class ModelManagementTable: UITableViewController {
     func createAddModelButton() {
         let addModel = UIButton();
         view.addSubview(addModel);
-        addModel.backgroundColor = .blue;
+        addModel.backgroundColor = .label;
+        addModel.tintColor = .systemBackground
         addModel.setImage(Images.plus, for: .normal)
         addModel.translatesAutoresizingMaskIntoConstraints = false;
         addModel.layer.cornerRadius = 10;

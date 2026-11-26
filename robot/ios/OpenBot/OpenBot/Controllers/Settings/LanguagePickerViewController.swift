@@ -21,7 +21,7 @@ final class LanguagePickerViewController: UIViewController, UITableViewDataSourc
         super.viewDidLoad()
         modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        view.backgroundColor = UIColor { $0.userInterfaceStyle == .dark ? UIColor.black.withAlphaComponent(0.4) : UIColor(red: 0.929, green: 0.953, blue: 0.984, alpha: 1) }
 
         setupCard()
         setupTitleLabel()
@@ -84,9 +84,9 @@ final class LanguagePickerViewController: UIViewController, UITableViewDataSourc
 
     private func setupCancelButton() {
         cancelButton.setTitle(Strings.cancel, for: .normal)
-        cancelButton.setTitleColor(.label, for: .normal)
+        cancelButton.setTitleColor(UIColor { $0.userInterfaceStyle == .dark ? .black : .white }, for: .normal)
         cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-        cancelButton.backgroundColor = .systemGray4
+        cancelButton.backgroundColor = Colors.title
         cancelButton.layer.cornerRadius = 8
         cancelButton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
@@ -113,7 +113,7 @@ final class LanguagePickerViewController: UIViewController, UITableViewDataSourc
         let option = options[indexPath.row]
         cell.textLabel?.text = "\(option.flagEmoji)  \(option.displayName)"
         cell.textLabel?.textColor = Colors.border
-        cell.tintColor = .white
+        cell.tintColor = .label
         cell.accessoryType = option.tag == selectedTag ? .checkmark : .none
         cell.selectionStyle = .default
         return cell

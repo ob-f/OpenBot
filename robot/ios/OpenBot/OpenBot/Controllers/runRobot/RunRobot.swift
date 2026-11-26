@@ -68,10 +68,12 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
         setUpUI();
         stopRobot.backgroundColor = Colors.title;
         stopRobot.setTitle(Strings.stopRobotButton, for: .normal);
+        stopRobot.setTitleColor(.white, for: .normal);
         stopRobot.addTarget(self, action: #selector(cancel), for: .touchUpInside);
         stopRobot.layer.cornerRadius = 10;
         resetRobot.backgroundColor = Colors.title
         resetRobot.setTitle(Strings.resetRobotButton, for: .normal);
+        resetRobot.setTitleColor(.white, for: .normal);
         resetRobot.addTarget(self, action: #selector(resetRobotFunction), for: .touchUpInside);
         resetRobot.layer.cornerRadius = 10;
         NotificationCenter.default.addObserver(self, selector: #selector(updateCommandMsg), name: .commandName, object: nil);

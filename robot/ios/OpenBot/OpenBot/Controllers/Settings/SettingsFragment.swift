@@ -46,7 +46,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         createPermissionIcon(systemName: "mic.fill", topAnchor: adapted(dimensionSize: 250, to: .height))
         scrollView.addSubview(createLabel(text: Strings.bluetooth, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 300, to: .height)))
         createBluetoothSwitch()
-        createPermissionIcon(image: Images.bluetooth, tinted: false, topAnchor: adapted(dimensionSize: 300, to: .height))
+        createPermissionIcon(image: Images.bluetooth_v2, tinted: false, topAnchor: adapted(dimensionSize: 300, to: .height))
         scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 350, to: .height)))
         createWebSignalingServerField()
         updateSwitchPosition()

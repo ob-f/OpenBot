@@ -404,7 +404,7 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
             NotificationCenter.default.addObserver(self, selector: #selector(updateControllerValues), name: NSNotification.Name(rawValue: Strings.controllerConnected), object: nil);
             gameControllerObj = gameController
             gameController.selectedControlMode = ControlMode.GAMEPAD
-            gamePadController.backgroundColor = Colors.title
+            highlightMode(gamePadController, Colors.title)
             let msg = JSON.toString(ConnectionActiveEvent(status: .init(CONNECTION_ACTIVE: "false")));
             client.send(message: msg);
             if(webRTCClient != nil){
@@ -414,7 +414,7 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
             gameControllerObj = nil;
             gameController.selectedControlMode = ControlMode.PHONE
             NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: Strings.controllerConnected), object: nil);
-            phoneController.backgroundColor = Colors.title
+            highlightMode(phoneController, Colors.title)
             client.start();
             let msg = JSON.toString(ConnectionActiveEvent(status: .init(CONNECTION_ACTIVE: "true")));
             client.send(message: msg);
@@ -422,7 +422,7 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
         else {
             gameControllerObj = nil;
             gameController.selectedControlMode = ControlMode.WEB
-            webController.backgroundColor = Colors.title
+            highlightMode(webController, Colors.title)
             client.start();
             let msg = JSON.toString(ConnectionActiveEvent(status: .init(CONNECTION_ACTIVE: "false")));
             client.send(message: msg);
@@ -447,19 +447,19 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
         let dual = createMode(x: 245, y: 145, width: Int(width / 4), label: Strings.dual, icon: "dual", action: #selector(dualMode(_:)))
         if selectedControlMode == ControlMode.PHONE {
             selectedDriveMode = DriveMode.DUAL
-            dual.backgroundColor = Colors.titleDeactivated
+            highlightMode(dual, Colors.titleDeactivated)
         }
         else if selectedControlMode == ControlMode.WEB{
             selectedDriveMode = DriveMode.GAME
-            game.backgroundColor = Colors.titleDeactivated;
+            highlightMode(game, Colors.titleDeactivated)
         }
         else {
             if selectedDriveMode == DriveMode.JOYSTICK {
-                joystick.backgroundColor = Colors.title
+                highlightMode(joystick, Colors.title)
             } else if selectedDriveMode == DriveMode.GAME {
-                game.backgroundColor = Colors.title
+                highlightMode(game, Colors.title)
             } else if selectedDriveMode == DriveMode.DUAL {
-                dual.backgroundColor = Colors.title
+                highlightMode(dual, Colors.title)
             }
         }
         gameController.selectedDriveMode = selectedDriveMode
@@ -495,11 +495,11 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
         let mediumMode = createMode(x: 140, y: 242, width: Int(width / 4), label: Strings.medium, icon: "medium", action: #selector(medium(_:)))
         let fastMode = createMode(x: 245, y: 242, width: Int(width / 4), label: Strings.fast, icon: "fast", action: #selector(fast(_:)))
         if selectedSpeedMode == SpeedMode.SLOW {
-            slowMode.backgroundColor = Colors.title
+            highlightMode(slowMode, Colors.title)
         } else if selectedSpeedMode == SpeedMode.NORMAL {
-            mediumMode.backgroundColor = Colors.title
+            highlightMode(mediumMode, Colors.title)
         } else {
-            fastMode.backgroundColor = Colors.title
+            highlightMode(fastMode, Colors.title)
         }
         gameController.selectedSpeedMode = selectedSpeedMode;
         secondView.addSubview(slowMode)
@@ -544,14 +544,14 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
         modeRectangle.backgroundColor = Colors.freeRoamButtonsColor
         let modeRectangleLabel = UILabel(frame: CGRect(x: 10, y: 4, width: modeRectangle.frame.width * 0.62, height: 50))
         modeRectangleLabel.text = label
-        modeRectangleLabel.textColor = .white
+        modeRectangleLabel.textColor = .label
         modeRectangleLabel.font = modeRectangleLabel.font.withSize(13)
         modeRectangleLabel.wrapOrTruncate(width: modeRectangle.frame.width * 0.62)
         modeRectangle.addSubview(modeRectangleLabel)
         let modeIcon = UIImageView(frame: CGRect(x: modeRectangle.frame.width - 12.8 - modeRectangle.frame.width / 10, y: modeRectangle.frame.height / 3, width: 19, height: 19))
         if let image = UIImage(named: icon)?.withRenderingMode(.alwaysTemplate) {
             modeIcon.image = image
-            modeIcon.tintColor = .white
+            modeIcon.tintColor = .label
         }        
         let tapGesture = UITapGestureRecognizer(target: self, action: action)
         tapGesture.delegate = self
@@ -559,6 +559,15 @@ class FreeRoamController: CameraController, UIGestureRecognizerDelegate {
         modeRectangle.addSubview(modeIcon)
         modeRectangle.layer.borderColor = .none
         return modeRectangle
+    }
+
+    /// Selected mode button: colored background with white label and icon
+    func highlightMode(_ view: UIView, _ color: UIColor?) {
+        view.backgroundColor = color
+        for subview in view.subviews {
+            (subview as? UILabel)?.textColor = .white
+            (subview as? UIImageView)?.tintColor = .white
+        }
     }
 
     /// update the screen values

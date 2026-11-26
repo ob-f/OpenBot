@@ -90,6 +90,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         let vehicleControls = VehicleControl();
         createLeftSpeed()
         addSubview(vehicleControls)
+        vehicleControls.subviews.compactMap { $0 as? UILabel }.forEach { $0.textColor = .white }
         vehicleControls.translatesAutoresizingMaskIntoConstraints = false
         vehicleControls.topAnchor.constraint(equalTo: magnetic.safeAreaLayoutGuide.bottomAnchor, constant: adapted(dimensionSize: 13, to: .height)).isActive = true;
         vehicleControls.leadingAnchor.constraint(equalTo: secondView.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
@@ -135,11 +136,12 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     /// UI Function to create button for ble
     func createBluetoothIcon() {
         bluetoothIcon.frame.size = CGSize(width: 30, height: 30)
+        bluetoothIcon.tintColor = .white
         bluetoothIcon.translatesAutoresizingMaskIntoConstraints = false
         if isBluetoothConnected {
-            bluetoothIcon.image = Images.bluetoothConnected_v2
+            bluetoothIcon.image = Images.bluetoothConnected_v2?.withRenderingMode(.alwaysTemplate)
         } else {
-            bluetoothIcon.image = Images.bluetoothDisconnected_v2
+            bluetoothIcon.image = Images.bluetoothDisconnected_v2?.withRenderingMode(.alwaysTemplate)
         }
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ble(_:)))
         bluetoothIcon.isUserInteractionEnabled = true
@@ -153,7 +155,8 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     func createCameraIcon() {
         cameraIcon.frame.size = CGSize(width: 30, height: 30)
         cameraIcon.translatesAutoresizingMaskIntoConstraints = false
-        cameraIcon.image = Images.frontCamera
+        cameraIcon.image = Images.frontCamera?.withRenderingMode(.alwaysTemplate)
+        cameraIcon.tintColor = .white
         cameraIcon.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(reverseCamera(_:)))
         cameraIcon.addGestureRecognizer(tap)
@@ -259,7 +262,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         server.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true;
         server.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 230).isActive = true;
         serverDropDownLabel.text = Strings.noServer
-        serverDropDownLabel.textColor = Colors.border
+        serverDropDownLabel.textColor = .white
         serverDropDownLabel.frame = CGRect(x: 10, y: 0, width: 210, height: 40)
         server.addSubview(serverDropDownLabel);
         server.isUserInteractionEnabled = true;
@@ -371,6 +374,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         let delayTextField = UITextField(frame: CGRect(x: 310, y: 217, width: 50, height: 40))
         delayTextField.placeholder = "200"
         delayTextField.font = UIFont.systemFont(ofSize: 15)
+        delayTextField.textColor = .white
         delayTextField.borderStyle = UITextField.BorderStyle.roundedRect
         delayTextField.autocorrectionType = UITextAutocorrectionType.no
         delayTextField.keyboardType = UIKeyboardType.phonePad
@@ -415,7 +419,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         dd.layer.cornerRadius = 10
         dd.backgroundColor = Colors.freeRoamButtonsColor
         dropdownLabel.text = buttonName
-        dropdownLabel.textColor = Colors.border
+        dropdownLabel.textColor = .white
         let tap = UITapGestureRecognizer(target: self, action: action)
         dd.addGestureRecognizer(tap)
         addSubview(dd)
@@ -436,7 +440,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         label.font = UIFont(name: "medium", size: adapted(dimensionSize: 30, to: .width))
         label.frame.size = CGSize(width: labelWidth, height: labelHeight)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black;
+        label.textColor = .white
         label.font = label.font.withSize(15)
         addSubview(label)
         label.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: topAnchor).isActive = true
@@ -451,7 +455,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         label.font = UIFont(name: "medium", size: adapted(dimensionSize: 30, to: .width))
         label.frame.size = CGSize(width: labelWidth, height: labelHeight)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black;
+        label.textColor = .white
         label.font = label.font.withSize(15)
         secondView.addSubview(label)
         label.topAnchor.constraint(equalTo: secondView.topAnchor, constant: topAnchor).isActive = true
@@ -489,6 +493,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         leftSpeedLabel.frame.size = CGSize(width: 100, height: 40);
         leftSpeedLabel.frame.origin = CGPoint(x: 10, y: 280)
         leftSpeedLabel.text = "xxx,xxx"
+        leftSpeedLabel.textColor = .white
         secondView.addSubview(leftSpeedLabel)
         leftSpeedLabel.font = leftSpeedLabel.font.withSize(13.5)
     }
@@ -554,19 +559,16 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     /// Function to update resolutions
     @objc func updateResolution() {
 
-        switch (selectedResolution) {
-        case .LOW:
-            low.backgroundColor = Colors.title
-            medium.backgroundColor = Colors.freeRoamButtonsColor
-            high.backgroundColor = Colors.freeRoamButtonsColor
-        case .MEDIUM:
-            low.backgroundColor = Colors.freeRoamButtonsColor
-            medium.backgroundColor = Colors.title
-            high.backgroundColor = Colors.freeRoamButtonsColor
-        case .HIGH:
-            low.backgroundColor = Colors.freeRoamButtonsColor
-            medium.backgroundColor = Colors.freeRoamButtonsColor
-            high.backgroundColor = Colors.title
+        highlightResolution(low, selected: selectedResolution == .LOW)
+        highlightResolution(medium, selected: selectedResolution == .MEDIUM)
+        highlightResolution(high, selected: selectedResolution == .HIGH)
+    }
+
+    /// Selected resolution button: blue background with white text, otherwise the default style
+    func highlightResolution(_ button: UIButton, selected: Bool) {
+        button.backgroundColor = selected ? Colors.title : Colors.freeRoamButtonsColor
+        for case let label as UILabel in button.subviews {
+            label.textColor = selected ? .white : Colors.border
         }
     }
 
@@ -631,9 +633,9 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
 
     @objc func updateConnect(_ notification: Notification) {
         if (isBluetoothConnected) {
-            bluetoothIcon.image = Images.bluetoothConnected
+            bluetoothIcon.image = Images.bluetoothConnected_v2?.withRenderingMode(.alwaysTemplate)
         } else {
-            bluetoothIcon.image = Images.bluetoothDisconnected
+            bluetoothIcon.image = Images.bluetoothDisconnected_v2?.withRenderingMode(.alwaysTemplate)
         }
     }
 
@@ -681,7 +683,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
         dd.layer.cornerRadius = 10;
         dd.backgroundColor = Colors.title;
         saveAsDropdownLabel.text = buttonName;
-        saveAsDropdownLabel.textColor = Colors.border
+        saveAsDropdownLabel.textColor = .white
         let tap = UITapGestureRecognizer(target: self, action: action)
         dd.addGestureRecognizer(tap)
         secondView.addSubview(dd);

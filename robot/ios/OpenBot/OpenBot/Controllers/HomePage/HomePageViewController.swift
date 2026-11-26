@@ -48,6 +48,9 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBarItem.title = Strings.homeTab
+        // Settings gear: black in light mode, white in dark mode
+        settings.setImage(Images.settings?.withRenderingMode(.alwaysTemplate), for: .normal)
+        settings.tintColor = .label
 
         UITabBar.appearance().tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black;
         bluetoothDataController.shared.startScan()
@@ -129,11 +132,11 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
         DeviceCurrentOrientation.shared.findDeviceOrientation()
         viewControllerName = classNameFrom(self)
         if (isBluetoothConnected) {
-            bluetooth.setImage(Images.bluetoothConnected, for: .normal)
+            bluetooth.setImage(Images.bluetoothConnected_v2, for: .normal)
             bluetoothDataController.shared.sendData(payload: "c" + String(0) + "," + String(0) + "\n")
 
         } else {
-            bluetooth.setImage(Images.bluetoothDisconnected, for: .normal)
+            bluetooth.setImage(Images.bluetoothDisconnected_v2, for: .normal)
         }
         gameController.resetControl = true
     }
@@ -179,10 +182,10 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
 
     @objc func updateConnect(_ notification: Notification) {
         if (isBluetoothConnected) {
-            bluetooth.setImage(Images.bluetoothConnected, for: .normal)
+            bluetooth.setImage(Images.bluetoothConnected_v2, for: .normal)
             bluetoothDataController.shared.sendData(payload: "c" + String(0) + "," + String(0) + "\n")
         } else {
-            bluetooth.setImage(Images.bluetoothDisconnected, for: .normal)
+            bluetooth.setImage(Images.bluetoothDisconnected_v2, for: .normal)
         }
     }
 

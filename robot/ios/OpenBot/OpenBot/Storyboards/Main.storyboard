@@ -228,7 +228,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kGN-Gy-879">
                                 <rect key="frame" x="280" y="92" width="45" height="45"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bluetoothConnected" translatesAutoresizingMaskIntoConstraints="NO" id="yiM-4h-xvS">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bluetoothConnected_v2" translatesAutoresizingMaskIntoConstraints="NO" id="yiM-4h-xvS">
                                         <rect key="frame" x="10" y="10" width="25" height="25"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="24" id="J8P-QY-cgP"/>
@@ -330,7 +330,7 @@
                             <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5sD-Bh-gBz">
                                 <rect key="frame" x="293" y="96" width="48" height="38"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" image="bluetoothConnected" title="" imagePadding="0.0">
+                                <buttonConfiguration key="configuration" style="plain" image="bluetoothConnected_v2" title="" imagePadding="0.0">
                                     <color key="baseForegroundColor" name="HomePageTitleColor"/>
                                 </buttonConfiguration>
                                 <connections>
@@ -399,13 +399,13 @@
                             <constraint firstItem="cJk-CX-n1c" firstAttribute="centerX" secondItem="yc1-Db-SC8" secondAttribute="centerX" id="BO6-80-i6k"/>
                             <constraint firstItem="gJj-cG-iuu" firstAttribute="top" secondItem="P4B-f4-UdK" secondAttribute="top" id="BTa-cL-bmc"/>
                             <constraint firstItem="f0H-Wf-1Xn" firstAttribute="leading" secondItem="5sD-Bh-gBz" secondAttribute="trailing" id="Cvj-Lc-Tqn"/>
-                            <constraint firstItem="cJk-CX-n1c" firstAttribute="top" secondItem="f0H-Wf-1Xn" secondAttribute="bottom" constant="13" id="JwB-zo-Tya"/>
+                            <constraint firstItem="cJk-CX-n1c" firstAttribute="top" secondItem="f0H-Wf-1Xn" secondAttribute="bottom" constant="10.5" id="JwB-zo-Tya"/>
                             <constraint firstItem="cJk-CX-n1c" firstAttribute="leading" secondItem="P4B-f4-UdK" secondAttribute="leading" id="LoT-CS-gFv"/>
                             <constraint firstItem="5sD-Bh-gBz" firstAttribute="leading" secondItem="gJj-cG-iuu" secondAttribute="trailing" constant="20" id="V6e-tW-EN9"/>
                             <constraint firstItem="5sD-Bh-gBz" firstAttribute="top" secondItem="P4B-f4-UdK" secondAttribute="top" constant="4" id="Wby-9T-xZR"/>
                             <constraint firstItem="P4B-f4-UdK" firstAttribute="trailing" secondItem="f0H-Wf-1Xn" secondAttribute="trailing" constant="10" id="dmJ-E3-a4v"/>
                             <constraint firstItem="ksi-ku-dkS" firstAttribute="leading" secondItem="P4B-f4-UdK" secondAttribute="leading" constant="12" id="eXh-Cq-5wb"/>
-                            <constraint firstItem="f0H-Wf-1Xn" firstAttribute="top" secondItem="P4B-f4-UdK" secondAttribute="top" constant="-6" id="wdv-gx-vS8"/>
+                            <constraint firstItem="f0H-Wf-1Xn" firstAttribute="top" secondItem="P4B-f4-UdK" secondAttribute="top" constant="-3.5" id="wdv-gx-vS8"/>
                             <constraint firstItem="P4B-f4-UdK" firstAttribute="bottom" secondItem="cJk-CX-n1c" secondAttribute="bottom" id="wg5-Od-Bjb"/>
                         </constraints>
                     </view>
@@ -658,7 +658,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="bluetoothConnected" width="24" height="24"/>
+        <image name="bluetoothConnected_v2" width="24" height="24"/>
         <image name="controller" width="444.66665649414062" height="405.66665649414062"/>
         <image name="home" width="22" height="22"/>
         <image name="ic_openbot" width="72" height="72"/>
